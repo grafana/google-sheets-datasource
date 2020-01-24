@@ -1,4 +1,4 @@
-DSNAME=test-datasource
+DSNAME=sheets-datasource
 GO = GO111MODULE=on go
 all: build-frontend build
 

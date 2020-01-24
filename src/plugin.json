@@ -1,38 +1,26 @@
 {
   "type": "datasource",
-  "name": "test-datasource",
-  "id": "grafana-test-datasource",
+  "name": "Google Sheets",
+  "id": "google-sheets-datasource",
   "backend": true,
-  "executable": "test-datasource",
+  "executable": "sheets-datasource",
   "metrics": true,
 
-  "includes": [
-    {
-      "type": "dashboard",
-      "name": "Grafana Test Datasource Stats",
-      "path": "dashboards/stats.json"
-    }
-  ],
-
   "info": {
-    "description": "Generate testdata as a V2 backend datasource plugin",
+    "description": "Show data from google sheets",
     "author": {
       "name": "Grafana Labs",
       "url": "https://grafana.com"
     },
     "keywords": [],
     "logos": {
-      "small": "img/logo.svg",
-      "large": "img/logo.svg"
+      "small": "img/sheets.svg",
+      "large": "img/sheets.svg"
     },
     "links": [
       {
         "name": "Website",
-        "url": "https://github.com/grafana/simple-datasource"
-      },
-      {
-        "name": "License",
-        "url": "https://github.com/grafana/simple-datasource/blob/master/LICENSE"
+        "url": "https://github.com/grafana/google-sheets-datasource"
       }
     ],
     "screenshots": [],

@@ -1,10 +1,10 @@
 import { DataSourceInstanceSettings } from '@grafana/data';
 import { getBackendSrv, DataSourceWithBackend } from '@grafana/runtime';
 
-import { MyQuery, MyDataSourceOptions } from './types';
+import { SheetsQuery, SheetsSourceOptions } from './types';
 
-export class DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOptions> {
-  constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
+export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceOptions> {
+  constructor(instanceSettings: DataSourceInstanceSettings<SheetsSourceOptions>) {
     super(instanceSettings);
   }
 

@@ -1,13 +1,11 @@
 import React, { PureComponent } from 'react';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { MyDataSourceOptions } from './types';
+import { SheetsSourceOptions } from './types';
 
-export type Props = DataSourcePluginOptionsEditorProps<MyDataSourceOptions>;
+export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions>;
 
 export class ConfigEditor extends PureComponent<Props> {
   render() {
-    // No options yet... may a global seed?
-
-    return <div className="gf-form-group">&nbsp;</div>;
+    return <div className="gf-form-group">TODO... enter JWT etc</div>;
   }
 }

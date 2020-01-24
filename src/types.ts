@@ -1,27 +1,39 @@
-import { DataQuery, DataSourceJsonData, QueryEditorProps, SelectableValue } from '@grafana/data';
-import { ComponentType } from 'react';
+import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
-export enum Scenario {
-  wave = 'wave',
-  noise = 'noise',
-  arrowFile = 'arrowFile',
-  csvWave = 'csvWave',
+//-------------------------------------------------------------------------------
+// General google cloud auth types
+// same as stackdriver etc
+//-------------------------------------------------------------------------------
+
+export interface JWT {
+  private_key: any;
+  token_uri: any;
+  client_email: any;
+  project_id: any;
 }
 
-export interface MyQuery extends DataQuery {
-  scenario: Scenario;
+export enum GoogleAuthType {
+  JWT = 'jwt',
+  GCE = 'gce',
 }
 
-// NOTE: the actual implementations are defined in
+export const googleAuthTypes = [
+  { label: 'Google JWT File', value: GoogleAuthType.JWT },
+  { label: 'GCE Default Service Account', value: GoogleAuthType.GCE },
+];
 
-export type ScenarioEditorProps<T extends MyQuery> = QueryEditorProps<any, T, MyDataSourceOptions>;
-
-export interface ScenarioProvider<T extends MyQuery> extends SelectableValue<Scenario> {
-  defaultQuery: Partial<T>;
-  editor: ComponentType<ScenarioEditorProps<T>>;
+export interface GoogleCloundOptions extends DataSourceJsonData {
+  authenticationType: GoogleAuthType;
 }
 
-/**
- * These are options configured for each DataSource instance
- */
-export interface MyDataSourceOptions extends DataSourceJsonData {}
+//-------------------------------------------------------------------------------
+// The Sheets specicif types
+//-------------------------------------------------------------------------------
+export interface GoogleSheetRangeInfo {
+  spreadsheetId: string;
+  range: string;
+}
+
+export interface SheetsQuery extends DataQuery, GoogleSheetRangeInfo {}
+
+export interface SheetsSourceOptions extends GoogleCloundOptions {}
