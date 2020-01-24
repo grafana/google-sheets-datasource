@@ -1,0 +1,20 @@
+{
+  "name": "google-sheets-datasource",
+  "version": "0.1.0",
+  "description": "Load data from google sheets",
+  "scripts": {
+    "build": "grafana-toolkit plugin:build",
+    "test": "grafana-toolkit plugin:test",
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch"
+  },
+  "author": "Grafana Labs",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/lodash": "latest",
+    "@grafana/data": "next",
+    "@grafana/toolkit": "next",
+    "@grafana/ui": "next",
+    "@grafana/runtime": "next"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "type": "datasource",
+  "name": "test-datasource",
+  "id": "grafana-test-datasource",
+  "backend": true,
+  "executable": "test-datasource",
+  "metrics": true,
+
+  "includes": [
+    {
+      "type": "dashboard",
+      "name": "Grafana Test Datasource Stats",
+      "path": "dashboards/stats.json"
+    }
+  ],
+
+  "info": {
+    "description": "Generate testdata as a V2 backend datasource plugin",
+    "author": {
+      "name": "Grafana Labs",
+      "url": "https://grafana.com"
+    },
+    "keywords": [],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {
+        "name": "Website",
+        "url": "https://github.com/grafana/simple-datasource"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/grafana/simple-datasource/blob/master/LICENSE"
+      }
+    ],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaVersion": "6.6.x",
+    "plugins": []
+  }
+}
