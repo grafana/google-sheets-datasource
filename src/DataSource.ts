@@ -1,5 +1,5 @@
 import { DataSourceInstanceSettings } from '@grafana/data';
-import { getBackendSrv, DataSourceWithBackend } from '@grafana/runtime';
+import { getBackendSrv, DataSourceWithBackend } from '@grafana/runtime'; //DataSourceWithBackend
 
 import { SheetsQuery, SheetsSourceOptions } from './types';
 
@@ -20,6 +20,7 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
             datasourceId: this.id,
             intervalMs: 1,
             maxDataPoints: 1,
+            queryType: 'testAPI',
           },
         ],
       })
