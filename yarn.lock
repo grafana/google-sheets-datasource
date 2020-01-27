@@ -872,18 +872,23 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@grafana/data@6.7.0-pre-ed140346a7", "@grafana/data@^6.7.0-pre-ed140346a7", "@grafana/data@canary":
+"@grafana/data@6.7.0-pre-3fabbbff4d", "@grafana/data@canary":
+  version "6.7.0-pre-3fabbbff4d"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.7.0-pre-3fabbbff4d.tgz#849784b4877c71a3649e4bae04fdab9d4f56d041"
+  integrity sha512-AJM1YpUBx8yHq8qWa4bV4oS0xgIIWaYwaQKSYL488uSYRLXxfNILa1Q5lpHQr8wZLjrOO3IKuTi6WdNuvZwgmQ==
+
+"@grafana/data@6.7.0-pre-ed140346a7", "@grafana/data@^6.7.0-pre-3fabbbff4d":
   version "6.7.0-pre-ed140346a7"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.7.0-pre-ed140346a7.tgz#55377037406473e17c8bb1bdfd59f91f922b125f"
   integrity sha512-vhaSJ8q4oL0wuVnyEsmGS6J2fVutFld4H+NdYdgvMhWSSfi/+T5By8lYxpKdU2x32e6KHBkg33YxgS9ic9xNeg==
 
 "@grafana/runtime@canary":
-  version "6.7.0-pre-ed140346a7"
-  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-6.7.0-pre-ed140346a7.tgz#dd7825711f21f1fc6c61daddd8da7bef30c4ea75"
-  integrity sha512-eFL85SrQjhIZnw/8l4/YpTus3vpn3vBr8u24Ubio6ygm7/5xBTQWG4TJMwNtOQuJSu5UJNrE+2vNXVZnOwuZRQ==
+  version "6.7.0-pre-3fabbbff4d"
+  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-6.7.0-pre-3fabbbff4d.tgz#2e6323aa17f828c6b34ea9a3edbc0d5092a76c70"
+  integrity sha512-phE8fRPPZj+1iqneu75PpkwGjBXvlZL9qxtY8R7dJByTVzhgPJWEZv7YA8Ulh7u+AdWGRtzK6RdebDA1bGU3jA==
   dependencies:
-    "@grafana/data" "6.7.0-pre-ed140346a7"
-    "@grafana/ui" "6.7.0-pre-ed140346a7"
+    "@grafana/data" "6.7.0-pre-3fabbbff4d"
+    "@grafana/ui" "6.7.0-pre-3fabbbff4d"
     systemjs "0.20.19"
     systemjs-plugin-css "0.1.37"
 
@@ -910,14 +915,14 @@
     tiny-warning "^0.0.3"
 
 "@grafana/toolkit@canary":
-  version "6.7.0-pre-ed140346a7"
-  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-6.7.0-pre-ed140346a7.tgz#d38297681782c1d528078f6107573c1af1e5a975"
-  integrity sha512-HHz8ny+HBRP+Nh7sE6zCZkZLKf2+woC9HgZvVpMWi0g4sthrASOauwhbzYn2PsSF33iIirGPC/cIBDxe8NAfiw==
+  version "6.7.0-pre-3fabbbff4d"
+  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-6.7.0-pre-3fabbbff4d.tgz#b35a8f18063949f09adde12c63a67cf0598ce913"
+  integrity sha512-CInNv+d9NpwKk4ZMJXXDKD7/ISg0Bog6ihynCOGhlgC5NZo7MLxvGUDpE8roKuaS+8FdqpkIc3paDNs6/1VR4w==
   dependencies:
     "@babel/core" "7.6.4"
     "@babel/preset-env" "7.6.3"
-    "@grafana/data" "^6.7.0-pre-ed140346a7"
-    "@grafana/ui" "^6.7.0-pre-ed140346a7"
+    "@grafana/data" "^6.7.0-pre-3fabbbff4d"
+    "@grafana/ui" "^6.7.0-pre-3fabbbff4d"
     "@types/command-exists" "^1.2.0"
     "@types/execa" "^0.9.0"
     "@types/expect-puppeteer" "3.3.1"
@@ -988,7 +993,46 @@
     url-loader "^2.0.1"
     webpack "4.35.0"
 
-"@grafana/ui@6.7.0-pre-ed140346a7", "@grafana/ui@^6.7.0-pre-ed140346a7", "@grafana/ui@canary":
+"@grafana/ui@6.7.0-pre-3fabbbff4d", "@grafana/ui@canary":
+  version "6.7.0-pre-3fabbbff4d"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-6.7.0-pre-3fabbbff4d.tgz#f4877daf694049c3f0b20ea27749c92183b47371"
+  integrity sha512-ctwvy14qkcinPrNlpvP5cAcM0c/TR8RPhYM9UkTJNZVrT6Pf6s5mogUAsMkmctoz5LSXXo5dvvx0gb7ddxxwfQ==
+  dependencies:
+    "@grafana/data" "6.7.0-pre-3fabbbff4d"
+    "@grafana/slate-react" "0.22.9-grafana"
+    "@torkelo/react-select" "2.1.1"
+    "@types/react-color" "2.17.0"
+    "@types/react-select" "2.0.15"
+    "@types/react-table" "7.0.2"
+    "@types/slate" "0.47.1"
+    "@types/slate-react" "0.22.5"
+    bizcharts "^3.5.5"
+    classnames "2.2.6"
+    d3 "5.15.0"
+    emotion "10.0.27"
+    immutable "3.8.2"
+    jquery "3.4.1"
+    lodash "4.17.15"
+    moment "2.24.0"
+    papaparse "4.6.3"
+    rc-cascader "0.17.5"
+    rc-drawer "3.0.2"
+    rc-time-picker "^3.7.2"
+    react "16.12.0"
+    react-calendar "2.18.1"
+    react-color "2.17.0"
+    react-custom-scrollbars "4.2.1"
+    react-dom "16.12.0"
+    react-highlight-words "0.11.0"
+    react-hook-form "4.5.3"
+    react-popper "1.3.3"
+    react-storybook-addon-props-combinations "1.1.0"
+    react-table "7.0.0-rc.15"
+    react-transition-group "2.6.1"
+    slate "0.47.8"
+    tinycolor2 "1.4.1"
+
+"@grafana/ui@^6.7.0-pre-3fabbbff4d":
   version "6.7.0-pre-ed140346a7"
   resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-6.7.0-pre-ed140346a7.tgz#2fb5acedff1107de250e0eb1ce517b07349e372c"
   integrity sha512-FkxQ2XcAFLFNCOpuH5JKL+AQPq51/QUF+pbcNVglDM1xYYtbnwmW5v4Y9LvITKpKgZ/mkR9/PfTbd2vv0NBVoA==
@@ -9537,9 +9581,9 @@ signal-exit@^3.0.0, signal-exit@^3.0.2:
   integrity sha1-tf3AjxKH6hF4Yo5BXiUTK3NkbG0=
 
 simple-git@^1.112.0:
-  version "1.130.0"
-  resolved "https://registry.yarnpkg.com/simple-git/-/simple-git-1.130.0.tgz#b689c4163bc021df563a81f256de54482005195d"
-  integrity sha512-gQsPA1uuAkGUa6S+yG4NRknKHVEV+Vnp437w8dJpDpzjtEH566WRSz5z6DoIxlBFaLC7Xwypznsuf1S/J0gtFg==
+  version "1.131.0"
+  resolved "https://registry.yarnpkg.com/simple-git/-/simple-git-1.131.0.tgz#68d85bf6a706e418b8a92cae765d2ad358781e21"
+  integrity sha512-z/art7YYtmPnnLItT/j+nKwJt6ap6nHZ4D8sYo9PdCKK/ug56SN6m/evfxJk7uDV3e9JuCa8qIyDU2P3cxmiNQ==
   dependencies:
     debug "^4.0.1"
 
