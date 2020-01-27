@@ -1,3 +1,5 @@
 node_modules
 datasource/vendor
 dist
+
+.env

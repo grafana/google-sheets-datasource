@@ -1,5 +1,7 @@
 grafana:
   image: grafana/grafana:6.6.0-beta1
+  env_file:
+    - .env
   ports:
     - '3090:3000'
   volumes:
