@@ -36,4 +36,10 @@ export interface GoogleSheetRangeInfo {
 
 export interface SheetsQuery extends DataQuery, GoogleSheetRangeInfo {}
 
-export interface SheetsSourceOptions extends GoogleCloundOptions {}
+export interface SheetsSourceOptions extends GoogleCloundOptions {
+}
+
+export interface GoogleSheetsSecureJsonData {
+  apiKey: string; 
+}
+
