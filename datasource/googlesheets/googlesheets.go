@@ -1,6 +1,8 @@
 package googlesheets
 
 import (
+	"fmt"
+
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"golang.org/x/net/context"
 	"google.golang.org/api/option"
@@ -8,17 +10,15 @@ import (
 )
 
 // Query function
-func Query(ctx context.Context, refID string, sheet GoogleSheetRangeInfo, config GoogleSheetConfig) (*df.Frame, error) {
+func Query(ctx context.Context, refID string, sheet *QueryModel, config *GoogleSheetConfig) (*df.Frame, error) {
 	srv, err := sheets.NewService(ctx, option.WithAPIKey(config.ApiKey))
 	if err != nil {
-		// gsd.logger.Error("Unable to create service: %v", err.Error())
-		return nil, err
+		return nil, fmt.Errorf("Unable to create service: %v", err.Error())
 	}
 
 	resp, err := srv.Spreadsheets.Values.Get(sheet.SpreadsheetID, sheet.Range).Do()
 	if err != nil {
-		// gsd.logger.Error("Unable to retrieve data from sheet: %v", err.Error())
-		return nil, err
+		return nil, fmt.Errorf("Unable to retrieve data from sheet: %v", err.Error())
 	}
 
 	fields := []*df.Field{}
@@ -36,4 +36,9 @@ func Query(ctx context.Context, refID string, sheet GoogleSheetRangeInfo, config
 	}
 
 	return frame, nil
+}
+
+// TestAPI function
+func TestAPI() (*df.Frame, error) {
+	return df.New("TestAPI"), nil
 }

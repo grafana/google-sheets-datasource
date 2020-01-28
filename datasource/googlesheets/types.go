@@ -1,6 +1,6 @@
 package googlesheets
 
-type GoogleSheetRangeInfo struct {
+type QueryModel struct {
 	QueryType     string
 	SpreadsheetID string
 	Range         string

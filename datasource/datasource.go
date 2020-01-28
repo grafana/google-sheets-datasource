@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	gs "github.com/grafana/google-sheets-datasource/datasource/googlesheets"
+
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 
@@ -12,8 +14,6 @@ import (
 	plugin "github.com/hashicorp/go-plugin"
 
 	"golang.org/x/net/context"
-	"google.golang.org/api/option"
-	"google.golang.org/api/sheets/v4"
 )
 
 const (
@@ -50,44 +50,32 @@ type GoogleSheetsDataSource struct {
 	logger hclog.Logger
 }
 
-type GoogleSheetRangeInfo struct {
-	QueryType     string
-	SpreadsheetID string
-	Range         string
-}
-
 func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
 	res := &backend.DataQueryResponse{}
-
 	for _, q := range req.Queries {
-		googleSheetRangeInfo := &GoogleSheetRangeInfo{}
-		err := json.Unmarshal(q.JSON, &googleSheetRangeInfo)
-
-		apiKey, _ := os.LookupEnv(variableName)
-		srv, err := sheets.NewService(ctx, option.WithAPIKey(apiKey))
+		queryModel := &gs.QueryModel{}
+		err := json.Unmarshal(q.JSON, &queryModel)
 		if err != nil {
-			gsd.logger.Error("Unable to create service: %v", err.Error())
+			gsd.logger.Error("Failed to unmarshal query: %v", err.Error())
 		}
-		resp, err := srv.Spreadsheets.Values.Get(googleSheetRangeInfo.SpreadsheetID, googleSheetRangeInfo.Range).Do()
+
+		var frame *df.Frame
+		switch queryModel.QueryType {
+		case "testAPI":
+			frame, err = gs.TestAPI()
+		case "query":
+			apiKey, _ := os.LookupEnv(variableName)
+			frame, err = gs.Query(ctx, q.RefID, queryModel, &gs.GoogleSheetConfig{ApiKey: apiKey})
+		default:
+			return nil, fmt.Errorf("Invalid query type")
+		}
+
 		if err != nil {
-			gsd.logger.Error("Unable to retrieve data from sheet: %v", err.Error())
+			gsd.logger.Error("Failed to execute query: %v", err.Error())
+		} else {
+			res.Frames = append(res.Frames, frame)
 		}
 
-		fields := []*df.Field{}
-		for _, column := range resp.Values[0] {
-			fields = append(fields, df.NewField(column.(string), nil, []string{}))
-		}
-
-		frame := df.New(googleSheetRangeInfo.Range, fields...)
-		frame.RefID = q.RefID
-
-		for index := 1; index < len(resp.Values); index++ {
-			for columnID, value := range resp.Values[index] {
-				frame.Fields[columnID].Vector.Append(value.(string))
-			}
-		}
-
-		res.Frames = append(res.Frames, frame)
 	}
 
 	return res, nil

@@ -1,4 +1,4 @@
-module github.com/grafana/test-datasource/datasource
+module github.com/grafana/google-sheets-datasource
 
 go 1.13
 

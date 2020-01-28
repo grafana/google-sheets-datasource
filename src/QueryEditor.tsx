@@ -40,7 +40,11 @@ export function toGoogleURL(info: GoogleSheetRangeInfo): string {
 const PASTE_SEPERATOR = '»';
 
 export class QueryEditor extends PureComponent<Props, State> {
-  onComponentDidMount() {}
+  componentWillMount() {
+    if (!this.props.query.queryType) {
+      this.props.query.queryType = 'query';
+    }
+  }
 
   onSpreadsheetIdPasted = (e: any) => {
     const v = e.clipboardData.getData('text/plain');

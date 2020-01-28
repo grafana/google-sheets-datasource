@@ -36,7 +36,9 @@ export interface GoogleSheetRangeInfo {
   range: string;
 }
 
-export interface SheetsQuery extends DataQuery, GoogleSheetRangeInfo {}
+export interface SheetsQuery extends DataQuery, GoogleSheetRangeInfo {
+  queryType: string;
+}
 
 export interface SheetsSourceOptions extends GoogleCloundOptions {}
 
