@@ -73,12 +73,13 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			gsd.logger.Error("Unable to retrieve data from sheet: %v", err.Error())
 		}
 
-		frame := df.New(googleSheetRangeInfo.Range, nil)
-		frame.RefID = q.RefID
-
+		fields := []*df.Field{}
 		for _, column := range resp.Values[0] {
-			frame.Fields = append(frame.Fields, df.NewField(column.(string), nil, []string{}))
+			fields = append(fields, df.NewField(column.(string), nil, []string{}))
 		}
+
+		frame := df.New(googleSheetRangeInfo.Range, fields...)
+		frame.RefID = q.RefID
 
 		for index := 1; index < len(resp.Values); index++ {
 			for columnID, value := range resp.Values[index] {

@@ -79,7 +79,7 @@ export class QueryEditor extends PureComponent<Props, State> {
   };
 
   render() {
-    const { query } = this.props;
+    const { query, onRunQuery } = this.props;
     return (
       <>
         <div className="gf-form">
@@ -92,6 +92,7 @@ export class QueryEditor extends PureComponent<Props, State> {
               placeholder="Enter ID from URL"
               onPaste={this.onSpreadsheetIdPasted}
               onChange={this.onSpreadsheetIdChange}
+              onBlur={onRunQuery}
             />
             <a href={toGoogleURL(query)}>link</a>
           </div>
@@ -105,6 +106,7 @@ export class QueryEditor extends PureComponent<Props, State> {
               value={query.range || ''}
               placeholder="ie: Class Data!A2:E"
               onChange={this.onRangeChange}
+              onBlur={onRunQuery}
             />
           </div>
         </div>

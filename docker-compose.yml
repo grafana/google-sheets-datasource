@@ -11,4 +11,4 @@ grafana:
     - TERM=linux
     - GF_LOG_LEVEL=debug
     - GF_DATAPROXY_LOGGING=true
-    - GF_FEATURE_TOGGLES_ENABLE=expressions
+    - GF_FEATURE_TOGGLES_ENABLE=expressions inspect
