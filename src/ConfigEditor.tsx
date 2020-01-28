@@ -48,10 +48,10 @@ export class ConfigEditor extends PureComponent<Props> {
         <div className="gf-form">
           <FormField
             value={jsonData.apiKey}
-            label="API Key"
+            label="API Key (temp)"
             labelWidth={10}
             inputWidth={25}
-            placeholder="Enter API Key (temp)"
+            placeholder="Enter API Key"
             onChange={e =>
               this.props.onOptionsChange({
                 ...this.props,
