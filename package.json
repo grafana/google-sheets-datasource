@@ -12,9 +12,9 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/lodash": "latest",
-    "@grafana/data": "canary",
-    "@grafana/toolkit": "canary",
-    "@grafana/ui": "canary",
-    "@grafana/runtime": "canary"
+    "@grafana/data": "latest",
+    "@grafana/toolkit": "latest",
+    "@grafana/ui": "latest",
+    "@grafana/runtime": "latest"
   }
 }

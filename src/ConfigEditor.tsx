@@ -1,54 +1,50 @@
 import React, { PureComponent } from 'react';
-import { FormLabel, Input, Button } from '@grafana/ui';
-import {
-  DataSourcePluginOptionsEditorProps,
-  onUpdateDatasourceResetOption,
-  onUpdateDatasourceSecureJsonDataOption,
-} from '@grafana/data';
+import { SecretFormField } from '@grafana/ui';
+import { DataSourcePluginOptionsEditorProps, onUpdateDatasourceSecureJsonDataOption } from '@grafana/data';
 import { SheetsSourceOptions, GoogleSheetsSecureJsonData } from './types';
 
-export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions, GoogleSheetsSecureJsonData>;
+export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions>;
 
 export class ConfigEditor extends PureComponent<Props> {
+  onResetApiKey = () => {
+    // :( TODO: typings do not let me call the standard function!!!
+    // :( updateDatasourcePluginResetOption(this.props, 'apiKey');
+
+    const { options } = this.props;
+    this.props.onOptionsChange({
+      ...options,
+      secureJsonData: {
+        ...options.secureJsonData,
+        apiKey: '',
+      },
+      secureJsonFields: {
+        ...options.secureJsonFields,
+        apiKey: false,
+      },
+    });
+  };
+
   render() {
-    const {options} = this.props;
-    const {secureJsonData, secureJsonFields} = options;
+    const { options } = this.props;
+    const { secureJsonFields } = options;
+    // HACK till after: https://github.com/grafana/grafana/pull/21772
+    const secureJsonData = options.secureJsonData as GoogleSheetsSecureJsonData;
 
-    return <div className="gf-form-group">
-
-{secureJsonFields?.apiKey ? (
-                <div className="gf-form-inline">
-                  <div className="gf-form">
-                    <FormLabel className="width-14">Secret Access Key</FormLabel>
-                    <Input className="width-25" placeholder="Configured" disabled={true} />
-                  </div>
-                  <div className="gf-form">
-                    <div className="max-width-30 gf-form-inline">
-                      <Button
-                        variant="secondary"
-                        type="button"
-                        onClick={onUpdateDatasourceResetOption(this.props, 'apiKey')}
-                      >
-                        Reset
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="gf-form-inline">
-                  <div className="gf-form">
-                    <FormLabel className="width-14">API Key</FormLabel>
-                    <div className="width-30">
-                      <Input
-                        className="width-30"
-                        value={secureJsonData?.apiKey || ''}
-                        onChange={onUpdateDatasourceSecureJsonDataOption(this.props, 'apiKey')}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
+    return (
+      <div className="gf-form-group">
+        <div className="gf-form">
+          <SecretFormField
+            isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}
+            value={secureJsonData?.apiKey || ''}
+            label="API Key"
+            labelWidth={10}
+            inputWidth={25}
+            placeholder="Enter API Key"
+            onReset={this.onResetApiKey}
+            onChange={onUpdateDatasourceSecureJsonDataOption(this.props, 'apiKey')}
+          />
+        </div>
       </div>
+    );
+  }
 }
-
-
