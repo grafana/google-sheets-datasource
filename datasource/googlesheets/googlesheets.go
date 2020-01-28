@@ -39,6 +39,9 @@ func Query(ctx context.Context, refID string, sheet *QueryModel, config *GoogleS
 }
 
 // TestAPI function
-func TestAPI() (*df.Frame, error) {
+func TestAPI(apiKey string) (*df.Frame, error) {
+	if len(apiKey) == 0 {
+		return nil, fmt.Errorf("Invalid API Key")
+	}
 	return df.New("TestAPI"), nil
 }

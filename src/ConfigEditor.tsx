@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { SecretFormField } from '@grafana/ui';
+import { SecretFormField, FormField } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps, onUpdateDatasourceSecureJsonDataOption } from '@grafana/data';
 import { SheetsSourceOptions, GoogleSheetsSecureJsonData } from './types';
 
@@ -26,7 +26,7 @@ export class ConfigEditor extends PureComponent<Props> {
 
   render() {
     const { options } = this.props;
-    const { secureJsonFields } = options;
+    const { secureJsonFields, jsonData } = options;
     // HACK till after: https://github.com/grafana/grafana/pull/21772
     const secureJsonData = options.secureJsonData as GoogleSheetsSecureJsonData;
 
@@ -42,6 +42,26 @@ export class ConfigEditor extends PureComponent<Props> {
             placeholder="Enter API Key"
             onReset={this.onResetApiKey}
             onChange={onUpdateDatasourceSecureJsonDataOption(this.props, 'apiKey')}
+          />
+        </div>
+
+        <div className="gf-form">
+          <FormField
+            value={jsonData.apiKey}
+            label="API Key"
+            labelWidth={10}
+            inputWidth={25}
+            placeholder="Enter API Key (temp)"
+            onChange={e =>
+              this.props.onOptionsChange({
+                ...this.props,
+                ...this.props.options,
+                jsonData: {
+                  ...this.props.options.jsonData,
+                  apiKey: e.target.value,
+                },
+              })
+            }
           />
         </div>
       </div>

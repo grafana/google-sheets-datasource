@@ -24,7 +24,7 @@ export const googleAuthTypes = [
   { label: 'None (public)', value: GoogleAuthType.NONE },
 ];
 
-export interface GoogleCloundOptions extends DataSourceJsonData {
+export interface GoogleCloudOptions extends DataSourceJsonData {
   authenticationType: GoogleAuthType;
 }
 
@@ -40,7 +40,9 @@ export interface SheetsQuery extends DataQuery, GoogleSheetRangeInfo {
   queryType: string;
 }
 
-export interface SheetsSourceOptions extends GoogleCloundOptions {}
+export interface SheetsSourceOptions extends GoogleCloudOptions {
+  apiKey: string;
+}
 
 export interface GoogleSheetsSecureJsonData {
   apiKey: string;

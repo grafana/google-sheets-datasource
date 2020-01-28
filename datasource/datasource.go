@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 
 	gs "github.com/grafana/google-sheets-datasource/datasource/googlesheets"
 
@@ -27,14 +26,6 @@ var pluginLogger = hclog.New(&hclog.LoggerOptions{
 })
 
 func main() {
-	path, exist := os.LookupEnv(variableName)
-	if !exist {
-		pluginLogger.Error("could not read environment variable", variableName)
-		panic(fmt.Errorf("could not read environment variable %v", variableName))
-	} else {
-		pluginLogger.Debug("environment variable for google sheets found", "variable", variableName, "value", path)
-	}
-
 	err := backend.Serve(backend.ServeOpts{
 		DataQueryHandler: &GoogleSheetsDataSource{
 			logger: pluginLogger,
@@ -52,30 +43,37 @@ type GoogleSheetsDataSource struct {
 
 func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
 	res := &backend.DataQueryResponse{}
+	config := gs.GoogleSheetConfig{}
+	err := json.Unmarshal(req.PluginConfig.JSONData, &config)
+	if err != nil {
+		gsd.logger.Error("Could not unmarshal DataSourceInfo json", "Error", err)
+		return nil, err
+	}
+
 	for _, q := range req.Queries {
 		queryModel := &gs.QueryModel{}
 		err := json.Unmarshal(q.JSON, &queryModel)
+
 		if err != nil {
 			gsd.logger.Error("Failed to unmarshal query: %v", err.Error())
+			return nil, fmt.Errorf("Invalid query")
 		}
 
 		var frame *df.Frame
 		switch queryModel.QueryType {
 		case "testAPI":
-			frame, err = gs.TestAPI()
+			frame, err = gs.TestAPI(config.ApiKey)
 		case "query":
-			apiKey, _ := os.LookupEnv(variableName)
-			frame, err = gs.Query(ctx, q.RefID, queryModel, &gs.GoogleSheetConfig{ApiKey: apiKey})
+			frame, err = gs.Query(ctx, q.RefID, queryModel, &config)
 		default:
 			return nil, fmt.Errorf("Invalid query type")
 		}
 
 		if err != nil {
-			gsd.logger.Error("Failed to execute query: %v", err.Error())
-		} else {
-			res.Frames = append(res.Frames, frame)
+			return nil, err
 		}
 
+		res.Frames = append(res.Frames, frame)
 	}
 
 	return res, nil

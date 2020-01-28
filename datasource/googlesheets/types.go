@@ -7,5 +7,5 @@ type QueryModel struct {
 }
 
 type GoogleSheetConfig struct {
-	ApiKey string `json:"path"`
+	ApiKey string `json:"apiKey"`
 }
