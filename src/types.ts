@@ -19,9 +19,9 @@ export enum GoogleAuthType {
 }
 
 export const googleAuthTypes = [
+  { label: 'None (public)', value: GoogleAuthType.NONE },
   { label: 'Google JWT File', value: GoogleAuthType.JWT },
   { label: 'GCE Default Service Account', value: GoogleAuthType.GCE },
-  { label: 'None (public)', value: GoogleAuthType.NONE },
 ];
 
 export interface GoogleCloudOptions extends DataSourceJsonData {
@@ -41,7 +41,9 @@ export interface SheetsQuery extends DataQuery, GoogleSheetRangeInfo {
 }
 
 export interface SheetsSourceOptions extends GoogleCloudOptions {
+  authType: GoogleAuthType;
   apiKey: string;
+  jwtFile: string;
 }
 
 export interface GoogleSheetsSecureJsonData {
