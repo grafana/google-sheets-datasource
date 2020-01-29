@@ -1,6 +1,6 @@
 import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { FormField, FormLabel, Segment } from '@grafana/ui';
+import { Button, LinkButton, FormLabel, Segment } from '@grafana/ui';
 import { DataSource } from './DataSource';
 import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo, majorDimensions } from './types';
 
@@ -98,6 +98,9 @@ export class QueryEditor extends PureComponent<Props, State> {
             onChange={this.onSpreadsheetIdChange}
             onBlur={onRunQuery}
           ></input>
+          <LinkButton disabled={!query.spreadsheetId} variant="secondary" icon="fa fa-link" href={toGoogleURL(query)} target="_blank">
+            {/* Open spreadsheet */}
+          </LinkButton>
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>
@@ -127,35 +130,6 @@ export class QueryEditor extends PureComponent<Props, State> {
           />
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
-          </div>
-        </div>
-
-        <div className="gf-form">
-          <div className="form-field">
-            <FormField
-              inputWidth={30}
-              labelWidth={8}
-              label="Spreadsheet ID"
-              value={query.spreadsheetId || ''}
-              placeholder="Enter ID from URL"
-              onPaste={this.onSpreadsheetIdPasted}
-              onChange={this.onSpreadsheetIdChange}
-              onBlur={onRunQuery}
-            />
-            <a href={toGoogleURL(query)}>link</a>
-          </div>
-        </div>
-        <div className="gf-form">
-          <div className="form-field">
-            <FormField
-              inputWidth={30}
-              labelWidth={8}
-              label="Range"
-              value={query.range || ''}
-              placeholder="ie: Class Data!A2:E"
-              onChange={this.onRangeChange}
-              onBlur={onRunQuery}
-            />
           </div>
         </div>
       </>
