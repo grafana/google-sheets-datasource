@@ -1,8 +1,8 @@
 import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { FormField } from '@grafana/ui';
+import { FormField, FormLabel, Segment } from '@grafana/ui';
 import { DataSource } from './DataSource';
-import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo } from './types';
+import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo, majorDimensions } from './types';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, SheetsSourceOptions>;
 
@@ -83,9 +83,53 @@ export class QueryEditor extends PureComponent<Props, State> {
   };
 
   render() {
-    const { query, onRunQuery } = this.props;
+    const { query, onRunQuery, onChange } = this.props;
     return (
       <>
+        <div className={'gf-form-inline'}>
+          <FormLabel width={8} className="query-keyword">
+            Spreadsheet ID
+          </FormLabel>
+          <input
+            className="gf-form-input width-28"
+            placeholder="Enter ID from URL"
+            value={query.spreadsheetId || ''}
+            onPaste={this.onSpreadsheetIdPasted}
+            onChange={this.onSpreadsheetIdChange}
+            onBlur={onRunQuery}
+          ></input>
+          <div className="gf-form gf-form--grow">
+            <div className="gf-form-label gf-form-label--grow" />
+          </div>
+        </div>
+
+        <div className={'gf-form-inline'}>
+          <FormLabel width={8} className="query-keyword">
+            Range
+          </FormLabel>
+          <input
+            className="gf-form-input width-14"
+            value={query.range || ''}
+            placeholder="ie: Class Data!A2:E"
+            onChange={this.onRangeChange}
+            onBlur={onRunQuery}
+          ></input>
+          <FormLabel width={10} className="query-keyword">
+            Major Dimension
+          </FormLabel>
+          <Segment
+            options={majorDimensions}
+            value={majorDimensions.find(({ value }) => value === query.majorDimension) || majorDimensions[0]}
+            onChange={({ value }) => {
+              onChange({ ...query, majorDimension: value! });
+              onRunQuery();
+            }}
+          />
+          <div className="gf-form gf-form--grow">
+            <div className="gf-form-label gf-form-label--grow" />
+          </div>
+        </div>
+
         <div className="gf-form">
           <div className="form-field">
             <FormField

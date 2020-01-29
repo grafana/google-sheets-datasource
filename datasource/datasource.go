@@ -62,10 +62,8 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 		var frame *df.Frame
 		switch queryModel.QueryType {
 		case "testAPI":
-			gsd.logger.Debug("FailedFailedFailedFailed: %v", config.JwtFile)
 			frame, err = gs.TestAPI(ctx, &config)
 		case "query":
-			gsd.logger.Debug("FailedFailedFailedFailed: %v", string([]byte(config.JwtFile)))
 			frame, err = gs.Query(ctx, q.RefID, queryModel, &config, gsd.logger)
 		default:
 			return nil, fmt.Errorf("Invalid query type")

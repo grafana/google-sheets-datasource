@@ -33,7 +33,7 @@ func Query(ctx context.Context, refID string, sheet *QueryModel, config *GoogleS
 		return nil, fmt.Errorf("Unable to create service: %v", err.Error())
 	}
 
-	resp, err := srv.Spreadsheets.Values.Get(sheet.SpreadsheetID, sheet.Range).Do()
+	resp, err := srv.Spreadsheets.Values.Get(sheet.SpreadsheetID, sheet.Range).MajorDimension(sheet.MajorDimension).Do()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to retrieve data from sheet: %v", err.Error())
 	}

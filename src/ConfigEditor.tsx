@@ -33,7 +33,7 @@ export class ConfigEditor extends PureComponent<Props> {
     return (
       <div className="gf-form-group">
         <div className="gf-form">
-          <FormLabel className="width-14">Auth Provider</FormLabel>
+          <FormLabel className="width-10">Auth Provider</FormLabel>
           <Select
             className="width-30"
             value={googleAuthTypes.find(x => x.value === jsonData.authType) || googleAuthTypes[0]}
@@ -44,7 +44,6 @@ export class ConfigEditor extends PureComponent<Props> {
         </div>
         {jsonData.authType === GoogleAuthType.NONE && (
           <>
-            {' '}
             <div className="gf-form">
               <SecretFormField
                 isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}

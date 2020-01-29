@@ -12,6 +12,17 @@ export interface JWT {
   project_id: any;
 }
 
+export enum MajorDimensionType {
+  DIMENSION_UNSPECIFIED = 'DIMENSION_UNSPECIFIED',
+  ROWS = 'ROWS',
+  COLUMNS = 'COLUMNS',
+}
+
+export const majorDimensions = [
+  { label: 'Rows', value: MajorDimensionType.ROWS },
+  { label: 'Columns', value: MajorDimensionType.COLUMNS },
+];
+
 export enum GoogleAuthType {
   JWT = 'jwt',
   GCE = 'gce',
@@ -34,6 +45,7 @@ export interface GoogleCloudOptions extends DataSourceJsonData {
 export interface GoogleSheetRangeInfo {
   spreadsheetId: string;
   range: string;
+  majorDimension: string;
 }
 
 export interface SheetsQuery extends DataQuery, GoogleSheetRangeInfo {
