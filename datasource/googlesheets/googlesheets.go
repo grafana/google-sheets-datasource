@@ -4,14 +4,31 @@ import (
 	"fmt"
 
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
+	"github.com/hashicorp/go-hclog"
 	"golang.org/x/net/context"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
 
+func createService(ctx context.Context, config *GoogleSheetConfig) (*sheets.Service, error) {
+	if config.AuthType == "none" {
+		return sheets.NewService(ctx, option.WithAPIKey(config.ApiKey))
+	}
+
+	jwtConfig, err := google.JWTConfigFromJSON([]byte(config.JwtFile), "https://www.googleapis.com/auth/spreadsheets.readonly", "https://www.googleapis.com/auth/spreadsheets")
+	if err != nil {
+		return nil, fmt.Errorf("Error parsin JWT file: %v", err)
+	}
+
+	client := jwtConfig.Client(ctx)
+
+	return sheets.New(client)
+}
+
 // Query function
-func Query(ctx context.Context, refID string, sheet *QueryModel, config *GoogleSheetConfig) (*df.Frame, error) {
-	srv, err := sheets.NewService(ctx, option.WithAPIKey(config.ApiKey))
+func Query(ctx context.Context, refID string, sheet *QueryModel, config *GoogleSheetConfig, logger hclog.Logger) (*df.Frame, error) {
+	srv, err := createService(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create service: %v", err.Error())
 	}
@@ -39,9 +56,11 @@ func Query(ctx context.Context, refID string, sheet *QueryModel, config *GoogleS
 }
 
 // TestAPI function
-func TestAPI(apiKey string) (*df.Frame, error) {
-	if len(apiKey) == 0 {
-		return nil, fmt.Errorf("Invalid API Key")
+func TestAPI(ctx context.Context, config *GoogleSheetConfig) (*df.Frame, error) {
+	_, err := createService(ctx, config)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
 	}
+
 	return df.New("TestAPI"), nil
 }

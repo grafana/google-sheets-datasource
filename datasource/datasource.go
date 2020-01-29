@@ -62,15 +62,22 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 		var frame *df.Frame
 		switch queryModel.QueryType {
 		case "testAPI":
-			frame, err = gs.TestAPI(config.ApiKey)
+			gsd.logger.Debug("FailedFailedFailedFailed: %v", config.JwtFile)
+			frame, err = gs.TestAPI(ctx, &config)
 		case "query":
-			frame, err = gs.Query(ctx, q.RefID, queryModel, &config)
+			gsd.logger.Debug("FailedFailedFailedFailed: %v", string([]byte(config.JwtFile)))
+			frame, err = gs.Query(ctx, q.RefID, queryModel, &config, gsd.logger)
 		default:
 			return nil, fmt.Errorf("Invalid query type")
 		}
 
 		if err != nil {
-			return nil, err
+			gsd.logger.Debug("QueryError", "QueryError", err.Error())
+			frame := df.New("default")
+			frame.RefID = q.RefID
+			frame.Meta = &df.QueryResultMeta{Custom: make(map[string]interface{})}
+			frame.Meta.Custom["error"] = err.Error()
+			// return nil, err
 		}
 
 		res.Frames = append(res.Frames, frame)
