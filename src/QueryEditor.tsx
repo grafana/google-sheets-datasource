@@ -82,12 +82,28 @@ export class QueryEditor extends PureComponent<Props, State> {
     });
   };
 
+  SpreadsheetIdTooltip = () => (
+    <p>
+      The <code>spreadsheetId</code> is used to identify which spreadsheet is to be accessed or altered. This ID is the value between the "/d/" and
+      the "/edit" in the URL of your spreadsheet.
+    </p>
+  );
+
   render() {
     const { query, onRunQuery, onChange } = this.props;
     return (
       <>
         <div className={'gf-form-inline'}>
-          <FormLabel width={8} className="query-keyword">
+          <FormLabel
+            width={10}
+            className="query-keyword"
+            tooltip={
+              <p>
+                The <code>spreadsheetId</code> is used to identify which spreadsheet is to be accessed or altered. This ID is the value between the
+                "/d/" and the "/edit" in the URL of your spreadsheet.
+              </p>
+            }
+          >
             Spreadsheet ID
           </FormLabel>
           <input
@@ -98,16 +114,23 @@ export class QueryEditor extends PureComponent<Props, State> {
             onChange={this.onSpreadsheetIdChange}
             onBlur={onRunQuery}
           ></input>
-          <LinkButton disabled={!query.spreadsheetId} variant="secondary" icon="fa fa-link" href={toGoogleURL(query)} target="_blank">
-            {/* Open spreadsheet */}
-          </LinkButton>
+          <LinkButton disabled={!query.spreadsheetId} variant="secondary" icon="fa fa-link" href={toGoogleURL(query)} target="_blank"></LinkButton>
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>
         </div>
 
         <div className={'gf-form-inline'}>
-          <FormLabel width={8} className="query-keyword">
+          <FormLabel
+            width={10}
+            className="query-keyword"
+            tooltip={
+              <p>
+                A string like <code>Sheet1!A1:B2</code>, that refers to a group of cells in the spreadsheet, and is typically used in formulas.Named
+                ranges are also supported. When a named range conflicts with a sheet's name, the named range is preferred.
+              </p>
+            }
+          >
             Range
           </FormLabel>
           <input
