@@ -8,6 +8,23 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
     super(instanceSettings);
   }
 
+  metricFindQuery(query: SheetsQuery, queryType: string): Promise<any[]> {
+    return getBackendSrv()
+      .post('/api/ds/query', {
+        from: '5m',
+        to: 'now',
+        queries: [
+          {
+            ...query,
+            datasource: this.name,
+            datasourceId: this.id,
+            queryType,
+          },
+        ],
+      })
+      .then((rsp: any) => Object.entries(rsp.results[''].meta).map(([value, label]) => ({ label, value: Number(value) })));
+  }
+
   async testDatasource() {
     return getBackendSrv()
       .post('/api/ds/query', {

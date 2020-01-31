@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
+	// "github.com/davecgh/go-spew/spew"
+	"github.com/araddon/dateparse"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/hashicorp/go-hclog"
 	"golang.org/x/net/context"
@@ -28,7 +30,7 @@ func createService(ctx context.Context, config *GoogleSheetConfig) (*sheets.Serv
 	return sheets.New(client)
 }
 
-func getTypeDefaultValue(t string) (interface{}) {
+func getTypeDefaultValue(t string) interface{} {
 	switch t {
 	case "time":
 		return nil
@@ -39,82 +41,108 @@ func getTypeDefaultValue(t string) (interface{}) {
 	}
 }
 
-// Query function
-func Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, logger hclog.Logger) (*df.Frame, error) {
-	srv, err := createService(ctx, config)
+func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclog.Logger) (*df.Frame, error) {
+	resp, err := srv.Spreadsheets.Values.Get(qm.SpreadsheetID, qm.Range).MajorDimension(qm.MajorDimension).Do()
 	if err != nil {
-		return nil, fmt.Errorf("Unable to create service: %v", err.Error())
+		return nil, fmt.Errorf("Unable to retrieve data from sheet: %v", err.Error())
 	}
 
+	fields := []*df.Field{}
+	for _, column := range resp.Values[0] {
+		fields = append(fields, df.NewField(column.(string), nil, []string{}))
+	}
+
+	frame := df.New(qm.Range, fields...)
+	frame.RefID = refID
+
+	for index := 1; index < len(resp.Values); index++ {
+		for columnID, value := range resp.Values[index] {
+			frame.Fields[columnID].Vector.Append(value.(string))
+		}
+	}
+
+	return frame, nil
+}
+
+func getTimeSeriesData(srv *sheets.Service, refID string, qm *QueryModel, timeRange backend.TimeRange, logger hclog.Logger) (*df.Frame, error) {
 	result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).Ranges(qm.Range).IncludeGridData(true).Do()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
 	}
 
 	sheet := result.Sheets[0].Data[0]
+	if result.Properties.TimeZone != "" {
+		loc, err := time.LoadLocation(result.Properties.TimeZone)
+		if err != nil {
+			return nil, fmt.Errorf("error while loading timezone: ", err.Error())
+		}
+		time.Local = loc
+	}
 
-	// Ensure all cells in a column have same type
-	columnDef := map[int]string{}
-	for rIndex, row := range sheet.RowData {
-		if rIndex == 0 {
+	frame := df.New(qm.Range,
+		df.NewField(qm.TimeColumn.Label, nil, []time.Time{}),
+		df.NewField(qm.MetricColumn.Label, nil, []float64{}),
+	)
+
+	for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
+		timeCell := sheet.RowData[rowIndex].Values[qm.TimeColumn.Value]
+		time, err := dateparse.ParseLocal(timeCell.FormattedValue)
+		if err != nil {
+			return nil, fmt.Errorf("error while parsing date :", err.Error())
+		}
+
+		if time.Sub(timeRange.From) < 0 {
+			logger.Debug("before time range")
 			continue
 		}
 
-		for cIndex, sCell := range row.Values {
-			cell := &cellParser{cell: sCell}
-			if val, exists := columnDef[cIndex]; exists {
-				t := cell.GetType()
-				if t != "" && val != t {
-					return nil, fmt.Errorf("Column %v contains different data types. Found in row %v", cIndex, rIndex)
-				}
-			} else {
-				columnDef[cIndex] = cell.GetType()
-			}
+		if time.Sub(timeRange.To) > 0 {
+			logger.Debug("after time range")
+			continue
 		}
-	}
+		frame.Fields[qm.TimeColumn.Value].Vector.Append(time)
 
-	// Create fields using header name
-	fields := []*df.Field{}
-	// for _, sCell := range sheet.RowData[0].Values {
-	for columnIndex, t := range columnDef {
-		// cell := &cellParser{cell: sCell}
-		cellParser := &cellParser{cell: sheet.RowData[0].Values[columnIndex]}
-		switch t {
-		case "time":
-			fields = append(fields, df.NewField(cellParser.cell.EffectiveValue.StringValue, nil, []time.Time{}))
-		case "float64":
-			fields = append(fields, df.NewField(cellParser.cell.EffectiveValue.StringValue, nil, []float64{}))
-		default:
-			fields = append(fields, df.NewField(cellParser.cell.EffectiveValue.StringValue, nil, []string{}))
-		}
-	}
-
-	frame := df.New(qm.Range, fields...)
-	frame.RefID = refID
-	for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
-		for columnIndex, t := range columnDef {
-			if columnIndex+1 > len(sheet.RowData[rowIndex].Values) {
-				frame.Fields[columnIndex].Vector.Append(getTypeDefaultValue(t))
-			} else {
-				cellParser := &cellParser{cell: sheet.RowData[rowIndex].Values[columnIndex]}
-				cellType := cellParser.GetType()
-				if cellType == "" {
-					frame.Fields[columnIndex].Vector.Append(getTypeDefaultValue(t))
-				} else {
-				v, err := cellParser.getValue()
-				if err != nil {
-					return nil, fmt.Errorf("Could not parse value: ", err.Error())
-				}
-				logger.Debug("type: " + t)
-				logger.Debug("value: " + sheet.RowData[rowIndex].Values[columnIndex].FormattedValue)
-				logger.Debug("janneb: " + spew.Sdump(v))
-				frame.Fields[columnIndex].Vector.Append(v)
-				}
-			}
-		}
+		metricCell := sheet.RowData[rowIndex].Values[qm.MetricColumn.Value]
+		frame.Fields[qm.MetricColumn.Value].Vector.Append(metricCell.EffectiveValue.NumberValue)
 	}
 
 	return frame, nil
+}
+
+// Query function
+func Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange, logger hclog.Logger) (*df.Frame, error) {
+	srv, err := createService(ctx, config)
+	if err != nil {
+		return nil, fmt.Errorf("Unable to create service: %v", err.Error())
+	}
+
+	switch qm.ResultFormat {
+	case "TABLE":
+		return getTableData(srv, refID, qm, logger)
+	case "TIME_SERIES":
+		return getTimeSeriesData(srv, refID, qm, timeRange, logger)
+	default:
+		return nil, fmt.Errorf("Invalid result format: %v", qm.ResultFormat)
+	}
+
+}
+
+func GetHeaders(ctx context.Context, qm *QueryModel, config *GoogleSheetConfig, logger hclog.Logger) ([]string, error) {
+	srv, err := createService(ctx, config)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
+	}
+
+	resp, err := srv.Spreadsheets.Values.Get(qm.SpreadsheetID, qm.Range).MajorDimension(qm.MajorDimension).Do()
+	if err != nil {
+		return nil, fmt.Errorf("Unable to retrieve data from sheet: %v", err.Error())
+	}
+
+	headers := []string{}
+	for _, column := range resp.Values[0] {
+		headers = append(headers, column.(string))
+	}
+	return headers, nil
 }
 
 // TestAPI function

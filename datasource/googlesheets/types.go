@@ -1,9 +1,18 @@
 package googlesheets
 
+type valueOption struct {
+	Label string
+	Value int
+}
+
 type QueryModel struct {
-	QueryType     string
-	SpreadsheetID string
-	Range         string
+	ResultFormat   string
+	QueryType      string
+	SpreadsheetID  string
+	Range          string
+	MajorDimension string
+	TimeColumn     valueOption `json:"timeColumn"`
+	MetricColumn   valueOption `json:"metricColumn"`
 }
 
 type GoogleSheetConfig struct {
