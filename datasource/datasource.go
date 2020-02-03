@@ -59,12 +59,12 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			return nil, fmt.Errorf("Invalid query")
 		}
 
-		var frame *df.Frame
+		var frames []*df.Frame
 		switch queryModel.QueryType {
 		case "testAPI":
-			frame, err = gs.TestAPI(ctx, &config)
+			frames, err = gs.TestAPI(ctx, &config)
 		case "query":
-			frame, err = gs.Query(ctx, q.RefID, queryModel, &config, q.TimeRange, gsd.logger)
+			frames, err = gs.Query(ctx, q.RefID, queryModel, &config, q.TimeRange, gsd.logger)
 		case "getHeaders":
 			// res.Metadata = make(map[string]string)
 			// frame = df.New("getHeader")
@@ -74,26 +74,27 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			// if err == nil {
 			// 	frame.Meta.Custom["headers"] = res
 			// }
-			frame = df.New("getHeader")
+			frame := df.New("getHeader")
 			headers, _ := gs.GetHeaders(ctx, queryModel, &config, gsd.logger)
 			res.Metadata = make(map[string]string)
 			for i, header := range headers {
 				res.Metadata[fmt.Sprint(i)] = header
 			}
+			frames = []*df.Frame{frame}
 		default:
 			return nil, fmt.Errorf("Invalid query type")
 		}
 
-		if err != nil {
-			gsd.logger.Debug("QueryError", "QueryError", err.Error())
-			frame = df.New("default")
-			frame.RefID = q.RefID
-			frame.Meta = &df.QueryResultMeta{Custom: make(map[string]interface{})}
-			frame.Meta.Custom["error"] = err.Error()
-			// return nil, err
-		}
+		// if err != nil {
+		// 	gsd.logger.Debug("QueryError", "QueryError", err.Error())
+		// 	frame = df.New("default")
+		// 	frame.RefID = q.RefID
+		// 	frame.Meta = &df.QueryResultMeta{Custom: make(map[string]interface{})}
+		// 	frame.Meta.Custom["error"] = err.Error()
+		// 	// return nil, err
+		// }
 		gsd.logger.Debug("aaaaa6: ")
-		res.Frames = append(res.Frames, frame)
+		res.Frames = append(res.Frames, frames...)
 	}
 
 	return res, nil

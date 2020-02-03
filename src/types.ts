@@ -62,7 +62,7 @@ export interface SheetsQuery extends DataQuery, GoogleSheetRangeInfo {
   queryType: string;
   resultFormat: ResultFormatType;
   timeColumn: SelectableValue<number>;
-  metricColumn: SelectableValue<number>;
+  metricColumns: Array<SelectableValue<number>>;
 }
 
 export interface SheetsSourceOptions extends GoogleCloudOptions {

@@ -2,6 +2,7 @@ import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
 import { LinkButton, FormLabel, Segment, SegmentAsync } from '@grafana/ui';
 import { DataSource } from './DataSource';
+import { MetricColumns } from './components/MetricColumns';
 import {
   SheetsQuery,
   SheetsSourceOptions,
@@ -59,6 +60,14 @@ export class QueryEditor extends PureComponent<Props, State> {
 
     if (!this.props.query.majorDimension) {
       this.props.query.majorDimension = MajorDimensionType.ROWS;
+    }
+
+    if (!this.props.query.metricColumns) {
+      this.props.query.metricColumns = [];
+    }
+
+    if (!this.props.query.timeColumn) {
+      this.props.query.timeColumn = [];
     }
   }
 
@@ -201,17 +210,18 @@ export class QueryEditor extends PureComponent<Props, State> {
               <FormLabel width={8} className="query-keyword">
                 Metric Column
               </FormLabel>
-              <SegmentAsync
-                loadOptions={() =>
-                  datasource.metricFindQuery(query, 'getHeaders').then(values => values.filter(({ value }) => value !== query.timeColumn.value))
-                }
-                value={query.metricColumn}
-                placeholder="Select metric column"
-                onChange={option => {
-                  onChange({ ...query, metricColumn: option });
+              <MetricColumns
+                values={query.metricColumns}
+                onChange={options => {
+                  console.log({ options });
+
+                  onChange({ ...query, metricColumns: options });
                   onRunQuery();
                 }}
-              />
+                loadColumns={() =>
+                  datasource.metricFindQuery(query, 'getHeaders').then(values => values.filter(({ value }) => value !== query.timeColumn.value))
+                }
+              ></MetricColumns>
             </>
           )}
 

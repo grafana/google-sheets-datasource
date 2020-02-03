@@ -41,7 +41,7 @@ func getTypeDefaultValue(t string) interface{} {
 	}
 }
 
-func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclog.Logger) (*df.Frame, error) {
+func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclog.Logger) ([]*df.Frame, error) {
 	resp, err := srv.Spreadsheets.Values.Get(qm.SpreadsheetID, qm.Range).MajorDimension(qm.MajorDimension).Do()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to retrieve data from sheet: %v", err.Error())
@@ -61,10 +61,10 @@ func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclo
 		}
 	}
 
-	return frame, nil
+	return []*df.Frame{frame}, nil
 }
 
-func getTimeSeriesData(srv *sheets.Service, refID string, qm *QueryModel, timeRange backend.TimeRange, logger hclog.Logger) (*df.Frame, error) {
+func getTimeSeriesData(srv *sheets.Service, refID string, qm *QueryModel, timeRange backend.TimeRange, logger hclog.Logger) ([]*df.Frame, error) {
 	result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).Ranges(qm.Range).IncludeGridData(true).Do()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
@@ -79,38 +79,50 @@ func getTimeSeriesData(srv *sheets.Service, refID string, qm *QueryModel, timeRa
 		time.Local = loc
 	}
 
-	frame := df.New(qm.Range,
-		df.NewField(qm.TimeColumn.Label, nil, []time.Time{}),
-		df.NewField(qm.MetricColumn.Label, nil, []float64{}),
-	)
+	frames := []*df.Frame{}
+	for _, metric := range qm.MetricColumns {
+		frame := df.New(metric.Label,
+			df.NewField("Time", nil, []time.Time{}),
+			df.NewField("Value", nil, []float64{}),
+		)
+		frame.RefID = refID
+		frames = append(frames, frame)
+	}
 
 	for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 		timeCell := sheet.RowData[rowIndex].Values[qm.TimeColumn.Value]
 		time, err := dateparse.ParseLocal(timeCell.FormattedValue)
 		if err != nil {
-			return nil, fmt.Errorf("error while parsing date :", err.Error())
-		}
-
-		if time.Sub(timeRange.From) < 0 {
-			logger.Debug("before time range")
+			logger.Error("error while parsing date :", err.Error())
 			continue
 		}
 
-		if time.Sub(timeRange.To) > 0 {
-			logger.Debug("after time range")
+		if time.Sub(timeRange.From) < 0 || time.Sub(timeRange.To) > 0 {
+			logger.Debug("time out of time range")
 			continue
 		}
-		frame.Fields[qm.TimeColumn.Value].Vector.Append(time)
 
-		metricCell := sheet.RowData[rowIndex].Values[qm.MetricColumn.Value]
-		frame.Fields[qm.MetricColumn.Value].Vector.Append(metricCell.EffectiveValue.NumberValue)
+		for i, metric := range qm.MetricColumns {
+			frames[i].Fields[0].Vector.Append(time)
+
+			if metric.Value+1 > len(sheet.RowData[rowIndex].Values) {
+				frames[i].Fields[1].Vector.Append(0.0)
+			} else {
+				metricCell := sheet.RowData[rowIndex].Values[metric.Value]
+				if metricCell.EffectiveValue == nil {
+					frames[i].Fields[1].Vector.Append(0.0)
+				} else {
+					frames[i].Fields[1].Vector.Append(metricCell.EffectiveValue.NumberValue)
+				}
+			}
+		}
 	}
 
-	return frame, nil
+	return frames, nil
 }
 
 // Query function
-func Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange, logger hclog.Logger) (*df.Frame, error) {
+func Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange, logger hclog.Logger) ([]*df.Frame, error) {
 	srv, err := createService(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create service: %v", err.Error())
@@ -146,11 +158,11 @@ func GetHeaders(ctx context.Context, qm *QueryModel, config *GoogleSheetConfig, 
 }
 
 // TestAPI function
-func TestAPI(ctx context.Context, config *GoogleSheetConfig) (*df.Frame, error) {
+func TestAPI(ctx context.Context, config *GoogleSheetConfig) ([]*df.Frame, error) {
 	_, err := createService(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
 	}
 
-	return df.New("TestAPI"), nil
+	return []*df.Frame{df.New("TestAPI")}, nil
 }

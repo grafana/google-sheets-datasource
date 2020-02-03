@@ -11,8 +11,8 @@ type QueryModel struct {
 	SpreadsheetID  string
 	Range          string
 	MajorDimension string
-	TimeColumn     valueOption `json:"timeColumn"`
-	MetricColumn   valueOption `json:"metricColumn"`
+	TimeColumn     valueOption   `json:"timeColumn"`
+	MetricColumns  []valueOption `json:"metricColumns"`
 }
 
 type GoogleSheetConfig struct {
