@@ -22,7 +22,22 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
           },
         ],
       })
-      .then((rsp: any) => Object.entries(rsp.results[''].meta).map(([value, label]) => ({ label, value: Number(value) })));
+      .then((rsp: any) => {
+        console.log({ rsp });
+        return Object.entries(rsp.results[''].meta).map(([value, label]) => ({ label, value: /^\d+$/.test(value) ? Number(value) : value }));
+      });
+  }
+
+  async getResource(body?: any): Promise<any[]> {
+    return getBackendSrv()
+      .post(`/api/datasources/${this.id}/resources`, {
+        queryType: 'getHeaders',
+        ...body,
+      })
+      .then((rsp: any) => {
+        console.log({ rsp });
+        return rsp;
+      });
   }
 
   async testDatasource() {

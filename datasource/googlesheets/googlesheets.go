@@ -11,11 +11,12 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
+	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
 
-func createService(ctx context.Context, config *GoogleSheetConfig) (*sheets.Service, error) {
+func createSheetsService(ctx context.Context, config *GoogleSheetConfig) (*sheets.Service, error) {
 	if config.AuthType == "none" {
 		return sheets.NewService(ctx, option.WithAPIKey(config.ApiKey))
 	}
@@ -28,6 +29,21 @@ func createService(ctx context.Context, config *GoogleSheetConfig) (*sheets.Serv
 	client := jwtConfig.Client(ctx)
 
 	return sheets.New(client)
+}
+
+func createDriveService(ctx context.Context, config *GoogleSheetConfig) (*drive.Service, error) {
+	if config.AuthType == "none" {
+		return drive.NewService(ctx, option.WithAPIKey(config.ApiKey))
+	}
+
+	jwtConfig, err := google.JWTConfigFromJSON([]byte(config.JwtFile), drive.DriveMetadataReadonlyScope)
+	if err != nil {
+		return nil, fmt.Errorf("Error parsin JWT file: %v", err)
+	}
+
+	client := jwtConfig.Client(ctx)
+
+	return drive.New(client)
 }
 
 func getTypeDefaultValue(t string) interface{} {
@@ -56,8 +72,14 @@ func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclo
 	frame.RefID = refID
 
 	for index := 1; index < len(resp.Values); index++ {
-		for columnID, value := range resp.Values[index] {
-			frame.Fields[columnID].Vector.Append(value.(string))
+		for columnID := 0; columnID < len(fields); columnID++ {
+			if columnID+1 <= len(resp.Values[index]) {
+				frame.Fields[columnID].Vector.Append(resp.Values[index][columnID].(string))
+			} else {
+				logger.Debug("appending default value", string(columnID))
+				frame.Fields[columnID].Vector.Append("")
+			}
+
 		}
 	}
 
@@ -65,7 +87,7 @@ func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclo
 }
 
 func getTimeSeriesData(srv *sheets.Service, refID string, qm *QueryModel, timeRange backend.TimeRange, logger hclog.Logger) ([]*df.Frame, error) {
-	result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).Ranges(qm.Range).IncludeGridData(true).Do()
+	result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).IncludeGridData(true).Do()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
 	}
@@ -85,6 +107,7 @@ func getTimeSeriesData(srv *sheets.Service, refID string, qm *QueryModel, timeRa
 			df.NewField("Time", nil, []time.Time{}),
 			df.NewField("Value", nil, []float64{}),
 		)
+
 		frame.RefID = refID
 		frames = append(frames, frame)
 	}
@@ -123,7 +146,7 @@ func getTimeSeriesData(srv *sheets.Service, refID string, qm *QueryModel, timeRa
 
 // Query function
 func Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange, logger hclog.Logger) ([]*df.Frame, error) {
-	srv, err := createService(ctx, config)
+	srv, err := createSheetsService(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("Unable to create service: %v", err.Error())
 	}
@@ -139,8 +162,52 @@ func Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleShee
 
 }
 
+func allFiles(d *drive.Service) ([]*drive.File, error) {
+	var fs []*drive.File
+	pageToken := ""
+	for {
+		q := d.Files.List().Q("mimeType='application/vnd.google-apps.spreadsheet'")
+		// If we have a pageToken set, apply it to the query
+		if pageToken != "" {
+			q = q.PageToken(pageToken)
+		}
+		r, err := q.Do()
+		if err != nil {
+			return fs, err
+		}
+		//   fs = append(fs, r.Items...)
+		fs = append(fs, r.Files...)
+		pageToken = r.NextPageToken
+		if pageToken == "" {
+			break
+		}
+	}
+	return fs, nil
+}
+
+//GetSpreadsheets
+func GetSpreadsheets(ctx context.Context, config *GoogleSheetConfig, logger hclog.Logger) (map[string]string, error) {
+	srv, err := createDriveService(ctx, config)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
+	}
+
+	files, err := allFiles(srv)
+	if err != nil {
+		logger.Debug("aaaaa12: " + err.Error())
+		return nil, fmt.Errorf("Could not get all files: %s", err.Error())
+	}
+	fileNames := map[string]string{}
+	for _, i := range files {
+		logger.Debug("%s (%s)\n", i.Name, i.Id)
+		fileNames[i.Id] = i.Name
+	}
+
+	return fileNames, nil
+}
+
 func GetHeaders(ctx context.Context, qm *QueryModel, config *GoogleSheetConfig, logger hclog.Logger) ([]string, error) {
-	srv, err := createService(ctx, config)
+	srv, err := createSheetsService(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
 	}
@@ -159,7 +226,7 @@ func GetHeaders(ctx context.Context, qm *QueryModel, config *GoogleSheetConfig, 
 
 // TestAPI function
 func TestAPI(ctx context.Context, config *GoogleSheetConfig) ([]*df.Frame, error) {
-	_, err := createService(ctx, config)
+	_, err := createSheetsService(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
 	}

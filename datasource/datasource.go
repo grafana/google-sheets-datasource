@@ -3,7 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
+	"github.com/davecgh/go-spew/spew"
 	gs "github.com/grafana/google-sheets-datasource/datasource/googlesheets"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -26,10 +28,12 @@ var pluginLogger = hclog.New(&hclog.LoggerOptions{
 })
 
 func main() {
+	ds := &GoogleSheetsDataSource{
+		logger: pluginLogger,
+	}
 	err := backend.Serve(backend.ServeOpts{
-		DataQueryHandler: &GoogleSheetsDataSource{
-			logger: pluginLogger,
-		},
+		CallResourceHandler: ds,
+		DataQueryHandler:    ds,
 	})
 	if err != nil {
 		pluginLogger.Error(err.Error())
@@ -42,6 +46,7 @@ type GoogleSheetsDataSource struct {
 }
 
 func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
+	gsd.logger.Debug("GoogleSheetsDatasource", "DataQuery")
 	res := &backend.DataQueryResponse{}
 	config := gs.GoogleSheetConfig{}
 	err := json.Unmarshal(req.PluginConfig.JSONData, &config)
@@ -65,6 +70,11 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			frames, err = gs.TestAPI(ctx, &config)
 		case "query":
 			frames, err = gs.Query(ctx, q.RefID, queryModel, &config, q.TimeRange, gsd.logger)
+		case "getSpreadsheets":
+			a, _ := gs.GetSpreadsheets(ctx, &config, gsd.logger)
+			frame := df.New("getHeader")
+			res.Metadata = a
+			frames = []*df.Frame{frame}
 		case "getHeaders":
 			// res.Metadata = make(map[string]string)
 			// frame = df.New("getHeader")
@@ -74,7 +84,7 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			// if err == nil {
 			// 	frame.Meta.Custom["headers"] = res
 			// }
-			frame := df.New("getHeader")
+			frame := df.New("getHeaders")
 			headers, _ := gs.GetHeaders(ctx, queryModel, &config, gsd.logger)
 			res.Metadata = make(map[string]string)
 			for i, header := range headers {
@@ -93,9 +103,54 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 		// 	frame.Meta.Custom["error"] = err.Error()
 		// 	// return nil, err
 		// }
-		gsd.logger.Debug("aaaaa6: ")
 		res.Frames = append(res.Frames, frames...)
 	}
 
 	return res, nil
+}
+
+func (gsd *GoogleSheetsDataSource) CallResource(ctx context.Context, req *backend.CallResourceRequest) (*backend.CallResourceResponse, error) {
+	gsd.logger.Debug("aaaaa7: ")
+	gsd.logger.Debug(spew.Sdump(req.PluginConfig))
+	response := make(map[string]interface{})
+
+	config := gs.GoogleSheetConfig{}
+	err := json.Unmarshal(req.PluginConfig.JSONData, &config)
+	if err != nil {
+		gsd.logger.Error("Could not unmarshal DataSourceInfo json", "Error", err)
+		return nil, err
+	}
+
+	var metaQuery = &gs.MetaQuery{}
+	if len(req.Body) > 0 {
+		err := json.Unmarshal(req.Body, &metaQuery)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	switch metaQuery.QueryType {
+	case "getHeaders":
+		headers, err := gs.GetHeaders(ctx, &metaQuery.Query, &config, gsd.logger)
+		if err != nil {
+			gsd.logger.Error("Failed to get headers: %v", err.Error())
+			return nil, fmt.Errorf("Invalid query")
+		}
+
+		response["headers"] = headers
+	}
+
+	body, err := json.Marshal(&response)
+	if err != nil {
+		return nil, err
+	}
+
+	headers := make(http.Header)
+	headers.Add("Content-Type", "application/json")
+
+	return &backend.CallResourceResponse{
+		Status:  http.StatusOK,
+		Headers: headers,
+		Body:    body,
+	}, nil
 }

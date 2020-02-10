@@ -67,7 +67,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     }
 
     if (!this.props.query.timeColumn) {
-      this.props.query.timeColumn = [];
+      this.props.query.timeColumn = {};
     }
   }
 
@@ -107,18 +107,34 @@ export class QueryEditor extends PureComponent<Props, State> {
     });
   };
 
-  SpreadsheetIdTooltip = () => (
-    <p>
-      The <code>spreadsheetId</code> is used to identify which spreadsheet is to be accessed or altered. This ID is the value between the "/d/" and
-      the "/edit" in the URL of your spreadsheet.
-    </p>
-  );
-
   render() {
     const { query, onRunQuery, onChange, datasource } = this.props;
     return (
       <>
         <div className={'gf-form-inline'}>
+          <FormLabel
+            width={10}
+            className="query-keyword"
+            tooltip={
+              <p>
+                The <code>spreadsheetId</code> is used to identify which spreadsheet is to be accessed or altered. This ID is the value between the
+                "/d/" and the "/edit" in the URL of your spreadsheet.
+              </p>
+            }
+          >
+            Spreadsheet ID
+          </FormLabel>
+          <SegmentAsync
+            loadOptions={() => datasource.metricFindQuery(query, 'getSpreadsheets')}
+            placeholder="Enter SpreadsheetID"
+            value={query.spreadsheetId || ''}
+            allowCustomValue={true}
+            onChange={({ value }) => {
+              console.log({ value });
+              onChange({ ...query, spreadsheetId: value! });
+              onRunQuery();
+            }}
+          ></SegmentAsync>
           <FormLabel
             width={10}
             className="query-keyword"

@@ -20,3 +20,8 @@ type GoogleSheetConfig struct {
 	AuthType string `json:"authType"`
 	JwtFile  string `json:"jwtFile"`
 }
+
+type MetaQuery struct {
+	QueryType string
+	Query     QueryModel
+}
