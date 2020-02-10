@@ -95,6 +95,10 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			return nil, fmt.Errorf("Invalid query type")
 		}
 
+		if err != nil {
+			gsd.logger.Debug("metric error=", err)
+		}
+
 		// if err != nil {
 		// 	gsd.logger.Debug("QueryError", "QueryError", err.Error())
 		// 	frame = df.New("default")

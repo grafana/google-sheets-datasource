@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"time"
 
-	// "github.com/davecgh/go-spew/spew"
 	"github.com/araddon/dateparse"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
@@ -58,28 +57,52 @@ func getTypeDefaultValue(t string) interface{} {
 }
 
 func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclog.Logger) ([]*df.Frame, error) {
-	resp, err := srv.Spreadsheets.Values.Get(qm.SpreadsheetID, qm.Range).MajorDimension(qm.MajorDimension).Do()
+	result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).Ranges(qm.Range).IncludeGridData(true).Do()
 	if err != nil {
-		return nil, fmt.Errorf("Unable to retrieve data from sheet: %v", err.Error())
+		return nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
 	}
+
+	sheet := result.Sheets[0].Data[0]
 
 	fields := []*df.Field{}
-	for _, column := range resp.Values[0] {
-		fields = append(fields, df.NewField(column.(string), nil, []string{}))
+	columns := []string{}
+	for columnIndex, column := range sheet.RowData[0].Values {
+
+		columnType := getColumnType(columnIndex, sheet.RowData)
+		columns = append(columns, columnType)
+		switch columnType {
+		case "TIME":
+			fields = append(fields, df.NewField(column.FormattedValue, nil, []*time.Time{}))
+		case "NUMBER":
+			fields = append(fields, df.NewField(column.FormattedValue, nil, []*float64{}))
+		case "STRING":
+			fields = append(fields, df.NewField(column.FormattedValue, nil, []*string{}))
+		}
+
+		fields[columnIndex].Config = &df.FieldConfig{Unit: getColumnUnit(columnIndex, sheet.RowData)}
 	}
 
-	frame := df.New(qm.Range, fields...)
-	frame.RefID = refID
+	frame := df.New(refID,
+		fields...,
+	)
 
-	for index := 1; index < len(resp.Values); index++ {
-		for columnID := 0; columnID < len(fields); columnID++ {
-			if columnID+1 <= len(resp.Values[index]) {
-				frame.Fields[columnID].Vector.Append(resp.Values[index][columnID].(string))
-			} else {
-				logger.Debug("appending default value", string(columnID))
-				frame.Fields[columnID].Vector.Append("")
+	for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
+		for columnIndex, columnType := range columns {
+			if columnIndex < len(sheet.RowData[rowIndex].Values) {
+				cellData := sheet.RowData[rowIndex].Values[columnIndex]
+				switch columnType {
+				case "TIME":
+					time, err := dateparse.ParseLocal(cellData.FormattedValue)
+					if err != nil {
+						return []*df.Frame{frame}, fmt.Errorf("error while parsing date :", err.Error())
+					}
+					frame.Fields[columnIndex].Vector.Append(&time)
+				case "NUMBER":
+					frame.Fields[columnIndex].Vector.Append(&cellData.EffectiveValue.NumberValue)
+				case "STRING":
+					frame.Fields[columnIndex].Vector.Append(&cellData.FormattedValue)
+				}
 			}
-
 		}
 	}
 
@@ -87,7 +110,7 @@ func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclo
 }
 
 func getTimeSeriesData(srv *sheets.Service, refID string, qm *QueryModel, timeRange backend.TimeRange, logger hclog.Logger) ([]*df.Frame, error) {
-	result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).IncludeGridData(true).Do()
+	result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).Ranges(qm.Range).IncludeGridData(true).Do()
 	if err != nil {
 		return nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
 	}
