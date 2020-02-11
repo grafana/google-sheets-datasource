@@ -1,6 +1,6 @@
 import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { Button, LinkButton, FormLabel, Segment } from '@grafana/ui';
+import { LinkButton, FormLabel, Segment } from '@grafana/ui';
 import { DataSource } from './DataSource';
 import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo, majorDimensions } from './types';
 
