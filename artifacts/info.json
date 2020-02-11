@@ -1,0 +1,14 @@
+{
+  "plugin": {
+    "name": "google-sheets-datasource-0.1.0.zip",
+    "size": 9893,
+    "contents": {
+      "json": {
+        "bytes": 933,
+        "count": 1
+      }
+    },
+    "sha1": "28258df76cc0f650fc1abf0f372fd1c28a10654d",
+    "md5": "c99fc2d7f112224dc1ee721b2347e623"
+  }
+}
