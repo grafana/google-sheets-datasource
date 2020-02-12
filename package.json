@@ -20,9 +20,9 @@
   },
   "devDependencies": {
     "@types/lodash": "latest",
-    "@grafana/data": "latest",
-    "@grafana/toolkit": "latest",
-    "@grafana/ui": "latest",
-    "@grafana/runtime": "latest"
+    "@grafana/data": "next",
+    "@grafana/toolkit": "next",
+    "@grafana/ui": "next",
+    "@grafana/runtime": "next"
   }
 }

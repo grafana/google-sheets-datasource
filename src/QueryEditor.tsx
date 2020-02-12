@@ -1,8 +1,8 @@
 import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { LinkButton, FormLabel, Segment } from '@grafana/ui';
+import { LinkButton, FormLabel, SegmentAsync } from '@grafana/ui';
 import { DataSource } from './DataSource';
-import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo, majorDimensions } from './types';
+import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo, ResultFormatType, MajorDimensionType } from './types';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, SheetsSourceOptions>;
 
@@ -44,6 +44,22 @@ export class QueryEditor extends PureComponent<Props, State> {
     if (!this.props.query.queryType) {
       this.props.query.queryType = 'query';
     }
+
+    if (!this.props.query.resultFormat) {
+      this.props.query.resultFormat = ResultFormatType.TABLE;
+    }
+
+    if (!this.props.query.majorDimension) {
+      this.props.query.majorDimension = MajorDimensionType.ROWS;
+    }
+
+    if (!this.props.query.metricColumns) {
+      this.props.query.metricColumns = [];
+    }
+
+    if (!this.props.query.timeColumn) {
+      this.props.query.timeColumn = {};
+    }
   }
 
   onSpreadsheetIdPasted = (e: any) => {
@@ -82,18 +98,34 @@ export class QueryEditor extends PureComponent<Props, State> {
     });
   };
 
-  SpreadsheetIdTooltip = () => (
-    <p>
-      The <code>spreadsheetId</code> is used to identify which spreadsheet is to be accessed or altered. This ID is the value between the "/d/" and
-      the "/edit" in the URL of your spreadsheet.
-    </p>
-  );
-
   render() {
-    const { query, onRunQuery, onChange } = this.props;
+    const { query, onRunQuery, onChange, datasource } = this.props;
     return (
       <>
         <div className={'gf-form-inline'}>
+          <FormLabel
+            width={10}
+            className="query-keyword"
+            tooltip={
+              <p>
+                The <code>spreadsheetId</code> is used to identify which spreadsheet is to be accessed or altered. This ID is the value between the
+                "/d/" and the "/edit" in the URL of your spreadsheet.
+              </p>
+            }
+          >
+            Spreadsheet ID
+          </FormLabel>
+          <SegmentAsync
+            loadOptions={() => datasource.metricFindQuery(query, 'getSpreadsheets')}
+            placeholder="Enter SpreadsheetID"
+            value={query.spreadsheetId || ''}
+            allowCustomValue={true}
+            onChange={({ value }) => {
+              console.log({ value });
+              onChange({ ...query, spreadsheetId: value! });
+              onRunQuery();
+            }}
+          ></SegmentAsync>
           <FormLabel
             width={10}
             className="query-keyword"
@@ -140,17 +172,6 @@ export class QueryEditor extends PureComponent<Props, State> {
             onChange={this.onRangeChange}
             onBlur={onRunQuery}
           ></input>
-          <FormLabel width={10} className="query-keyword">
-            Major Dimension
-          </FormLabel>
-          <Segment
-            options={majorDimensions}
-            value={majorDimensions.find(({ value }) => value === query.majorDimension) || majorDimensions[0]}
-            onChange={({ value }) => {
-              onChange({ ...query, majorDimension: value! });
-              onRunQuery();
-            }}
-          />
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>

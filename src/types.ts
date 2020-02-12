@@ -1,4 +1,4 @@
-import { DataQuery, DataSourceJsonData } from '@grafana/data';
+import { DataQuery, DataSourceJsonData, SelectableValue } from '@grafana/data';
 
 //-------------------------------------------------------------------------------
 // General google cloud auth types
@@ -11,6 +11,16 @@ export interface JWT {
   client_email: any;
   project_id: any;
 }
+
+export enum ResultFormatType {
+  TABLE = 'TABLE',
+  TIME_SERIES = 'TIME_SERIES',
+}
+
+export const resultFormats = [
+  { label: 'Table', value: ResultFormatType.TABLE },
+  { label: 'Time Series', value: ResultFormatType.TIME_SERIES },
+];
 
 export enum MajorDimensionType {
   DIMENSION_UNSPECIFIED = 'DIMENSION_UNSPECIFIED',
@@ -50,6 +60,9 @@ export interface GoogleSheetRangeInfo {
 
 export interface SheetsQuery extends DataQuery, GoogleSheetRangeInfo {
   queryType: string;
+  resultFormat: ResultFormatType;
+  timeColumn: SelectableValue<number>;
+  metricColumns: Array<SelectableValue<number>>;
 }
 
 export interface SheetsSourceOptions extends GoogleCloudOptions {
