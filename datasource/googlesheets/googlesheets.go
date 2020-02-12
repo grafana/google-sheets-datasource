@@ -58,7 +58,7 @@ func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclo
 	columns := getColumnDefintions(sheet.RowData, logger)
 
 	for _, columnDef := range columns {
-		logger.Debug("COLUMNNAME", spew.Sdump(columnDef.Header))
+
 		var field *df.Field
 		switch columnDef.Type {
 		case "TIME":
@@ -70,12 +70,12 @@ func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclo
 		}
 
 		if columnDef.Unit != "" {
+			logger.Debug("COLUMN_UNIT", spew.Sdump(columnDef.Unit))
 			field.Config = &df.FieldConfig{Unit: columnDef.Unit}
 		}
 
 		fields = append(fields, field)
 	}
-	logger.Debug("COLUMN fields", spew.Sdump(fields))
 
 	frame := df.New(refID,
 		fields...,

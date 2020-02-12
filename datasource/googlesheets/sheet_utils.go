@@ -5,7 +5,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/araddon/dateparse"
 	"github.com/hashicorp/go-hclog"
 	"google.golang.org/api/sheets/v4"
 )
@@ -28,7 +27,7 @@ func getColumnDefintions(rows []*sheets.RowData, logger hclog.Logger) []*columnD
 		for columnIndex, columnCell := range rows[rowIndex].Values {
 			columnType := getType(columnCell)
 			unit := getUnit(columnCell)
-			columnTypes[columnIndex][columnType] = &columnDefinition{Type: columnType, Unit: unit}
+			columnTypes[columnIndex][columnType+unit] = &columnDefinition{Type: columnType, Unit: unit}
 		}
 	}
 
@@ -101,37 +100,45 @@ func getType(cellData *sheets.CellData) string {
 	return "STRING"
 }
 
+var unitMappings = map[string]string{
+	"$":   "currencyUSD",
+	"£":   "currencyGBP",
+	"€":   "currencyEUR",
+	"¥":   "currencyJPY",
+	"₽":   "currencyRUB",
+	"₴":   "currencyUAH",
+	"R$":  "currencyBRL",
+	"kr.": "currencyDKK",
+	"kr":  "currencySEK",
+	"czk": "currencyCZK",
+	"CHF": "currencyCHF",
+	"PLN": "currencyPLN",
+	"฿":   "currencyBTC",
+	"R":   "currencyZAR",
+	"₹":   "currencyINR",
+	"₩":   "currencyKRW"}
+
 func getUnit(cellData *sheets.CellData) string {
 	if cellData.UserEnteredFormat.NumberFormat != nil {
 		switch cellData.UserEnteredFormat.NumberFormat.Type {
 		case "NUMBER":
-			if strings.Contains(cellData.UserEnteredFormat.NumberFormat.Pattern, "$") {
-				return "$"
+			for unit, unitID := range unitMappings {
+				if strings.Contains(cellData.UserEnteredFormat.NumberFormat.Pattern, unit) {
+					return unitID
+				}
 			}
 		case "PERCENT":
-			return "%"
+			return "percent"
 		case "CURRENCY":
-			return "$"
+			for unit, unitID := range unitMappings {
+				if strings.Contains(cellData.FormattedValue, unit) {
+					return unitID
+				}
+			}
+
+			return "currencyUSD"
 		}
 	}
 
 	return ""
-}
-
-func getValue(cellData *sheets.CellData) (interface{}, error) {
-	if cellData.UserEnteredFormat.NumberFormat != nil {
-		switch cellData.UserEnteredFormat.NumberFormat.Type {
-		case "DATE", "DATE_TIME":
-			time, err := dateparse.ParseLocal(cellData.FormattedValue)
-			if err != nil {
-				return nil, fmt.Errorf("error while parsing date :", err.Error())
-			}
-
-			return &time, nil
-		default:
-			return &cellData.EffectiveValue.NumberValue, nil
-		}
-	}
-
-	return &cellData.FormattedValue, nil
 }
