@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/araddon/dateparse"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/hashicorp/go-hclog"
@@ -57,6 +56,11 @@ func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclo
 	fields := []*df.Field{}
 	columns := []string{}
 	for columnIndex, column := range sheet.RowData[0].Values {
+		// columnTypes := getColumnTypes(sheet.RowData)
+		// for columnIndex, columnType := range columnTypes {
+		// 	logger.Debug("COLUMN TYPE", spew.Sdump(columnType, columnIndex))
+		// }
+
 		columnType := getColumnType(columnIndex, sheet.RowData)
 		columns = append(columns, columnType)
 		switch columnType {
