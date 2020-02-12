@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	gs "github.com/grafana/google-sheets-datasource/datasource/googlesheets"
 
@@ -31,8 +30,7 @@ func main() {
 		logger: pluginLogger,
 	}
 	err := backend.Serve(backend.ServeOpts{
-		CallResourceHandler: ds,
-		DataQueryHandler:    ds,
+		DataQueryHandler: ds,
 	})
 	if err != nil {
 		pluginLogger.Error(err.Error())
@@ -73,14 +71,6 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			frame := df.New("getHeader")
 			res.Metadata = a
 			frames = []*df.Frame{frame}
-		case "getHeaders":
-			frame := df.New("getHeaders")
-			headers, _ := gs.GetHeaders(ctx, queryModel, &config, gsd.logger)
-			res.Metadata = make(map[string]string)
-			for i, header := range headers {
-				res.Metadata[fmt.Sprint(i)] = header
-			}
-			frames = []*df.Frame{frame}
 		default:
 			return nil, fmt.Errorf("Invalid query type")
 		}
@@ -101,48 +91,4 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 	}
 
 	return res, nil
-}
-
-func (gsd *GoogleSheetsDataSource) CallResource(ctx context.Context, req *backend.CallResourceRequest) (*backend.CallResourceResponse, error) {
-	response := make(map[string]interface{})
-
-	config := gs.GoogleSheetConfig{}
-	err := json.Unmarshal(req.PluginConfig.JSONData, &config)
-	if err != nil {
-		gsd.logger.Error("Could not unmarshal DataSourceInfo json", "Error", err)
-		return nil, err
-	}
-
-	var metaQuery = &gs.MetaQuery{}
-	if len(req.Body) > 0 {
-		err := json.Unmarshal(req.Body, &metaQuery)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	switch metaQuery.QueryType {
-	case "getHeaders":
-		headers, err := gs.GetHeaders(ctx, &metaQuery.Query, &config, gsd.logger)
-		if err != nil {
-			gsd.logger.Error("Failed to get headers: %v", err.Error())
-			return nil, fmt.Errorf("Invalid query")
-		}
-
-		response["headers"] = headers
-	}
-
-	body, err := json.Marshal(&response)
-	if err != nil {
-		return nil, err
-	}
-
-	headers := make(http.Header)
-	headers.Add("Content-Type", "application/json")
-
-	return &backend.CallResourceResponse{
-		Status:  http.StatusOK,
-		Headers: headers,
-		Body:    body,
-	}, nil
 }

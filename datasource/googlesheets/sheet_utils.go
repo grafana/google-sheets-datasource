@@ -2,33 +2,56 @@ package googlesheets
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/araddon/dateparse"
+	"github.com/hashicorp/go-hclog"
 	"google.golang.org/api/sheets/v4"
 )
 
-func getColumnTypes(rows []*sheets.RowData) map[int]string {
-	columnTypes := map[int]map[string]bool{}
-	for rowIndex := 1; rowIndex < len(rows); rowIndex++ {
+type columnDefinition struct {
+	Header      string
+	ColumnIndex int
+	Type        string
+	Unit        string
+	Warning     string
+}
+
+func getColumnDefintions(rows []*sheets.RowData, logger hclog.Logger) []*columnDefinition {
+	columnTypes := map[int]map[string]*columnDefinition{}
+	for columnIndex := range rows[0].Values {
+		columnTypes[columnIndex] = map[string]*columnDefinition{}
+	}
+
+	for rowIndex := 0; rowIndex < len(rows); rowIndex++ {
 		for columnIndex, columnCell := range rows[rowIndex].Values {
-			columnTypes[columnIndex] = map[string]bool{}
 			columnType := getType(columnCell)
-			columnTypes[columnIndex][columnType] = true
+			unit := getUnit(columnCell)
+			columnTypes[columnIndex][columnType] = &columnDefinition{Type: columnType, Unit: unit}
 		}
 	}
 
-	columns := map[int]string{}
+	columns := []*columnDefinition{}
 	for columnIndex, columnTypeMap := range columnTypes {
+		columnName := rows[0].Values[columnIndex].FormattedValue
+		var column *columnDefinition
 		if len(columnTypeMap) == 1 {
-			for key := range columnTypeMap {
-				columns[columnIndex] = key
+			for _, c := range columnTypeMap {
+				column = c
 			}
 		} else {
 			//The column has different data types - fallback to string
-			columns[columnIndex] = "STRING"
+			column = &columnDefinition{Type: "STRING", Warning: fmt.Sprint("Multipe data types found in column index %v. Using string data type", columnName)}
 		}
+		column.ColumnIndex = columnIndex
+		column.Header = columnName
+		columns = append(columns, column)
 	}
+
+	sort.Slice(columns, func(i, j int) bool {
+		return columns[i].ColumnIndex < columns[j].ColumnIndex
+	})
 
 	return columns
 }

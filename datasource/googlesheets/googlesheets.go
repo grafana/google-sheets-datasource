@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/araddon/dateparse"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/hashicorp/go-hclog"
@@ -54,46 +55,47 @@ func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclo
 	sheet := result.Sheets[0].Data[0]
 
 	fields := []*df.Field{}
-	columns := []string{}
-	for columnIndex, column := range sheet.RowData[0].Values {
-		// columnTypes := getColumnTypes(sheet.RowData)
-		// for columnIndex, columnType := range columnTypes {
-		// 	logger.Debug("COLUMN TYPE", spew.Sdump(columnType, columnIndex))
-		// }
+	columns := getColumnDefintions(sheet.RowData, logger)
 
-		columnType := getColumnType(columnIndex, sheet.RowData)
-		columns = append(columns, columnType)
-		switch columnType {
+	for _, columnDef := range columns {
+		logger.Debug("COLUMNNAME", spew.Sdump(columnDef.Header))
+		var field *df.Field
+		switch columnDef.Type {
 		case "TIME":
-			fields = append(fields, df.NewField(column.FormattedValue, nil, []*time.Time{}))
+			field = df.NewField(columnDef.Header, nil, []*time.Time{})
 		case "NUMBER":
-			fields = append(fields, df.NewField(column.FormattedValue, nil, []*float64{}))
+			field = df.NewField(columnDef.Header, nil, []*float64{})
 		case "STRING":
-			fields = append(fields, df.NewField(column.FormattedValue, nil, []*string{}))
+			field = df.NewField(columnDef.Header, nil, []*string{})
 		}
 
-		fields[columnIndex].Config = &df.FieldConfig{Unit: getColumnUnit(columnIndex, sheet.RowData)}
+		if columnDef.Unit != "" {
+			field.Config = &df.FieldConfig{Unit: columnDef.Unit}
+		}
+
+		fields = append(fields, field)
 	}
+	logger.Debug("COLUMN fields", spew.Sdump(fields))
 
 	frame := df.New(refID,
 		fields...,
 	)
 
 	for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
-		for columnIndex, columnType := range columns {
-			if columnIndex < len(sheet.RowData[rowIndex].Values) {
-				cellData := sheet.RowData[rowIndex].Values[columnIndex]
-				switch columnType {
+		for _, columnDef := range columns {
+			if columnDef.ColumnIndex < len(sheet.RowData[rowIndex].Values) {
+				cellData := sheet.RowData[rowIndex].Values[columnDef.ColumnIndex]
+				switch columnDef.Type {
 				case "TIME":
 					time, err := dateparse.ParseLocal(cellData.FormattedValue)
 					if err != nil {
 						return []*df.Frame{frame}, fmt.Errorf("error while parsing date :", err.Error())
 					}
-					frame.Fields[columnIndex].Vector.Append(&time)
+					frame.Fields[columnDef.ColumnIndex].Vector.Append(&time)
 				case "NUMBER":
-					frame.Fields[columnIndex].Vector.Append(&cellData.EffectiveValue.NumberValue)
+					frame.Fields[columnDef.ColumnIndex].Vector.Append(&cellData.EffectiveValue.NumberValue)
 				case "STRING":
-					frame.Fields[columnIndex].Vector.Append(&cellData.FormattedValue)
+					frame.Fields[columnDef.ColumnIndex].Vector.Append(&cellData.FormattedValue)
 				}
 			}
 		}
@@ -152,24 +154,6 @@ func GetSpreadsheets(ctx context.Context, config *GoogleSheetConfig, logger hclo
 	}
 
 	return fileNames, nil
-}
-
-func GetHeaders(ctx context.Context, qm *QueryModel, config *GoogleSheetConfig, logger hclog.Logger) ([]string, error) {
-	srv, err := createSheetsService(ctx, config)
-	if err != nil {
-		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
-	}
-
-	resp, err := srv.Spreadsheets.Values.Get(qm.SpreadsheetID, qm.Range).MajorDimension(qm.MajorDimension).Do()
-	if err != nil {
-		return nil, fmt.Errorf("Unable to retrieve data from sheet: %v", err.Error())
-	}
-
-	headers := []string{}
-	for _, column := range resp.Values[0] {
-		headers = append(headers, column.(string))
-	}
-	return headers, nil
 }
 
 // TestAPI function
