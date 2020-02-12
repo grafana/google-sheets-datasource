@@ -181,66 +181,6 @@ export class QueryEditor extends PureComponent<Props, State> {
             onChange={this.onRangeChange}
             onBlur={onRunQuery}
           ></input>
-          <FormLabel width={10} className="query-keyword">
-            Major Dimension
-          </FormLabel>
-          <Segment
-            options={majorDimensions}
-            value={majorDimensions.find(({ value }) => value === query.majorDimension)}
-            onChange={({ value }) => {
-              onChange({ ...query, majorDimension: value! });
-              onRunQuery();
-            }}
-          />
-          <div className="gf-form gf-form--grow">
-            <div className="gf-form-label gf-form-label--grow" />
-          </div>
-        </div>
-        <div className={'gf-form-inline'}>
-          <FormLabel width={10} className="query-keyword">
-            Format
-          </FormLabel>
-          <Segment
-            options={resultFormats}
-            value={resultFormats.find(({ value }) => value === query.resultFormat)}
-            onChange={({ value }) => {
-              onChange({ ...query, resultFormat: value! });
-              onRunQuery();
-            }}
-          />
-
-          {query.resultFormat == ResultFormatType.TIME_SERIES && (
-            <>
-              <FormLabel width={8} className="query-keyword">
-                Time Column
-              </FormLabel>
-              <SegmentAsync
-                loadOptions={() => datasource.metricFindQuery(query, 'getHeaders')}
-                value={query.timeColumn}
-                placeholder="Select time column"
-                onChange={option => {
-                  onChange({ ...query, timeColumn: option });
-                  onRunQuery();
-                }}
-              />
-              <FormLabel width={8} className="query-keyword">
-                Metric Column
-              </FormLabel>
-              <MetricColumns
-                values={query.metricColumns}
-                onChange={options => {
-                  console.log({ options });
-
-                  onChange({ ...query, metricColumns: options });
-                  onRunQuery();
-                }}
-                loadColumns={() =>
-                  datasource.metricFindQuery(query, 'getHeaders').then(values => values.filter(({ value }) => value !== query.timeColumn.value))
-                }
-              ></MetricColumns>
-            </>
-          )}
-
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>

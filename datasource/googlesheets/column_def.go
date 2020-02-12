@@ -8,8 +8,29 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
-type columnDef struct {
-	Name string
+func getColumnTypes(rows []*sheets.RowData) map[int]string {
+	columnTypes := map[int]map[string]bool{}
+	for rowIndex := 1; rowIndex < len(rows); rowIndex++ {
+		for columnIndex, columnCell := range rows[rowIndex].Values {
+			columnTypes[columnIndex] = map[string]bool{}
+			columnType := getType(columnCell)
+			columnTypes[columnIndex][columnType] = true
+		}
+	}
+
+	columns := map[int]string{}
+	for columnIndex, columnTypeMap := range columnTypes {
+		if len(columnTypeMap) == 1 {
+			for key := range columnTypeMap {
+				columns[columnIndex] = key
+			}
+		} else {
+			//The column has different data types - fallback to string
+			columns[columnIndex] = "STRING"
+		}
+	}
+
+	return columns
 }
 
 func getColumnType(columnIndex int, rows []*sheets.RowData) string {

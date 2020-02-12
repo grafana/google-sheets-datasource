@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/davecgh/go-spew/spew"
 	gs "github.com/grafana/google-sheets-datasource/datasource/googlesheets"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -46,7 +45,6 @@ type GoogleSheetsDataSource struct {
 }
 
 func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
-	gsd.logger.Debug("GoogleSheetsDatasource", "DataQuery")
 	res := &backend.DataQueryResponse{}
 	config := gs.GoogleSheetConfig{}
 	err := json.Unmarshal(req.PluginConfig.JSONData, &config)
@@ -76,14 +74,6 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			res.Metadata = a
 			frames = []*df.Frame{frame}
 		case "getHeaders":
-			// res.Metadata = make(map[string]string)
-			// frame = df.New("getHeader")
-			// frame.RefID = q.RefID
-			// frame.Meta = &df.QueryResultMeta{Custom: make(map[string]interface{})}
-			// res, err := gs.GetHeaders(ctx, queryModel, &config, gsd.logger)
-			// if err == nil {
-			// 	frame.Meta.Custom["headers"] = res
-			// }
 			frame := df.New("getHeaders")
 			headers, _ := gs.GetHeaders(ctx, queryModel, &config, gsd.logger)
 			res.Metadata = make(map[string]string)
@@ -96,7 +86,7 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 		}
 
 		if err != nil {
-			gsd.logger.Debug("metric error=", err)
+			gsd.logger.Debug("Metric Error: ", err.Error())
 		}
 
 		// if err != nil {
@@ -114,8 +104,6 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 }
 
 func (gsd *GoogleSheetsDataSource) CallResource(ctx context.Context, req *backend.CallResourceRequest) (*backend.CallResourceResponse, error) {
-	gsd.logger.Debug("aaaaa7: ")
-	gsd.logger.Debug(spew.Sdump(req.PluginConfig))
 	response := make(map[string]interface{})
 
 	config := gs.GoogleSheetConfig{}
