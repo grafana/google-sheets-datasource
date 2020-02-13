@@ -2,10 +2,12 @@ package googlesheets
 
 import (
 	"fmt"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/araddon/dateparse"
-	"github.com/davecgh/go-spew/spew"
+	cd "github.com/grafana/google-sheets-datasource/datasource/columndefinition"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/hashicorp/go-hclog"
@@ -46,6 +48,27 @@ func createDriveService(ctx context.Context, config *GoogleSheetConfig) (*drive.
 	return drive.New(client)
 }
 
+func getColumnDefintions(rows []*sheets.RowData) []*cd.ColumnDefinition {
+	columnTypes := []*cd.ColumnDefinition{}
+	headerRow := rows[0].Values
+
+	for columnIndex, headerCell := range headerRow {
+		columnTypes = append(columnTypes, cd.New(strings.TrimSpace(headerCell.FormattedValue), columnIndex))
+	}
+
+	for rowIndex := 1; rowIndex < len(rows); rowIndex++ {
+		for columnIndex, columnCell := range rows[rowIndex].Values {
+			columnTypes[columnIndex].CheckCell(columnCell)
+		}
+	}
+
+	sort.Slice(columnTypes, func(i, j int) bool {
+		return columnTypes[i].ColumnIndex < columnTypes[j].ColumnIndex
+	})
+
+	return columnTypes
+}
+
 func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclog.Logger) ([]*df.Frame, error) {
 	result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).Ranges(qm.Range).IncludeGridData(true).Do()
 	if err != nil {
@@ -55,23 +78,29 @@ func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclo
 	sheet := result.Sheets[0].Data[0]
 
 	fields := []*df.Field{}
-	columns := getColumnDefintions(sheet.RowData, logger)
+	columns := getColumnDefintions(sheet.RowData)
 
-	for _, columnDef := range columns {
+	for _, column := range columns {
 
 		var field *df.Field
-		switch columnDef.Type {
+		switch column.GetType() {
 		case "TIME":
-			field = df.NewField(columnDef.Header, nil, []*time.Time{})
+			field = df.NewField(column.Header, nil, []time.Time{})
 		case "NUMBER":
-			field = df.NewField(columnDef.Header, nil, []*float64{})
+			field = df.NewField(column.Header, nil, []float64{})
 		case "STRING":
-			field = df.NewField(columnDef.Header, nil, []*string{})
+			field = df.NewField(column.Header, nil, []string{})
 		}
 
-		if columnDef.Unit != "" {
-			logger.Debug("COLUMN_UNIT", spew.Sdump(columnDef.Unit))
-			field.Config = &df.FieldConfig{Unit: columnDef.Unit}
+		if column.HasMixedTypes() {
+			// fmt.Sprintf("Multipe data types found in column %s. Using string data type", columnTypeMap.Header)
+			logger.Error("Multipe data types found in column " + column.Header + ". Using string data type")
+		}
+
+		if column.GetUnit() != "" {
+			field.Config = &df.FieldConfig{Unit: column.GetUnit()}
+		} else if column.HasMixedUnits() {
+			logger.Error("Multipe units found in column " + column.Header + ". Formatted value will be used")
 		}
 
 		fields = append(fields, field)
@@ -85,18 +114,25 @@ func getTableData(srv *sheets.Service, refID string, qm *QueryModel, logger hclo
 		for _, columnDef := range columns {
 			if columnDef.ColumnIndex < len(sheet.RowData[rowIndex].Values) {
 				cellData := sheet.RowData[rowIndex].Values[columnDef.ColumnIndex]
-				switch columnDef.Type {
+				switch columnDef.GetType() {
 				case "TIME":
 					time, err := dateparse.ParseLocal(cellData.FormattedValue)
 					if err != nil {
-						return []*df.Frame{frame}, fmt.Errorf("error while parsing date :", err.Error())
+						return []*df.Frame{frame}, fmt.Errorf("error while parsing date : %v", err.Error())
 					}
-					frame.Fields[columnDef.ColumnIndex].Vector.Append(&time)
+					frame.Fields[columnDef.ColumnIndex].Vector.Append(time)
 				case "NUMBER":
-					frame.Fields[columnDef.ColumnIndex].Vector.Append(&cellData.EffectiveValue.NumberValue)
+					// logger.Debug("CELL", spew.Sdump(cellData))
+					if cellData.EffectiveValue != nil {
+						frame.Fields[columnDef.ColumnIndex].Vector.Append(cellData.EffectiveValue.NumberValue)
+					} else {
+						frame.Fields[columnDef.ColumnIndex].Vector.Append(0.0)
+					}
 				case "STRING":
-					frame.Fields[columnDef.ColumnIndex].Vector.Append(&cellData.FormattedValue)
+					frame.Fields[columnDef.ColumnIndex].Vector.Append(cellData.FormattedValue)
 				}
+			} else {
+				frame.Fields[columnDef.ColumnIndex].Vector.Append(getDefaultValue(columnDef.GetType()))
 			}
 		}
 	}
