@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
+	"github.com/grafana/google-sheets-datasource/datasource/googlesheets"
 	gs "github.com/grafana/google-sheets-datasource/datasource/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
@@ -31,7 +31,10 @@ func main() {
 	cache := cache.New(300*time.Second, 5*time.Second)
 	ds := &GoogleSheetsDataSource{
 		logger: pluginLogger,
-		cache:  cache,
+		googlesheet: &googlesheets.GoogleSheets{
+			Cache:  cache,
+			Logger: pluginLogger,
+		},
 	}
 	err := backend.Serve(backend.ServeOpts{
 		DataQueryHandler: ds,
@@ -43,8 +46,8 @@ func main() {
 
 type GoogleSheetsDataSource struct {
 	plugin.NetRPCUnsupportedPlugin
-	logger hclog.Logger
-	cache  *cache.Cache
+	logger      hclog.Logger
+	googlesheet *googlesheets.GoogleSheets
 }
 
 func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
@@ -68,22 +71,13 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 		var frames []*df.Frame
 		switch queryModel.QueryType {
 		case "testAPI":
-			frames, err = gs.TestAPI(ctx, &config)
+			frames, err = gsd.googlesheet.TestAPI(ctx, &config)
 		case "query":
-			if item, found := gsd.cache.Get(queryModel.SpreadsheetID + queryModel.Range); found {
-				frames = item.([]*df.Frame)
-				gsd.logger.Debug("GET_FROM_CACHE: ", queryModel.SpreadsheetID+queryModel.Range)
-			} else {
-				frames, err = gs.Query(ctx, q.RefID, queryModel, &config, q.TimeRange, gsd.logger)
-				if err != nil && config.CacheDurationSeconds > 0 {
-					gsd.logger.Debug("PUT_IN_CACHE: ", spew.Sdump(config.CacheDurationSeconds))
-					gsd.cache.Set(queryModel.SpreadsheetID+queryModel.Range, frames, time.Duration(config.CacheDurationSeconds)*time.Second)
-				}
-			}
+			frames, err = gsd.googlesheet.Query(ctx, q.RefID, queryModel, &config, q.TimeRange)
 		case "getSpreadsheets":
-			a, _ := gs.GetSpreadsheets(ctx, &config, gsd.logger)
+			spreadSheets, _ := gsd.googlesheet.GetSpreadsheetsByServiceAccount(ctx, &config)
 			frame := df.New("getHeader")
-			res.Metadata = a
+			res.Metadata = spreadSheets
 			frames = []*df.Frame{frame}
 		default:
 			return nil, fmt.Errorf("Invalid query type")

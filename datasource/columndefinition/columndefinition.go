@@ -99,6 +99,8 @@ var unitMappings = map[string]string{
 	"₩":   "currencyKRW",
 }
 
+// A lot more that can be done/improved here. For example it should be possible to extract
+// the number of decimals from the pattern. Read more here: https://developers.google.com/sheets/api/guides/formats
 func (cd *ColumnDefinition) checkUnit(cellData *sheets.CellData) {
 	if cellData != nil {
 		if cellData.UserEnteredFormat != nil && cellData.UserEnteredFormat.NumberFormat != nil {
