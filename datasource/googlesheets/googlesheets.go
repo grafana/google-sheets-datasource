@@ -29,7 +29,6 @@ func createSheetsService(ctx context.Context, config *GoogleSheetConfig) (*sheet
 	}
 
 	client := jwtConfig.Client(ctx)
-
 	return sheets.New(client)
 }
 

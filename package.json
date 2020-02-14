@@ -20,9 +20,9 @@
   },
   "devDependencies": {
     "@types/lodash": "latest",
-    "@grafana/data": "next",
-    "@grafana/toolkit": "next",
-    "@grafana/ui": "next",
-    "@grafana/runtime": "next"
+    "@grafana/data": "canary",
+    "@grafana/toolkit": "canary",
+    "@grafana/ui": "canary",
+    "@grafana/runtime": "canary"
   }
 }
