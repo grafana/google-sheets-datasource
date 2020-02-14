@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	gs "github.com/grafana/google-sheets-datasource/datasource/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
@@ -27,7 +28,7 @@ var pluginLogger = hclog.New(&hclog.LoggerOptions{
 })
 
 func main() {
-	cache := cache.New(10*time.Second, 10*time.Second)
+	cache := cache.New(300*time.Second, 5*time.Second)
 	ds := &GoogleSheetsDataSource{
 		logger: pluginLogger,
 		cache:  cache,
@@ -74,9 +75,9 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 				gsd.logger.Debug("GET_FROM_CACHE: ", queryModel.SpreadsheetID+queryModel.Range)
 			} else {
 				frames, err = gs.Query(ctx, q.RefID, queryModel, &config, q.TimeRange, gsd.logger)
-				if err != nil {
-					gsd.cache.Set(queryModel.SpreadsheetID+queryModel.Range, frames, cache.DefaultExpiration)
-					gsd.logger.Debug("PUT_IN_CACHE: ", queryModel.SpreadsheetID+queryModel.Range)
+				if err != nil && config.CacheDurationSeconds > 0 {
+					gsd.logger.Debug("PUT_IN_CACHE: ", spew.Sdump(config.CacheDurationSeconds))
+					gsd.cache.Set(queryModel.SpreadsheetID+queryModel.Range, frames, time.Duration(config.CacheDurationSeconds)*time.Second)
 				}
 			}
 		case "getSpreadsheets":

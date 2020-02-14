@@ -69,6 +69,7 @@ export interface SheetsSourceOptions extends GoogleCloudOptions {
   authType: GoogleAuthType;
   apiKey: string;
   jwtFile: string;
+  cacheDurationSeconds: number;
 }
 
 export interface GoogleSheetsSecureJsonData {

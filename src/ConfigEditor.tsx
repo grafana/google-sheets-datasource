@@ -29,7 +29,7 @@ export class ConfigEditor extends PureComponent<Props> {
     const { secureJsonFields, jsonData } = options;
     // HACK till after: https://github.com/grafana/grafana/pull/21772
     const secureJsonData = options.secureJsonData as GoogleSheetsSecureJsonData;
-
+    const cacheDuration = isNaN(jsonData.cacheDurationSeconds) ? 300 : jsonData.cacheDurationSeconds;
     return (
       <div className="gf-form-group">
         <div className="gf-form">
@@ -40,6 +40,21 @@ export class ConfigEditor extends PureComponent<Props> {
             options={googleAuthTypes}
             defaultValue={options.jsonData.authType}
             onChange={onUpdateDatasourceJsonDataOptionSelect(this.props, 'authType')}
+          />
+        </div>
+        <div className="gf-form">
+          <FormLabel tooltip="Time in seconds to cache the spreadsheet response" className="width-10">
+            Cache Time
+          </FormLabel>
+          <Select
+            className="width-30"
+            value={{ label: `${cacheDuration}s`, value: cacheDuration }}
+            options={[0, 5, 10, 30, 60, 120, 300, 600, 3600].map(value => ({
+              label: `${value}s`,
+              value,
+              description: value ? '' : 'Response is not cached at all',
+            }))}
+            onChange={onUpdateDatasourceJsonDataOptionSelect(this.props, 'cacheDurationSeconds')}
           />
         </div>
         {jsonData.authType === GoogleAuthType.NONE && (
@@ -81,7 +96,7 @@ export class ConfigEditor extends PureComponent<Props> {
             onPaste={e => onUpdateDatasourceJsonDataOptionSelect(this.props, 'jwtFile')({ value: e.clipboardData.getData('text/plain') })}
             placeholder="Paste your Google JWT file content here"
             className="gf-form-input"
-            style={{ height: 200 }}
+            style={{ height: 450 }}
           >
             {jsonData.jwtFile}
           </textarea>

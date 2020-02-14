@@ -16,9 +16,10 @@ type QueryModel struct {
 }
 
 type GoogleSheetConfig struct {
-	ApiKey   string `json:"apiKey"`
-	AuthType string `json:"authType"`
-	JwtFile  string `json:"jwtFile"`
+	ApiKey               string `json:"apiKey"`
+	AuthType             string `json:"authType"`
+	JwtFile              string `json:"jwtFile"`
+	CacheDurationSeconds int    `json:"cacheDurationSeconds"`
 }
 
 type MetaQuery struct {
