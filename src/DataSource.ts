@@ -9,6 +9,7 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
   }
 
   metricFindQuery(query: SheetsQuery, queryType: string): Promise<any[]> {
+    // TODO: convert to resource endpoit
     return getBackendSrv()
       .post('/api/ds/query', {
         from: '5m',

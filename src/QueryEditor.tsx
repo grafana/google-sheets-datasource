@@ -2,13 +2,13 @@ import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
 import { LinkButton, FormLabel, SegmentAsync } from '@grafana/ui';
 import { DataSource } from './DataSource';
-import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo, ResultFormatType, MajorDimensionType } from './types';
+import { SheetsQuery, SheetsSourceOptions } from './types';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, SheetsSourceOptions>;
 
 interface State {}
 
-export function getGoogleSheetRangeInfoFromURL(url: string): Partial<GoogleSheetRangeInfo> {
+export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery> {
   let idx = url?.indexOf('/d/');
   if (!idx) {
     // The original value
@@ -29,7 +29,7 @@ export function getGoogleSheetRangeInfoFromURL(url: string): Partial<GoogleSheet
   return { spreadsheetId: id };
 }
 
-export function toGoogleURL(info: GoogleSheetRangeInfo): string {
+export function toGoogleURL(info: SheetsQuery): string {
   let url = `https://docs.google.com/spreadsheets/d/${info.spreadsheetId}/view`;
   if (info.range) {
     url += '#range=' + info.range;
@@ -40,28 +40,6 @@ export function toGoogleURL(info: GoogleSheetRangeInfo): string {
 const PASTE_SEPERATOR = '»';
 
 export class QueryEditor extends PureComponent<Props, State> {
-  componentWillMount() {
-    if (!this.props.query.queryType) {
-      this.props.query.queryType = 'query';
-    }
-
-    if (!this.props.query.resultFormat) {
-      this.props.query.resultFormat = ResultFormatType.TABLE;
-    }
-
-    if (!this.props.query.majorDimension) {
-      this.props.query.majorDimension = MajorDimensionType.ROWS;
-    }
-
-    if (!this.props.query.metricColumns) {
-      this.props.query.metricColumns = [];
-    }
-
-    if (!this.props.query.timeColumn) {
-      this.props.query.timeColumn = {};
-    }
-  }
-
   onSpreadsheetIdPasted = (e: any) => {
     const v = e.clipboardData.getData('text/plain');
     if (v) {
