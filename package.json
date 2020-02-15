@@ -23,6 +23,7 @@
     "@grafana/data": "canary",
     "@grafana/toolkit": "canary",
     "@grafana/ui": "canary",
-    "@grafana/runtime": "canary"
+    "@grafana/runtime": "canary",
+    "apache-arrow": "0.15.1"
   }
 }

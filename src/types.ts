@@ -28,7 +28,6 @@ export interface GoogleCloudOptions extends DataSourceJsonData {
   authenticationType: GoogleAuthType;
 }
 
-
 //-------------------------------------------------------------------------------
 // Sheet metadata (returned in custom)
 //-------------------------------------------------------------------------------

@@ -10,7 +10,7 @@ export class MetaInspector extends PureComponent<Props> {
 
   renderInfo = (frame: DataFrame) => {
     const meta = frame.meta?.custom as SheetResponseMeta;
-    if(!meta) {
+    if (!meta) {
       return null;
     }
 
@@ -30,7 +30,7 @@ export class MetaInspector extends PureComponent<Props> {
     return (
       <div>
         <h3>Google Sheets Metadata</h3>
-        {data.map( frame => {
+        {data.map(frame => {
           return this.renderInfo(frame);
         })}
       </div>
