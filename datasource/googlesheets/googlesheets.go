@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/araddon/dateparse"
+	"github.com/davecgh/go-spew/spew"
 	cd "github.com/grafana/google-sheets-datasource/datasource/columndefinition"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
@@ -19,8 +20,8 @@ import (
 )
 
 type GoogleSheets struct {
-	Cache *cache.Cache
-	Logger      hclog.Logger
+	Cache  *cache.Cache
+	Logger hclog.Logger
 }
 
 // Query function
@@ -30,14 +31,24 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 		return nil, fmt.Errorf("Unable to create service: %v", err.Error())
 	}
 
-	sheet, err := gs.getSpreadSheet(srv, qm, config)
+	meta := &df.QueryResultMeta{}
+	meta.Custom = make(map[string]interface{})
+
+	sheet, err := gs.getSpreadSheet(srv, meta, qm, config)
 	if err != nil {
 		return nil, err
 	}
 
-	return gs.transformSheetToDataFrames(sheet, refID, qm)
-}
+	frame, err := gs.transformSheetToDataFrame(sheet, meta, refID, qm)
+	if err != nil {
+		return nil, err
+	}
 
+	frame.Meta = meta
+	gs.Logger.Debug("frame.Meta", spew.Sdump(frame.Meta))
+
+	return []*df.Frame{frame}, nil
+}
 
 // TestAPI function
 func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) ([]*df.Frame, error) {
@@ -68,29 +79,30 @@ func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, con
 	return fileNames, nil
 }
 
-func (gs *GoogleSheets) getSpreadSheet(srv *sheets.Service, qm *QueryModel, config *GoogleSheetConfig) (*sheets.GridData, error) {
+func (gs *GoogleSheets) getSpreadSheet(srv *sheets.Service, meta *df.QueryResultMeta, qm *QueryModel, config *GoogleSheetConfig) (*sheets.GridData, error) {
 	var sheet *sheets.GridData
-	cacheKey:=qm.SpreadsheetID + qm.Range
-	if item, found := gs.Cache.Get(cacheKey); found {
+	cacheKey := qm.SpreadsheetID + qm.Range
+	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found {
 		sheet = item.(*sheets.GridData)
-		gs.Logger.Debug("GET_FROM_CACHE: ", cacheKey)
+		meta.Custom["cache"] = map[string]interface{}{"hit": true, "count": gs.Cache.ItemCount(), "expires": fmt.Sprint("%ss", expires.Second)}
 	} else {
 		result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).Ranges(qm.Range).IncludeGridData(true).Do()
 		if err != nil {
 			return nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
 		} else if config.CacheDurationSeconds > 0 {
-			gs.Logger.Debug("PUT_IN_CACHE: ", cacheKey)
 			sheet = result.Sheets[0].Data[0]
 			gs.Cache.Set(cacheKey, sheet, time.Duration(config.CacheDurationSeconds)*time.Second)
+			meta.Custom["cache"] = map[string]interface{}{"hit": false}
 		}
 	}
 
 	return sheet, nil
 }
 
-func (gs *GoogleSheets) transformSheetToDataFrames(sheet *sheets.GridData, refID string, qm *QueryModel) ([]*df.Frame, error) {
+func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta *df.QueryResultMeta, refID string, qm *QueryModel) (*df.Frame, error) {
 	fields := []*df.Field{}
 	columns := getColumnDefintions(sheet.RowData)
+	warnings := []string{}
 
 	for _, column := range columns {
 
@@ -108,10 +120,12 @@ func (gs *GoogleSheets) transformSheetToDataFrames(sheet *sheets.GridData, refID
 		field.Config.Unit = column.GetUnit()
 
 		if column.HasMixedTypes() {
+			warnings = append(warnings, fmt.Sprintf("Multipe data types found in column %s. Using string data type", column.Header))
 			gs.Logger.Error("Multipe data types found in column " + column.Header + ". Using string data type")
 		}
 
 		if column.HasMixedUnits() {
+			warnings = append(warnings, fmt.Sprintf("Multipe units found in column %s. Formatted value will be used", column.Header))
 			gs.Logger.Error("Multipe units found in column " + column.Header + ". Formatted value will be used")
 		}
 
@@ -121,16 +135,16 @@ func (gs *GoogleSheets) transformSheetToDataFrames(sheet *sheets.GridData, refID
 	frame := df.New(refID,
 		fields...,
 	)
-
 	for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
 			switch columns[columnIndex].GetType() {
 			case "TIME":
 				time, err := dateparse.ParseLocal(cellData.FormattedValue)
 				if err != nil {
-					return []*df.Frame{frame}, fmt.Errorf("error while parsing date : %v", err.Error())
+					warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %v in column %s", rowIndex+1, columns[columnIndex].Header))
+				} else {
+					frame.Fields[columnIndex].Vector.Set(rowIndex-1, &time)
 				}
-				frame.Fields[columnIndex].Vector.Set(rowIndex-1, &time)
 			case "NUMBER":
 				if cellData.EffectiveValue != nil {
 					frame.Fields[columnIndex].Vector.Set(rowIndex-1, &cellData.EffectiveValue.NumberValue)
@@ -141,7 +155,11 @@ func (gs *GoogleSheets) transformSheetToDataFrames(sheet *sheets.GridData, refID
 		}
 	}
 
-	return []*df.Frame{frame}, nil
+	meta.Custom["warnings"] = warnings
+	meta.Custom["spreadsheetId"] = qm.SpreadsheetID
+	meta.Custom["range"] = qm.Range
+
+	return frame, nil
 }
 
 func createSheetsService(ctx context.Context, config *GoogleSheetConfig) (*sheets.Service, error) {
