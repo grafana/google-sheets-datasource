@@ -1,8 +1,8 @@
 import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { LinkButton, FormLabel, SegmentAsync } from '@grafana/ui';
+import { LinkButton, FormLabel, Segment, SegmentAsync } from '@grafana/ui';
 import { DataSource } from './DataSource';
-import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo, ResultFormatType, MajorDimensionType } from './types';
+import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo } from './types';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, SheetsSourceOptions>;
 
@@ -45,20 +45,8 @@ export class QueryEditor extends PureComponent<Props, State> {
       this.props.query.queryType = 'query';
     }
 
-    if (!this.props.query.resultFormat) {
-      this.props.query.resultFormat = ResultFormatType.TABLE;
-    }
-
-    if (!this.props.query.majorDimension) {
-      this.props.query.majorDimension = MajorDimensionType.ROWS;
-    }
-
-    if (!this.props.query.metricColumns) {
-      this.props.query.metricColumns = [];
-    }
-
-    if (!this.props.query.timeColumn) {
-      this.props.query.timeColumn = {};
+    if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
+      this.props.query.cacheDurationSeconds = 300;
     }
   }
 
@@ -102,7 +90,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     const { query, onRunQuery, onChange, datasource } = this.props;
     return (
       <>
-        <div className={'gf-form-inline'}>
+        <div className="gf-form-inline">
           <FormLabel
             width={10}
             className="query-keyword"
@@ -151,8 +139,7 @@ export class QueryEditor extends PureComponent<Props, State> {
             <div className="gf-form-label gf-form-label--grow" />
           </div>
         </div>
-
-        <div className={'gf-form-inline'}>
+        <div className="gf-form-inline">
           <FormLabel
             width={10}
             className="query-keyword"
@@ -172,6 +159,27 @@ export class QueryEditor extends PureComponent<Props, State> {
             onChange={this.onRangeChange}
             onBlur={onRunQuery}
           ></input>
+          <div className="gf-form gf-form--grow">
+            <div className="gf-form-label gf-form-label--grow" />
+          </div>
+        </div>
+        <div className="gf-form-inline">
+          <FormLabel
+            width={10}
+            className="query-keyword"
+            tooltip="Time in seconds that the spreadsheet will be cached in Grafana after receiving a response from the spreadsheet API"
+          >
+            Cache Time
+          </FormLabel>
+          <Segment
+            value={{ label: `${query.cacheDurationSeconds}s`, value: query.cacheDurationSeconds }}
+            options={[0, 5, 10, 30, 60, 120, 300, 600, 3600].map(value => ({
+              label: `${value}s`,
+              value,
+              description: value ? '' : 'Response is not cached at all',
+            }))}
+            onChange={({ value }) => onChange({ ...query, cacheDurationSeconds: value! })}
+          />
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>

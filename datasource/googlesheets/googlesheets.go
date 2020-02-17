@@ -82,18 +82,17 @@ func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, con
 func (gs *GoogleSheets) getSpreadSheet(srv *sheets.Service, meta *df.QueryResultMeta, qm *QueryModel, config *GoogleSheetConfig) (*sheets.GridData, error) {
 	var sheet *sheets.GridData
 	cacheKey := qm.SpreadsheetID + qm.Range
-	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found {
+	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		sheet = item.(*sheets.GridData)
-		meta.Custom["cache"] = map[string]interface{}{"hit": true, "count": gs.Cache.ItemCount(), "expires": fmt.Sprint("%ss", expires.Second)}
+		meta.Custom["cache"] = map[string]interface{}{"hit": true, "count": gs.Cache.ItemCount(), "expires": fmt.Sprintf("%v s", int(expires.Sub(time.Now()).Seconds()))}
 	} else {
 		result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).Ranges(qm.Range).IncludeGridData(true).Do()
 		if err != nil {
 			return nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
-		} else if config.CacheDurationSeconds > 0 {
-			sheet = result.Sheets[0].Data[0]
-			gs.Cache.Set(cacheKey, sheet, time.Duration(config.CacheDurationSeconds)*time.Second)
-			meta.Custom["cache"] = map[string]interface{}{"hit": false}
 		}
+		sheet = result.Sheets[0].Data[0]
+		gs.Cache.Set(cacheKey, sheet, time.Duration(qm.CacheDurationSeconds)*time.Second)
+		meta.Custom["cache"] = map[string]interface{}{"hit": false}
 	}
 
 	return sheet, nil
