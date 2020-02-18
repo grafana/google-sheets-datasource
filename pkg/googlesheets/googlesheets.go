@@ -7,7 +7,7 @@ import (
 
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
-	cd "github.com/grafana/google-sheets-datasource/pkg/columndefinition"
+	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/hashicorp/go-hclog"
@@ -31,10 +31,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 		return nil, fmt.Errorf("Unable to create service: %v", err.Error())
 	}
 
-	meta := &df.QueryResultMeta{}
-	meta.Custom = make(map[string]interface{})
-
-	sheet, err := gs.getSpreadSheet(srv, meta, qm, config)
+	sheet, meta, err := gs.getSpreadSheet(srv, qm, config)
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +40,6 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 	if err != nil {
 		return nil, err
 	}
-
-	frame.Meta = meta
-	gs.Logger.Debug("frame.Meta", spew.Sdump(frame.Meta))
 
 	return []*df.Frame{frame}, nil
 }
@@ -79,26 +73,23 @@ func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, con
 	return fileNames, nil
 }
 
-func (gs *GoogleSheets) getSpreadSheet(srv *sheets.Service, meta *df.QueryResultMeta, qm *QueryModel, config *GoogleSheetConfig) (*sheets.GridData, error) {
-	var sheet *sheets.GridData
+func (gs *GoogleSheets) getSpreadSheet(srv *sheets.Service, qm *QueryModel, config *GoogleSheetConfig) (*sheets.GridData, map[string]interface{}, error) {
 	cacheKey := qm.Spreadsheet.ID + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
-		sheet = item.(*sheets.GridData)
-		meta.Custom["cache"] = map[string]interface{}{"hit": true, "count": gs.Cache.ItemCount(), "expires": fmt.Sprintf("%v s", int(expires.Sub(time.Now()).Seconds()))}
-	} else {
-		result, err := srv.Spreadsheets.Get(qm.Spreadsheet.ID).Ranges(qm.Range).IncludeGridData(true).Do()
-		if err != nil {
-			return nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
-		}
-		sheet = result.Sheets[0].Data[0]
-		gs.Cache.Set(cacheKey, sheet, time.Duration(qm.CacheDurationSeconds)*time.Second)
-		meta.Custom["cache"] = map[string]interface{}{"hit": false}
+		return item.(*sheets.GridData), map[string]interface{}{"hit": true, "count": gs.Cache.ItemCount(), "expires": fmt.Sprintf("%v s", int(expires.Sub(time.Now()).Seconds()))}, nil
 	}
 
-	return sheet, nil
+	result, err := srv.Spreadsheets.Get(qm.Spreadsheet.ID).Ranges(qm.Range).IncludeGridData(true).Do()
+	if err != nil {
+		return nil, nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
+	}
+	sheet := result.Sheets[0].Data[0]
+	gs.Cache.Set(cacheKey, sheet, time.Duration(qm.CacheDurationSeconds)*time.Second)
+
+	return sheet, map[string]interface{}{"hit": false}, nil
 }
 
-func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta *df.QueryResultMeta, refID string, qm *QueryModel) (*df.Frame, error) {
+func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *QueryModel) (*df.Frame, error) {
 	fields := []*df.Field{}
 	columns := getColumnDefintions(sheet.RowData)
 	warnings := []string{}
@@ -115,8 +106,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta *
 			field = df.NewField(column.Header, nil, make([]*string, len(sheet.RowData)-1))
 		}
 
-		field.Config = &df.FieldConfig{}
-		field.Config.Unit = column.GetUnit()
+		field.Config = &df.FieldConfig{Unit: column.GetUnit()}
 
 		if column.HasMixedTypes() {
 			warnings = append(warnings, fmt.Sprintf("Multipe data types found in column %s. Using string data type", column.Header))
@@ -134,6 +124,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta *
 	frame := df.New(refID,
 		fields...,
 	)
+
 	for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
 			switch columns[columnIndex].GetType() {
@@ -154,9 +145,11 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta *
 		}
 	}
 
-	meta.Custom["warnings"] = warnings
-	meta.Custom["spreadsheetId"] = qm.Spreadsheet.ID
-	meta.Custom["range"] = qm.Range
+	meta["warnings"] = warnings
+	meta["spreadsheetId"] = qm.Spreadsheet.ID
+	meta["range"] = qm.Range
+	frame.Meta = &df.QueryResultMeta{Custom: meta}
+	gs.Logger.Debug("frame.Meta", spew.Sdump(frame.Meta))
 
 	return frame, nil
 }
