@@ -7,7 +7,7 @@ import (
 
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
-	cd "github.com/grafana/google-sheets-datasource/datasource/columndefinition"
+	cd "github.com/grafana/google-sheets-datasource/pkg/columndefinition"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/hashicorp/go-hclog"

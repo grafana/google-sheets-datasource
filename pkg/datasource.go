@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/grafana/google-sheets-datasource/datasource/googlesheets"
-	gs "github.com/grafana/google-sheets-datasource/datasource/googlesheets"
+	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
+	gs "github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/patrickmn/go-cache"
