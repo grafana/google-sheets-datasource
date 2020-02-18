@@ -1,10 +1,13 @@
 package googlesheets
 
 type QueryModel struct {
-	QueryType            string
-	SpreadsheetID        string
-	Range                string
-	CacheDurationSeconds int
+	QueryType   string `json:"queryType"`
+	Spreadsheet struct {
+		ID   string `json:"value"`
+		Name string `json:"label"`
+	} `json:"Spreadsheet"`
+	Range                string `json:"range"`
+	CacheDurationSeconds int    `json:"cacheDurationSeconds"`
 }
 
 type GoogleSheetConfig struct {

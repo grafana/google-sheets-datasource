@@ -81,12 +81,12 @@ func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, con
 
 func (gs *GoogleSheets) getSpreadSheet(srv *sheets.Service, meta *df.QueryResultMeta, qm *QueryModel, config *GoogleSheetConfig) (*sheets.GridData, error) {
 	var sheet *sheets.GridData
-	cacheKey := qm.SpreadsheetID + qm.Range
+	cacheKey := qm.Spreadsheet.ID + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		sheet = item.(*sheets.GridData)
 		meta.Custom["cache"] = map[string]interface{}{"hit": true, "count": gs.Cache.ItemCount(), "expires": fmt.Sprintf("%v s", int(expires.Sub(time.Now()).Seconds()))}
 	} else {
-		result, err := srv.Spreadsheets.Get(qm.SpreadsheetID).Ranges(qm.Range).IncludeGridData(true).Do()
+		result, err := srv.Spreadsheets.Get(qm.Spreadsheet.ID).Ranges(qm.Range).IncludeGridData(true).Do()
 		if err != nil {
 			return nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
 		}
@@ -155,7 +155,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta *
 	}
 
 	meta.Custom["warnings"] = warnings
-	meta.Custom["spreadsheetId"] = qm.SpreadsheetID
+	meta.Custom["spreadsheetId"] = qm.Spreadsheet.ID
 	meta.Custom["range"] = qm.Range
 
 	return frame, nil

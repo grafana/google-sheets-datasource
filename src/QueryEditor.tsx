@@ -12,7 +12,7 @@ export function getGoogleSheetRangeInfoFromURL(url: string): Partial<GoogleSheet
   let idx = url?.indexOf('/d/');
   if (!idx) {
     // The original value
-    return { spreadsheetId: url };
+    return { spreadsheet: { value: url, label: url } };
   }
 
   let id = url.substring(idx + 3);
@@ -24,23 +24,25 @@ export function getGoogleSheetRangeInfoFromURL(url: string): Partial<GoogleSheet
   idx = url.indexOf('range=');
   if (idx > 0) {
     const sub = url.substring(idx + 'range='.length);
-    return { spreadsheetId: id, range: sub };
+    return { spreadsheet: { value: id, label: id }, range: sub };
   }
-  return { spreadsheetId: id };
+  return { spreadsheet: { value: id, label: id } };
 }
 
 export function toGoogleURL(info: GoogleSheetRangeInfo): string {
-  let url = `https://docs.google.com/spreadsheets/d/${info.spreadsheetId}/view`;
+  let url = `https://docs.google.com/spreadsheets/d/${info.spreadsheet.value}/view`;
   if (info.range) {
     url += '#range=' + info.range;
   }
   return url;
 }
 
-const PASTE_SEPERATOR = '»';
-
 export class QueryEditor extends PureComponent<Props, State> {
   componentWillMount() {
+    if (!this.props.query.spreadsheet) {
+      this.props.query.spreadsheet = {};
+    }
+
     if (!this.props.query.queryType) {
       this.props.query.queryType = 'query';
     }
@@ -49,22 +51,6 @@ export class QueryEditor extends PureComponent<Props, State> {
       this.props.query.cacheDurationSeconds = 300;
     }
   }
-
-  onSpreadsheetIdPasted = (e: any) => {
-    const v = e.clipboardData.getData('text/plain');
-    if (v) {
-      const info = getGoogleSheetRangeInfoFromURL(v);
-      if (info.spreadsheetId) {
-        console.log('PASTED', v, info);
-        info.spreadsheetId = info.spreadsheetId + PASTE_SEPERATOR;
-        this.props.onChange({
-          ...this.props.query,
-          ...info,
-        });
-        console.log('UPDATED', info);
-      }
-    }
-  };
 
   onRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
     this.props.onChange({
@@ -93,16 +79,23 @@ export class QueryEditor extends PureComponent<Props, State> {
           <SegmentAsync
             loadOptions={() => datasource.metricFindQuery(query, 'getSpreadsheets')}
             placeholder="Enter SpreadsheetID"
-            value={query.spreadsheetId || ''}
+            // value={query.spreadsheetId || ''}
+            value={query.spreadsheet}
             allowCustomValue={true}
-            onChange={({ value }) => {
-              /(.*)\/spreadsheets\/d\/(.*)/.test(value!)
-                ? onChange({ ...query, ...getGoogleSheetRangeInfoFromURL(value!) })
-                : onChange({ ...query, spreadsheetId: value! });
+            onChange={item => {
+              /(.*)\/spreadsheets\/d\/(.*)/.test(item.value!)
+                ? onChange({ ...query, ...getGoogleSheetRangeInfoFromURL(item.value!) })
+                : onChange({ ...query, spreadsheet: item });
               onRunQuery();
             }}
           ></SegmentAsync>
-          <LinkButton disabled={!query.spreadsheetId} variant="secondary" icon="fa fa-link" href={toGoogleURL(query)} target="_blank"></LinkButton>
+          <LinkButton
+            disabled={!query.spreadsheet.value}
+            variant="secondary"
+            icon="fa fa-link"
+            href={toGoogleURL(query)}
+            target="_blank"
+          ></LinkButton>
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>

@@ -1,4 +1,4 @@
-import { DataQuery, DataSourceJsonData } from '@grafana/data';
+import { DataQuery, DataSourceJsonData, SelectableValue } from '@grafana/data';
 
 //-------------------------------------------------------------------------------
 // General google cloud auth types
@@ -32,7 +32,7 @@ export interface GoogleCloudOptions extends DataSourceJsonData {
 // The Sheets specicif types
 //-------------------------------------------------------------------------------
 export interface GoogleSheetRangeInfo {
-  spreadsheetId: string;
+  spreadsheet: SelectableValue<string>;
   range: string;
 }
 
