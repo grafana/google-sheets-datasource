@@ -24,7 +24,8 @@
     "@grafana/toolkit": "canary",
     "@grafana/ui": "canary",
     "@types/lodash": "latest",
-    "@types/react-dropzone": "^5.1.0"
+    "@types/react-dropzone": "^5.1.0",
+    "apache-arrow": "0.15.1"
   },
   "dependencies": {
     "react-dropzone": "^10.2.1"

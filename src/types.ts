@@ -29,14 +29,12 @@ export interface GoogleCloudOptions extends DataSourceJsonData {
 }
 
 //-------------------------------------------------------------------------------
-// The Sheets specicif types
+// The Sheets specific types
 //-------------------------------------------------------------------------------
-export interface GoogleSheetRangeInfo {
+
+export interface SheetsQuery extends DataQuery {
   spreadsheet: SelectableValue<string>;
   range: string;
-}
-
-export interface SheetsQuery extends DataQuery, GoogleSheetRangeInfo {
   cacheDurationSeconds: number;
   queryType: string;
 }

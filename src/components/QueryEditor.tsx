@@ -2,13 +2,13 @@ import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
 import { LinkButton, FormLabel, Segment, SegmentAsync } from '@grafana/ui';
 import { DataSource } from '../DataSource';
-import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo } from '../types';
+import { SheetsQuery, SheetsSourceOptions } from '../types';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, SheetsSourceOptions>;
 
 interface State {}
 
-export function getGoogleSheetRangeInfoFromURL(url: string): Partial<GoogleSheetRangeInfo> {
+export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery> {
   let idx = url?.indexOf('/d/');
   if (!idx) {
     // The original value
@@ -29,7 +29,7 @@ export function getGoogleSheetRangeInfoFromURL(url: string): Partial<GoogleSheet
   return { spreadsheet: { value: id, label: id } };
 }
 
-export function toGoogleURL(info: GoogleSheetRangeInfo): string {
+export function toGoogleURL(info: SheetsQuery): string {
   let url = `https://docs.google.com/spreadsheets/d/${info.spreadsheet.value}/view`;
   if (info.range) {
     url += '#range=' + info.range;
@@ -39,13 +39,13 @@ export function toGoogleURL(info: GoogleSheetRangeInfo): string {
 
 export class QueryEditor extends PureComponent<Props, State> {
   componentWillMount() {
-    if (!this.props.query.spreadsheet) {
-      this.props.query.spreadsheet = {};
-    }
+    // if (!this.props.query.spreadsheet) {
+    //   this.props.query.spreadsheet = {};
+    // }
 
-    if (!this.props.query.queryType) {
-      this.props.query.queryType = 'query';
-    }
+    // if (!this.props.query.queryType) {
+    //   this.props.query.queryType = 'query';
+    // }
 
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
       this.props.query.cacheDurationSeconds = 300;
@@ -79,7 +79,6 @@ export class QueryEditor extends PureComponent<Props, State> {
           <SegmentAsync
             loadOptions={() => datasource.metricFindQuery(query, 'getSpreadsheets')}
             placeholder="Enter SpreadsheetID"
-            // value={query.spreadsheetId || ''}
             value={query.spreadsheet}
             allowCustomValue={true}
             onChange={item => {
