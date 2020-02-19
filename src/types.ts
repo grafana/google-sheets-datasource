@@ -1,4 +1,4 @@
-import { DataQuery, DataSourceJsonData } from '@grafana/data';
+import { DataQuery, DataSourceJsonData, SelectableValue } from '@grafana/data';
 
 //-------------------------------------------------------------------------------
 // General google cloud auth types
@@ -29,36 +29,33 @@ export interface GoogleCloudOptions extends DataSourceJsonData {
 }
 
 //-------------------------------------------------------------------------------
-// Sheet metadata (returned in custom)
-//-------------------------------------------------------------------------------
-
-export interface CacheInfo {
-  hit: boolean;
-  count: number;
-  time: number;
-}
-
-export interface SheetResponseMeta {
-  spreadsheetId: string;
-  range: string;
-  cache: CacheInfo;
-  warnings: string[];
-}
-
-//-------------------------------------------------------------------------------
 // The Sheets specific types
 //-------------------------------------------------------------------------------
 
 export interface SheetsQuery extends DataQuery {
-  spreadsheetId: string;
-  range?: string; // without a range it should get all sheets
+  spreadsheet: SelectableValue<string>;
+  range: string;
+  cacheDurationSeconds: number;
+  queryType: string;
+}
+
+export interface JWTFile {
+  type: string;
+  project_id: string;
+  private_key_id: string;
+  private_key: string;
+  client_email: string;
+  client_id: string;
+  auth_uri: string;
+  token_uri: string;
+  auth_provider_x509_cert_url: string;
+  client_x509_cert_url: string;
 }
 
 export interface SheetsSourceOptions extends GoogleCloudOptions {
   authType: GoogleAuthType;
   apiKey: string;
-  jwtFile: string;
-  cacheDurationSeconds: number;
+  jwt: JWTFile;
 }
 
 export interface GoogleSheetsSecureJsonData {

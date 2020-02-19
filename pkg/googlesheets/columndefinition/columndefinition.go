@@ -1,6 +1,7 @@
 package columndefinition
 
 import (
+	"fmt"
 	"strings"
 
 	"google.golang.org/api/sheets/v4"
@@ -14,8 +15,12 @@ type ColumnDefinition struct {
 }
 
 func New(header string, index int) *ColumnDefinition {
+	name := header
+	if name == "" {
+		name = fmt.Sprintf("Field %v", index+1)
+	}
 	return &ColumnDefinition{
-		Header:      header,
+		Header:      name,
 		ColumnIndex: index,
 		types:       map[string]bool{},
 		units:       map[string]bool{},

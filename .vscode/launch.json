@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug backend plugin",
+      "type": "go",
+      "request": "attach",
+      "mode": "remote",
+      "port": 3222,
+      "host": "127.0.0.1"
+    }
+  ]
+}

@@ -1,8 +1,8 @@
 import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { LinkButton, FormLabel, SegmentAsync } from '@grafana/ui';
-import { DataSource } from './DataSource';
-import { SheetsQuery, SheetsSourceOptions } from './types';
+import { LinkButton, FormLabel, Segment, SegmentAsync } from '@grafana/ui';
+import { DataSource } from '../DataSource';
+import { SheetsQuery, SheetsSourceOptions } from '../types';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, SheetsSourceOptions>;
 
@@ -12,7 +12,7 @@ export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery
   let idx = url?.indexOf('/d/');
   if (!idx) {
     // The original value
-    return { spreadsheetId: url };
+    return { spreadsheet: { value: url, label: url } };
   }
 
   let id = url.substring(idx + 3);
@@ -24,50 +24,33 @@ export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery
   idx = url.indexOf('range=');
   if (idx > 0) {
     const sub = url.substring(idx + 'range='.length);
-    return { spreadsheetId: id, range: sub };
+    return { spreadsheet: { value: id, label: id }, range: sub };
   }
-  return { spreadsheetId: id };
+  return { spreadsheet: { value: id, label: id } };
 }
 
 export function toGoogleURL(info: SheetsQuery): string {
-  let url = `https://docs.google.com/spreadsheets/d/${info.spreadsheetId}/view`;
+  let url = `https://docs.google.com/spreadsheets/d/${info.spreadsheet.value}/view`;
   if (info.range) {
     url += '#range=' + info.range;
   }
   return url;
 }
 
-const PASTE_SEPERATOR = '»';
-
 export class QueryEditor extends PureComponent<Props, State> {
-  onSpreadsheetIdPasted = (e: any) => {
-    const v = e.clipboardData.getData('text/plain');
-    if (v) {
-      const info = getGoogleSheetRangeInfoFromURL(v);
-      if (info.spreadsheetId) {
-        console.log('PASTED', v, info);
-        info.spreadsheetId = info.spreadsheetId + PASTE_SEPERATOR;
-        this.props.onChange({
-          ...this.props.query,
-          ...info,
-        });
-        console.log('UPDATED', info);
-      }
-    }
-  };
+  componentWillMount() {
+    // if (!this.props.query.spreadsheet) {
+    //   this.props.query.spreadsheet = {};
+    // }
 
-  onSpreadsheetIdChange = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log('CHANGE', event.target.value);
-    let v = event.target.value;
-    const idx = v.indexOf(PASTE_SEPERATOR);
-    if (idx > 0) {
-      v = v.substring(0, idx);
+    // if (!this.props.query.queryType) {
+    //   this.props.query.queryType = 'query';
+    // }
+
+    if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
+      this.props.query.cacheDurationSeconds = 300;
     }
-    this.props.onChange({
-      ...this.props.query,
-      spreadsheetId: v,
-    });
-  };
+  }
 
   onRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
     this.props.onChange({
@@ -80,7 +63,7 @@ export class QueryEditor extends PureComponent<Props, State> {
     const { query, onRunQuery, onChange, datasource } = this.props;
     return (
       <>
-        <div className={'gf-form-inline'}>
+        <div className="gf-form-inline">
           <FormLabel
             width={10}
             className="query-keyword"
@@ -96,41 +79,27 @@ export class QueryEditor extends PureComponent<Props, State> {
           <SegmentAsync
             loadOptions={() => datasource.metricFindQuery(query, 'getSpreadsheets')}
             placeholder="Enter SpreadsheetID"
-            value={query.spreadsheetId || ''}
+            value={query.spreadsheet}
             allowCustomValue={true}
-            onChange={({ value }) => {
-              console.log({ value });
-              onChange({ ...query, spreadsheetId: value! });
+            onChange={item => {
+              /(.*)\/spreadsheets\/d\/(.*)/.test(item.value!)
+                ? onChange({ ...query, ...getGoogleSheetRangeInfoFromURL(item.value!) })
+                : onChange({ ...query, spreadsheet: item });
               onRunQuery();
             }}
           ></SegmentAsync>
-          <FormLabel
-            width={10}
-            className="query-keyword"
-            tooltip={
-              <p>
-                The <code>spreadsheetId</code> is used to identify which spreadsheet is to be accessed or altered. This ID is the value between the
-                "/d/" and the "/edit" in the URL of your spreadsheet.
-              </p>
-            }
-          >
-            Spreadsheet ID
-          </FormLabel>
-          <input
-            className="gf-form-input width-28"
-            placeholder="Enter ID from URL"
-            value={query.spreadsheetId || ''}
-            onPaste={this.onSpreadsheetIdPasted}
-            onChange={this.onSpreadsheetIdChange}
-            onBlur={onRunQuery}
-          ></input>
-          <LinkButton disabled={!query.spreadsheetId} variant="secondary" icon="fa fa-link" href={toGoogleURL(query)} target="_blank"></LinkButton>
+          <LinkButton
+            disabled={!query.spreadsheet.value}
+            variant="secondary"
+            icon="fa fa-link"
+            href={toGoogleURL(query)}
+            target="_blank"
+          ></LinkButton>
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>
         </div>
-
-        <div className={'gf-form-inline'}>
+        <div className="gf-form-inline">
           <FormLabel
             width={10}
             className="query-keyword"
@@ -150,6 +119,27 @@ export class QueryEditor extends PureComponent<Props, State> {
             onChange={this.onRangeChange}
             onBlur={onRunQuery}
           ></input>
+          <div className="gf-form gf-form--grow">
+            <div className="gf-form-label gf-form-label--grow" />
+          </div>
+        </div>
+        <div className="gf-form-inline">
+          <FormLabel
+            width={10}
+            className="query-keyword"
+            tooltip="Time in seconds that the spreadsheet will be cached in Grafana after receiving a response from the spreadsheet API"
+          >
+            Cache Time
+          </FormLabel>
+          <Segment
+            value={{ label: `${query.cacheDurationSeconds}s`, value: query.cacheDurationSeconds }}
+            options={[0, 5, 10, 30, 60, 120, 300, 600, 3600].map(value => ({
+              label: `${value}s`,
+              value,
+              description: value ? '' : 'Response is not cached at all',
+            }))}
+            onChange={({ value }) => onChange({ ...query, cacheDurationSeconds: value! })}
+          />
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>
