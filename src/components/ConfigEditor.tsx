@@ -1,7 +1,8 @@
 import React, { PureComponent } from 'react';
 import { SecretFormField, FormField, FormLabel, Select } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps, onUpdateDatasourceSecureJsonDataOption, onUpdateDatasourceJsonDataOptionSelect } from '@grafana/data';
-import { SheetsSourceOptions, GoogleSheetsSecureJsonData, GoogleAuthType, googleAuthTypes } from './types';
+import { SheetsSourceOptions, GoogleSheetsSecureJsonData, GoogleAuthType, googleAuthTypes, JWTFile } from '../types';
+import { JWTConfig } from './';
 
 export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions>;
 
@@ -76,14 +77,10 @@ export class ConfigEditor extends PureComponent<Props> {
           </>
         )}
         {jsonData.authType === GoogleAuthType.JWT && (
-          <textarea
-            onPaste={e => onUpdateDatasourceJsonDataOptionSelect(this.props, 'jwtFile')({ value: e.clipboardData.getData('text/plain') })}
-            placeholder="Paste your Google JWT file content here"
-            className="gf-form-input"
-            style={{ height: 450 }}
-          >
-            {jsonData.jwtFile}
-          </textarea>
+          <JWTConfig
+            jwt={this.props.options.jsonData.jwt}
+            onChange={(jwt: JWTFile) => onUpdateDatasourceJsonDataOptionSelect(this.props, 'jwt')({ value: jwt })}
+          ></JWTConfig>
         )}
       </div>
     );

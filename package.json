@@ -19,10 +19,14 @@
     "email": "plugins@grafana.com"
   },
   "devDependencies": {
-    "@types/lodash": "latest",
     "@grafana/data": "canary",
+    "@grafana/runtime": "canary",
     "@grafana/toolkit": "canary",
     "@grafana/ui": "canary",
-    "@grafana/runtime": "canary"
+    "@types/lodash": "latest",
+    "@types/react-dropzone": "^5.1.0"
+  },
+  "dependencies": {
+    "react-dropzone": "^10.2.1"
   }
 }

@@ -1,8 +1,8 @@
 import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
 import { LinkButton, FormLabel, Segment, SegmentAsync } from '@grafana/ui';
-import { DataSource } from './DataSource';
-import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo } from './types';
+import { DataSource } from '../DataSource';
+import { SheetsQuery, SheetsSourceOptions, GoogleSheetRangeInfo } from '../types';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, SheetsSourceOptions>;
 
