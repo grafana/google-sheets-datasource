@@ -24,7 +24,7 @@ export interface Props {
 
 const validateJson = (json: { [key: string]: string }) => isObject(json) && configKeys.every(key => !!json[key]);
 
-export function JWTConfig({ onChange, jwt }: Props) {
+export function JWTConfig({ onChange, jwt = {} as JWTFile }: Props) {
   const [enableUpload, setEnableUpload] = useState<boolean>(!Object.keys(jwt).length);
   const [error, setError] = useState<string>();
 
