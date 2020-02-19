@@ -1,5 +1,7 @@
 package googlesheets
 
+import "encoding/json"
+
 type QueryModel struct {
 	QueryType   string `json:"queryType"`
 	Spreadsheet struct {
@@ -11,7 +13,7 @@ type QueryModel struct {
 }
 
 type GoogleSheetConfig struct {
-	ApiKey   string `json:"apiKey"`
-	AuthType string `json:"authType"`
-	JwtFile  string `json:"jwtFile"`
+	ApiKey   string          `json:"apiKey"`
+	AuthType string          `json:"authType"`
+	JWT      json.RawMessage `json:"jwt"`
 }

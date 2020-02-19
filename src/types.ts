@@ -57,7 +57,6 @@ export interface JWTFile {
 export interface SheetsSourceOptions extends GoogleCloudOptions {
   authType: GoogleAuthType;
   apiKey: string;
-  jwtFile: string;
   jwt: JWTFile;
 }
 

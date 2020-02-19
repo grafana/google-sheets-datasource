@@ -1,12 +1,10 @@
 grafana:
   image: grafana/grafana:master
-  env_file:
-    - .env
   ports:
     - '3090:3000'
   volumes:
     - ./:/var/lib/grafana/plugins/google-sheets-datasource
-    # - ./provisioning:/etc/grafana/provisioning
+    - ./provisioning:/etc/grafana/provisioning
   environment:
     - TERM=linux
     - GF_LOG_LEVEL=debug

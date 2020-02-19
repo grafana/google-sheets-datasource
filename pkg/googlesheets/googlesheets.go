@@ -28,19 +28,16 @@ type GoogleSheets struct {
 func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*df.Frame, error) {
 	srv, err := createSheetsService(ctx, config)
 	if err != nil {
-		gs.Logger.Debug("createSheetsService", spew.Sdump(err))
 		return df.New(refID), fmt.Errorf("Unable to create service: %v", err.Error())
 	}
 
 	sheet, meta, err := gs.getSpreadSheet(srv, qm, config)
 	if err != nil {
-		gs.Logger.Debug("getSpreadSheet", spew.Sdump(err))
 		return df.New(refID), err
 	}
 
 	frame, err := gs.transformSheetToDataFrame(sheet, meta, refID, qm)
 	if err != nil {
-		gs.Logger.Debug("transformSheetToDataFrame", spew.Sdump(err))
 		return df.New(refID), err
 	}
 
@@ -162,7 +159,7 @@ func createSheetsService(ctx context.Context, config *GoogleSheetConfig) (*sheet
 		return sheets.NewService(ctx, option.WithAPIKey(config.ApiKey))
 	}
 
-	jwtConfig, err := google.JWTConfigFromJSON([]byte(config.JwtFile), "https://www.googleapis.com/auth/spreadsheets.readonly", "https://www.googleapis.com/auth/spreadsheets")
+	jwtConfig, err := google.JWTConfigFromJSON([]byte(config.JWT), "https://www.googleapis.com/auth/spreadsheets.readonly", "https://www.googleapis.com/auth/spreadsheets")
 	if err != nil {
 		return nil, fmt.Errorf("Error parsin JWT file: %v", err)
 	}
@@ -176,7 +173,7 @@ func createDriveService(ctx context.Context, config *GoogleSheetConfig) (*drive.
 		return drive.NewService(ctx, option.WithAPIKey(config.ApiKey))
 	}
 
-	jwtConfig, err := google.JWTConfigFromJSON([]byte(config.JwtFile), drive.DriveMetadataReadonlyScope)
+	jwtConfig, err := google.JWTConfigFromJSON([]byte(config.JWT), drive.DriveMetadataReadonlyScope)
 	if err != nil {
 		return nil, fmt.Errorf("Error parsin JWT file: %v", err)
 	}
