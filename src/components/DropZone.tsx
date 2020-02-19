@@ -3,19 +3,17 @@ import { useDropzone, DropzoneOptions, DropzoneRootProps } from 'react-dropzone'
 
 const defaultBaseStyle = {
   display: 'flex',
-  height: '150px',
   justifyContent: 'center',
-  backgroundColor: '#212327',
-  flexDirection: 'column',
   alignItems: 'center',
-  padding: '24px',
+  height: '150px',
+  backgroundColor: '#212327',
+  padding: 24,
   borderWidth: 2,
   borderRadius: 2,
   borderColor: '#808080',
   borderStyle: 'dashed',
   outline: 'none',
   transition: 'border .24s ease-in-out',
-  color: '#d8d9da',
 };
 
 const defaultActiveStyle = {
@@ -27,7 +25,7 @@ const defaultAcceptStyle = {
 };
 
 const defaultRejectStyle = {
-  borderColor: '#ff1744',
+  borderColor: '#E24D42',
 };
 
 type Style = { [key: string]: any };
