@@ -50,13 +50,20 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
             refId: 'A',
             datasource: this.name,
             datasourceId: this.id,
-            intervalMs: 1,
-            maxDataPoints: 1,
+            // intervalMs: 1,
+            // maxDataPoints: 1,
             queryType: 'testAPI',
           },
         ],
       })
       .then((rsp: any) => {
+        if (rsp.results[''].meta && rsp.results[''].meta.error) {
+          return {
+            status: 'fail',
+            message: rsp.results[''].meta.error,
+          };
+        }
+
         return {
           status: 'success',
           message: 'Success',

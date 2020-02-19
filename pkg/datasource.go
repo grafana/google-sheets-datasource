@@ -68,34 +68,26 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			return nil, fmt.Errorf("Invalid query")
 		}
 
-		var frames []*df.Frame
+		var frame *df.Frame
 		switch queryModel.QueryType {
 		case "testAPI":
-			frames, err = gsd.googlesheet.TestAPI(ctx, &config)
+			frame, err = gsd.googlesheet.TestAPI(ctx, &config)
 		case "query":
-			frames, err = gsd.googlesheet.Query(ctx, q.RefID, queryModel, &config, q.TimeRange)
+			frame, err = gsd.googlesheet.Query(ctx, q.RefID, queryModel, &config, q.TimeRange)
 		case "getSpreadsheets":
 			spreadSheets, _ := gsd.googlesheet.GetSpreadsheetsByServiceAccount(ctx, &config)
-			frame := df.New("getHeader")
+			frame = df.New("getHeader")
 			res.Metadata = spreadSheets
-			frames = []*df.Frame{frame}
 		default:
 			return nil, fmt.Errorf("Invalid query type")
 		}
 
 		if err != nil {
-			gsd.logger.Debug("Metric Error: ", err.Error())
+			// TEMP: at the moment, the only way to return an error is by using meta
+			res.Metadata = map[string]string{"error": err.Error()}
 		}
 
-		// if err != nil {
-		// 	gsd.logger.Debug("QueryError", "QueryError", err.Error())
-		// 	frame = df.New("default")
-		// 	frame.RefID = q.RefID
-		// 	frame.Meta = &df.QueryResultMeta{Custom: make(map[string]interface{})}
-		// 	frame.Meta.Custom["error"] = err.Error()
-		// 	// return nil, err
-		// }
-		res.Frames = append(res.Frames, frames...)
+		res.Frames = append(res.Frames, []*df.Frame{frame}...)
 	}
 
 	return res, nil

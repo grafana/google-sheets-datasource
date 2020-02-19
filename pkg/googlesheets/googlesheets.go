@@ -25,33 +25,32 @@ type GoogleSheets struct {
 }
 
 // Query function
-func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) ([]*df.Frame, error) {
+func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*df.Frame, error) {
 	srv, err := createSheetsService(ctx, config)
 	if err != nil {
-		return nil, fmt.Errorf("Unable to create service: %v", err.Error())
+		gs.Logger.Debug("createSheetsService", spew.Sdump(err))
+		return df.New(refID), fmt.Errorf("Unable to create service: %v", err.Error())
 	}
 
 	sheet, meta, err := gs.getSpreadSheet(srv, qm, config)
 	if err != nil {
-		return nil, err
+		gs.Logger.Debug("getSpreadSheet", spew.Sdump(err))
+		return df.New(refID), err
 	}
 
 	frame, err := gs.transformSheetToDataFrame(sheet, meta, refID, qm)
 	if err != nil {
-		return nil, err
+		gs.Logger.Debug("transformSheetToDataFrame", spew.Sdump(err))
+		return df.New(refID), err
 	}
 
-	return []*df.Frame{frame}, nil
+	return frame, nil
 }
 
 // TestAPI function
-func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) ([]*df.Frame, error) {
+func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) (*df.Frame, error) {
 	_, err := createSheetsService(ctx, config)
-	if err != nil {
-		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
-	}
-
-	return []*df.Frame{df.New("TestAPI")}, nil
+	return df.New("TestAPI"), err
 }
 
 //GetSpreadsheets
@@ -156,6 +155,10 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 
 func createSheetsService(ctx context.Context, config *GoogleSheetConfig) (*sheets.Service, error) {
 	if config.AuthType == "none" {
+		if len(config.ApiKey) == 0 {
+			return nil, fmt.Errorf("Invalid API Key")
+		}
+
 		return sheets.NewService(ctx, option.WithAPIKey(config.ApiKey))
 	}
 

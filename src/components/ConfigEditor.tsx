@@ -62,6 +62,7 @@ export class ConfigEditor extends PureComponent<Props> {
                 labelWidth={10}
                 inputWidth={25}
                 placeholder="Enter API Key"
+                value={this.props.options.jsonData.apiKey}
                 onChange={e =>
                   this.props.onOptionsChange({
                     ...this.props,
