@@ -2,6 +2,7 @@ package googlesheets
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -123,6 +124,10 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 
 	for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
+			if columnIndex >= len(columns) {
+				continue
+			}
+
 			switch columns[columnIndex].GetType() {
 			case "TIME":
 				time, err := dateparse.ParseLocal(cellData.FormattedValue)
@@ -184,20 +189,41 @@ func createDriveService(ctx context.Context, config *GoogleSheetConfig) (*drive.
 }
 
 func getColumnDefintions(rows []*sheets.RowData) []*cd.ColumnDefinition {
-	columnTypes := []*cd.ColumnDefinition{}
+	columnMap := map[string]*cd.ColumnDefinition{}
 	headerRow := rows[0].Values
 
 	for columnIndex, headerCell := range headerRow {
-		columnTypes = append(columnTypes, cd.New(strings.TrimSpace(headerCell.FormattedValue), columnIndex))
+		name := strings.TrimSpace(headerCell.FormattedValue)
+		nameExist := true
+		counter := 1
+		for nameExist {
+			if _, exist := columnMap[name]; exist {
+				name = fmt.Sprintf("%s%v", strings.TrimSpace(headerCell.FormattedValue), counter)
+				counter++
+			} else {
+				nameExist = false
+			}
+		}
+		columnMap[name] = cd.New(name, columnIndex)
 	}
 
 	for rowIndex := 1; rowIndex < len(rows); rowIndex++ {
-		for columnIndex, columnCell := range rows[rowIndex].Values {
-			columnTypes[columnIndex].CheckCell(columnCell)
+		for _, column := range columnMap {
+			if column.ColumnIndex < len(rows[rowIndex].Values) {
+				column.CheckCell(rows[rowIndex].Values[column.ColumnIndex])
+			}
 		}
 	}
+	columns := []*cd.ColumnDefinition{}
+	for _, c := range columnMap {
+		columns = append(columns, c)
+	}
 
-	return columnTypes
+	sort.Slice(columns, func(i, j int) bool {
+		return columns[i].ColumnIndex < columns[j].ColumnIndex
+	})
+
+	return columns
 }
 
 func getAllSheets(d *drive.Service) ([]*drive.File, error) {
