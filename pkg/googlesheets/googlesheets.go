@@ -80,7 +80,17 @@ func (gs *GoogleSheets) getSpreadSheet(srv *sheets.Service, qm *QueryModel, conf
 	if err != nil {
 		return nil, nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
 	}
+
+	if result.Properties.TimeZone != "" {
+		loc, err := time.LoadLocation(result.Properties.TimeZone)
+		if err != nil {
+			return nil, nil, fmt.Errorf("error while loading timezone: ", err.Error())
+		}
+		time.Local = loc
+	}
+
 	sheet := result.Sheets[0].Data[0]
+
 	gs.Cache.Set(cacheKey, sheet, time.Duration(qm.CacheDurationSeconds)*time.Second)
 
 	return sheet, map[string]interface{}{"hit": false}, nil

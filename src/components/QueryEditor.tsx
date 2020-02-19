@@ -89,6 +89,7 @@ export class QueryEditor extends PureComponent<Props, State> {
             }}
           ></SegmentAsync>
           <LinkButton
+            style={{ marginTop: 1 }}
             disabled={!query.spreadsheet.value}
             variant="secondary"
             icon="fa fa-link"
