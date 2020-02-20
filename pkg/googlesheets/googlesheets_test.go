@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/hashicorp/go-hclog"
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/api/sheets/v4"
@@ -75,6 +76,47 @@ func TestGooglesheets(t *testing.T) {
 			_, meta, _ := gsd.getSpreadSheet(client, &qm)
 			assert.False(t, meta["hit"].(bool))
 			assert.Equal(t, 0, gsd.Cache.ItemCount())
+		})
+	})
+
+	t.Run("transformSheetToDataFrame", func(t *testing.T) {
+		sheet, _ := loadTestSheet("./testdata/mixed-data.json")
+		gsd := &GoogleSheets{
+			Cache: cache.New(300*time.Second, 50*time.Second),
+			Logger: hclog.New(&hclog.LoggerOptions{
+				Name:  "",
+				Level: hclog.LevelFromString("DEBUG"),
+			}),
+		}
+		qm := QueryModel{Range: "A1:O", Spreadsheet: Spreadsheet{ID: "someid"}, CacheDurationSeconds: 10}
+
+		meta := make(map[string]interface{})
+		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
+		assert.Nil(t, err)
+		assert.Equal(t, frame.Name, "ref1")
+
+		t.Run("no of columns match", func(t *testing.T) {
+			assert.Equal(t, len(frame.Fields), 16)
+		})
+
+		t.Run("no of rows match field length", func(t *testing.T) {
+			for _, field := range frame.Fields {
+				assert.Equal(t, field.Len(), len(sheet.Sheets[0].Data[0].RowData)-1)
+			}
+		})
+
+		t.Run("meta is populated correctly", func(t *testing.T) {
+			assert.Equal(t, meta["spreadsheetId"], qm.Spreadsheet.ID)
+			assert.Equal(t, meta["range"], qm.Range)
+		})
+
+		t.Run("meta warnings is populated correctly", func(t *testing.T) {
+			warnings := meta["warnings"].([]string)
+			assert.Equal(t, 4, len(warnings))
+			assert.Equal(t, "Multipe data types found in column MixedDataTypes. Using string data type", warnings[0])
+			assert.Equal(t, "Multipe data types found in column MixedUnits. Using string data type", warnings[1])
+			assert.Equal(t, "Multipe units found in column MixedUnits. Formatted value will be used", warnings[2])
+			assert.Equal(t, "Multipe units found in column Mixed currencies. Formatted value will be used", warnings[3])
 		})
 	})
 }
