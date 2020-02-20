@@ -7,8 +7,8 @@ import (
 
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
-	client "github.com/grafana/google-sheets-datasource/pkg/googlesheets/client"
 	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
+	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/hashicorp/go-hclog"
@@ -24,12 +24,12 @@ type GoogleSheets struct {
 
 // Query function
 func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*df.Frame, error) {
-	client, err := client.New(ctx, client.NewAuth(config.ApiKey, config.AuthType, config.JWT))
+	client, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
 	if err != nil {
 		return df.New(refID), fmt.Errorf("Unable to create service: %v", err.Error())
 	}
 
-	sheet, meta, err := gs.getSpreadSheet(client, qm, config)
+	sheet, meta, err := gs.getSpreadSheet(client, qm)
 	if err != nil {
 		return df.New(refID), err
 	}
@@ -45,13 +45,13 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 // TestAPI function
 func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) (*df.Frame, error) {
 	// _, err := createSheetsService(ctx, config)
-	_, err := client.New(ctx, client.NewAuth(config.ApiKey, config.AuthType, config.JWT))
+	_, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
 	return df.New("TestAPI"), err
 }
 
 //GetSpreadsheets
 func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, config *GoogleSheetConfig) (map[string]string, error) {
-	client, err := client.New(ctx, client.NewAuth(config.ApiKey, config.AuthType, config.JWT))
+	client, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
 	if err != nil {
 		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
 	}
@@ -60,7 +60,6 @@ func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, con
 	if err != nil {
 		return nil, fmt.Errorf("Could not get all files: %s", err.Error())
 	}
-	gs.Logger.Debug("!!!files", spew.Sdump(files))
 
 	fileNames := map[string]string{}
 	for _, i := range files {
@@ -70,7 +69,7 @@ func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, con
 	return fileNames, nil
 }
 
-func (gs *GoogleSheets) getSpreadSheet(client *client.Client, qm *QueryModel, config *GoogleSheetConfig) (*sheets.GridData, map[string]interface{}, error) {
+func (gs *GoogleSheets) getSpreadSheet(client client, qm *QueryModel) (*sheets.GridData, map[string]interface{}, error) {
 	cacheKey := qm.Spreadsheet.ID + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		return item.(*sheets.GridData), map[string]interface{}{"hit": true, "count": gs.Cache.ItemCount(), "expires": fmt.Sprintf("%vs", int(expires.Sub(time.Now()).Seconds()))}, nil
@@ -91,7 +90,9 @@ func (gs *GoogleSheets) getSpreadSheet(client *client.Client, qm *QueryModel, co
 
 	sheet := result.Sheets[0].Data[0]
 
-	gs.Cache.Set(cacheKey, sheet, time.Duration(qm.CacheDurationSeconds)*time.Second)
+	if qm.CacheDurationSeconds > 0 {
+		gs.Cache.Set(cacheKey, sheet, time.Duration(qm.CacheDurationSeconds)*time.Second)
+	}
 
 	return sheet, map[string]interface{}{"hit": false}, nil
 }

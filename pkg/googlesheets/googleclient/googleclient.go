@@ -1,4 +1,4 @@
-package client
+package googleclient
 
 import (
 	"context"
@@ -11,8 +11,8 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
-// Client struct
-type Client struct {
+// GoogleClient struct
+type GoogleClient struct {
 	sheetsService *sheets.Service
 	driveService  *drive.Service
 }
@@ -34,7 +34,7 @@ func NewAuth(apiKey string, authType string, jwt json.RawMessage) *Auth {
 }
 
 // New creates a new client and initializes a sheet service and a drive service
-func New(ctx context.Context, auth *Auth) (*Client, error) {
+func New(ctx context.Context, auth *Auth) (*GoogleClient, error) {
 	sheetsService, err := createSheetsService(ctx, auth)
 	if err != nil {
 		return nil, err
@@ -45,23 +45,23 @@ func New(ctx context.Context, auth *Auth) (*Client, error) {
 		return nil, err
 	}
 
-	return &Client{
+	return &GoogleClient{
 		sheetsService: sheetsService,
 		driveService:  driveService,
 	}, nil
 }
 
 // GetSpreadsheet gets a google spreadsheet struct by id and range
-func (c *Client) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
-	return c.sheetsService.Spreadsheets.Get(spreadSheetID).Ranges(sheetRange).IncludeGridData(true).Do()
+func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
+	return gc.sheetsService.Spreadsheets.Get(spreadSheetID).Ranges(sheetRange).IncludeGridData(true).Do()
 }
 
 // GetSpreadsheetFiles lists all files with spreadsheet mimetype that the service account that was used to initialize the client has access to
-func (c *Client) GetSpreadsheetFiles() ([]*drive.File, error) {
+func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 	var fs []*drive.File
 	pageToken := ""
 	for {
-		q := c.driveService.Files.List().Q("mimeType='application/vnd.google-apps.spreadsheet'")
+		q := gc.driveService.Files.List().Q("mimeType='application/vnd.google-apps.spreadsheet'")
 		if pageToken != "" {
 			q = q.PageToken(pageToken)
 		}
