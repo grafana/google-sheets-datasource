@@ -44,7 +44,6 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 
 // TestAPI function
 func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) (*df.Frame, error) {
-	// _, err := createSheetsService(ctx, config)
 	_, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
 	return df.New("TestAPI"), err
 }

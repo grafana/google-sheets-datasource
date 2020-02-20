@@ -34,8 +34,6 @@ func loadTestSheet(path string) (*sheets.Spreadsheet, error) {
 }
 
 func TestGooglesheets(t *testing.T) {
-	// sheet, _ := loadTestSheet("./testdata/mixed-data.json")
-
 	t.Run("getUniqueColumnName", func(t *testing.T) {
 		t.Run("name is appended with number if not unique", func(t *testing.T) {
 			columns := map[string]bool{"header": true, "name": true}
