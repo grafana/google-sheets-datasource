@@ -17,3 +17,7 @@ type GoogleSheetConfig struct {
 	AuthType string          `json:"authType"`
 	JWT      json.RawMessage `json:"jwt"`
 }
+
+// type googleClient interface {
+// 	createClient
+// }
