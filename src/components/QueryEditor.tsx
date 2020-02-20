@@ -39,14 +39,6 @@ export function toGoogleURL(info: SheetsQuery): string {
 
 export class QueryEditor extends PureComponent<Props, State> {
   componentWillMount() {
-    // if (!this.props.query.spreadsheet) {
-    //   this.props.query.spreadsheet = {};
-    // }
-
-    // if (!this.props.query.queryType) {
-    //   this.props.query.queryType = 'query';
-    // }
-
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
       this.props.query.cacheDurationSeconds = 300;
     }
