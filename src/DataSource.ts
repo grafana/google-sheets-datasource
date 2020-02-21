@@ -10,7 +10,7 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
 
   async getSpreadSheets(): Promise<SelectableValue<string>[]> {
     return this.getResource('spreadsheets').then(({ spreadsheets }) =>
-      Object.entries(spreadsheets).map(([value, label]) => ({ label, value } as SelectableValue<string>))
+      spreadsheets ? Object.entries(spreadsheets).map(([value, label]) => ({ label, value } as SelectableValue<string>)) : []
     );
   }
 

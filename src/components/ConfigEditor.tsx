@@ -7,6 +7,12 @@ import { JWTConfig } from './';
 export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions>;
 
 export class ConfigEditor extends PureComponent<Props> {
+  componentWillMount() {
+    if (!this.props.options.jsonData.hasOwnProperty('authType')) {
+      this.props.options.jsonData.authType = GoogleAuthType.NONE;
+    }
+  }
+
   onResetApiKey = () => {
     // :( TODO: typings do not let me call the standard function!!!
     // :( updateDatasourcePluginResetOption(this.props, 'apiKey');
@@ -45,7 +51,6 @@ export class ConfigEditor extends PureComponent<Props> {
         {jsonData.authType === GoogleAuthType.NONE && (
           <>
             <div className="gf-form">
-              {console.log({ tjennnna: secureJsonData })}
               <SecretFormField
                 isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}
                 value={secureJsonData?.apiKey || ''}

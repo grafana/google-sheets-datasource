@@ -62,7 +62,7 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 	}
 
 	config.ApiKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
-	config.JWT, _ = req.PluginConfig.DecryptedSecureJSONData["jwt"]
+	config.JWT = req.PluginConfig.DecryptedSecureJSONData["jwt"]
 
 	for _, q := range req.Queries {
 		queryModel := &gs.QueryModel{}
