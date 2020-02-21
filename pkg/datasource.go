@@ -61,6 +61,9 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 		return nil, err
 	}
 
+	config.ApiKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
+	config.JWT, _ = req.PluginConfig.DecryptedSecureJSONData["jwt"]
+
 	for _, q := range req.Queries {
 		queryModel := &gs.QueryModel{}
 		err := json.Unmarshal(q.JSON, &queryModel)
@@ -98,6 +101,8 @@ func (gsd *GoogleSheetsDataSource) CallResource(ctx context.Context, req *backen
 		gsd.logger.Error("Could not unmarshal DataSourceInfo json", "Error", err)
 		return nil, err
 	}
+	config.ApiKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
+	config.JWT, _ = req.PluginConfig.DecryptedSecureJSONData["jwt"]
 
 	response := make(map[string]interface{})
 	var res interface{}

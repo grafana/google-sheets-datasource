@@ -42,6 +42,14 @@ export class QueryEditor extends PureComponent<Props, State> {
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
       this.props.query.cacheDurationSeconds = 300;
     }
+
+    if (!this.props.query.hasOwnProperty('spreadsheet')) {
+      this.props.query.spreadsheet = {};
+    }
+
+    if (!this.props.query.hasOwnProperty('queryType')) {
+      this.props.query.queryType = 'query';
+    }
   }
 
   onRangeChange = (event: ChangeEvent<HTMLInputElement>) => {

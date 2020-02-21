@@ -1,8 +1,6 @@
 package googlesheets
 
 import (
-	"encoding/json"
-
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -19,9 +17,9 @@ type QueryModel struct {
 }
 
 type GoogleSheetConfig struct {
-	ApiKey   string          `json:"apiKey"`
-	AuthType string          `json:"authType"`
-	JWT      json.RawMessage `json:"jwt"`
+	ApiKey   string `json:"apiKey"`
+	AuthType string `json:"authType"`
+	JWT      string `json:"jwt"`
 }
 
 type client interface {

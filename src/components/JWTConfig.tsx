@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { startCase, isObject } from 'lodash';
 import { FormLabel, Button } from '@grafana/ui';
 import { DropZone } from './';
-import { JWTFile } from '../types';
+// import { JWTFile } from '../types';
 
 const configKeys = [
   'type',
@@ -18,14 +18,14 @@ const configKeys = [
 ];
 
 export interface Props {
-  onChange: (jwt: JWTFile) => void;
-  jwt: JWTFile;
+  onChange: (jwt: string) => void;
+  isConfigured: boolean;
 }
 
 const validateJson = (json: { [key: string]: string }) => isObject(json) && configKeys.every(key => !!json[key]);
 
-export function JWTConfig({ onChange, jwt = {} as JWTFile }: Props) {
-  const [enableUpload, setEnableUpload] = useState<boolean>(!Object.keys(jwt).length);
+export function JWTConfig({ onChange, isConfigured }: Props) {
+  const [enableUpload, setEnableUpload] = useState<boolean>(!isConfigured);
   const [error, setError] = useState<string>();
 
   return enableUpload ? (
@@ -39,7 +39,7 @@ export function JWTConfig({ onChange, jwt = {} as JWTFile }: Props) {
             reader.onloadend = (e: any) => {
               const json = JSON.parse(e.target.result);
               if (validateJson(json)) {
-                onChange(json as JWTFile);
+                onChange(e.target.result);
                 setEnableUpload(false);
               } else {
                 setError('Invalid JWT file');
@@ -62,11 +62,10 @@ export function JWTConfig({ onChange, jwt = {} as JWTFile }: Props) {
     </>
   ) : (
     <>
-      {Object.entries(jwt).map(([key, value]) => (
+      {configKeys.map(key => (
         <div className="gf-form">
           <FormLabel width={10}>{startCase(key)}</FormLabel>
-          {/* Should be secure json data */}
-          <input disabled className="gf-form-input width-30" value={value} />
+          <input disabled className="gf-form-input width-30" value="configured" />
         </div>
       ))}
       <Button style={{ marginTop: 12 }} variant="secondary" onClick={() => setEnableUpload(true)}>

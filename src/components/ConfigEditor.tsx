@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
-import { SecretFormField, FormField, FormLabel, Select } from '@grafana/ui';
+import { SecretFormField, FormLabel, Select } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps, onUpdateDatasourceSecureJsonDataOption, onUpdateDatasourceJsonDataOptionSelect } from '@grafana/data';
-import { SheetsSourceOptions, GoogleSheetsSecureJsonData, GoogleAuthType, googleAuthTypes, JWTFile } from '../types';
+import { SheetsSourceOptions, GoogleSheetsSecureJsonData, GoogleAuthType, googleAuthTypes } from '../types';
 import { JWTConfig } from './';
 
 export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions>;
@@ -26,7 +26,7 @@ export class ConfigEditor extends PureComponent<Props> {
   };
 
   render() {
-    const { options } = this.props;
+    const { options, onOptionsChange } = this.props;
     const { secureJsonFields, jsonData } = options;
     // HACK till after: https://github.com/grafana/grafana/pull/21772
     const secureJsonData = options.secureJsonData as GoogleSheetsSecureJsonData;
@@ -45,6 +45,7 @@ export class ConfigEditor extends PureComponent<Props> {
         {jsonData.authType === GoogleAuthType.NONE && (
           <>
             <div className="gf-form">
+              {console.log({ tjennnna: secureJsonData })}
               <SecretFormField
                 isConfigured={(secureJsonFields && secureJsonFields.apiKey) as boolean}
                 value={secureJsonData?.apiKey || ''}
@@ -56,31 +57,20 @@ export class ConfigEditor extends PureComponent<Props> {
                 onChange={onUpdateDatasourceSecureJsonDataOption(this.props, 'apiKey')}
               />
             </div>
-            <div className="gf-form">
-              <FormField
-                label="API Key (temp)"
-                labelWidth={10}
-                inputWidth={25}
-                placeholder="Enter API Key"
-                value={this.props.options.jsonData.apiKey}
-                onChange={e =>
-                  this.props.onOptionsChange({
-                    ...this.props,
-                    ...this.props.options,
-                    jsonData: {
-                      ...this.props.options.jsonData,
-                      apiKey: e.target.value,
-                    },
-                  })
-                }
-              />
-            </div>
           </>
         )}
         {jsonData.authType === GoogleAuthType.JWT && (
           <JWTConfig
-            jwt={this.props.options.jsonData.jwt}
-            onChange={(jwt: JWTFile) => onUpdateDatasourceJsonDataOptionSelect(this.props, 'jwt')({ value: jwt })}
+            isConfigured={(secureJsonFields && !!secureJsonFields.jwt) as boolean}
+            onChange={jwt => {
+              onOptionsChange({
+                ...options,
+                secureJsonData: {
+                  ...secureJsonData!,
+                  jwt,
+                },
+              });
+            }}
           ></JWTConfig>
         )}
       </div>

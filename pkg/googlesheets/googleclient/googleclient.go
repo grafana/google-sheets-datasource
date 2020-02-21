@@ -2,7 +2,6 @@ package googleclient
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"golang.org/x/oauth2/google"
@@ -21,11 +20,11 @@ type GoogleClient struct {
 type Auth struct {
 	APIKey   string
 	AuthType string
-	JWT      json.RawMessage
+	JWT      string
 }
 
 // NewAuth creates a new auth struct
-func NewAuth(apiKey string, authType string, jwt json.RawMessage) *Auth {
+func NewAuth(apiKey string, authType string, jwt string) *Auth {
 	return &Auth{
 		APIKey:   apiKey,
 		AuthType: authType,
