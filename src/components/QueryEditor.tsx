@@ -69,7 +69,7 @@ export class QueryEditor extends PureComponent<Props, State> {
             Spreadsheet ID
           </FormLabel>
           <SegmentAsync
-            loadOptions={() => datasource.metricFindQuery(query, 'getSpreadsheets')}
+            loadOptions={() => datasource.getSpreadSheets()}
             placeholder="Enter SpreadsheetID"
             value={query.spreadsheet}
             allowCustomValue={true}

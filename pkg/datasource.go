@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
@@ -37,7 +38,8 @@ func main() {
 		},
 	}
 	err := backend.Serve(backend.ServeOpts{
-		DataQueryHandler: ds,
+		DataQueryHandler:    ds,
+		CallResourceHandler: ds,
 	})
 	if err != nil {
 		pluginLogger.Error(err.Error())
@@ -74,10 +76,6 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			frame, err = gsd.googlesheet.TestAPI(ctx, &config)
 		case "query":
 			frame, err = gsd.googlesheet.Query(ctx, q.RefID, queryModel, &config, q.TimeRange)
-		case "getSpreadsheets":
-			spreadSheets, _ := gsd.googlesheet.GetSpreadsheetsByServiceAccount(ctx, &config)
-			frame = df.New("getHeader")
-			res.Metadata = spreadSheets
 		default:
 			return nil, fmt.Errorf("Invalid query type")
 		}
@@ -91,4 +89,40 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 	}
 
 	return res, nil
+}
+
+func (gsd *GoogleSheetsDataSource) CallResource(ctx context.Context, req *backend.CallResourceRequest) (*backend.CallResourceResponse, error) {
+	config := gs.GoogleSheetConfig{}
+	err := json.Unmarshal(req.PluginConfig.JSONData, &config)
+	if err != nil {
+		gsd.logger.Error("Could not unmarshal DataSourceInfo json", "Error", err)
+		return nil, err
+	}
+
+	response := make(map[string]interface{})
+	var res interface{}
+	switch req.Path {
+	case "spreadsheets":
+		res, err = gsd.googlesheet.GetSpreadsheetsByServiceAccount(ctx, &config)
+	}
+
+	if err != nil {
+		response["error"] = err.Error()
+	} else {
+		response[req.Path] = res
+	}
+
+	body, err := json.Marshal(response)
+	if err != nil {
+		return nil, err
+	}
+
+	headers := make(http.Header)
+	headers.Add("Content-Type", "application/json")
+
+	return &backend.CallResourceResponse{
+		Status:  http.StatusOK,
+		Headers: headers,
+		Body:    body,
+	}, nil
 }
