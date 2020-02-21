@@ -27,6 +27,19 @@ export const googleAuthTypes = [
 export interface GoogleCloudOptions extends DataSourceJsonData {
   authenticationType: GoogleAuthType;
 }
+export interface CacheInfo {
+  hit: boolean;
+  count: number;
+  expires: string;
+}
+
+export interface SheetResponseMeta {
+  spreadsheetId: string;
+  range: string;
+  majorDimension: string;
+  cache: CacheInfo;
+  warnings: string[];
+}
 
 //-------------------------------------------------------------------------------
 // The Sheets specific types

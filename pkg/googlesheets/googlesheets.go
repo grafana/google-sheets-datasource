@@ -8,14 +8,12 @@ import (
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
 	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
+	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/hashicorp/go-hclog"
 	"github.com/patrickmn/go-cache"
 	"golang.org/x/net/context"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/drive/v3"
-	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -26,12 +24,12 @@ type GoogleSheets struct {
 
 // Query function
 func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*df.Frame, error) {
-	srv, err := createSheetsService(ctx, config)
+	client, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
 	if err != nil {
 		return df.New(refID), fmt.Errorf("Unable to create service: %v", err.Error())
 	}
 
-	sheet, meta, err := gs.getSpreadSheet(srv, qm, config)
+	sheet, meta, err := gs.getSpreadSheet(client, qm)
 	if err != nil {
 		return df.New(refID), err
 	}
@@ -46,21 +44,22 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 
 // TestAPI function
 func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) (*df.Frame, error) {
-	_, err := createSheetsService(ctx, config)
+	_, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
 	return df.New("TestAPI"), err
 }
 
 //GetSpreadsheets
 func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, config *GoogleSheetConfig) (map[string]string, error) {
-	srv, err := createDriveService(ctx, config)
+	client, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
 	if err != nil {
 		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
 	}
 
-	files, err := getAllSheets(srv)
+	files, err := client.GetSpreadsheetFiles()
 	if err != nil {
 		return nil, fmt.Errorf("Could not get all files: %s", err.Error())
 	}
+
 	fileNames := map[string]string{}
 	for _, i := range files {
 		fileNames[i.Id] = i.Name
@@ -69,18 +68,30 @@ func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, con
 	return fileNames, nil
 }
 
-func (gs *GoogleSheets) getSpreadSheet(srv *sheets.Service, qm *QueryModel, config *GoogleSheetConfig) (*sheets.GridData, map[string]interface{}, error) {
+func (gs *GoogleSheets) getSpreadSheet(client client, qm *QueryModel) (*sheets.GridData, map[string]interface{}, error) {
 	cacheKey := qm.Spreadsheet.ID + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
-		return item.(*sheets.GridData), map[string]interface{}{"hit": true, "count": gs.Cache.ItemCount(), "expires": fmt.Sprintf("%v s", int(expires.Sub(time.Now()).Seconds()))}, nil
+		return item.(*sheets.GridData), map[string]interface{}{"hit": true, "count": gs.Cache.ItemCount(), "expires": fmt.Sprintf("%vs", int(expires.Sub(time.Now()).Seconds()))}, nil
 	}
 
-	result, err := srv.Spreadsheets.Get(qm.Spreadsheet.ID).Ranges(qm.Range).IncludeGridData(true).Do()
+	result, err := client.GetSpreadsheet(qm.Spreadsheet.ID, qm.Range, true)
 	if err != nil {
 		return nil, nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
 	}
+
+	if result.Properties.TimeZone != "" {
+		loc, err := time.LoadLocation(result.Properties.TimeZone)
+		if err != nil {
+			return nil, nil, fmt.Errorf("error while loading timezone: %v", err.Error())
+		}
+		time.Local = loc
+	}
+
 	sheet := result.Sheets[0].Data[0]
-	gs.Cache.Set(cacheKey, sheet, time.Duration(qm.CacheDurationSeconds)*time.Second)
+
+	if qm.CacheDurationSeconds > 0 {
+		gs.Cache.Set(cacheKey, sheet, time.Duration(qm.CacheDurationSeconds)*time.Second)
+	}
 
 	return sheet, map[string]interface{}{"hit": false}, nil
 }
@@ -106,7 +117,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 
 		if column.HasMixedTypes() {
 			warnings = append(warnings, fmt.Sprintf("Multipe data types found in column %s. Using string data type", column.Header))
-			gs.Logger.Error("Multipe data types found in column " + column.Header + ". Using string data type")
+			gs.Logger.Error("Multipe data types found in column " + column.Header + ". Using string")
 		}
 
 		if column.HasMixedUnits() {
@@ -123,6 +134,10 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 
 	for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
+			if columnIndex >= len(columns) {
+				continue
+			}
+
 			switch columns[columnIndex].GetType() {
 			case "TIME":
 				time, err := dateparse.ParseLocal(cellData.FormattedValue)
@@ -150,73 +165,44 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	return frame, nil
 }
 
-func createSheetsService(ctx context.Context, config *GoogleSheetConfig) (*sheets.Service, error) {
-	if config.AuthType == "none" {
-		if len(config.ApiKey) == 0 {
-			return nil, fmt.Errorf("Invalid API Key")
+func getUniqueColumnName(formattedName string, columnIndex int, columns map[string]bool) string {
+	name := formattedName
+	if name == "" {
+		name = fmt.Sprintf("Field %v", columnIndex+1)
+	}
+
+	nameExist := true
+	counter := 1
+	for nameExist {
+		if _, exist := columns[name]; exist {
+			name = fmt.Sprintf("%s%v", formattedName, counter)
+			counter++
+		} else {
+			nameExist = false
 		}
-
-		return sheets.NewService(ctx, option.WithAPIKey(config.ApiKey))
 	}
 
-	jwtConfig, err := google.JWTConfigFromJSON([]byte(config.JWT), "https://www.googleapis.com/auth/spreadsheets.readonly", "https://www.googleapis.com/auth/spreadsheets")
-	if err != nil {
-		return nil, fmt.Errorf("Error parsin JWT file: %v", err)
-	}
-
-	client := jwtConfig.Client(ctx)
-	return sheets.New(client)
-}
-
-func createDriveService(ctx context.Context, config *GoogleSheetConfig) (*drive.Service, error) {
-	if config.AuthType == "none" {
-		return drive.NewService(ctx, option.WithAPIKey(config.ApiKey))
-	}
-
-	jwtConfig, err := google.JWTConfigFromJSON([]byte(config.JWT), drive.DriveMetadataReadonlyScope)
-	if err != nil {
-		return nil, fmt.Errorf("Error parsin JWT file: %v", err)
-	}
-
-	client := jwtConfig.Client(ctx)
-
-	return drive.New(client)
+	return name
 }
 
 func getColumnDefintions(rows []*sheets.RowData) []*cd.ColumnDefinition {
-	columnTypes := []*cd.ColumnDefinition{}
+	columns := []*cd.ColumnDefinition{}
+	columnMap := map[string]bool{}
 	headerRow := rows[0].Values
 
 	for columnIndex, headerCell := range headerRow {
-		columnTypes = append(columnTypes, cd.New(strings.TrimSpace(headerCell.FormattedValue), columnIndex))
+		name := getUniqueColumnName(strings.TrimSpace(headerCell.FormattedValue), columnIndex, columnMap)
+		columnMap[name] = true
+		columns = append(columns, cd.New(name, columnIndex))
 	}
 
 	for rowIndex := 1; rowIndex < len(rows); rowIndex++ {
-		for columnIndex, columnCell := range rows[rowIndex].Values {
-			columnTypes[columnIndex].CheckCell(columnCell)
+		for _, column := range columns {
+			if column.ColumnIndex < len(rows[rowIndex].Values) {
+				column.CheckCell(rows[rowIndex].Values[column.ColumnIndex])
+			}
 		}
 	}
 
-	return columnTypes
-}
-
-func getAllSheets(d *drive.Service) ([]*drive.File, error) {
-	var fs []*drive.File
-	pageToken := ""
-	for {
-		q := d.Files.List().Q("mimeType='application/vnd.google-apps.spreadsheet'")
-		if pageToken != "" {
-			q = q.PageToken(pageToken)
-		}
-		r, err := q.Do()
-		if err != nil {
-			return fs, err
-		}
-		fs = append(fs, r.Files...)
-		pageToken = r.NextPageToken
-		if pageToken == "" {
-			break
-		}
-	}
-	return fs, nil
+	return columns
 }

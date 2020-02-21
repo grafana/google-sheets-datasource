@@ -39,14 +39,6 @@ export function toGoogleURL(info: SheetsQuery): string {
 
 export class QueryEditor extends PureComponent<Props, State> {
   componentWillMount() {
-    // if (!this.props.query.spreadsheet) {
-    //   this.props.query.spreadsheet = {};
-    // }
-
-    // if (!this.props.query.queryType) {
-    //   this.props.query.queryType = 'query';
-    // }
-
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
       this.props.query.cacheDurationSeconds = 300;
     }
@@ -77,7 +69,7 @@ export class QueryEditor extends PureComponent<Props, State> {
             Spreadsheet ID
           </FormLabel>
           <SegmentAsync
-            loadOptions={() => datasource.metricFindQuery(query, 'getSpreadsheets')}
+            loadOptions={() => datasource.getSpreadSheets()}
             placeholder="Enter SpreadsheetID"
             value={query.spreadsheet}
             allowCustomValue={true}
@@ -89,6 +81,7 @@ export class QueryEditor extends PureComponent<Props, State> {
             }}
           ></SegmentAsync>
           <LinkButton
+            style={{ marginTop: 1 }}
             disabled={!query.spreadsheet.value}
             variant="secondary"
             icon="fa fa-link"
