@@ -56,6 +56,7 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 	res := &backend.DataQueryResponse{}
 	config := gs.GoogleSheetConfig{}
 	err := json.Unmarshal(req.PluginConfig.JSONData, &config)
+
 	if err != nil {
 		gsd.logger.Error("Could not unmarshal DataSourceInfo json", "Error", err)
 		return nil, err

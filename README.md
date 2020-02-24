@@ -1,5 +1,9 @@
-# Simple Data Source
+# Google Sheets Datasource
 
-[![CircleCI](https://circleci.com/gh/grafana/simple-datasource/tree/master.svg?style=svg)](https://circleci.com/gh/grafana/simple-datasource/tree/master)
+## Development
 
-This is a stub to show how to create a basic data source plugin.
+`make dev`
+`docker-compose up`
+
+To restart after backend changes:
+`./scripts/restart-plugin.sh`

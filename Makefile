@@ -2,7 +2,9 @@ DSNAME=sheets-datasource
 GO = GO111MODULE=on go
 all: build-frontend build
 
-# TODO: This should build for the current arch, not linux
+
+dev: build watch-frontend
+
 build:
 	GOOS=linux $(GO) build -o ./dist/${DSNAME}_linux_amd64 -tags netgo -ldflags '-w' ./pkg
 
@@ -18,3 +20,6 @@ build-debug-darwin:
 # Note frontend deletes backend file
 build-frontend:
 	npx grafana-toolkit plugin:build
+
+watch-frontend: 
+	grafana-toolkit plugin:dev --watch
