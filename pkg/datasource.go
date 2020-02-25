@@ -75,14 +75,7 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 		}
 
 		var frame *df.Frame
-		switch queryModel.QueryType {
-		case "testAPI":
-			frame, err = gsd.googlesheet.TestAPI(ctx, &config)
-		case "query":
-			frame, err = gsd.googlesheet.Query(ctx, q.RefID, queryModel, &config, q.TimeRange)
-		default:
-			return nil, fmt.Errorf("Invalid query type")
-		}
+		frame, err = gsd.googlesheet.Query(ctx, q.RefID, queryModel, &config, q.TimeRange)
 
 		if err != nil {
 			// TEMP: at the moment, the only way to return an error is by using meta
@@ -110,6 +103,8 @@ func (gsd *GoogleSheetsDataSource) CallResource(ctx context.Context, req *backen
 	switch req.Path {
 	case "spreadsheets":
 		res, err = gsd.googlesheet.GetSpreadsheetsByServiceAccount(ctx, &config)
+	case "test":
+		_, err = gsd.googlesheet.TestAPI(ctx, &config)
 	}
 
 	if err != nil {
