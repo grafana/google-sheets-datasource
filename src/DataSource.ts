@@ -8,7 +8,7 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
     super(instanceSettings);
   }
 
-  async getSpreadSheets(): Promise<SelectableValue<string>[]> {
+  async getSpreadSheets(): Promise<Array<SelectableValue<string>>> {
     return this.getResource('spreadsheets').then(({ spreadsheets }) =>
       spreadsheets ? Object.entries(spreadsheets).map(([value, label]) => ({ label, value } as SelectableValue<string>)) : []
     );
@@ -19,31 +19,18 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
   }
 
   async testDatasource() {
-    return getBackendSrv()
-      .post('/api/ds/query', {
-        from: '5m',
-        to: 'now',
-        queries: [
-          {
-            refId: 'A',
-            datasource: this.name,
-            datasourceId: this.id,
-            queryType: 'testAPI',
-          },
-        ],
-      })
-      .then((rsp: any) => {
-        if (rsp.results[''].meta && rsp.results[''].meta.error) {
-          return {
-            status: 'fail',
-            message: rsp.results[''].meta.error,
-          };
-        }
-
+    return this.getResource('test').then((rsp: any) => {
+      if (rsp.error) {
         return {
-          status: 'success',
-          message: 'Success',
+          status: 'fail',
+          message: rsp.error,
         };
-      });
+      }
+
+      return {
+        status: 'success',
+        message: 'Success',
+      };
+    });
   }
 }

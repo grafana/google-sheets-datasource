@@ -10,7 +10,6 @@ type Spreadsheet struct {
 }
 
 type QueryModel struct {
-	QueryType            string      `json:"queryType"`
 	Spreadsheet          Spreadsheet `json:"Spreadsheet"`
 	Range                string      `json:"range"`
 	CacheDurationSeconds int         `json:"cacheDurationSeconds"`

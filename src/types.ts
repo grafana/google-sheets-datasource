@@ -49,7 +49,6 @@ export interface SheetsQuery extends DataQuery {
   spreadsheet: SelectableValue<string>;
   range: string;
   cacheDurationSeconds: number;
-  queryType: string;
 }
 
 export interface SheetsSourceOptions extends GoogleCloudOptions {
