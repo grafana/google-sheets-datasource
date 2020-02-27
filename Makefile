@@ -17,6 +17,9 @@ build-darwin:
 build-debug-darwin:
 	$(GO) build -o ./dist/${DSNAME}_darwin_amd64 -gcflags=all="-N -l" ./pkg
 
+test:
+	$(GO) test ./...
+
 # Note frontend deletes backend file
 build-frontend:
 	npx grafana-toolkit plugin:build
