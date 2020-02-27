@@ -22,4 +22,4 @@ build-frontend:
 	npx grafana-toolkit plugin:build
 
 watch-frontend: 
-	grafana-toolkit plugin:dev --watch
+	npx grafana-toolkit plugin:dev --watch
