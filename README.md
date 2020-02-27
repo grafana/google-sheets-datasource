@@ -9,8 +9,10 @@ In particular, the code style and tooling needs work before it should be widely 
 
 ## Development
 
-`make dev`
-`docker-compose up`
+```
+make dev
+docker-compose up
+```
 
 To restart after backend changes:
 `./scripts/restart-plugin.sh`
