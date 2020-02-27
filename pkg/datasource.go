@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
@@ -43,6 +44,7 @@ func main() {
 	})
 	if err != nil {
 		pluginLogger.Error(err.Error())
+		os.Exit(1)
 	}
 }
 
