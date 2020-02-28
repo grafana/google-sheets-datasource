@@ -28,6 +28,7 @@ jobs:
             echo 08df79b46b0adf498ea9f320a0f23d6ec59e9003660b4c9c1ce8e5e2c6f823ca go1.14.linux-amd64.tar.gz | sha256sum --check --status
             sudo tar -C /usr/local -xf go1.14.linux-amd64.tar.gz
             echo 'export PATH=/usr/local/go/bin:$PATH' >> $BASH_ENV
+            source $BASH_ENV
 
             # Install golangci-lint
             curl -fLO https://github.com/golangci/golangci-lint/releases/download/v1.23.7/golangci-lint-1.23.7-linux-amd64.tar.gz
