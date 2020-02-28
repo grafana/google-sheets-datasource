@@ -7,7 +7,6 @@ aliases:
       only: master
 
 defaults: &defaults
-  working_directory: ~/plugin
   docker:
     - image: circleci/node:12
 
@@ -15,25 +14,41 @@ jobs:
   build_plugin:
     <<: *defaults
     steps:
-    - checkout
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
-    - run:
-        name: Install yarn
-        command: |
-          yarn install --pure-lockfile
-    - run:
-        name: Run Toolkit Build
-        command: npx grafana-toolkit plugin:ci-build
-    - save_cache:
-        paths:
-        - node_modules
-        key: yarn-packages-{{ checksum "yarn.lock" }}
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci
+      - checkout
+      - restore_cache:
+          keys:
+          - yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install dependencies
+          command: |
+            yarn install --pure-lockfile
+            # Install golangci-lint
+            # Install Mage
+      - run:
+          name: Build back-end
+          command: |
+            mage build:backend
+            mage build:backendDebug
+            mage build:backendLinux
+            mage build:backendLinuxDebug
+      - run:
+          name: Build front-end
+          command: ./node_modules/.bin/grafana-toolkit plugin:ci-build
+      - run:
+          name: Test
+          command: |
+            gofmt -l .
+            golangci-lint run ./...
+            go test ./pkg/...
+            yarn test
+      - save_cache:
+          paths:
+            - node_modules
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci
   build_docs:
     <<: *defaults
     steps:
@@ -42,14 +57,14 @@ jobs:
         keys:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
-        name: Install yarn
+        name: Install dependencies
         command: |
           yarn install --pure-lockfile
     - run:
         name: Build Docs
         command: |
           mkdir ci # Avoid error if not exists
-          npx grafana-toolkit plugin:ci-docs
+          ./node_modules/.bin/grafana-toolkit plugin:ci-docs
     - save_cache:
         paths:
         - node_modules
@@ -70,7 +85,9 @@ jobs:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
         name: Package Distribution
-        command: npx grafana-toolkit plugin:ci-package
+        command: |
+          yarn install --pure-lockfile
+          ./node_modules/.bin/grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
         paths:
@@ -82,7 +99,6 @@ jobs:
   test_integration:
     docker:
     - image: circleci/node:12-browsers
-    working_directory: ~/plugin
     steps:
     - checkout
     - attach_workspace:
@@ -108,7 +124,8 @@ jobs:
     - run:
         name: Run e2e tests
         command: |
-          npx grafana-toolkit plugin:ci-test
+          yarn install --pure-lockfile
+          ./node_modules/.bin/grafana-toolkit plugin:ci-test
     - persist_to_workspace:
         root: .
         paths:
@@ -121,7 +138,6 @@ jobs:
   report:
     docker:
     - image: circleci/node:12
-    working_directory: ~/plugin
     steps:
     - checkout
     - attach_workspace:
@@ -131,7 +147,9 @@ jobs:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
         name: Toolkit Report
-        command: npx grafana-toolkit plugin:ci-report
+        command: |
+          yarn install --pure-lockfile
+          ./node_modules/.bin/grafana-toolkit plugin:ci-report
     - store_artifacts:
         path: ci
 
@@ -182,18 +200,18 @@ workflows:
   version: 2
   plugin_workflow:
     jobs:
-    - build_plugin
-    - build_docs
+      - build_plugin
+      - build_docs
     - package:
         requires:
-        - build_plugin
-        - build_docs
+          - build_plugin
+          - build_docs
     - test_integration:
         requires:
-        - package
+          - package
     - report:
         requires:
-        - test_integration
+          - test_integration
     - approve_release:
         type: approval
         requires:
