@@ -19,7 +19,7 @@ func buildBackend(variant string, enableDebug bool, env map[string]string) error
 		"build", "-o", fmt.Sprintf("dist/%s%s", dsName, varStr), "-tags", "netgo",
 	}
 	if enableDebug {
-		args = append(args, "-gcflags=all=\"-N -l\"")
+		args = append(args, "-gcflags=all=-N -l")
 	} else {
 		args = append(args, []string{"-ldflags", "-w"}...)
 	}
