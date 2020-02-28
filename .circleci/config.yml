@@ -212,22 +212,22 @@ workflows:
     jobs:
       - build_plugin
       - build_docs
-    - package:
-        requires:
-          - build_plugin
-          - build_docs
-    - test_integration:
-        requires:
-          - package
-    - report:
-        requires:
-          - test_integration
-    - approve_release:
-        type: approval
-        requires:
-          - report
-        filters: *filter-only-master
-    - publish_github_release:
-        requires:
-          - approve_release
-        filters: *filter-only-master
+      - package:
+          requires:
+            - build_plugin
+            - build_docs
+      - test_integration:
+          requires:
+            - package
+      - report:
+          requires:
+            - test_integration
+      - approve_release:
+          type: approval
+          requires:
+            - report
+          filters: *filter-only-master
+      - publish_github_release:
+          requires:
+            - approve_release
+          filters: *filter-only-master
