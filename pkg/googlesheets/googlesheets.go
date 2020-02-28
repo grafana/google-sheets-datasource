@@ -71,7 +71,11 @@ func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, con
 func (gs *GoogleSheets) getSpreadSheet(client client, qm *QueryModel) (*sheets.GridData, map[string]interface{}, error) {
 	cacheKey := qm.Spreadsheet.ID + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
-		return item.(*sheets.GridData), map[string]interface{}{"hit": true, "count": gs.Cache.ItemCount(), "expires": fmt.Sprintf("%vs", int(expires.Sub(time.Now()).Seconds()))}, nil
+		return item.(*sheets.GridData), map[string]interface{}{
+			"hit":     true,
+			"count":   gs.Cache.ItemCount(),
+			"expires": fmt.Sprintf("%ds", int(time.Until(expires).Seconds())),
+		}, nil
 	}
 
 	result, err := client.GetSpreadsheet(qm.Spreadsheet.ID, qm.Range, true)

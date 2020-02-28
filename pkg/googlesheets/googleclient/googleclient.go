@@ -92,8 +92,7 @@ func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, erro
 	}
 
 	client := jwtConfig.Client(ctx)
-
-	return sheets.New(client)
+	return sheets.NewService(ctx, option.WithHTTPClient(client))
 }
 
 func createDriveService(ctx context.Context, auth *Auth) (*drive.Service, error) {
@@ -107,6 +106,5 @@ func createDriveService(ctx context.Context, auth *Auth) (*drive.Service, error)
 	}
 
 	client := jwtConfig.Client(ctx)
-
-	return drive.New(client)
+	return drive.NewService(ctx, option.WithHTTPClient(client))
 }

@@ -21,16 +21,17 @@ func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, inc
 }
 
 func loadTestSheet(path string) (*sheets.Spreadsheet, error) {
-	var data *sheets.Spreadsheet
-
 	jsonBody, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(jsonBody, &data)
-	sheet := data
 
-	return sheet, nil
+	var sheet sheets.Spreadsheet
+	if err := json.Unmarshal(jsonBody, &sheet); err != nil {
+		return nil, err
+	}
+
+	return &sheet, nil
 }
 
 func TestGooglesheets(t *testing.T) {
