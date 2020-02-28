@@ -81,7 +81,12 @@ func Deps() error {
 
 // Test runs all tests.
 func Test() error {
-	return sh.RunV("go", "test", "./pkg/...")
+	mg.Deps(Deps)
+
+	if err := sh.RunV("go", "test", "./pkg/..."); err != nil {
+		return nil
+	}
+	return sh.RunV("yarn", "test")
 }
 
 // Lint lints the sources.
