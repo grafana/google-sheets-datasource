@@ -6,24 +6,29 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/api/sheets/v4"
 )
 
 func loadTestSheet(path string) (*sheets.GridData, error) {
-	var data *sheets.Spreadsheet
-
 	jsonBody, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(jsonBody, &data)
+
+	var data sheets.Spreadsheet
+	if err := json.Unmarshal(jsonBody, &data); err != nil {
+		return nil, err
+	}
+
 	sheet := data.Sheets[0].Data[0]
 
 	return sheet, nil
 }
 
 func TestColumnDefinition(t *testing.T) {
-	sheet, _ := loadTestSheet("../testdata/mixed-data.json")
+	sheet, err := loadTestSheet("../testdata/mixed-data.json")
+	require.Nil(t, err)
 
 	t.Run("TestDataTypes", func(t *testing.T) {
 		t.Run("MixedTypesDetected", func(t *testing.T) {

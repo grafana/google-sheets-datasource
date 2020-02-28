@@ -49,19 +49,11 @@ func (cd *ColumnDefinition) GetUnit() string {
 }
 
 func (cd *ColumnDefinition) HasMixedTypes() bool {
-	if len(cd.types) > 1 {
-		return true
-	}
-
-	return false
+	return len(cd.types) > 1
 }
 
 func (cd *ColumnDefinition) HasMixedUnits() bool {
-	if len(cd.units) > 1 {
-		return true
-	}
-
-	return false
+	return len(cd.units) > 1
 }
 
 func (cd *ColumnDefinition) checkType(cell *sheets.CellData) {

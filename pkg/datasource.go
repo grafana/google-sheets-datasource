@@ -20,8 +20,7 @@ import (
 )
 
 const (
-	pluginID     = "google-sheets-datasource"
-	variableName = "GOOGLE_SHEETS_API_KEY"
+	pluginID = "google-sheets-datasource"
 )
 
 var pluginLogger = hclog.New(&hclog.LoggerOptions{
@@ -91,7 +90,7 @@ func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backen
 	}
 
 	config.ApiKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
-	config.JWT, _ = req.PluginConfig.DecryptedSecureJSONData["jwt"]
+	config.JWT = req.PluginConfig.DecryptedSecureJSONData["jwt"]
 
 	response := make(map[string]interface{})
 	var res interface{}
