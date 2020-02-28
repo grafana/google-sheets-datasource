@@ -9,6 +9,7 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -16,21 +17,21 @@ type fakeClient struct {
 }
 
 func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
-	sheet, _ := loadTestSheet("./testdata/mixed-data.json")
-	return sheet, nil
+	return loadTestSheet("./testdata/mixed-data.json")
 }
 
 func loadTestSheet(path string) (*sheets.Spreadsheet, error) {
-	var data *sheets.Spreadsheet
-
 	jsonBody, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(jsonBody, &data)
-	sheet := data
 
-	return sheet, nil
+	var sheet sheets.Spreadsheet
+	if err := json.Unmarshal(jsonBody, &sheet); err != nil {
+		return nil, err
+	}
+
+	return &sheet, nil
 }
 
 func TestGooglesheets(t *testing.T) {
@@ -38,13 +39,13 @@ func TestGooglesheets(t *testing.T) {
 		t.Run("name is appended with number if not unique", func(t *testing.T) {
 			columns := map[string]bool{"header": true, "name": true}
 			name := getUniqueColumnName("header", 1, columns)
-			assert.Equal(t, name, "header1")
+			assert.Equal(t, "header1", name)
 		})
 
 		t.Run("name becomes field + column index if header row is empty", func(t *testing.T) {
 			columns := map[string]bool{}
 			name := getUniqueColumnName("", 3, columns)
-			assert.Equal(t, name, "Field 4")
+			assert.Equal(t, "Field 4", name)
 		})
 	})
 
@@ -55,10 +56,11 @@ func TestGooglesheets(t *testing.T) {
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
 			qm := QueryModel{Range: "A1:O", Spreadsheet: Spreadsheet{ID: "someid"}, CacheDurationSeconds: 10}
+			require.Equal(t, 0, gsd.Cache.ItemCount())
 
-			assert.Equal(t, 0, gsd.Cache.ItemCount())
+			_, meta, err := gsd.getSheetData(client, &qm)
+			require.NoError(t, err)
 
-			_, meta, _ := gsd.getSheetData(client, &qm)
 			assert.False(t, meta["hit"].(bool))
 			assert.Equal(t, 1, gsd.Cache.ItemCount())
 		})
@@ -68,17 +70,20 @@ func TestGooglesheets(t *testing.T) {
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
 			qm := QueryModel{Range: "A1:O", Spreadsheet: Spreadsheet{ID: "someid"}, CacheDurationSeconds: 0}
+			require.Equal(t, 0, gsd.Cache.ItemCount())
 
-			assert.Equal(t, 0, gsd.Cache.ItemCount())
+			_, meta, err := gsd.getSheetData(client, &qm)
+			require.NoError(t, err)
 
-			_, meta, _ := gsd.getSheetData(client, &qm)
 			assert.False(t, meta["hit"].(bool))
 			assert.Equal(t, 0, gsd.Cache.ItemCount())
 		})
 	})
 
 	t.Run("transformSheetToDataFrame", func(t *testing.T) {
-		sheet, _ := loadTestSheet("./testdata/mixed-data.json")
+		sheet, err := loadTestSheet("./testdata/mixed-data.json")
+		require.NoError(t, err)
+
 		gsd := &GoogleSheets{
 			Cache: cache.New(300*time.Second, 50*time.Second),
 			Logger: hclog.New(&hclog.LoggerOptions{
@@ -90,8 +95,8 @@ func TestGooglesheets(t *testing.T) {
 
 		meta := make(map[string]interface{})
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
-		assert.Nil(t, err)
-		assert.Equal(t, frame.Name, "ref1")
+		require.NoError(t, err)
+		require.Equal(t, "ref1", frame.Name)
 
 		t.Run("no of columns match", func(t *testing.T) {
 			assert.Equal(t, len(frame.Fields), 16)
@@ -99,7 +104,7 @@ func TestGooglesheets(t *testing.T) {
 
 		t.Run("no of rows match field length", func(t *testing.T) {
 			for _, field := range frame.Fields {
-				assert.Equal(t, field.Len(), len(sheet.Sheets[0].Data[0].RowData)-1)
+				assert.Equal(t, len(sheet.Sheets[0].Data[0].RowData)-1, field.Len())
 			}
 		})
 
