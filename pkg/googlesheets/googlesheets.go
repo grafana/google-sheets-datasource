@@ -22,42 +22,42 @@ type GoogleSheets struct {
 	Logger hclog.Logger
 }
 
-// Query function
+// Query queries a spreadsheet and returns a corresponding data frame.
 func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*df.Frame, error) {
 	client, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
 	if err != nil {
-		return df.New(refID), fmt.Errorf("Unable to create service: %v", err.Error())
+		return nil, fmt.Errorf("unable to create Google API client: %w", err)
 	}
 
-	sheet, meta, err := gs.getSpreadSheet(client, qm)
+	data, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
-		return df.New(refID), err
+		return nil, err
 	}
 
-	frame, err := gs.transformSheetToDataFrame(sheet, meta, refID, qm)
+	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
 	if err != nil {
-		return df.New(refID), err
+		return nil, err
 	}
 
 	return frame, nil
 }
 
-// TestAPI function
-func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) (*df.Frame, error) {
+// TestAPI tests the Google API.
+func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) error {
 	_, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
-	return df.New("TestAPI"), err
+	return err
 }
 
-//GetSpreadsheets
-func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, config *GoogleSheetConfig) (map[string]string, error) {
+// GetSpreadsheets gets spreadsheets from the Google API.
+func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *GoogleSheetConfig) (map[string]string, error) {
 	client, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
 	if err != nil {
-		return nil, fmt.Errorf("Invalid datasource configuration: %s", err)
+		return nil, fmt.Errorf("failed to create Google API client: %w", err)
 	}
 
 	files, err := client.GetSpreadsheetFiles()
 	if err != nil {
-		return nil, fmt.Errorf("Could not get all files: %s", err.Error())
+		return nil, fmt.Errorf("could not get all files: %w", err)
 	}
 
 	fileNames := map[string]string{}
@@ -68,7 +68,8 @@ func (gs *GoogleSheets) GetSpreadsheetsByServiceAccount(ctx context.Context, con
 	return fileNames, nil
 }
 
-func (gs *GoogleSheets) getSpreadSheet(client client, qm *QueryModel) (*sheets.GridData, map[string]interface{}, error) {
+// getSheetData gets grid data corresponding to a spreadsheet.
+func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.GridData, map[string]interface{}, error) {
 	cacheKey := qm.Spreadsheet.ID + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		return item.(*sheets.GridData), map[string]interface{}{
@@ -80,29 +81,28 @@ func (gs *GoogleSheets) getSpreadSheet(client client, qm *QueryModel) (*sheets.G
 
 	result, err := client.GetSpreadsheet(qm.Spreadsheet.ID, qm.Range, true)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Unable to get spreadsheet: %v", err.Error())
+		return nil, nil, fmt.Errorf("unable to get spreadsheet: %w", err)
 	}
 
 	if result.Properties.TimeZone != "" {
 		loc, err := time.LoadLocation(result.Properties.TimeZone)
 		if err != nil {
-			return nil, nil, fmt.Errorf("error while loading timezone: %v", err.Error())
+			return nil, nil, fmt.Errorf("error while loading timezone: %w", err)
 		}
 		time.Local = loc
 	}
 
-	sheet := result.Sheets[0].Data[0]
-
+	data := result.Sheets[0].Data[0]
 	if qm.CacheDurationSeconds > 0 {
-		gs.Cache.Set(cacheKey, sheet, time.Duration(qm.CacheDurationSeconds)*time.Second)
+		gs.Cache.Set(cacheKey, data, time.Duration(qm.CacheDurationSeconds)*time.Second)
 	}
 
-	return sheet, map[string]interface{}{"hit": false}, nil
+	return data, map[string]interface{}{"hit": false}, nil
 }
 
 func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *QueryModel) (*df.Frame, error) {
 	fields := []*df.Field{}
-	columns := getColumnDefintions(sheet.RowData)
+	columns := getColumnDefinitions(sheet.RowData)
 	warnings := []string{}
 
 	for _, column := range columns {
@@ -189,7 +189,7 @@ func getUniqueColumnName(formattedName string, columnIndex int, columns map[stri
 	return name
 }
 
-func getColumnDefintions(rows []*sheets.RowData) []*cd.ColumnDefinition {
+func getColumnDefinitions(rows []*sheets.RowData) []*cd.ColumnDefinition {
 	columns := []*cd.ColumnDefinition{}
 	columnMap := map[string]bool{}
 	headerRow := rows[0].Values
