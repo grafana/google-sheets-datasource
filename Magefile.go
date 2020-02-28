@@ -19,7 +19,7 @@ func buildBackend(variant string, enableDebug bool, env map[string]string) error
 		"build", "-o", fmt.Sprintf("dist/%s%s", dsName, varStr), "-tags", "netgo",
 	}
 	if enableDebug {
-		args = append(args, "-gcflags=all=\"-N -l\"")
+		args = append(args, "-gcflags=all=-N -l")
 	} else {
 		args = append(args, []string{"-ldflags", "-w"}...)
 	}
@@ -81,7 +81,12 @@ func Deps() error {
 
 // Test runs all tests.
 func Test() error {
-	return sh.RunV("go", "test", "./pkg/...")
+	mg.Deps(Deps)
+
+	if err := sh.RunV("go", "test", "./pkg/..."); err != nil {
+		return nil
+	}
+	return sh.RunV("yarn", "test")
 }
 
 // Lint lints the sources.

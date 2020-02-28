@@ -7,7 +7,6 @@ aliases:
       only: master
 
 defaults: &defaults
-  working_directory: ~/plugin
   docker:
     - image: circleci/node:12
 
@@ -15,25 +14,61 @@ jobs:
   build_plugin:
     <<: *defaults
     steps:
-    - checkout
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
-    - run:
-        name: Install yarn
-        command: |
-          yarn install --pure-lockfile
-    - run:
-        name: Run Toolkit Build
-        command: npx grafana-toolkit plugin:ci-build
-    - save_cache:
-        paths:
-        - node_modules
-        key: yarn-packages-{{ checksum "yarn.lock" }}
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci
+      - checkout
+      - restore_cache:
+          keys:
+          - yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install dependencies
+          command: |
+            yarn install --pure-lockfile
+
+            echo 'export PATH=$HOME/go/bin:/usr/local/go/bin:$PATH' >> $BASH_ENV
+            source $BASH_ENV
+
+            cd /tmp
+
+            # Install Go
+            curl -fLO https://dl.google.com/go/go1.14.linux-amd64.tar.gz
+            echo 08df79b46b0adf498ea9f320a0f23d6ec59e9003660b4c9c1ce8e5e2c6f823ca go1.14.linux-amd64.tar.gz | sha256sum --check --status
+            sudo tar -C /usr/local -xf go1.14.linux-amd64.tar.gz
+
+            # Install golangci-lint
+            curl -fLO https://github.com/golangci/golangci-lint/releases/download/v1.23.7/golangci-lint-1.23.7-linux-amd64.tar.gz
+            echo 34df1794a2ea8e168b3c98eed3cc0f3e13ed4cba735e4e40ef141df5c41bc086 golangci-lint-1.23.7-linux-amd64.tar.gz | sha256sum --check --status
+            tar xf golangci-lint-1.23.7-linux-amd64.tar.gz
+            sudo mv golangci-lint-1.23.7-linux-amd64/golangci-lint /usr/local/bin
+
+            # Install Mage
+            mkdir -p ~/go/bin
+            git clone https://github.com/magefile/mage.git
+            cd mage
+            go run bootstrap.go
+      - run:
+          name: Build back-end
+          command: |
+            mage -v build:backend
+            mage -v build:backendDebug
+            mage -v build:backendLinux
+            mage -v build:backendLinuxDebug
+      - run:
+          name: Build front-end
+          command: ./node_modules/.bin/grafana-toolkit plugin:ci-build
+      - run:
+          name: Test
+          command: |
+            gofmt -l .
+            golangci-lint run ./...
+            go test ./pkg/...
+            yarn test
+      - save_cache:
+          paths:
+            - node_modules
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci
   build_docs:
     <<: *defaults
     steps:
@@ -42,14 +77,14 @@ jobs:
         keys:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
-        name: Install yarn
+        name: Install dependencies
         command: |
           yarn install --pure-lockfile
     - run:
         name: Build Docs
         command: |
           mkdir ci # Avoid error if not exists
-          npx grafana-toolkit plugin:ci-docs
+          ./node_modules/.bin/grafana-toolkit plugin:ci-docs
     - save_cache:
         paths:
         - node_modules
@@ -70,7 +105,9 @@ jobs:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
         name: Package Distribution
-        command: npx grafana-toolkit plugin:ci-package
+        command: |
+          yarn install --pure-lockfile
+          ./node_modules/.bin/grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
         paths:
@@ -82,7 +119,6 @@ jobs:
   test_integration:
     docker:
     - image: circleci/node:12-browsers
-    working_directory: ~/plugin
     steps:
     - checkout
     - attach_workspace:
@@ -108,7 +144,8 @@ jobs:
     - run:
         name: Run e2e tests
         command: |
-          npx grafana-toolkit plugin:ci-test
+          yarn install --pure-lockfile
+          ./node_modules/.bin/grafana-toolkit plugin:ci-test
     - persist_to_workspace:
         root: .
         paths:
@@ -121,7 +158,6 @@ jobs:
   report:
     docker:
     - image: circleci/node:12
-    working_directory: ~/plugin
     steps:
     - checkout
     - attach_workspace:
@@ -130,8 +166,10 @@ jobs:
         keys:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
-        name: Toolkit Report
-        command: npx grafana-toolkit plugin:ci-report
+        name: Toolkit report
+        command: |
+          yarn install --pure-lockfile
+          ./node_modules/.bin/grafana-toolkit plugin:ci-report
     - store_artifacts:
         path: ci
 
@@ -165,6 +203,7 @@ jobs:
             git add artifacts/
             git commit -m "automated release $VERSION [skip ci]"
             git push -f origin release-${VERSION}
+            # XXX: Should this be an annotated tag?
             git tag -f v${VERSION}
             git push -f origin v${VERSION}
             ghr \
@@ -182,24 +221,24 @@ workflows:
   version: 2
   plugin_workflow:
     jobs:
-    - build_plugin
-    - build_docs
-    - package:
-        requires:
-        - build_plugin
-        - build_docs
-    - test_integration:
-        requires:
-        - package
-    - report:
-        requires:
-        - test_integration
-    - approve_release:
-        type: approval
-        requires:
-          - report
-        filters: *filter-only-master
-    - publish_github_release:
-        requires:
-          - approve_release
-        filters: *filter-only-master
+      - build_plugin
+      - build_docs
+      - package:
+          requires:
+            - build_plugin
+            - build_docs
+      - test_integration:
+          requires:
+            - package
+      - report:
+          requires:
+            - test_integration
+      - approve_release:
+          type: approval
+          requires:
+            - report
+          filters: *filter-only-master
+      - publish_github_release:
+          requires:
+            - approve_release
+          filters: *filter-only-master
