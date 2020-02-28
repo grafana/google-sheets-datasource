@@ -12,6 +12,7 @@ require (
 	github.com/hashicorp/go-hclog v0.10.0
 	github.com/hashicorp/go-plugin v1.0.1
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
+	github.com/magefile/mage v1.9.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/prometheus/client_golang v1.3.0
 	github.com/stretchr/testify v1.4.0

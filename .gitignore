@@ -2,5 +2,5 @@ node_modules
 datasource/vendor
 dist
 provisioning
-
 .env
+coverage/
