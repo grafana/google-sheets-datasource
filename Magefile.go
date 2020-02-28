@@ -98,8 +98,8 @@ func Format() error {
 	return nil
 }
 
-// WatchFrontend starts a front-end development server.
-func WatchFrontend() error {
+// Dev starts a front-end development server.
+func Dev() error {
 	b := Build{}
 	mg.Deps(b.Frontend)
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev", "--watch")
