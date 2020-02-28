@@ -76,7 +76,6 @@ func (cd *ColumnDefinition) checkType(cell *sheets.CellData) {
 		} else if cell.FormattedValue != "" {
 			cd.types["STRING"] = true
 		}
-
 	}
 }
 
@@ -102,23 +101,23 @@ var unitMappings = map[string]string{
 // A lot more that can be done/improved here. For example it should be possible to extract
 // the number of decimals from the pattern. Read more here: https://developers.google.com/sheets/api/guides/formats
 func (cd *ColumnDefinition) checkUnit(cellData *sheets.CellData) {
-	if cellData != nil {
-		if cellData.UserEnteredFormat != nil && cellData.UserEnteredFormat.NumberFormat != nil {
-			switch cellData.UserEnteredFormat.NumberFormat.Type {
-			case "NUMBER":
-				for unit, unitID := range unitMappings {
-					if strings.Contains(cellData.UserEnteredFormat.NumberFormat.Pattern, unit) {
-						cd.units[unitID] = true
-					}
-				}
-			case "PERCENT":
-				cd.units["percent"] = true
-			case "CURRENCY":
-				for unit, unitID := range unitMappings {
-					if strings.Contains(cellData.FormattedValue, unit) {
-						cd.units[unitID] = true
-					}
-				}
+	if cellData == nil || cellData.UserEnteredFormat == nil || cellData.UserEnteredFormat.NumberFormat == nil {
+		return
+	}
+
+	switch cellData.UserEnteredFormat.NumberFormat.Type {
+	case "NUMBER":
+		for unit, unitID := range unitMappings {
+			if strings.Contains(cellData.UserEnteredFormat.NumberFormat.Pattern, unit) {
+				cd.units[unitID] = true
+			}
+		}
+	case "PERCENT":
+		cd.units["percent"] = true
+	case "CURRENCY":
+		for unit, unitID := range unitMappings {
+			if strings.Contains(cellData.FormattedValue, unit) {
+				cd.units[unitID] = true
 			}
 		}
 	}

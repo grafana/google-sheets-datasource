@@ -48,7 +48,7 @@ func TestGooglesheets(t *testing.T) {
 		})
 	})
 
-	t.Run("getSpreadSheet", func(t *testing.T) {
+	t.Run("getSheetData", func(t *testing.T) {
 		client := &fakeClient{}
 		t.Run("spreadsheet is being cached", func(t *testing.T) {
 			gsd := &GoogleSheets{
@@ -58,7 +58,7 @@ func TestGooglesheets(t *testing.T) {
 
 			assert.Equal(t, 0, gsd.Cache.ItemCount())
 
-			_, meta, _ := gsd.getSpreadSheet(client, &qm)
+			_, meta, _ := gsd.getSheetData(client, &qm)
 			assert.False(t, meta["hit"].(bool))
 			assert.Equal(t, 1, gsd.Cache.ItemCount())
 		})
@@ -71,7 +71,7 @@ func TestGooglesheets(t *testing.T) {
 
 			assert.Equal(t, 0, gsd.Cache.ItemCount())
 
-			_, meta, _ := gsd.getSpreadSheet(client, &qm)
+			_, meta, _ := gsd.getSheetData(client, &qm)
 			assert.False(t, meta["hit"].(bool))
 			assert.Equal(t, 0, gsd.Cache.ItemCount())
 		})

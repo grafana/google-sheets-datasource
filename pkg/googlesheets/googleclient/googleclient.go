@@ -88,7 +88,7 @@ func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, erro
 
 	jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT), "https://www.googleapis.com/auth/spreadsheets.readonly", "https://www.googleapis.com/auth/spreadsheets")
 	if err != nil {
-		return nil, fmt.Errorf("Error parsin JWT file: %v", err)
+		return nil, fmt.Errorf("error parsing JWT file: %w", err)
 	}
 
 	client := jwtConfig.Client(ctx)
@@ -103,7 +103,7 @@ func createDriveService(ctx context.Context, auth *Auth) (*drive.Service, error)
 
 	jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT), drive.DriveMetadataReadonlyScope)
 	if err != nil {
-		return nil, fmt.Errorf("Error parsin JWT file: %v", err)
+		return nil, fmt.Errorf("error parsing JWT file: %w", err)
 	}
 
 	client := jwtConfig.Client(ctx)

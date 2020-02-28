@@ -31,7 +31,7 @@ var pluginLogger = hclog.New(&hclog.LoggerOptions{
 
 func main() {
 	cache := cache.New(300*time.Second, 5*time.Second)
-	ds := &GoogleSheetsDataSource{
+	ds := &googleSheetsDataSource{
 		logger: pluginLogger,
 		googlesheet: &googlesheets.GoogleSheets{
 			Cache:  cache,
@@ -48,20 +48,17 @@ func main() {
 	}
 }
 
-type GoogleSheetsDataSource struct {
+type googleSheetsDataSource struct {
 	plugin.NetRPCUnsupportedPlugin
 	logger      hclog.Logger
 	googlesheet *googlesheets.GoogleSheets
 }
 
-func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
+func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
 	res := &backend.DataQueryResponse{}
 	config := gs.GoogleSheetConfig{}
-	err := json.Unmarshal(req.PluginConfig.JSONData, &config)
-
-	if err != nil {
-		gsd.logger.Error("Could not unmarshal DataSourceInfo json", "Error", err)
-		return nil, err
+	if err := json.Unmarshal(req.PluginConfig.JSONData, &config); err != nil {
+		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
 	}
 
 	config.ApiKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
@@ -69,19 +66,16 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 
 	for _, q := range req.Queries {
 		queryModel := &gs.QueryModel{}
-		err := json.Unmarshal(q.JSON, &queryModel)
-
-		if err != nil {
-			gsd.logger.Error("Failed to unmarshal query: %v", err.Error())
-			return nil, fmt.Errorf("Invalid query")
+		if err := json.Unmarshal(q.JSON, &queryModel); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal query: %w", err)
 		}
 
-		var frame *df.Frame
-		frame, err = gsd.googlesheet.Query(ctx, q.RefID, queryModel, &config, q.TimeRange)
-
+		frame, err := gsd.googlesheet.Query(ctx, q.RefID, queryModel, &config, q.TimeRange)
 		if err != nil {
+			gsd.logger.Error("Query failed", "refId", q.RefID, "error", err)
 			// TEMP: at the moment, the only way to return an error is by using meta
 			res.Metadata = map[string]string{"error": err.Error()}
+			continue
 		}
 
 		res.Frames = append(res.Frames, []*df.Frame{frame}...)
@@ -90,25 +84,24 @@ func (gsd *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 	return res, nil
 }
 
-func (gsd *GoogleSheetsDataSource) CallResource(ctx context.Context, req *backend.CallResourceRequest) (*backend.CallResourceResponse, error) {
+func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backend.CallResourceRequest) (*backend.CallResourceResponse, error) {
 	config := gs.GoogleSheetConfig{}
-	err := json.Unmarshal(req.PluginConfig.JSONData, &config)
-	if err != nil {
-		gsd.logger.Error("Could not unmarshal DataSourceInfo json", "Error", err)
-		return nil, err
+	if err := json.Unmarshal(req.PluginConfig.JSONData, &config); err != nil {
+		return nil, fmt.Errorf("could not unmarshal configuration: %w", err)
 	}
+
 	config.ApiKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
 	config.JWT, _ = req.PluginConfig.DecryptedSecureJSONData["jwt"]
 
 	response := make(map[string]interface{})
 	var res interface{}
+	var err error
 	switch req.Path {
 	case "spreadsheets":
-		res, err = gsd.googlesheet.GetSpreadsheetsByServiceAccount(ctx, &config)
+		res, err = gsd.googlesheet.GetSpreadsheets(ctx, &config)
 	case "test":
-		_, err = gsd.googlesheet.TestAPI(ctx, &config)
+		err = gsd.googlesheet.TestAPI(ctx, &config)
 	}
-
 	if err != nil {
 		response["error"] = err.Error()
 	} else {
