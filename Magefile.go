@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
@@ -103,8 +104,15 @@ func Format() error {
 	return nil
 }
 
-// Dev starts a front-end development server.
+// Build the plugin in dev mode
 func Dev() error {
+	b := Build{}
+	mg.Deps(b.Frontend)
+	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev")
+}
+
+// Builds dev artifacts and update when the frontend files change
+func Watch() error {
 	b := Build{}
 	mg.Deps(b.Frontend)
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev", "--watch")

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
-	gs "github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/patrickmn/go-cache"
@@ -55,7 +54,7 @@ type googleSheetsDataSource struct {
 
 func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
 	res := &backend.DataQueryResponse{}
-	config := gs.GoogleSheetConfig{}
+	config := googlesheets.GoogleSheetConfig{}
 	if err := json.Unmarshal(req.PluginConfig.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
 	}
@@ -64,7 +63,7 @@ func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 	config.JWT = req.PluginConfig.DecryptedSecureJSONData["jwt"]
 
 	for _, q := range req.Queries {
-		queryModel := &gs.QueryModel{}
+		queryModel := &googlesheets.QueryModel{}
 		if err := json.Unmarshal(q.JSON, &queryModel); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal query: %w", err)
 		}
@@ -84,7 +83,7 @@ func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 }
 
 func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backend.CallResourceRequest) (*backend.CallResourceResponse, error) {
-	config := gs.GoogleSheetConfig{}
+	config := googlesheets.GoogleSheetConfig{}
 	if err := json.Unmarshal(req.PluginConfig.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal configuration: %w", err)
 	}
@@ -99,6 +98,7 @@ func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backen
 	case "spreadsheets":
 		res, err = gsd.googlesheet.GetSpreadsheets(ctx, &config)
 	case "test":
+		pluginLogger.Info("running TEST!!!!!!!")
 		err = gsd.googlesheet.TestAPI(ctx, &config)
 	}
 	if err != nil {

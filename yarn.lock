@@ -913,16 +913,16 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@grafana/data@6.7.0-pre-72628c8ea0", "@grafana/data@canary":
-  version "6.7.0-pre-72628c8ea0"
-  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.7.0-pre-72628c8ea0.tgz#2c99444207008469b39fd3a608520a40ee8e90ef"
-  integrity sha512-DvBdkBqCFH48WuO4fIYLe9akWHG6HY3FIket3jmzUb8wN3dgJQb1z5g8tuenM84FFKOaAKpwk/sakI6M6n4mkw==
+"@grafana/data@6.7.0-pre-a8531978b6", "@grafana/data@canary":
+  version "6.7.0-pre-a8531978b6"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.7.0-pre-a8531978b6.tgz#1107137740c95c74fe76d30c623a58f3b3dc7cb2"
+  integrity sha512-o9vMKgLAWJ8nWRxGe1fnqUcEBvvHg1uyGWWdjWIWZvD6FvEH/EPMdnWGrpWyU6qOVJO2UK3omfwRWLbNyPs89w==
   dependencies:
     apache-arrow "0.15.1"
     lodash "4.17.15"
     rxjs "6.5.4"
 
-"@grafana/data@6.7.0-pre-ff6a082e23", "@grafana/data@^6.7.0-pre-72628c8ea0":
+"@grafana/data@6.7.0-pre-ff6a082e23", "@grafana/data@^6.7.0-pre-a8531978b6":
   version "6.7.0-pre-ff6a082e23"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.7.0-pre-ff6a082e23.tgz#26d7c928a5dc21bb8b830fa038a1c073b9df5eec"
   integrity sha512-hFreGvFPFoRpYccJfTbwYxle3mxPD7Rh6VN8WutFnz+TMQuT8uZcHSSsTnE9VwbPPWh6x5u2hPinmmQiSFuVWQ==
@@ -933,12 +933,12 @@
   integrity sha512-xmcJR6mUYw1llq3m8gT2kE7xoq6yLMUgNf2Mf1yZvDCx2cXFSyaLlGs1dqjFWjJDbV46GdhYRAyRbyGR+J9QKg==
 
 "@grafana/runtime@canary":
-  version "6.7.0-pre-72628c8ea0"
-  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-6.7.0-pre-72628c8ea0.tgz#497f44d6902c49438a4e9f084f12596941269863"
-  integrity sha512-a2zSRfAyjhiT7BAOLESL4YVzwrJ1PoGN0cKvFQZxsvVrBxAl/thl/231v+a8dX1WBACPApFwx9Y3GkNYJiT7BQ==
+  version "6.7.0-pre-a8531978b6"
+  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-6.7.0-pre-a8531978b6.tgz#c6eb63980f233c7ed3d4c11ae6722cb41429ef1a"
+  integrity sha512-xHbAY8p6NPyf0mDdY90VnI5Pi+707F6W14QBE7hgfTM1AfOWmUwubKspmw8LgLCAIQ7WhdGd+MnyEyay7XwcyA==
   dependencies:
-    "@grafana/data" "6.7.0-pre-72628c8ea0"
-    "@grafana/ui" "6.7.0-pre-72628c8ea0"
+    "@grafana/data" "6.7.0-pre-a8531978b6"
+    "@grafana/ui" "6.7.0-pre-a8531978b6"
     systemjs "0.20.19"
     systemjs-plugin-css "0.1.37"
 
@@ -965,16 +965,16 @@
     tiny-warning "^0.0.3"
 
 "@grafana/toolkit@canary":
-  version "6.7.0-pre-72628c8ea0"
-  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-6.7.0-pre-72628c8ea0.tgz#16a058892a96a1484e4cd827e5ce3b5678544169"
-  integrity sha512-oqPVT3ZyGEnDcHKRcSj28f1TOpv1VowbJCdYTJ/quapQ2/KvMCoK2NxLT/gomBrz1Kjw/eVnKoyxu8lHv6thWw==
+  version "6.7.0-pre-a8531978b6"
+  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-6.7.0-pre-a8531978b6.tgz#d84b8e467a3b20c36fa31d2a1cc9d5728bb60b34"
+  integrity sha512-682Kw49gdBXT6yJrJCWdaD5SQuAs56dSXBUcaa6HAzCASPxEimW+BhTVjvSbxBlcOB3lWbLGJnlgrM0IfVMMNw==
   dependencies:
     "@babel/core" "7.8.3"
     "@babel/preset-env" "7.8.3"
-    "@grafana/data" "^6.7.0-pre-72628c8ea0"
+    "@grafana/data" "^6.7.0-pre-a8531978b6"
     "@grafana/eslint-config" "^1.0.0-rc1"
     "@grafana/tsconfig" "^1.0.0-rc1"
-    "@grafana/ui" "^6.7.0-pre-72628c8ea0"
+    "@grafana/ui" "^6.7.0-pre-a8531978b6"
     "@types/command-exists" "^1.2.0"
     "@types/execa" "^0.9.0"
     "@types/expect-puppeteer" "3.3.1"
@@ -1054,13 +1054,13 @@
   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-1.0.0-rc1.tgz#d07ea16755a50cae21000113f30546b61647a200"
   integrity sha512-nucKPGyzlSKYSiJk5RA8GzMdVWhdYNdF+Hh65AXxjD9PlY69JKr5wANj8bVdQboag6dgg0BFKqgKPyY+YtV4Iw==
 
-"@grafana/ui@6.7.0-pre-72628c8ea0", "@grafana/ui@canary":
-  version "6.7.0-pre-72628c8ea0"
-  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-6.7.0-pre-72628c8ea0.tgz#12d7bae82be5e766e9d4a910f2dd99cd8773065c"
-  integrity sha512-yVVsNr/RhCCo3iAZD3EzkTqoI91rqgRDQzisVcsVcU9dBxQo+NP423Bn/vNrVm9U7adJD0uwvSz379CLufPQMg==
+"@grafana/ui@6.7.0-pre-a8531978b6", "@grafana/ui@canary":
+  version "6.7.0-pre-a8531978b6"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-6.7.0-pre-a8531978b6.tgz#0cc8efc17bb9678aa96cda1f745dea7f76d81e0f"
+  integrity sha512-hQkP7SaWWeUyayv7oQ9qXRlvM+8sTCCKUFYBecEMNelrLMH0Y093PSXwgFDM4UCfhwVf6sT+XQqguKt8SzFoLg==
   dependencies:
     "@emotion/core" "^10.0.27"
-    "@grafana/data" "6.7.0-pre-72628c8ea0"
+    "@grafana/data" "6.7.0-pre-a8531978b6"
     "@grafana/slate-react" "0.22.9-grafana"
     "@grafana/tsconfig" "^1.0.0-rc1"
     "@torkelo/react-select" "3.0.8"
@@ -1096,7 +1096,7 @@
     slate "0.47.8"
     tinycolor2 "1.4.1"
 
-"@grafana/ui@^6.7.0-pre-72628c8ea0":
+"@grafana/ui@^6.7.0-pre-a8531978b6":
   version "6.7.0-pre-ff6a082e23"
   resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-6.7.0-pre-ff6a082e23.tgz#1a4addb560d3b77da931719ef28845ff5d23a547"
   integrity sha512-D9vArWeFEMnRFt4vB6b3KGt8mVcUtUUuspdfHB+MMnwFiDb5moartSi9TI2NY+moDwwIopeAi7XR9RLD8RDpcA==

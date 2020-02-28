@@ -14,14 +14,12 @@ export interface JWT {
 
 export enum GoogleAuthType {
   JWT = 'jwt',
-  GCE = 'gce',
-  NONE = 'none',
+  KEY = 'key',
 }
 
 export const googleAuthTypes = [
-  { label: 'None (public)', value: GoogleAuthType.NONE },
+  { label: 'API Key', value: GoogleAuthType.KEY },
   { label: 'Google JWT File', value: GoogleAuthType.JWT },
-  { label: 'GCE Default Service Account', value: GoogleAuthType.GCE },
 ];
 
 export interface GoogleCloudOptions extends DataSourceJsonData {

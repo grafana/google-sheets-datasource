@@ -78,33 +78,50 @@ func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 }
 
 func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, error) {
-	if auth.AuthType == "none" {
-		if len(auth.APIKey) == 0 {
-			return nil, fmt.Errorf("Invalid API Key")
-		}
+	if len(auth.AuthType) == 0 {
+		return nil, fmt.Errorf("Missing AuthType setting")
+	}
 
+	if auth.AuthType == "key" {
+		if len(auth.APIKey) == 0 {
+			return nil, fmt.Errorf("Missing API Key")
+		}
 		return sheets.NewService(ctx, option.WithAPIKey(auth.APIKey))
 	}
 
-	jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT), "https://www.googleapis.com/auth/spreadsheets.readonly", "https://www.googleapis.com/auth/spreadsheets")
-	if err != nil {
-		return nil, fmt.Errorf("error parsing JWT file: %w", err)
+	if auth.APIKey == "jwt" {
+		jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT), "https://www.googleapis.com/auth/spreadsheets.readonly", "https://www.googleapis.com/auth/spreadsheets")
+		if err != nil {
+			return nil, fmt.Errorf("error parsing JWT file: %w", err)
+		}
+
+		client := jwtConfig.Client(ctx)
+		return sheets.NewService(ctx, option.WithHTTPClient(client))
 	}
 
-	client := jwtConfig.Client(ctx)
-	return sheets.NewService(ctx, option.WithHTTPClient(client))
+	return nil, fmt.Errorf("Invalid Auth Type: %s", auth.AuthType)
 }
 
 func createDriveService(ctx context.Context, auth *Auth) (*drive.Service, error) {
-	if auth.AuthType == "none" {
+	if len(auth.AuthType) == 0 {
+		return nil, fmt.Errorf("Missing AuthType setting")
+	}
+
+	if auth.AuthType == "key" {
+		if len(auth.APIKey) == 0 {
+			return nil, fmt.Errorf("Missing API Key")
+		}
 		return drive.NewService(ctx, option.WithAPIKey(auth.APIKey))
 	}
 
-	jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT), drive.DriveMetadataReadonlyScope)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing JWT file: %w", err)
-	}
+	if auth.APIKey == "jwt" {
+		jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT), drive.DriveMetadataReadonlyScope)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing JWT file: %w", err)
+		}
 
-	client := jwtConfig.Client(ctx)
-	return drive.NewService(ctx, option.WithHTTPClient(client))
+		client := jwtConfig.Client(ctx)
+		return drive.NewService(ctx, option.WithHTTPClient(client))
+	}
+	return nil, fmt.Errorf("Invalid Auth Type: %s", auth.AuthType)
 }

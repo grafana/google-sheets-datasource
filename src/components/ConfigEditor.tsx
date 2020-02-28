@@ -8,8 +8,9 @@ export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions>;
 
 export class ConfigEditor extends PureComponent<Props> {
   componentWillMount() {
+    // Set the default values
     if (!this.props.options.jsonData.hasOwnProperty('authType')) {
-      this.props.options.jsonData.authType = GoogleAuthType.NONE;
+      this.props.options.jsonData.authType = GoogleAuthType.KEY;
     }
   }
 
@@ -34,12 +35,11 @@ export class ConfigEditor extends PureComponent<Props> {
   render() {
     const { options, onOptionsChange } = this.props;
     const { secureJsonFields, jsonData } = options;
-    // HACK till after: https://github.com/grafana/grafana/pull/21772
     const secureJsonData = options.secureJsonData as GoogleSheetsSecureJsonData;
     return (
       <div className="gf-form-group">
         <div className="gf-form">
-          <FormLabel className="width-10">Auth Provider</FormLabel>
+          <FormLabel className="width-10">Auth</FormLabel>
           <Select
             className="width-30"
             value={googleAuthTypes.find(x => x.value === jsonData.authType) || googleAuthTypes[0]}
@@ -48,7 +48,7 @@ export class ConfigEditor extends PureComponent<Props> {
             onChange={onUpdateDatasourceJsonDataOptionSelect(this.props, 'authType')}
           />
         </div>
-        {jsonData.authType === GoogleAuthType.NONE && (
+        {jsonData.authType === GoogleAuthType.KEY && (
           <>
             <div className="gf-form">
               <SecretFormField
@@ -56,11 +56,18 @@ export class ConfigEditor extends PureComponent<Props> {
                 value={secureJsonData?.apiKey || ''}
                 label="API Key"
                 labelWidth={10}
-                inputWidth={25}
+                inputWidth={30}
                 placeholder="Enter API Key"
                 onReset={this.onResetApiKey}
                 onChange={onUpdateDatasourceSecureJsonDataOption(this.props, 'apiKey')}
               />
+            </div>
+            <div>
+              See{' '}
+              <a href="https://developers.google.com/sheets/api/guides/authorizing#APIKey" target="blank">
+                Acquiring and using an API key
+              </a>{' '}
+              for help
             </div>
           </>
         )}
