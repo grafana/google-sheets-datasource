@@ -4,7 +4,7 @@ import { DataSourcePluginOptionsEditorProps, onUpdateDatasourceSecureJsonDataOpt
 import { SheetsSourceOptions, GoogleSheetsSecureJsonData, GoogleAuthType, googleAuthTypes } from '../types';
 import { JWTConfig } from './';
 
-export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions>;
+export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions, GoogleSheetsSecureJsonData>;
 
 export class ConfigEditor extends PureComponent<Props> {
   componentWillMount() {
@@ -15,9 +15,6 @@ export class ConfigEditor extends PureComponent<Props> {
   }
 
   onResetApiKey = () => {
-    // :( TODO: typings do not let me call the standard function!!!
-    // :( updateDatasourcePluginResetOption(this.props, 'apiKey');
-
     const { options } = this.props;
     this.props.onOptionsChange({
       ...options,
@@ -63,10 +60,10 @@ export class ConfigEditor extends PureComponent<Props> {
               />
             </div>
             <div>
-              See{' '}
+              See
               <a href="https://developers.google.com/sheets/api/guides/authorizing#APIKey" target="blank">
-                Acquiring and using an API key
-              </a>{' '}
+                acquiring and using an API key
+              </a>
               for help
             </div>
           </>
