@@ -75,7 +75,7 @@ export class ConfigEditor extends PureComponent<Props> {
               onOptionsChange({
                 ...options,
                 secureJsonData: {
-                  ...secureJsonData!,
+                  ...secureJsonData,
                   jwt,
                 },
               });
