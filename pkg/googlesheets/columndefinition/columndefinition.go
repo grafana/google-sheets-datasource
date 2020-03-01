@@ -6,6 +6,7 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
+// ColumnDefinition represents a spreadsheet column definition.
 type ColumnDefinition struct {
 	Header      string
 	ColumnIndex int
@@ -13,6 +14,7 @@ type ColumnDefinition struct {
 	units       map[string]bool
 }
 
+// New creates a new ColumnDefinition.
 func New(header string, index int) *ColumnDefinition {
 	return &ColumnDefinition{
 		Header:      header,
@@ -22,11 +24,13 @@ func New(header string, index int) *ColumnDefinition {
 	}
 }
 
+// CheckCell checks a ColumnDefinition's cell.
 func (cd *ColumnDefinition) CheckCell(cell *sheets.CellData) {
 	cd.checkType(cell)
 	cd.checkUnit(cell)
 }
 
+// GetType gets the type of a ColumnDefinition.
 func (cd *ColumnDefinition) GetType() string {
 	if len(cd.types) == 1 {
 		for columnType := range cd.types {
@@ -38,6 +42,7 @@ func (cd *ColumnDefinition) GetType() string {
 	return "STRING"
 }
 
+// GetUnit gets the unit of a ColumnDefinition.
 func (cd *ColumnDefinition) GetUnit() string {
 	if len(cd.units) == 1 {
 		for unit := range cd.units {
@@ -48,10 +53,12 @@ func (cd *ColumnDefinition) GetUnit() string {
 	return ""
 }
 
+// HasMixedTypes returns whether a ColumnDefinition has mixed types.
 func (cd *ColumnDefinition) HasMixedTypes() bool {
 	return len(cd.types) > 1
 }
 
+// HasMixedUnits returns whether a ColumnDefinition has mixed units.
 func (cd *ColumnDefinition) HasMixedUnits() bool {
 	return len(cd.units) > 1
 }

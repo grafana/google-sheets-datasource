@@ -32,6 +32,7 @@ func buildBackend(variant string, enableDebug bool, env map[string]string) error
 	return nil
 }
 
+// Build is a namespace.
 type Build mg.Namespace
 
 // Backend builds the back-end plugin.
@@ -110,4 +111,5 @@ func Dev() error {
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev", "--watch")
 }
 
+// Default configures the default target.
 var Default = BuildAll
