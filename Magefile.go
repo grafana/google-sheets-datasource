@@ -63,7 +63,8 @@ func (Build) BackendLinuxDebug() error {
 	return buildBackend("linux_amd64", true, env)
 }
 
-// Frontend builds the front-end.
+// Frontend builds the front-end for production.  Note that this build script will also
+// clean the `dist` folder
 func (Build) Frontend() error {
 	mg.Deps(Deps)
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:build")
@@ -72,7 +73,8 @@ func (Build) Frontend() error {
 // BuildAll builds both back-end and front-end components.
 func BuildAll() {
 	b := Build{}
-	mg.Deps(b.Backend, b.BackendLinux, b.Frontend)
+	// Frontend goes first and cleans the 'dist' folder
+	mg.Deps(b.Frontend, b.Backend, b.BackendLinux)
 }
 
 // Deps installs dependencies.
@@ -107,14 +109,22 @@ func Format() error {
 // Dev builds the plugin in dev mode
 func Dev() error {
 	b := Build{}
-	mg.Deps(b.Frontend)
-	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev")
+
+	// First build the frontend
+	if err := sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev"); err != nil {
+		return err
+	}
+
+	// Then a debug backend
+	mg.Deps(b.BackendDebug)
+
+	return nil
 }
 
 // Watch will build the plugin in dev mode and then update when the frontend files change
 func Watch() error {
 	b := Build{}
-	mg.Deps(b.Frontend)
+	mg.Deps(b.BackendDebug)
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev", "--watch")
 }
 
