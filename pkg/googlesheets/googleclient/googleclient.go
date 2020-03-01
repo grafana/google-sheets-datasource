@@ -84,7 +84,7 @@ func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, erro
 
 	if auth.AuthType == "key" {
 		if len(auth.APIKey) == 0 {
-			return nil, fmt.Errorf("Missing API Key")
+			return nil, fmt.Errorf("missing API Key")
 		}
 		return sheets.NewService(ctx, option.WithAPIKey(auth.APIKey))
 	}
