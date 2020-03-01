@@ -123,5 +123,5 @@ func createDriveService(ctx context.Context, auth *Auth) (*drive.Service, error)
 		client := jwtConfig.Client(ctx)
 		return drive.NewService(ctx, option.WithHTTPClient(client))
 	}
-	return nil, fmt.Errorf("Invalid Auth Type: %s", auth.AuthType)
+	return nil, fmt.Errorf("invalid Auth Type: %s", auth.AuthType)
 }
