@@ -79,7 +79,7 @@ func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 
 func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, error) {
 	if len(auth.AuthType) == 0 {
-		return nil, fmt.Errorf("Missing AuthType setting")
+		return nil, fmt.Errorf("missing AuthType setting")
 	}
 
 	if auth.AuthType == "key" {
