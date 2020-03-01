@@ -104,14 +104,14 @@ func Format() error {
 	return nil
 }
 
-// Build the plugin in dev mode
+// Dev builds the plugin in dev mode
 func Dev() error {
 	b := Build{}
 	mg.Deps(b.Frontend)
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev")
 }
 
-// Builds dev artifacts and update when the frontend files change
+// Watch will build the plugin in dev mode and then update when the frontend files change
 func Watch() error {
 	b := Build{}
 	mg.Deps(b.Frontend)
