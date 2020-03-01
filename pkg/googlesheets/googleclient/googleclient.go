@@ -99,7 +99,7 @@ func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, erro
 		return sheets.NewService(ctx, option.WithHTTPClient(client))
 	}
 
-	return nil, fmt.Errorf("Invalid Auth Type: %s", auth.AuthType)
+	return nil, fmt.Errorf("invalid Auth Type: %s", auth.AuthType)
 }
 
 func createDriveService(ctx context.Context, auth *Auth) (*drive.Service, error) {
