@@ -59,7 +59,7 @@ func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
 	}
 
-	config.ApiKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
+	config.APIKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
 	config.JWT = req.PluginConfig.DecryptedSecureJSONData["jwt"]
 
 	for _, q := range req.Queries {
@@ -88,7 +88,7 @@ func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backen
 		return nil, fmt.Errorf("could not unmarshal configuration: %w", err)
 	}
 
-	config.ApiKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
+	config.APIKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
 	config.JWT = req.PluginConfig.DecryptedSecureJSONData["jwt"]
 
 	response := make(map[string]interface{})

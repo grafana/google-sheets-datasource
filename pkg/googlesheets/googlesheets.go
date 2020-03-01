@@ -17,6 +17,7 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
+// GoogleSheets provides an interface to the Google Sheets API.
 type GoogleSheets struct {
 	Cache  *cache.Cache
 	Logger hclog.Logger
@@ -24,7 +25,7 @@ type GoogleSheets struct {
 
 // Query queries a spreadsheet and returns a corresponding data frame.
 func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*df.Frame, error) {
-	client, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
+	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create Google API client: %w", err)
 	}
@@ -44,13 +45,13 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 
 // TestAPI tests the Google API.
 func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) error {
-	_, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
+	_, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
 	return err
 }
 
 // GetSpreadsheets gets spreadsheets from the Google API.
 func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *GoogleSheetConfig) (map[string]string, error) {
-	client, err := gc.New(ctx, gc.NewAuth(config.ApiKey, config.AuthType, config.JWT))
+	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Google API client: %w", err)
 	}
