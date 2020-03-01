@@ -104,7 +104,7 @@ func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, erro
 
 func createDriveService(ctx context.Context, auth *Auth) (*drive.Service, error) {
 	if len(auth.AuthType) == 0 {
-		return nil, fmt.Errorf("Missing AuthType setting")
+		return nil, fmt.Errorf("missing AuthType setting")
 	}
 
 	if auth.AuthType == "key" {
