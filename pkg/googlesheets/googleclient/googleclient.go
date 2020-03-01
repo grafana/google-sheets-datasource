@@ -109,7 +109,7 @@ func createDriveService(ctx context.Context, auth *Auth) (*drive.Service, error)
 
 	if auth.AuthType == "key" {
 		if len(auth.APIKey) == 0 {
-			return nil, fmt.Errorf("Missing API Key")
+			return nil, fmt.Errorf("missing API Key")
 		}
 		return drive.NewService(ctx, option.WithAPIKey(auth.APIKey))
 	}
