@@ -17,7 +17,8 @@ You need to install the following first:
 ```
 mage watch
 ```
-# In another terminal
+
+In another terminal
 ```
 docker-compose up
 ```
