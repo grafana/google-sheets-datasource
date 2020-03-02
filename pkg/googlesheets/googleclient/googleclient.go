@@ -55,9 +55,9 @@ func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRange string, 
 	return gc.sheetsService.Spreadsheets.Get(spreadSheetID).Ranges(sheetRange).IncludeGridData(true).Do()
 }
 
-// GetSpreadsheetFiles lists all files with spreadsheet mimetype that the service account that was used to initialize the client has access to
+// GetSpreadsheetFiles lists all files with spreadsheet mimetype that the client has access to.
 func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
-	var fs []*drive.File
+	fs := []*drive.File{}
 	pageToken := ""
 	for {
 		q := gc.driveService.Files.List().Q("mimeType='application/vnd.google-apps.spreadsheet'")
@@ -66,21 +66,23 @@ func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 		}
 		r, err := q.Do()
 		if err != nil {
-			return fs, err
+			return nil, fmt.Errorf("failed to list spreadsheet files, page token %q: %w", pageToken, err)
 		}
+
 		fs = append(fs, r.Files...)
 		pageToken = r.NextPageToken
 		if pageToken == "" {
 			break
 		}
 	}
+
 	return fs, nil
 }
 
 func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, error) {
 	if auth.AuthType == "none" {
 		if len(auth.APIKey) == 0 {
-			return nil, fmt.Errorf("Invalid API Key")
+			return nil, fmt.Errorf("invalid API Key")
 		}
 
 		return sheets.NewService(ctx, option.WithAPIKey(auth.APIKey))

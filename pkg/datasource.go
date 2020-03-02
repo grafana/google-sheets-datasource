@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
-	gs "github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/patrickmn/go-cache"
@@ -50,9 +49,10 @@ type googleSheetsDataSource struct {
 	googlesheet *googlesheets.GoogleSheets
 }
 
+// DataQuery queries for data.
 func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
 	res := &backend.DataQueryResponse{}
-	config := gs.GoogleSheetConfig{}
+	config := googlesheets.GoogleSheetConfig{}
 	if err := json.Unmarshal(req.PluginConfig.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
 	}
@@ -61,7 +61,7 @@ func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 	config.JWT = req.PluginConfig.DecryptedSecureJSONData["jwt"]
 
 	for _, q := range req.Queries {
-		queryModel := &gs.QueryModel{}
+		queryModel := &googlesheets.QueryModel{}
 		if err := json.Unmarshal(q.JSON, &queryModel); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal query: %w", err)
 		}
@@ -80,8 +80,9 @@ func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 	return res, nil
 }
 
+// CallResource calls a resource.
 func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backend.CallResourceRequest) (*backend.CallResourceResponse, error) {
-	config := gs.GoogleSheetConfig{}
+	config := googlesheets.GoogleSheetConfig{}
 	if err := json.Unmarshal(req.PluginConfig.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal configuration: %w", err)
 	}
@@ -106,15 +107,14 @@ func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backen
 
 	body, err := json.Marshal(response)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal response: %w", err)
 	}
 
-	headers := make(http.Header)
-	headers.Add("Content-Type", "application/json")
-
 	return &backend.CallResourceResponse{
-		Status:  http.StatusOK,
-		Headers: headers,
-		Body:    body,
+		Status: http.StatusOK,
+		Headers: map[string][]string{
+			"Content-Type": {"application/json"},
+		},
+		Body: body,
 	}, nil
 }
