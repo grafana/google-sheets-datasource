@@ -14,7 +14,6 @@ import (
 	"github.com/patrickmn/go-cache"
 
 	hclog "github.com/hashicorp/go-hclog"
-	plugin "github.com/hashicorp/go-plugin"
 
 	"golang.org/x/net/context"
 )
@@ -37,18 +36,16 @@ func main() {
 			Logger: pluginLogger,
 		},
 	}
-	err := backend.Serve(backend.ServeOpts{
+	if err := backend.Serve(backend.ServeOpts{
 		DataQueryHandler:    ds,
 		CallResourceHandler: ds,
-	})
-	if err != nil {
+	}); err != nil {
 		pluginLogger.Error(err.Error())
 		os.Exit(1)
 	}
 }
 
 type googleSheetsDataSource struct {
-	plugin.NetRPCUnsupportedPlugin
 	logger      hclog.Logger
 	googlesheet *googlesheets.GoogleSheets
 }
