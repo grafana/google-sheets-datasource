@@ -47,7 +47,6 @@ jobs:
       - run:
           name: Build back-end
           command: |
-            mage -v build:backend
             mage -v build:backendDebug
             mage -v build:backendLinux
             mage -v build:backendLinuxDebug
