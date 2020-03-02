@@ -60,11 +60,10 @@ export class ConfigEditor extends PureComponent<Props> {
               />
             </div>
             <div>
-              See
+              <div>See google's documentaiotn for help:</div>
               <a href="https://developers.google.com/sheets/api/guides/authorizing#APIKey" target="blank">
                 acquiring and using an API key
               </a>
-              for help
             </div>
           </>
         )}

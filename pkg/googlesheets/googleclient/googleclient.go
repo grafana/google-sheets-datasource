@@ -50,6 +50,19 @@ func New(ctx context.Context, auth *Auth) (*GoogleClient, error) {
 	}, nil
 }
 
+// TestClient checks that the client can connect to required services
+func (gc *GoogleClient) TestClient() error {
+	// Check the drive API (only the first page)
+	q := gc.driveService.Files.List().Q("mimeType='application/vnd.google-apps.spreadsheet'")
+	_, err := q.Do()
+	if err != nil {
+		return err
+	}
+
+	// TODO: check the sheets API
+	return nil
+}
+
 // GetSpreadsheet gets a google spreadsheet struct by id and range
 func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
 	return gc.sheetsService.Spreadsheets.Get(spreadSheetID).Ranges(sheetRange).IncludeGridData(true).Do()
@@ -91,8 +104,10 @@ func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, erro
 		return sheets.NewService(ctx, option.WithAPIKey(auth.APIKey))
 	}
 
-	if auth.APIKey == "jwt" {
-		jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT), "https://www.googleapis.com/auth/spreadsheets.readonly", "https://www.googleapis.com/auth/spreadsheets")
+	if auth.AuthType == "jwt" {
+		jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT),
+			// Only need readonly access to spreadsheets (and drive?)
+			"https://www.googleapis.com/auth/spreadsheets.readonly")
 		if err != nil {
 			return nil, fmt.Errorf("error parsing JWT file: %w", err)
 		}
@@ -116,7 +131,7 @@ func createDriveService(ctx context.Context, auth *Auth) (*drive.Service, error)
 		return drive.NewService(ctx, option.WithAPIKey(auth.APIKey))
 	}
 
-	if auth.APIKey == "jwt" {
+	if auth.AuthType == "jwt" {
 		jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT), drive.DriveMetadataReadonlyScope)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing JWT file: %w", err)

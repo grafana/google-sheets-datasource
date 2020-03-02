@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"context"
+
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
 	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
@@ -39,10 +40,13 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 	return frame, err
 }
 
-// TestAPI tests the Google API.
+// TestAPI checks if the credentials can talk to the Google API
 func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) error {
-	_, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
-	return err
+	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
+	if err != nil {
+		return err
+	}
+	return client.TestClient()
 }
 
 // GetSpreadsheets gets spreadsheets from the Google API.

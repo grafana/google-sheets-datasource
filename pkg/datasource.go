@@ -66,6 +66,10 @@ func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			return nil, fmt.Errorf("failed to unmarshal query: %w", err)
 		}
 
+		if len(queryModel.Spreadsheet.ID) < 1 {
+			continue // not query really exists
+		}
+
 		frame, err := gsd.googlesheet.Query(ctx, q.RefID, queryModel, &config, q.TimeRange)
 		if err != nil {
 			gsd.logger.Error("Query failed", "refId", q.RefID, "error", err)
