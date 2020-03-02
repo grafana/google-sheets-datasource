@@ -36,16 +36,6 @@ func buildBackend(variant string, enableDebug bool, env map[string]string) error
 // Build is a namespace.
 type Build mg.Namespace
 
-// Backend builds the back-end plugin.
-func (Build) Backend() error {
-	return buildBackend("", false, map[string]string{})
-}
-
-// BackendDebug builds the back-end plugin in debug mode.
-func (Build) BackendDebug() error {
-	return buildBackend("", true, map[string]string{})
-}
-
 // BackendLinux builds the back-end plugin for Linux.
 func (Build) BackendLinux() error {
 	env := map[string]string{
@@ -75,7 +65,7 @@ func (Build) Frontend() error {
 func BuildAll() {
 	b := Build{}
 	// Frontend goes first and cleans the 'dist' folder
-	mg.Deps(b.Frontend, b.Backend, b.BackendLinux)
+	mg.Deps(b.Frontend, b.BackendLinux)
 }
 
 // Deps installs dependencies.
@@ -117,7 +107,7 @@ func Dev() error {
 	}
 
 	// Then a debug backend
-	mg.Deps(b.BackendDebug)
+	mg.Deps(b.BackendLinuxDebug) // TODO: only the current architecture
 
 	return nil
 }
@@ -125,7 +115,9 @@ func Dev() error {
 // Watch will build the plugin in dev mode and then update when the frontend files change
 func Watch() error {
 	b := Build{}
-	mg.Deps(b.BackendDebug)
+	mg.Deps(b.BackendLinuxDebug)
+
+	// The --watch will never return
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev", "--watch")
 }
 

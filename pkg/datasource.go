@@ -13,21 +13,20 @@ import (
 	"github.com/patrickmn/go-cache"
 
 	hclog "github.com/hashicorp/go-hclog"
-	plugin "github.com/hashicorp/go-plugin"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 const (
 	pluginID = "google-sheets-datasource"
 )
 
-var pluginLogger = hclog.New(&hclog.LoggerOptions{
-	Name:  pluginID,
-	Level: hclog.LevelFromString("DEBUG"),
-})
-
 func main() {
+	pluginLogger := hclog.New(&hclog.LoggerOptions{
+		Name: pluginID,
+		// TODO: How to make level configurable?
+		Level: hclog.LevelFromString("DEBUG"),
+	})
 	cache := cache.New(300*time.Second, 5*time.Second)
 	ds := &googleSheetsDataSource{
 		logger: pluginLogger,
@@ -36,22 +35,21 @@ func main() {
 			Logger: pluginLogger,
 		},
 	}
-	err := backend.Serve(backend.ServeOpts{
+	if err := backend.Serve(backend.ServeOpts{
 		DataQueryHandler:    ds,
 		CallResourceHandler: ds,
-	})
-	if err != nil {
+	}); err != nil {
 		pluginLogger.Error(err.Error())
 		os.Exit(1)
 	}
 }
 
 type googleSheetsDataSource struct {
-	plugin.NetRPCUnsupportedPlugin
 	logger      hclog.Logger
 	googlesheet *googlesheets.GoogleSheets
 }
 
+// DataQuery queries for data.
 func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
 	res := &backend.DataQueryResponse{}
 	config := googlesheets.GoogleSheetConfig{}
@@ -82,6 +80,7 @@ func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 	return res, nil
 }
 
+// CallResource calls a resource.
 func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backend.CallResourceRequest) (*backend.CallResourceResponse, error) {
 	config := googlesheets.GoogleSheetConfig{}
 	if err := json.Unmarshal(req.PluginConfig.JSONData, &config); err != nil {
@@ -98,7 +97,6 @@ func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backen
 	case "spreadsheets":
 		res, err = gsd.googlesheet.GetSpreadsheets(ctx, &config)
 	case "test":
-		pluginLogger.Info("running TEST!!!!!!!")
 		err = gsd.googlesheet.TestAPI(ctx, &config)
 	}
 	if err != nil {
@@ -109,15 +107,14 @@ func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backen
 
 	body, err := json.Marshal(response)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to marshal response: %w", err)
 	}
 
-	headers := make(http.Header)
-	headers.Add("Content-Type", "application/json")
-
 	return &backend.CallResourceResponse{
-		Status:  http.StatusOK,
-		Headers: headers,
-		Body:    body,
+		Status: http.StatusOK,
+		Headers: map[string][]string{
+			"Content-Type": {"application/json"},
+		},
+		Body: body,
 	}, nil
 }

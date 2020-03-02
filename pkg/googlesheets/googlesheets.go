@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"context"
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
 	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
@@ -13,7 +14,6 @@ import (
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/hashicorp/go-hclog"
 	"github.com/patrickmn/go-cache"
-	"golang.org/x/net/context"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -36,11 +36,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 	}
 
 	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
-	if err != nil {
-		return nil, err
-	}
-
-	return frame, nil
+	return frame, err
 }
 
 // TestAPI tests the Google API.
@@ -58,7 +54,7 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *GoogleSheet
 
 	files, err := client.GetSpreadsheetFiles()
 	if err != nil {
-		return nil, fmt.Errorf("could not get all files: %w", err)
+		return nil, err
 	}
 
 	fileNames := map[string]string{}
@@ -107,7 +103,6 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	warnings := []string{}
 
 	for _, column := range columns {
-
 		var field *df.Field
 		switch column.GetType() {
 		case "TIME":
@@ -121,13 +116,15 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		field.Config = &df.FieldConfig{Unit: column.GetUnit()}
 
 		if column.HasMixedTypes() {
-			warnings = append(warnings, fmt.Sprintf("Multipe data types found in column %s. Using string data type", column.Header))
-			gs.Logger.Error("Multipe data types found in column " + column.Header + ". Using string")
+			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
+			warnings = append(warnings, warning)
+			gs.Logger.Warn(warning)
 		}
 
 		if column.HasMixedUnits() {
-			warnings = append(warnings, fmt.Sprintf("Multipe units found in column %s. Formatted value will be used", column.Header))
-			gs.Logger.Error("Multipe units found in column " + column.Header + ". Formatted value will be used")
+			warning := fmt.Sprintf("Multiple units found in column %q. Formatted value will be used", column.Header)
+			warnings = append(warnings, warning)
+			gs.Logger.Warn(warning)
 		}
 
 		fields = append(fields, field)
@@ -147,7 +144,8 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 			case "TIME":
 				time, err := dateparse.ParseLocal(cellData.FormattedValue)
 				if err != nil {
-					warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %v in column %s", rowIndex+1, columns[columnIndex].Header))
+					warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %d in column %q",
+						rowIndex+1, columns[columnIndex].Header))
 				} else {
 					frame.Fields[columnIndex].Vector.Set(rowIndex-1, &time)
 				}
@@ -173,14 +171,14 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 func getUniqueColumnName(formattedName string, columnIndex int, columns map[string]bool) string {
 	name := formattedName
 	if name == "" {
-		name = fmt.Sprintf("Field %v", columnIndex+1)
+		name = fmt.Sprintf("Field %d", columnIndex+1)
 	}
 
 	nameExist := true
 	counter := 1
 	for nameExist {
 		if _, exist := columns[name]; exist {
-			name = fmt.Sprintf("%s%v", formattedName, counter)
+			name = fmt.Sprintf("%s%d", formattedName, counter)
 			counter++
 		} else {
 			nameExist = false
