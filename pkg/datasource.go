@@ -22,12 +22,12 @@ const (
 	pluginID = "google-sheets-datasource"
 )
 
-var pluginLogger = hclog.New(&hclog.LoggerOptions{
-	Name:  pluginID,
-	Level: hclog.LevelFromString("DEBUG"),
-})
-
 func main() {
+	pluginLogger := hclog.New(&hclog.LoggerOptions{
+		Name: pluginID,
+		// TODO: How to make level configurable?
+		Level: hclog.LevelFromString("DEBUG"),
+	})
 	cache := cache.New(300*time.Second, 5*time.Second)
 	ds := &googleSheetsDataSource{
 		logger: pluginLogger,
