@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"context"
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
 	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
@@ -13,7 +14,6 @@ import (
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/hashicorp/go-hclog"
 	"github.com/patrickmn/go-cache"
-	"golang.org/x/net/context"
 	"google.golang.org/api/sheets/v4"
 )
 

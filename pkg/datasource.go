@@ -15,7 +15,7 @@ import (
 
 	hclog "github.com/hashicorp/go-hclog"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 const (
