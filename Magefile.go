@@ -97,7 +97,7 @@ func Format() error {
 	return nil
 }
 
-// Dev builds the plugin in dev mode
+// Dev builds the plugin in dev mode.
 func Dev() error {
 	b := Build{}
 
