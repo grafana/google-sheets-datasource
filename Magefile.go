@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"runtime"
 )
 
 const dsName string = "sheets-datasource"
@@ -36,17 +35,6 @@ func buildBackend(variant string, enableDebug bool, env map[string]string) error
 // Build is a namespace.
 type Build mg.Namespace
 
-// Backend builds the back-end plugin.
-func (Build) Backend() error {
-	variant := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
-	return buildBackend(variant, false, map[string]string{})
-}
-
-// BackendDebug builds the back-end plugin in debug mode.
-func (Build) BackendDebug() error {
-	return buildBackend("", true, map[string]string{})
-}
-
 // BackendLinux builds the back-end plugin for Linux.
 func (Build) BackendLinux() error {
 	env := map[string]string{
@@ -74,7 +62,9 @@ func (Build) Frontend() error {
 // BuildAll builds both back-end and front-end components.
 func BuildAll() {
 	b := Build{}
-	mg.Deps(b.Backend, b.BackendLinux, b.Frontend)
+	// Build front-end first, since it wipes the dist/ directory (and the back-end plugin with it)
+	mg.Deps(b.Frontend)
+	mg.Deps(b.BackendLinux)
 }
 
 // Deps installs dependencies.
@@ -108,8 +98,7 @@ func Format() error {
 
 // Dev starts a front-end development server.
 func Dev() error {
-	b := Build{}
-	mg.Deps(b.Frontend)
+	mg.Deps(BuildAll)
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev", "--watch")
 }
 
