@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"runtime"
 )
 
 const dsName string = "sheets-datasource"
@@ -37,7 +38,8 @@ type Build mg.Namespace
 
 // Backend builds the back-end plugin.
 func (Build) Backend() error {
-	return buildBackend("", false, map[string]string{})
+	variant := fmt.Sprintf("%s_%s", runtime.GOOS, runtime.GOARCH)
+	return buildBackend(variant, false, map[string]string{})
 }
 
 // BackendDebug builds the back-end plugin in debug mode.
