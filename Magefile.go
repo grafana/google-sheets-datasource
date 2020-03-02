@@ -55,7 +55,7 @@ func (Build) BackendLinuxDebug() error {
 }
 
 // Frontend builds the front-end for production.  Note that this build script will also
-// clean the `dist` folder
+// clean the `dist` folder.
 func (Build) Frontend() error {
 	mg.Deps(Deps)
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:build")
