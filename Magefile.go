@@ -112,7 +112,7 @@ func Dev() error {
 	return nil
 }
 
-// Watch will build the plugin in dev mode and then update when the frontend files change
+// Watch will build the plugin in dev mode and then update when the frontend files change.
 func Watch() error {
 	b := Build{}
 	mg.Deps(b.BackendLinuxDebug)
