@@ -116,10 +116,10 @@ func TestGooglesheets(t *testing.T) {
 		t.Run("meta warnings is populated correctly", func(t *testing.T) {
 			warnings := meta["warnings"].([]string)
 			assert.Equal(t, 4, len(warnings))
-			assert.Equal(t, "Multipe data types found in column MixedDataTypes. Using string data type", warnings[0])
-			assert.Equal(t, "Multipe data types found in column MixedUnits. Using string data type", warnings[1])
-			assert.Equal(t, "Multipe units found in column MixedUnits. Formatted value will be used", warnings[2])
-			assert.Equal(t, "Multipe units found in column Mixed currencies. Formatted value will be used", warnings[3])
+			assert.Equal(t, "Multiple data types found in column \"MixedDataTypes\". Using string data type", warnings[0])
+			assert.Equal(t, "Multiple data types found in column \"MixedUnits\". Using string data type", warnings[1])
+			assert.Equal(t, "Multiple units found in column \"MixedUnits\". Formatted value will be used", warnings[2])
+			assert.Equal(t, "Multiple units found in column \"Mixed currencies\". Formatted value will be used", warnings[3])
 		})
 	})
 }
