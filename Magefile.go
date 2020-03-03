@@ -61,6 +61,12 @@ func (Build) Frontend() error {
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:build")
 }
 
+// FrontendDev builds the front-end for development.
+func (Build) FrontendDev() error {
+	mg.Deps(Deps)
+	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev")
+}
+
 // BuildAll builds both back-end and front-end components.
 func BuildAll() {
 	b := Build{}
@@ -99,15 +105,7 @@ func Format() error {
 // Dev builds the plugin in dev mode.
 func Dev() error {
 	b := Build{}
-
-	// First build the frontend
-	if err := sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev"); err != nil {
-		return err
-	}
-
-	// Then a debug backend
-	mg.Deps(b.BackendLinuxDebug) // TODO: only the current architecture
-
+	mg.Deps(b.BackendLinuxDebug, b.FrontendDev) // TODO: only the current architecture
 	return nil
 }
 
