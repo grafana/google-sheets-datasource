@@ -64,17 +64,19 @@ func (cd *ColumnDefinition) HasMixedUnits() bool {
 }
 
 func (cd *ColumnDefinition) checkType(cell *sheets.CellData) {
-	if cell != nil {
-		if cell.UserEnteredFormat != nil && cell.UserEnteredFormat.NumberFormat != nil {
-			switch cell.UserEnteredFormat.NumberFormat.Type {
-			case "DATE", "DATE_TIME":
-				cd.types["TIME"] = true
-			case "NUMBER", "PERCENT", "CURRENCY":
-				cd.types["NUMBER"] = true
-			}
-		} else if cell.FormattedValue != "" {
-			cd.types["STRING"] = true
+	if cell == nil {
+		return
+	}
+
+	if cell.UserEnteredFormat != nil && cell.UserEnteredFormat.NumberFormat != nil {
+		switch cell.UserEnteredFormat.NumberFormat.Type {
+		case "DATE", "DATE_TIME":
+			cd.types["TIME"] = true
+		case "NUMBER", "PERCENT", "CURRENCY":
+			cd.types["NUMBER"] = true
 		}
+	} else if cell.FormattedValue != "" {
+		cd.types["STRING"] = true
 	}
 }
 
