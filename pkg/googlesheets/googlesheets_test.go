@@ -42,7 +42,7 @@ func TestGooglesheets(t *testing.T) {
 			assert.Equal(t, "header1", name)
 		})
 
-		t.Run("name becomes field + column index if header row is empty", func(t *testing.T) {
+		t.Run("name becomes Field + column index if header row is empty", func(t *testing.T) {
 			columns := map[string]bool{}
 			name := getUniqueColumnName("", 3, columns)
 			assert.Equal(t, "Field 4", name)
@@ -51,7 +51,8 @@ func TestGooglesheets(t *testing.T) {
 
 	t.Run("getSheetData", func(t *testing.T) {
 		client := &fakeClient{}
-		t.Run("spreadsheet is being cached", func(t *testing.T) {
+
+		t.Run("spreadsheets get cached", func(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
@@ -63,9 +64,14 @@ func TestGooglesheets(t *testing.T) {
 
 			assert.False(t, meta["hit"].(bool))
 			assert.Equal(t, 1, gsd.Cache.ItemCount())
+
+			_, meta, err = gsd.getSheetData(client, &qm)
+			require.NoError(t, err)
+			assert.True(t, meta["hit"].(bool))
+			assert.Equal(t, 1, gsd.Cache.ItemCount())
 		})
 
-		t.Run("spreadsheet is not being cached if CacheDurationSeconds is 0", func(t *testing.T) {
+		t.Run("spreadsheets don't get cached if CacheDurationSeconds is 0", func(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
@@ -99,21 +105,21 @@ func TestGooglesheets(t *testing.T) {
 		require.Equal(t, "ref1", frame.Name)
 
 		t.Run("no of columns match", func(t *testing.T) {
-			assert.Equal(t, len(frame.Fields), 16)
+			assert.Equal(t, 16, len(frame.Fields))
 		})
 
-		t.Run("no of rows match field length", func(t *testing.T) {
+		t.Run("no of rows matches field length", func(t *testing.T) {
 			for _, field := range frame.Fields {
 				assert.Equal(t, len(sheet.Sheets[0].Data[0].RowData)-1, field.Len())
 			}
 		})
 
 		t.Run("meta is populated correctly", func(t *testing.T) {
-			assert.Equal(t, meta["spreadsheetId"], qm.Spreadsheet)
-			assert.Equal(t, meta["range"], qm.Range)
+			assert.Equal(t, qm.Spreadsheet, meta["spreadsheetId"])
+			assert.Equal(t, qm.Range, meta["range"])
 		})
 
-		t.Run("meta warnings is populated correctly", func(t *testing.T) {
+		t.Run("meta warnings field is populated correctly", func(t *testing.T) {
 			warnings := meta["warnings"].([]string)
 			assert.Equal(t, 4, len(warnings))
 			assert.Equal(t, "Multiple data types found in column \"MixedDataTypes\". Using string data type", warnings[0])

@@ -31,7 +31,7 @@ func TestColumnDefinition(t *testing.T) {
 	require.Nil(t, err)
 
 	t.Run("TestDataTypes", func(t *testing.T) {
-		t.Run("MixedTypesDetected", func(t *testing.T) {
+		t.Run("Mixed types detected", func(t *testing.T) {
 			column := New(sheet.RowData[0].Values[10].FormattedValue, 10)
 			for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 				column.CheckCell(sheet.RowData[rowIndex].Values[column.ColumnIndex])
@@ -40,7 +40,7 @@ func TestColumnDefinition(t *testing.T) {
 			assert.True(t, column.HasMixedTypes())
 		})
 
-		t.Run("MixedTypesNotDetected", func(t *testing.T) {
+		t.Run("Mixed types not detected", func(t *testing.T) {
 			column := New(sheet.RowData[0].Values[0].FormattedValue, 0)
 			for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 				column.CheckCell(sheet.RowData[rowIndex].Values[column.ColumnIndex])
@@ -51,7 +51,7 @@ func TestColumnDefinition(t *testing.T) {
 	})
 
 	t.Run("TestUnits", func(t *testing.T) {
-		t.Run("MixedUnitsDetected", func(t *testing.T) {
+		t.Run("Mixed units detected", func(t *testing.T) {
 			column := New(sheet.RowData[0].Values[11].FormattedValue, 11)
 			for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 				column.CheckCell(sheet.RowData[rowIndex].Values[column.ColumnIndex])
@@ -60,7 +60,7 @@ func TestColumnDefinition(t *testing.T) {
 			assert.True(t, column.HasMixedUnits())
 		})
 
-		t.Run("MixedUnitsNotDetected", func(t *testing.T) {
+		t.Run("Mixed units not detected", func(t *testing.T) {
 			column := New(sheet.RowData[0].Values[0].FormattedValue, 0)
 			for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 				column.CheckCell(sheet.RowData[rowIndex].Values[column.ColumnIndex])
@@ -70,7 +70,8 @@ func TestColumnDefinition(t *testing.T) {
 		})
 
 		t.Run("Currency unit mapping", func(t *testing.T) {
-			currencyColumnIndex := 14
+			const currencyColumnIndex int = 14
+
 			t.Run("SEK", func(t *testing.T) {
 				column := New("SEK", currencyColumnIndex)
 				column.CheckCell(sheet.RowData[1].Values[currencyColumnIndex])
