@@ -25,7 +25,8 @@ func main() {
 	pluginLogger := hclog.New(&hclog.LoggerOptions{
 		Name: pluginID,
 		// TODO: How to make level configurable?
-		Level: hclog.LevelFromString("DEBUG"),
+		Level:      hclog.LevelFromString("DEBUG"),
+		JSONFormat: true,
 	})
 	cache := cache.New(300*time.Second, 5*time.Second)
 	ds := &googleSheetsDataSource{
