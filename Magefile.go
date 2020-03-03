@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -54,8 +55,7 @@ func (Build) BackendLinuxDebug() error {
 	return buildBackend("linux_amd64", true, env)
 }
 
-// Frontend builds the front-end for production.  Note that this build script will also
-// clean the `dist` folder.
+// Frontend builds the front-end for production.
 func (Build) Frontend() error {
 	mg.Deps(Deps)
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:build")
@@ -64,8 +64,7 @@ func (Build) Frontend() error {
 // BuildAll builds both back-end and front-end components.
 func BuildAll() {
 	b := Build{}
-	// Frontend goes first and cleans the 'dist' folder
-	mg.Deps(b.Frontend, b.BackendLinux)
+	mg.Deps(b.BackendLinux, b.Frontend)
 }
 
 // Deps installs dependencies.
@@ -119,6 +118,11 @@ func Watch() error {
 
 	// The --watch will never return
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev", "--watch")
+}
+
+// Clean cleans build artifacts, by deleting the dist directory.
+func Clean() error {
+	return os.RemoveAll("dist")
 }
 
 // Default configures the default target.
