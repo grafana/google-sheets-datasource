@@ -54,10 +54,17 @@ export class QueryEditor extends PureComponent<Props, State> {
   onSpreadsheetIDChange = (item: any) => {
     const { query, onRunQuery, onChange } = this.props;
 
-    /(.*)\/spreadsheets\/d\/(.*)/.test(item.value!)
-      ? onChange({ ...query, ...getGoogleSheetRangeInfoFromURL(item.value!) })
-      : onChange({ ...query, spreadsheet: item });
+    if (!item.value) {
+      return; // ignore delete?
+    }
 
+    const v = item.value;
+    // Check for pasted full URLs
+    if (/(.*)\/spreadsheets\/d\/(.*)/.test(v)) {
+      onChange({ ...query, ...getGoogleSheetRangeInfoFromURL(v) });
+    } else {
+      onChange({ ...query, spreadsheet: v });
+    }
     onRunQuery();
   };
 
@@ -88,8 +95,8 @@ export class QueryEditor extends PureComponent<Props, State> {
           <LinkButton
             style={{ marginTop: 1 }}
             disabled={!query.spreadsheet}
-            variant="secondary"
-            icon="fa fa-link"
+            variant="link"
+            icon="fa fa-external-link"
             href={toGoogleURL(query)}
             target="_blank"
           ></LinkButton>

@@ -55,7 +55,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := QueryModel{Range: "A1:O", Spreadsheet: Spreadsheet{ID: "someid"}, CacheDurationSeconds: 10}
+			qm := QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
 			_, meta, err := gsd.getSheetData(client, &qm)
@@ -69,7 +69,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := QueryModel{Range: "A1:O", Spreadsheet: Spreadsheet{ID: "someid"}, CacheDurationSeconds: 0}
+			qm := QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 0}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
 			_, meta, err := gsd.getSheetData(client, &qm)
@@ -91,7 +91,7 @@ func TestGooglesheets(t *testing.T) {
 				Level: hclog.LevelFromString("DEBUG"),
 			}),
 		}
-		qm := QueryModel{Range: "A1:O", Spreadsheet: Spreadsheet{ID: "someid"}, CacheDurationSeconds: 10}
+		qm := QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
 
 		meta := make(map[string]interface{})
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
@@ -109,7 +109,7 @@ func TestGooglesheets(t *testing.T) {
 		})
 
 		t.Run("meta is populated correctly", func(t *testing.T) {
-			assert.Equal(t, meta["spreadsheetId"], qm.Spreadsheet.ID)
+			assert.Equal(t, meta["spreadsheetId"], qm.Spreadsheet)
 			assert.Equal(t, meta["range"], qm.Range)
 		})
 
