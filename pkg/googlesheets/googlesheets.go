@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"context"
+
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
 	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
@@ -39,10 +40,13 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 	return frame, err
 }
 
-// TestAPI tests the Google API.
+// TestAPI checks if the credentials can talk to the Google API
 func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) error {
-	_, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
-	return err
+	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
+	if err != nil {
+		return err
+	}
+	return client.TestClient()
 }
 
 // GetSpreadsheets gets spreadsheets from the Google API.
@@ -67,7 +71,7 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *GoogleSheet
 
 // getSheetData gets grid data corresponding to a spreadsheet.
 func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.GridData, map[string]interface{}, error) {
-	cacheKey := qm.Spreadsheet.ID + qm.Range
+	cacheKey := qm.Spreadsheet + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		return item.(*sheets.GridData), map[string]interface{}{
 			"hit":     true,
@@ -76,7 +80,7 @@ func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.Gri
 		}, nil
 	}
 
-	result, err := client.GetSpreadsheet(qm.Spreadsheet.ID, qm.Range, true)
+	result, err := client.GetSpreadsheet(qm.Spreadsheet, qm.Range, true)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unable to get spreadsheet: %w", err)
 	}
@@ -160,7 +164,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	}
 
 	meta["warnings"] = warnings
-	meta["spreadsheetId"] = qm.Spreadsheet.ID
+	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
 	frame.Meta = &df.QueryResultMeta{Custom: meta}
 	gs.Logger.Debug("frame.Meta", spew.Sdump(frame.Meta))

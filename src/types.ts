@@ -1,4 +1,4 @@
-import { DataQuery, DataSourceJsonData, SelectableValue } from '@grafana/data';
+import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 //-------------------------------------------------------------------------------
 // General google cloud auth types
@@ -14,14 +14,12 @@ export interface JWT {
 
 export enum GoogleAuthType {
   JWT = 'jwt',
-  GCE = 'gce',
-  NONE = 'none',
+  KEY = 'key',
 }
 
 export const googleAuthTypes = [
-  { label: 'None (public)', value: GoogleAuthType.NONE },
+  { label: 'API Key', value: GoogleAuthType.KEY },
   { label: 'Google JWT File', value: GoogleAuthType.JWT },
-  { label: 'GCE Default Service Account', value: GoogleAuthType.GCE },
 ];
 
 export interface GoogleCloudOptions extends DataSourceJsonData {
@@ -46,9 +44,9 @@ export interface SheetResponseMeta {
 //-------------------------------------------------------------------------------
 
 export interface SheetsQuery extends DataQuery {
-  spreadsheet: SelectableValue<string>;
-  range: string;
-  cacheDurationSeconds: number;
+  spreadsheet: string;
+  range?: string;
+  cacheDurationSeconds?: number;
 }
 
 export interface SheetsSourceOptions extends GoogleCloudOptions {
@@ -56,6 +54,6 @@ export interface SheetsSourceOptions extends GoogleCloudOptions {
 }
 
 export interface GoogleSheetsSecureJsonData {
-  apiKey: string;
-  jwt: string;
+  apiKey?: string;
+  jwt?: string;
 }

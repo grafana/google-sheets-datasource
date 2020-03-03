@@ -45,22 +45,18 @@ jobs:
             cd mage
             go run bootstrap.go
       - run:
-          name: Build back-end
-          command: |
-            mage -v build:backend
-            mage -v build:backendDebug
-            mage -v build:backendLinux
-            mage -v build:backendLinuxDebug
-      - run:
           name: Build front-end
           command: ./node_modules/.bin/grafana-toolkit plugin:ci-build
       - run:
-          name: Test
+          name: Build back-end
+          command: |
+            mage -v buildAll
+      - run:
+          name: Test Backend
           command: |
             gofmt -l .
             golangci-lint run ./...
             go test ./pkg/...
-            yarn test
       - save_cache:
           paths:
             - node_modules

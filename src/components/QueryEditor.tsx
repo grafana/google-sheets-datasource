@@ -12,7 +12,7 @@ export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery
   let idx = url?.indexOf('/d/');
   if (!idx) {
     // The original value
-    return { spreadsheet: { value: url, label: url } };
+    return { spreadsheet: url };
   }
 
   let id = url.substring(idx + 3);
@@ -24,13 +24,13 @@ export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery
   idx = url.indexOf('range=');
   if (idx > 0) {
     const sub = url.substring(idx + 'range='.length);
-    return { spreadsheet: { value: id, label: id }, range: sub };
+    return { spreadsheet: id, range: sub };
   }
-  return { spreadsheet: { value: id, label: id } };
+  return { spreadsheet: id };
 }
 
 export function toGoogleURL(info: SheetsQuery): string {
-  let url = `https://docs.google.com/spreadsheets/d/${info.spreadsheet.value}/view`;
+  let url = `https://docs.google.com/spreadsheets/d/${info.spreadsheet}/view`;
   if (info.range) {
     url += '#range=' + info.range;
   }
@@ -42,10 +42,6 @@ export class QueryEditor extends PureComponent<Props, State> {
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
       this.props.query.cacheDurationSeconds = 300;
     }
-
-    if (!this.props.query.hasOwnProperty('spreadsheet')) {
-      this.props.query.spreadsheet = {};
-    }
   }
 
   onRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +49,23 @@ export class QueryEditor extends PureComponent<Props, State> {
       ...this.props.query,
       range: event.target.value,
     });
+  };
+
+  onSpreadsheetIDChange = (item: any) => {
+    const { query, onRunQuery, onChange } = this.props;
+
+    if (!item.value) {
+      return; // ignore delete?
+    }
+
+    const v = item.value;
+    // Check for pasted full URLs
+    if (/(.*)\/spreadsheets\/d\/(.*)/.test(v)) {
+      onChange({ ...query, ...getGoogleSheetRangeInfoFromURL(v) });
+    } else {
+      onChange({ ...query, spreadsheet: v });
+    }
+    onRunQuery();
   };
 
   render() {
@@ -77,18 +90,13 @@ export class QueryEditor extends PureComponent<Props, State> {
             placeholder="Enter SpreadsheetID"
             value={query.spreadsheet}
             allowCustomValue={true}
-            onChange={item => {
-              /(.*)\/spreadsheets\/d\/(.*)/.test(item.value!)
-                ? onChange({ ...query, ...getGoogleSheetRangeInfoFromURL(item.value!) })
-                : onChange({ ...query, spreadsheet: item });
-              onRunQuery();
-            }}
+            onChange={this.onSpreadsheetIDChange}
           ></SegmentAsync>
           <LinkButton
             style={{ marginTop: 1 }}
-            disabled={!query.spreadsheet.value}
-            variant="secondary"
-            icon="fa fa-link"
+            disabled={!query.spreadsheet}
+            variant="link"
+            icon="fa fa-external-link"
             href={toGoogleURL(query)}
             target="_blank"
           ></LinkButton>

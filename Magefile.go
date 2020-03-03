@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
@@ -35,16 +36,6 @@ func buildBackend(variant string, enableDebug bool, env map[string]string) error
 // Build is a namespace.
 type Build mg.Namespace
 
-// Backend builds the back-end plugin.
-func (Build) Backend() error {
-	return buildBackend("", false, map[string]string{})
-}
-
-// BackendDebug builds the back-end plugin in debug mode.
-func (Build) BackendDebug() error {
-	return buildBackend("", true, map[string]string{})
-}
-
 // BackendLinux builds the back-end plugin for Linux.
 func (Build) BackendLinux() error {
 	env := map[string]string{
@@ -63,7 +54,8 @@ func (Build) BackendLinuxDebug() error {
 	return buildBackend("linux_amd64", true, env)
 }
 
-// Frontend builds the front-end.
+// Frontend builds the front-end for production.  Note that this build script will also
+// clean the `dist` folder.
 func (Build) Frontend() error {
 	mg.Deps(Deps)
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:build")
@@ -72,7 +64,8 @@ func (Build) Frontend() error {
 // BuildAll builds both back-end and front-end components.
 func BuildAll() {
 	b := Build{}
-	mg.Deps(b.Backend, b.BackendLinux, b.Frontend)
+	// Frontend goes first and cleans the 'dist' folder
+	mg.Deps(b.Frontend, b.BackendLinux)
 }
 
 // Deps installs dependencies.
@@ -104,10 +97,27 @@ func Format() error {
 	return nil
 }
 
-// Dev starts a front-end development server.
+// Dev builds the plugin in dev mode.
 func Dev() error {
 	b := Build{}
-	mg.Deps(b.Frontend)
+
+	// First build the frontend
+	if err := sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev"); err != nil {
+		return err
+	}
+
+	// Then a debug backend
+	mg.Deps(b.BackendLinuxDebug) // TODO: only the current architecture
+
+	return nil
+}
+
+// Watch will build the plugin in dev mode and then update when the frontend files change.
+func Watch() error {
+	b := Build{}
+	mg.Deps(b.BackendLinuxDebug)
+
+	// The --watch will never return
 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev", "--watch")
 }
 

@@ -4,23 +4,17 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
-// Spreadsheet represents a Google spreadsheet.
-type Spreadsheet struct {
-	ID   string `json:"value"`
-	Name string `json:"label"`
-}
-
 // QueryModel represents a spreadsheet query.
 type QueryModel struct {
-	Spreadsheet          Spreadsheet `json:"Spreadsheet"`
-	Range                string      `json:"range"`
-	CacheDurationSeconds int         `json:"cacheDurationSeconds"`
+	Spreadsheet          string `json:"spreadsheet"`
+	Range                string `json:"range"`
+	CacheDurationSeconds int    `json:"cacheDurationSeconds"`
 }
 
 // GoogleSheetConfig contains Google Sheets API authentication properties.
 type GoogleSheetConfig struct {
+	AuthType string `json:"authType"` // jwt | key
 	APIKey   string `json:"apiKey"`
-	AuthType string `json:"authType"`
 	JWT      string `json:"jwt"`
 }
 

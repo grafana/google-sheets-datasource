@@ -15,7 +15,11 @@ You need to install the following first:
 * [Docker Compose](https://docs.docker.com/compose/)
 
 ```
-mage dev
+mage watch
+```
+
+In another terminal
+```
 docker-compose up
 ```
 
