@@ -50,9 +50,7 @@ jobs:
       - run:
           name: Build back-end
           command: |
-            mage -v build:backendDebug
-            mage -v build:backendLinux
-            mage -v build:backendLinuxDebug
+            mage -v buildAll
       - run:
           name: Test Backend
           command: |

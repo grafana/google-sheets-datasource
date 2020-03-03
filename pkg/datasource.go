@@ -66,7 +66,7 @@ func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			return nil, fmt.Errorf("failed to unmarshal query: %w", err)
 		}
 
-		if len(queryModel.Spreadsheet.ID) < 1 {
+		if len(queryModel.Spreadsheet) < 1 {
 			continue // not query really exists
 		}
 

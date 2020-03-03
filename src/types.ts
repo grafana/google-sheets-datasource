@@ -1,4 +1,4 @@
-import { DataQuery, DataSourceJsonData, SelectableValue } from '@grafana/data';
+import { DataQuery, DataSourceJsonData } from '@grafana/data';
 
 //-------------------------------------------------------------------------------
 // General google cloud auth types
@@ -44,9 +44,9 @@ export interface SheetResponseMeta {
 //-------------------------------------------------------------------------------
 
 export interface SheetsQuery extends DataQuery {
-  spreadsheet: SelectableValue<string>;
-  range: string;
-  cacheDurationSeconds: number;
+  spreadsheet: string;
+  range?: string;
+  cacheDurationSeconds?: number;
 }
 
 export interface SheetsSourceOptions extends GoogleCloudOptions {

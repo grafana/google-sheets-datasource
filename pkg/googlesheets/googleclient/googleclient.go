@@ -65,7 +65,11 @@ func (gc *GoogleClient) TestClient() error {
 
 // GetSpreadsheet gets a google spreadsheet struct by id and range
 func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
-	return gc.sheetsService.Spreadsheets.Get(spreadSheetID).Ranges(sheetRange).IncludeGridData(true).Do()
+	req := gc.sheetsService.Spreadsheets.Get(spreadSheetID)
+	if len(sheetRange) > 0 {
+		req = req.Ranges(sheetRange)
+	}
+	return req.IncludeGridData(true).Do()
 }
 
 // GetSpreadsheetFiles lists all files with spreadsheet mimetype that the client has access to.
