@@ -74,12 +74,12 @@ func (Build) Linux() error {
 	return buildBackend("linux", "amd64", false)
 }
 
-// Linux builds the back-end plugin for Linux.
+// Windows builds the back-end plugin for Windows.
 func (Build) Windows() error {
 	return buildBackend("windows", "amd64", false)
 }
 
-// Linux builds the back-end plugin for Linux.
+// Darwin builds the back-end plugin for OSX.
 func (Build) Darwin() error {
 	return buildBackend("darwin", "amd64", false)
 }
@@ -163,7 +163,7 @@ func Clean() error {
 	return os.RemoveAll("dist")
 }
 
-// Clean cleans build artifacts, by deleting the dist directory.
+// Debugger makes a new debug build and attaches dvl
 func Debugger() error {
 	// 1. kill any running instance
 	exeName := getExecutableName(runtime.GOOS, runtime.GOARCH)
