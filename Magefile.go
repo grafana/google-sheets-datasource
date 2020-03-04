@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -26,15 +28,11 @@ func getExecutableName(os string, arch string) string {
 	return exeName
 }
 
-func findRunningExecutable(exe string) *goprocess.P {
-	ps := goprocess.FindAll()
-
-	for _, process := range ps {
-		// The name gets truncated, so check if it starts with our longer name
+func findRunningProcess(exe string) *goprocess.P {
+	for _, process := range goprocess.FindAll() {
 		if strings.HasSuffix(process.Path, exe) {
 			return &process
 		}
-		// log.Printf("nope: %s (%d)", process.Path, process.PID)
 	}
 	return nil
 }
@@ -118,7 +116,7 @@ func BuildAll() {
 // 	return nil //sh.RunV("yarn", "install")
 // }
 
-// Test runs all tests.
+// Test run backend tests
 func Test() error {
 	//mg.Deps(Deps)
 
@@ -128,7 +126,22 @@ func Test() error {
 	return nil // sh.RunV("yarn", "test")
 }
 
-// Lint lints the sources.
+// Coverage runs backend tests and make a coverage report
+func Coverage() error {
+	os.MkdirAll(filepath.Join(".", "coverage"), os.ModePerm)
+
+	if err := sh.RunV("go", "test", "./pkg/...", "-v", "-cover", "-coverprofile=coverage/backend.out"); err != nil {
+		return nil
+	}
+
+	if err := sh.RunV("go", "tool", "cover", "-html=coverage/backend.out", "-o", "coverage/backend.html"); err != nil {
+		return nil
+	}
+
+	return nil
+}
+
+// Lint audits the source style
 func Lint() error {
 	return sh.RunV("golangci-lint", "run", "./...")
 }
@@ -169,7 +182,7 @@ func Debugger() error {
 	exeName := getExecutableName(runtime.GOOS, runtime.GOARCH)
 
 	// Kill any running processs
-	process := findRunningExecutable(exeName)
+	process := findRunningProcess(exeName)
 	if process != nil {
 		err := killProcess(process)
 		if err != nil {
@@ -181,14 +194,32 @@ func Debugger() error {
 	b := Build{}
 	mg.Deps(b.Debug)
 
+	if runtime.GOOS == "linux" {
+		// 	ptrace_scope=`cat /proc/sys/kernel/yama/ptrace_scope`
+		// 	if [ "$ptrace_scope" != 0 ]; then
+		// 	  echo "WARNING: ptrace_scope set to value other than 0, this might prevent debugger from connecting, try writing \"0\" to /proc/sys/kernel/yama/ptrace_scope.
+		//   Read more at https://www.kernel.org/doc/Documentation/security/Yama.txt"
+		// 	  read -p "Set ptrace_scope to 0? y/N (default N)" set_ptrace_input
+		// 	  if [ "$set_ptrace_input" == "y" ] || [ "$set_ptrace_input" == "Y" ]; then
+		// 		echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
+		// 	  fi
+		// 	fi
+	}
+
 	// Wait for grafana to start plugin
 	for i := 0; i < 20; i++ {
-		process := findRunningExecutable(exeName)
+		process := findRunningProcess(exeName)
 		if process != nil {
 			log.Printf("Running PID: %d", process.PID)
 
 			// dlv attach ${PLUGIN_PID} --headless --listen=:${PORT} --api-version 2 --log
-			if err := sh.RunV("dvl", "attach", "${PLUGIN_PID}", "--headless", "--listen=:${PORT}", "--api-version", "2", "--log"); err != nil {
+			if err := sh.RunV("dvl",
+				"attach",
+				strconv.Itoa(process.PID),
+				"--headless",
+				"--listen=:3222",
+				"--api-version", "2",
+				"--log"); err != nil {
 				return err
 			}
 			// And then kill dvl

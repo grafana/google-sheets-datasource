@@ -45,17 +45,17 @@ jobs:
             cd mage
             go run bootstrap.go
       - run:
-          name: Build front-end
-          command: ./node_modules/.bin/grafana-toolkit plugin:ci-build
+          name: Build and test frontend
+          command: npx grafana-toolkit plugin:ci-build
       - run:
-          name: Build back-end
+          name: Build Backend
           command: |
             mage -v buildAll
       - run:
           name: Test Backend
           command: |
             mage -v lint
-            mage -v test
+            mage -v coverage
       - save_cache:
           paths:
             - node_modules
