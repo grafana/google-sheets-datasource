@@ -188,11 +188,11 @@ func Debugger() error {
 			log.Printf("Running PID: %d", process.PID)
 
 			// dlv attach ${PLUGIN_PID} --headless --listen=:${PORT} --api-version 2 --log
-			sh.RunV("dvl", "attach", "${PLUGIN_PID}", "--headless", "--listen=:${PORT}", "--api-version", "2", "--log")
-
+			if err := sh.RunV("dvl", "attach", "${PLUGIN_PID}", "--headless", "--listen=:${PORT}", "--api-version", "2", "--log"); err != nil {
+				return err
+			}
 			// And then kill dvl
-			sh.RunV("pkill", "dlv")
-			return nil
+			return sh.RunV("pkill", "dlv")
 		}
 
 		log.Printf("waiting for grafana to start: %s...", exeName)
