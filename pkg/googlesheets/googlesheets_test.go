@@ -128,4 +128,40 @@ func TestGooglesheets(t *testing.T) {
 			assert.Equal(t, "Multiple units found in column \"Mixed currencies\". Formatted value will be used", warnings[3])
 		})
 	})
+
+	t.Run("query single cell", func(t *testing.T) {
+		sheet, err := loadTestSheet("./testdata/single-cell.json")
+		require.NoError(t, err)
+
+		gsd := &GoogleSheets{
+			Cache: cache.New(300*time.Second, 50*time.Second),
+			Logger: hclog.New(&hclog.LoggerOptions{
+				Name:  "",
+				Level: hclog.LevelFromString("DEBUG"),
+			}),
+		}
+		qm := QueryModel{Range: "A2", Spreadsheet: "someid", CacheDurationSeconds: 10}
+
+		meta := make(map[string]interface{})
+		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
+		require.NoError(t, err)
+		require.Equal(t, "ref1", frame.Name)
+
+		t.Run("single field", func(t *testing.T) {
+			assert.Equal(t, 1, len(frame.Fields))
+		})
+
+		t.Run("single row", func(t *testing.T) {
+			for _, field := range frame.Fields {
+				assert.Equal(t, 1, field.Len())
+			}
+		})
+
+		t.Run("single value", func(t *testing.T) {
+			strVal, ok := frame.Fields[0].Vector.At(0).(*string)
+			require.True(t, ok)
+			require.NotNil(t, strVal)
+			assert.Equal(t, "🌭", *strVal)
+		})
+	})
 }
