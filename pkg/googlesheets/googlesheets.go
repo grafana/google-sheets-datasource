@@ -36,8 +36,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 		return nil, err
 	}
 
-	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
-	return frame, err
+	return gs.transformSheetToDataFrame(data, meta, refID, qm)
 }
 
 // TestAPI checks if the credentials can talk to the Google API
@@ -103,18 +102,20 @@ func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.Gri
 
 func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *QueryModel) (*df.Frame, error) {
 	fields := []*df.Field{}
-	columns := getColumnDefinitions(sheet.RowData)
+	columns, start := getColumnDefinitions(sheet.RowData)
 	warnings := []string{}
 
 	for _, column := range columns {
 		var field *df.Field
 		switch column.GetType() {
 		case "TIME":
-			field = df.NewField(column.Header, nil, make([]*time.Time, len(sheet.RowData)-1))
+			field = df.NewField(column.Header, nil, make([]*time.Time, len(sheet.RowData)-start))
 		case "NUMBER":
-			field = df.NewField(column.Header, nil, make([]*float64, len(sheet.RowData)-1))
+			field = df.NewField(column.Header, nil, make([]*float64, len(sheet.RowData)-start))
 		case "STRING":
-			field = df.NewField(column.Header, nil, make([]*string, len(sheet.RowData)-1))
+			field = df.NewField(column.Header, nil, make([]*string, len(sheet.RowData)-start))
+		default:
+			return nil, fmt.Errorf("unknown column type: %s", column.GetType())
 		}
 
 		field.Config = &df.FieldConfig{Unit: column.GetUnit()}
@@ -138,7 +139,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		fields...,
 	)
 
-	for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
+	for rowIndex := start; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
 			if columnIndex >= len(columns) {
 				continue
@@ -151,14 +152,14 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 					warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %d in column %q",
 						rowIndex+1, columns[columnIndex].Header))
 				} else {
-					frame.Fields[columnIndex].Vector.Set(rowIndex-1, &time)
+					frame.Fields[columnIndex].Vector.Set(rowIndex-start, &time)
 				}
 			case "NUMBER":
 				if cellData.EffectiveValue != nil {
-					frame.Fields[columnIndex].Vector.Set(rowIndex-1, &cellData.EffectiveValue.NumberValue)
+					frame.Fields[columnIndex].Vector.Set(rowIndex-start, &cellData.EffectiveValue.NumberValue)
 				}
 			case "STRING":
-				frame.Fields[columnIndex].Vector.Set(rowIndex-1, &cellData.FormattedValue)
+				frame.Fields[columnIndex].Vector.Set(rowIndex-start, &cellData.FormattedValue)
 			}
 		}
 	}
@@ -192,18 +193,29 @@ func getUniqueColumnName(formattedName string, columnIndex int, columns map[stri
 	return name
 }
 
-func getColumnDefinitions(rows []*sheets.RowData) []*cd.ColumnDefinition {
+func getColumnDefinitions(rows []*sheets.RowData) ([]*cd.ColumnDefinition, int) {
 	columns := []*cd.ColumnDefinition{}
 	columnMap := map[string]bool{}
 	headerRow := rows[0].Values
 
-	for columnIndex, headerCell := range headerRow {
-		name := getUniqueColumnName(strings.TrimSpace(headerCell.FormattedValue), columnIndex, columnMap)
-		columnMap[name] = true
-		columns = append(columns, cd.New(name, columnIndex))
+	start := 0
+	if len(rows) > 1 {
+		start = 1
+		for columnIndex, headerCell := range headerRow {
+			name := getUniqueColumnName(strings.TrimSpace(headerCell.FormattedValue), columnIndex, columnMap)
+			columnMap[name] = true
+			columns = append(columns, cd.New(name, columnIndex))
+		}
+	} else {
+		for columnIndex := range headerRow {
+			name := getUniqueColumnName("", columnIndex, columnMap)
+			columnMap[name] = true
+			columns = append(columns, cd.New(name, columnIndex))
+		}
 	}
 
-	for rowIndex := 1; rowIndex < len(rows); rowIndex++ {
+	// Check the types for each column
+	for rowIndex := start; rowIndex < len(rows); rowIndex++ {
 		for _, column := range columns {
 			if column.ColumnIndex < len(rows[rowIndex].Values) {
 				column.CheckCell(rows[rowIndex].Values[column.ColumnIndex])
@@ -211,5 +223,5 @@ func getColumnDefinitions(rows []*sheets.RowData) []*cd.ColumnDefinition {
 		}
 	}
 
-	return columns
+	return columns, start
 }
