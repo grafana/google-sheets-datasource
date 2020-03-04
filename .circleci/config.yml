@@ -54,9 +54,8 @@ jobs:
       - run:
           name: Test Backend
           command: |
-            gofmt -l .
-            golangci-lint run ./...
-            go test ./pkg/...
+            mage -v lint
+            mage -v test
       - save_cache:
           paths:
             - node_modules
