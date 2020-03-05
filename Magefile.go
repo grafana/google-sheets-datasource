@@ -128,7 +128,8 @@ func Test() error {
 
 // Coverage runs backend tests and make a coverage report
 func Coverage() error {
-	os.MkdirAll(filepath.Join(".", "coverage"), os.ModePerm)
+	// Create a coverage file if it does not already exist
+	_ = os.MkdirAll(filepath.Join(".", "coverage"), os.ModePerm)
 
 	if err := sh.RunV("go", "test", "./pkg/...", "-v", "-cover", "-coverprofile=coverage/backend.out"); err != nil {
 		return nil
@@ -176,7 +177,7 @@ func Clean() error {
 	return os.RemoveAll("dist")
 }
 
-// Debugger makes a new debug build and attaches dvl
+// Debugger makes a new debug build and attaches dlv (go-delve)
 func Debugger() error {
 	// 1. kill any running instance
 	exeName := getExecutableName(runtime.GOOS, runtime.GOARCH)
@@ -195,6 +196,7 @@ func Debugger() error {
 	mg.Deps(b.Debug)
 
 	if runtime.GOOS == "linux" {
+		log.Printf("On linux we should check ptrace_scope")
 		// 	ptrace_scope=`cat /proc/sys/kernel/yama/ptrace_scope`
 		// 	if [ "$ptrace_scope" != 0 ]; then
 		// 	  echo "WARNING: ptrace_scope set to value other than 0, this might prevent debugger from connecting, try writing \"0\" to /proc/sys/kernel/yama/ptrace_scope.
@@ -213,7 +215,7 @@ func Debugger() error {
 			log.Printf("Running PID: %d", process.PID)
 
 			// dlv attach ${PLUGIN_PID} --headless --listen=:${PORT} --api-version 2 --log
-			if err := sh.RunV("dvl",
+			if err := sh.RunV("dlv",
 				"attach",
 				strconv.Itoa(process.PID),
 				"--headless",
