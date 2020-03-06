@@ -97,6 +97,8 @@ github.com/googleapis/gax-go/v2 v2.0.5 h1:sjZBwGj9Jlw33ImPtvFviGYvseOtDM7hkSKB7+
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/grafana/grafana-plugin-sdk-go v0.16.0 h1:fuoLzsQLs0RKcvXDP/cAQxaZGP1rbnoBwUaY/1yvh6k=
 github.com/grafana/grafana-plugin-sdk-go v0.16.0/go.mod h1:D1MkO+4EPCWc1Wrr260hq7wbo7Ox0grnNWBygulq7aM=
+github.com/grafana/grafana-plugin-sdk-go v0.19.0 h1:qLq8tOSxZ9O7+AdduXJVU6jEOlg/2eP8UXdhAzQ81g0=
+github.com/grafana/grafana-plugin-sdk-go v0.19.0/go.mod h1:G6Ov9M+FDOZXNw8eKXINO6XzqdUvTs7huwyQp5jLTBQ=
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 h1:Ovs26xHkKqVztRpIrF/92BcuyuQ/YW4NSIpoGtfXNho=
 github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0/go.mod h1:8NvIoxWQoOIhqOTXgfV/d3M/q6VIi02HzZEHgUlZvzk=
 github.com/hashicorp/go-hclog v0.0.0-20180709165350-ff2cf002a8dd/go.mod h1:9bjs9uLqI8l75knNv3lV1kA55veR+WUPSiKIWcQHudI=

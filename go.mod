@@ -11,12 +11,13 @@ require (
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/google/gops v0.3.7
-	github.com/grafana/grafana-plugin-sdk-go v0.16.0
+	github.com/grafana/grafana-plugin-sdk-go v0.19.0
 	github.com/hashicorp/go-hclog v0.11.0
 	github.com/keybase/go-ps v0.0.0-20190827175125-91aafc93ba19 // indirect
 	github.com/magefile/mage v1.9.0
-	github.com/mitchellh/go-ps v1.0.0
+	github.com/mitchellh/go-ps v1.0.0 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/prometheus/client_golang v1.3.0
 	github.com/shirou/gopsutil v2.20.2+incompatible // indirect
 	github.com/stretchr/testify v1.5.1
 	github.com/xlab/treeprint v1.0.0 // indirect
