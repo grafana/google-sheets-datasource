@@ -22,6 +22,30 @@ jobs:
           name: Install dependencies
           command: |
             yarn install --pure-lockfile
+      - run:
+          name: Build and test frontend
+          command:  |
+            npx grafana-toolkit plugin:ci-build
+            npx grafana-toolkit plugin:ci-build --finish
+      - save_cache:
+          paths:
+            - node_modules
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci
+  build_backend:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+          - yarn-packages-{{ checksum "yarn.lock" }}
+      - run:
+          name: Install dependencies
+          command: |
+            yarn install --pure-lockfile
 
             echo 'export PATH=$HOME/go/bin:/usr/local/go/bin:$PATH' >> $BASH_ENV
             source $BASH_ENV
@@ -45,18 +69,18 @@ jobs:
             cd mage
             go run bootstrap.go
       - run:
-          name: Build front-end
-          command: ./node_modules/.bin/grafana-toolkit plugin:ci-build
-      - run:
-          name: Build back-end
+          name: Build Backend
           command: |
             mage -v buildAll
       - run:
           name: Test Backend
           command: |
-            gofmt -l .
-            golangci-lint run ./...
-            go test ./pkg/...
+            mage -v lint
+            mage -v coverage
+      - run:
+          name: Move results to ci folder
+          command:  |
+            npx grafana-toolkit plugin:ci-build --finish
       - save_cache:
           paths:
             - node_modules
@@ -218,10 +242,12 @@ workflows:
   plugin_workflow:
     jobs:
       - build_plugin
+      - build_backend
       - build_docs
       - package:
           requires:
             - build_plugin
+            - build_backend
             - build_docs
       - test_integration:
           requires:

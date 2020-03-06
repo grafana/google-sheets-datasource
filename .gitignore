@@ -1,6 +1,4 @@
-node_modules
-datasource/vendor
-dist
-provisioning
-.env
+node_modules/
+dist/
 coverage/
+ci/
