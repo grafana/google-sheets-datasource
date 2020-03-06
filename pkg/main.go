@@ -15,6 +15,8 @@ const (
 
 func main() {
 	pluginLogger := hclog.New(&hclog.LoggerOptions{
+		Name: pluginID,
+		// TODO: How to make level configurable?
 		Level:      hclog.LevelFromString("DEBUG"),
 		JSONFormat: true,
 		Color:      hclog.ColorOff,
