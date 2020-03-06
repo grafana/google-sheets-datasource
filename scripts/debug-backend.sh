@@ -5,7 +5,7 @@ if [ "$1" == "-h" ]; then
 fi
 
 PORT="${2:-3222}"
-PLUGIN_NAME="${1:-sheets-datasource}"
+PLUGIN_NAME="${1:-gds_sheets}"
 
 if [ "$OSTYPE" == "linux-gnu" ]; then
   ptrace_scope=`cat /proc/sys/kernel/yama/ptrace_scope`

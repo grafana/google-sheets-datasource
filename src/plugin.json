@@ -3,7 +3,7 @@
   "name": "Google Sheets",
   "id": "google-sheets-datasource",
   "backend": true,
-  "executable": "sheets-datasource",
+  "executable": "gds_sheets",
   "metrics": true,
 
   "info": {
@@ -28,7 +28,7 @@
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaVersion": "6.6.x",
+    "grafanaVersion": "6.7.x",
     "plugins": []
   }
 }

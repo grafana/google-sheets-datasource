@@ -18,7 +18,7 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-const dsName string = "sheets-datasource"
+const dsName string = "gds_sheets"
 
 func getExecutableName(os string, arch string) string {
 	exeName := fmt.Sprintf("%s_%s_%s", dsName, os, arch)
