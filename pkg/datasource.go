@@ -4,62 +4,72 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/httpresource"
 	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
 	"github.com/patrickmn/go-cache"
+	"github.com/prometheus/client_golang/prometheus"
 
 	hclog "github.com/hashicorp/go-hclog"
 
 	"context"
 )
 
-const (
-	pluginID = "google-sheets-datasource"
-)
+const metricNamespace = "sheets_datasource"
 
-func main() {
-	pluginLogger := hclog.New(&hclog.LoggerOptions{
-		Name: pluginID,
-		// TODO: How to make level configurable?
-		Level:      hclog.LevelFromString("DEBUG"),
-		JSONFormat: true,
-	})
+// Init creates the google sheets datasource and sets up all the routes
+func Init(logger hclog.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
+	queriesTotal := prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name:      "data_query_total",
+			Help:      "data query counter",
+			Namespace: metricNamespace,
+		},
+		[]string{"scenario"},
+	)
+	prometheus.MustRegister(queriesTotal)
+
 	cache := cache.New(300*time.Second, 5*time.Second)
-	ds := &googleSheetsDataSource{
-		logger: pluginLogger,
+	ds := &GoogleSheetsDataSource{
+		logger: logger,
 		googlesheet: &googlesheets.GoogleSheets{
 			Cache:  cache,
-			Logger: pluginLogger,
+			Logger: logger,
 		},
 	}
-	if err := backend.Serve(backend.ServeOpts{
-		DataQueryHandler:    ds,
-		CallResourceHandler: ds,
-	}); err != nil {
-		pluginLogger.Error(err.Error())
-		os.Exit(1)
-	}
+
+	mux.HandleFunc("/test", ds.handleResourceTest)
+	mux.HandleFunc("/spreadsheets", ds.handleResourceSpreadsheets)
+	return ds
 }
 
-type googleSheetsDataSource struct {
+// GoogleSheetsDataSource handler for google sheets
+type GoogleSheetsDataSource struct {
 	logger      hclog.Logger
 	googlesheet *googlesheets.GoogleSheets
 }
 
-// DataQuery queries for data.
-func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
-	res := &backend.DataQueryResponse{}
+func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConfig, error) {
 	config := googlesheets.GoogleSheetConfig{}
-	if err := json.Unmarshal(req.PluginConfig.JSONData, &config); err != nil {
+	if err := json.Unmarshal(pluginConfig.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
 	}
 
-	config.APIKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
-	config.JWT = req.PluginConfig.DecryptedSecureJSONData["jwt"]
+	config.APIKey = pluginConfig.DecryptedSecureJSONData["apiKey"]
+	config.JWT = pluginConfig.DecryptedSecureJSONData["jwt"]
+	return &config, nil
+}
+
+// DataQuery queries for data.
+func (ds *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
+	res := &backend.DataQueryResponse{}
+	config, err := getConfig(req.PluginConfig)
+	if err != nil {
+		return nil, err
+	}
 
 	for _, q := range req.Queries {
 		queryModel := &googlesheets.QueryModel{}
@@ -71,9 +81,9 @@ func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 			continue // not query really exists
 		}
 
-		frame, err := gsd.googlesheet.Query(ctx, q.RefID, queryModel, &config, q.TimeRange)
+		frame, err := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
 		if err != nil {
-			gsd.logger.Error("Query failed", "refId", q.RefID, "error", err)
+			ds.logger.Error("Query failed", "refId", q.RefID, "error", err)
 			// TEMP: at the moment, the only way to return an error is by using meta
 			res.Metadata = map[string]string{"error": err.Error()}
 			continue
@@ -85,41 +95,58 @@ func (gsd *googleSheetsDataSource) DataQuery(ctx context.Context, req *backend.D
 	return res, nil
 }
 
-// CallResource calls a resource.
-func (gsd *googleSheetsDataSource) CallResource(ctx context.Context, req *backend.CallResourceRequest) (*backend.CallResourceResponse, error) {
-	config := googlesheets.GoogleSheetConfig{}
-	if err := json.Unmarshal(req.PluginConfig.JSONData, &config); err != nil {
-		return nil, fmt.Errorf("could not unmarshal configuration: %w", err)
-	}
-
-	config.APIKey = req.PluginConfig.DecryptedSecureJSONData["apiKey"]
-	config.JWT = req.PluginConfig.DecryptedSecureJSONData["jwt"]
-
+func writeResult(rw http.ResponseWriter, path string, val interface{}, err error) {
 	response := make(map[string]interface{})
-	var res interface{}
-	var err error
-	switch req.Path {
-	case "spreadsheets":
-		res, err = gsd.googlesheet.GetSpreadsheets(ctx, &config)
-	case "test":
-		err = gsd.googlesheet.TestAPI(ctx, &config)
-	}
+	code := http.StatusOK
 	if err != nil {
 		response["error"] = err.Error()
+		code = http.StatusBadRequest
 	} else {
-		response[req.Path] = res
+		response[path] = val
 	}
 
 	body, err := json.Marshal(response)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal response: %w", err)
+		body = []byte(err.Error())
+		code = http.StatusInternalServerError
+	}
+	_, err = rw.Write(body)
+	if err != nil {
+		code = http.StatusInternalServerError
+	}
+	rw.WriteHeader(code)
+}
+
+func (ds *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.ResponseWriter, req *http.Request) {
+	ds.logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
+	if req.Method != http.MethodGet {
+		return
 	}
 
-	return &backend.CallResourceResponse{
-		Status: http.StatusOK,
-		Headers: map[string][]string{
-			"Content-Type": {"application/json"},
-		},
-		Body: body,
-	}, nil
+	ctx := req.Context()
+	config, err := getConfig(httpresource.PluginConfigFromContext(ctx))
+	if err != nil {
+		writeResult(rw, "?", nil, err)
+		return
+	}
+
+	res, err := ds.googlesheet.GetSpreadsheets(ctx, config)
+	writeResult(rw, "spreadsheets", res, err)
+}
+
+func (ds *GoogleSheetsDataSource) handleResourceTest(rw http.ResponseWriter, req *http.Request) {
+	ds.logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
+	if req.Method != http.MethodGet {
+		return
+	}
+
+	ctx := req.Context()
+	config, err := getConfig(httpresource.PluginConfigFromContext(ctx))
+	if err != nil {
+		writeResult(rw, "?", nil, err)
+		return
+	}
+
+	err = ds.googlesheet.TestAPI(ctx, config)
+	writeResult(rw, "test", "OK", err)
 }
