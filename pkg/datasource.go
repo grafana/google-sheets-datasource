@@ -110,7 +110,10 @@ func writeResult(rw http.ResponseWriter, path string, val interface{}, err error
 		body = []byte(err.Error())
 		code = http.StatusInternalServerError
 	}
-	rw.Write(body)
+	_, err = rw.Write(body)
+	if err != nil {
+		code = http.StatusInternalServerError
+	}
 	rw.WriteHeader(code)
 }
 
