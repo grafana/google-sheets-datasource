@@ -18,7 +18,7 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-const dsName string = "gds_sheets"
+const dsName string = "gp_sheets"
 
 func getExecutableName(os string, arch string) string {
 	exeName := fmt.Sprintf("%s_%s_%s", dsName, os, arch)
@@ -174,7 +174,21 @@ func Format() error {
 
 // Clean cleans build artifacts, by deleting the dist directory.
 func Clean() error {
-	return os.RemoveAll("dist")
+	err := os.RemoveAll("dist")
+	if err != nil {
+		return err
+	}
+
+	err = os.RemoveAll("coverage")
+	if err != nil {
+		return err
+	}
+
+	err = os.RemoveAll("ci")
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 // Debugger makes a new debug build and attaches dlv (go-delve)
