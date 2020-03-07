@@ -39,6 +39,7 @@ func filterByTime(frame *df.Frame, timeRange backend.TimeRange) *df.Frame {
 
 	if filteredLen != length {
 		// TODO -- create a new frame keeping all fields, but shorter vectors
+		length = filteredLen // make linter happy
 	}
 	return frame
 }
