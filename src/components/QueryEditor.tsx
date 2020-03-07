@@ -1,6 +1,6 @@
 import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { LinkButton, FormLabel, Segment, SegmentAsync } from '@grafana/ui';
+import { LinkButton, FormLabel, Segment, SegmentAsync, Switch } from '@grafana/ui';
 import { DataSource } from '../DataSource';
 import { SheetsQuery, SheetsSourceOptions } from '../types';
 
@@ -66,6 +66,14 @@ export class QueryEditor extends PureComponent<Props, State> {
       onChange({ ...query, spreadsheet: v });
     }
     onRunQuery();
+  };
+
+  toggleUseTimeFilter = (event?: React.SyntheticEvent<HTMLInputElement>) => {
+    const { query } = this.props;
+    this.props.onChange({
+      ...query,
+      useTimeFilter: !query.useTimeFilter,
+    });
   };
 
   render() {
@@ -144,6 +152,18 @@ export class QueryEditor extends PureComponent<Props, State> {
               description: value ? '' : 'Response is not cached at all',
             }))}
             onChange={({ value }) => onChange({ ...query, cacheDurationSeconds: value! })}
+          />
+          <div className="gf-form gf-form--grow">
+            <div className="gf-form-label gf-form-label--grow" />
+          </div>
+        </div>
+        <div className="gf-form-inline">
+          <Switch
+            label="Use Time Filter"
+            tooltip="Apply the dashboard time range to the first time field"
+            labelClass={'width-10  query-keyword'}
+            checked={query.useTimeFilter === true}
+            onChange={this.toggleUseTimeFilter}
           />
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />

@@ -31,12 +31,17 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 		return nil, fmt.Errorf("unable to create Google API client: %w", err)
 	}
 
+	// This result may be cached
 	data, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
 		return nil, err
 	}
 
-	return gs.transformSheetToDataFrame(data, meta, refID, qm)
+	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
+	if frame != nil && qm.UseTimeFilter {
+		return filterByTime(frame, timeRange), nil
+	}
+	return frame, err
 }
 
 // TestAPI checks if the credentials can talk to the Google API
