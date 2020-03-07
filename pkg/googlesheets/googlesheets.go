@@ -79,7 +79,6 @@ func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.Gri
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		return item.(*sheets.GridData), map[string]interface{}{
 			"hit":     true,
-			"count":   gs.Cache.ItemCount(),
 			"expires": fmt.Sprintf("%ds", int(time.Until(expires).Seconds())),
 		}, nil
 	}

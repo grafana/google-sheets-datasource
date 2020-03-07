@@ -9,6 +9,7 @@ import (
 
 func findTimeField(frame *df.Frame) int {
 	for fieldIdx, f := range frame.Fields {
+		// The vector type is time.Time!
 		if f.Name == "time" { // DOOH!!  how do we check if it is a time field?
 			return fieldIdx
 		}
