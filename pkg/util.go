@@ -9,6 +9,10 @@ import (
 	hclog "github.com/hashicorp/go-hclog"
 )
 
+//--------------------------------------------------------------------------
+// NOTE: this file should really be in the SDK and shared across everything
+//--------------------------------------------------------------------------
+
 // SetupPluginEnvironment will read the environment variables and apply the
 // standard environment behavior.  As the SDK evolves, this will likely change!
 func SetupPluginEnvironment(pluginID string) hclog.Logger {
