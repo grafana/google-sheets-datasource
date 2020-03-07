@@ -1,6 +1,7 @@
 package googlesheets
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -39,7 +40,7 @@ func filterByTime(frame *df.Frame, timeRange backend.TimeRange) *df.Frame {
 
 	if filteredLen != length {
 		// TODO -- create a new frame keeping all fields, but shorter vectors
-		length = filteredLen // make linter happy
+		fmt.Println("TODO... actually filter")
 	}
 	return frame
 }
