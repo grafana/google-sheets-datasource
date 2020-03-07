@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
@@ -19,6 +20,24 @@ import (
 )
 
 const metricNamespace = "sheets_datasource"
+
+func main() {
+	// Setup the plugin environment
+	pluginLogger := SetupPluginEnvironment("google-sheets-datasource")
+
+	mux := http.NewServeMux()
+	ds := Init(pluginLogger, mux)
+	httpResourceHandler := httpresource.New(mux)
+
+	err := backend.Serve(backend.ServeOpts{
+		CallResourceHandler: httpResourceHandler,
+		DataQueryHandler:    ds,
+	})
+	if err != nil {
+		pluginLogger.Error(err.Error())
+		os.Exit(1)
+	}
+}
 
 // Init creates the google sheets datasource and sets up all the routes
 func Init(logger hclog.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
@@ -64,7 +83,7 @@ func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConf
 }
 
 // DataQuery queries for data.
-func (ds *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
+func (plugin *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
 	res := &backend.DataQueryResponse{}
 	config, err := getConfig(req.PluginConfig)
 	if err != nil {
@@ -81,9 +100,9 @@ func (ds *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.Da
 			continue // not query really exists
 		}
 
-		frame, err := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
+		frame, err := plugin.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
 		if err != nil {
-			ds.logger.Error("Query failed", "refId", q.RefID, "error", err)
+			plugin.logger.Error("Query failed", "refId", q.RefID, "error", err)
 			// TEMP: at the moment, the only way to return an error is by using meta
 			res.Metadata = map[string]string{"error": err.Error()}
 			continue
@@ -117,8 +136,8 @@ func writeResult(rw http.ResponseWriter, path string, val interface{}, err error
 	rw.WriteHeader(code)
 }
 
-func (ds *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.ResponseWriter, req *http.Request) {
-	ds.logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
+func (plugin *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.ResponseWriter, req *http.Request) {
+	plugin.logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
 	if req.Method != http.MethodGet {
 		return
 	}
@@ -130,12 +149,12 @@ func (ds *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.ResponseWri
 		return
 	}
 
-	res, err := ds.googlesheet.GetSpreadsheets(ctx, config)
+	res, err := plugin.googlesheet.GetSpreadsheets(ctx, config)
 	writeResult(rw, "spreadsheets", res, err)
 }
 
-func (ds *GoogleSheetsDataSource) handleResourceTest(rw http.ResponseWriter, req *http.Request) {
-	ds.logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
+func (plugin *GoogleSheetsDataSource) handleResourceTest(rw http.ResponseWriter, req *http.Request) {
+	plugin.logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
 	if req.Method != http.MethodGet {
 		return
 	}
@@ -147,6 +166,6 @@ func (ds *GoogleSheetsDataSource) handleResourceTest(rw http.ResponseWriter, req
 		return
 	}
 
-	err = ds.googlesheet.TestAPI(ctx, config)
+	err = plugin.googlesheet.TestAPI(ctx, config)
 	writeResult(rw, "test", "OK", err)
 }

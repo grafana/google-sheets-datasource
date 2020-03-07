@@ -1,35 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/pprof"
 	"os"
 
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/httpresource"
 	hclog "github.com/hashicorp/go-hclog"
 )
 
-func main() {
-	// Setup the plugin environment
-	pluginLogger := setupPluginEnvironment("google-sheets-datasource")
-
-	mux := http.NewServeMux()
-	ds := Init(pluginLogger, mux)
-	httpResourceHandler := httpresource.New(mux)
-
-	err := backend.Serve(backend.ServeOpts{
-		CallResourceHandler: httpResourceHandler,
-		DataQueryHandler:    ds,
-	})
-	if err != nil {
-		pluginLogger.Error(err.Error())
-		os.Exit(1)
-	}
-}
-
-// TODO: move this function to the SDK
-func setupPluginEnvironment(pluginID string) hclog.Logger {
+// SetupPluginEnvironment will read the environment variables and apply the
+// standard environment behavior.  As the SDK evolves, this will likely change!
+func SetupPluginEnvironment(pluginID string) hclog.Logger {
 	pluginLogger := hclog.New(&hclog.LoggerOptions{
 		Name: pluginID,
 		// TODO: How to make level configurable?
@@ -48,6 +30,14 @@ func setupPluginEnvironment(pluginID string) hclog.Logger {
 	}
 	pluginLogger.Info("Profiler", "enabled", profilerEnabled)
 	if profilerEnabled {
+		profilerPort := "6060"
+		if value, ok := os.LookupEnv("GF_PLUGINS_PROFILER_PORT"); ok {
+			profilerPort = value
+		}
+
+		pluginLogger.Info("Profiler", "port", profilerPort)
+		portConfig := fmt.Sprintf(":%s", profilerPort)
+
 		r := http.NewServeMux()
 		r.HandleFunc("/debug/pprof/", pprof.Index)
 		r.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
@@ -56,7 +46,7 @@ func setupPluginEnvironment(pluginID string) hclog.Logger {
 		r.HandleFunc("/debug/pprof/trace", pprof.Trace)
 
 		go func() {
-			if err := http.ListenAndServe(":6060", r); err != nil {
+			if err := http.ListenAndServe(portConfig, r); err != nil {
 				pluginLogger.Error("Error Running profiler: %s", err.Error())
 			}
 		}()
