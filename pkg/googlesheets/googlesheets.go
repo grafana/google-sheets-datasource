@@ -134,7 +134,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		fields = append(fields, field)
 	}
 
-	frame := data.New(refID,
+	frame := data.NewFrame(refID,
 		fields...,
 	)
 
@@ -151,14 +151,14 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 					warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %d in column %q",
 						rowIndex+1, columns[columnIndex].Header))
 				} else {
-					frame.Fields[columnIndex].Vector.Set(rowIndex-start, &time)
+					frame.Fields[columnIndex].Set(rowIndex-start, &time)
 				}
 			case "NUMBER":
 				if cellData.EffectiveValue != nil {
-					frame.Fields[columnIndex].Vector.Set(rowIndex-start, &cellData.EffectiveValue.NumberValue)
+					frame.Fields[columnIndex].Set(rowIndex-start, &cellData.EffectiveValue.NumberValue)
 				}
 			case "STRING":
-				frame.Fields[columnIndex].Vector.Set(rowIndex-start, &cellData.FormattedValue)
+				frame.Fields[columnIndex].Set(rowIndex-start, &cellData.FormattedValue)
 			}
 		}
 	}

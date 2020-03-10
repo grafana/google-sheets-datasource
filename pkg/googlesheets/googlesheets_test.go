@@ -158,7 +158,7 @@ func TestGooglesheets(t *testing.T) {
 		})
 
 		t.Run("single value", func(t *testing.T) {
-			strVal, ok := frame.Fields[0].Vector.At(0).(*string)
+			strVal, ok := frame.Fields[0].At(0).(*string)
 			require.True(t, ok)
 			require.NotNil(t, strVal)
 			assert.Equal(t, "🌭", *strVal)
