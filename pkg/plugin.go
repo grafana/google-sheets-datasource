@@ -10,7 +10,7 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpresource"
-	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -31,7 +31,7 @@ func main() {
 
 	err := backend.Serve(backend.ServeOpts{
 		CallResourceHandler: httpResourceHandler,
-		DataQueryHandler:    ds,
+		QueryDataHandler:    ds,
 	})
 	if err != nil {
 		pluginLogger.Error(err.Error())
@@ -82,9 +82,9 @@ func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConf
 	return &config, nil
 }
 
-// DataQuery queries for data.
-func (plugin *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
-	res := &backend.DataQueryResponse{}
+// QueryData queries for data.
+func (plugin *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+	res := &backend.QueryDataResponse{}
 	config, err := getConfig(req.PluginConfig)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (plugin *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backen
 			continue
 		}
 
-		res.Frames = append(res.Frames, []*df.Frame{frame}...)
+		res.Frames = append(res.Frames, []*data.Frame{frame}...)
 	}
 
 	return res, nil
