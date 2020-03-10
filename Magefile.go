@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -27,7 +28,7 @@ func getExecutableName(os string, arch string) string {
 		var err error
 		exname, err = getExecutableFromPluginJSON()
 		if err != nil {
-			exname = "gp_xxxx"
+			exname = "set_exe_name_in_plugin_json" // warning in the final name?
 		}
 	}
 
@@ -43,7 +44,9 @@ func getExecutableFromPluginJSON() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer jsonFile.Close()
+	defer func() {
+		_ = jsonFile.Close()
+	}()
 
 	byteValue, err := ioutil.ReadAll(jsonFile)
 	if err != nil {
@@ -51,7 +54,10 @@ func getExecutableFromPluginJSON() (string, error) {
 	}
 
 	var result map[string]interface{}
-	json.Unmarshal([]byte(byteValue), &result)
+	err = json.Unmarshal([]byte(byteValue), &result)
+	if err != nil {
+		return "", err
+	}
 	return result["executable"].(string), nil
 }
 
@@ -73,7 +79,7 @@ func buildBackend(os string, arch string, enableDebug bool) error {
 	exeName := getExecutableName(os, arch)
 
 	args := []string{
-		"build", "-o", fmt.Sprintf("dist/%s", exeName), "-tags", "netgo",
+		"build", "-o", path.Join("dist", exeName), "-tags", "netgo",
 	}
 	if enableDebug {
 		args = append(args, "-gcflags=all=-N -l")
@@ -132,7 +138,7 @@ func (Build) Backend() {
 // 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev")
 // }
 
-// BuildAll builds both back-end and front-end components.
+// BuildAll builds production back-end components.
 func BuildAll() {
 	b := Build{}
 	mg.Deps(b.Backend)
@@ -143,17 +149,15 @@ func BuildAll() {
 // 	return nil //sh.RunV("yarn", "install")
 // }
 
-// Test run backend tests
+// Test runs backend tests.
 func Test() error {
-	//mg.Deps(Deps)
-
 	if err := sh.RunV("go", "test", "./pkg/..."); err != nil {
 		return nil
 	}
-	return nil // sh.RunV("yarn", "test")
+	return nil
 }
 
-// Coverage runs backend tests and make a coverage report
+// Coverage runs backend tests and makes a coverage report.
 func Coverage() error {
 	// Create a coverage file if it does not already exist
 	_ = os.MkdirAll(filepath.Join(".", "coverage"), os.ModePerm)
@@ -218,7 +222,7 @@ func Clean() error {
 	return nil
 }
 
-// Debugger makes a new debug build and attaches dlv (go-delve)
+// Debugger makes a new debug build and attaches dlv (go-delve).
 func Debugger() error {
 	// 1. kill any running instance
 	exeName := getExecutableName(runtime.GOOS, runtime.GOARCH)
