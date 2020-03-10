@@ -3,7 +3,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -18,14 +20,39 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-const dsName string = "gp_sheets"
+var exname string = ""
 
 func getExecutableName(os string, arch string) string {
-	exeName := fmt.Sprintf("%s_%s_%s", dsName, os, arch)
+	if exname == "" {
+		var err error
+		exname, err = getExecutableFromPluginJSON()
+		if err != nil {
+			exname = "gp_xxxx"
+		}
+	}
+
+	exeName := fmt.Sprintf("%s_%s_%s", exname, os, arch)
 	if "windows" == os {
 		exeName = fmt.Sprintf("%s.exe", exeName)
 	}
 	return exeName
+}
+
+func getExecutableFromPluginJSON() (string, error) {
+	jsonFile, err := os.Open("src/plugin.json")
+	if err != nil {
+		return "", err
+	}
+	defer jsonFile.Close()
+
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return "", err
+	}
+
+	var result map[string]interface{}
+	json.Unmarshal([]byte(byteValue), &result)
+	return result["executable"].(string), nil
 }
 
 func findRunningProcess(exe string) *goprocess.P {
