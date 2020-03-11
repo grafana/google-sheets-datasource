@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -40,15 +41,7 @@ func getExecutableName(os string, arch string) string {
 }
 
 func getExecutableFromPluginJSON() (string, error) {
-	jsonFile, err := os.Open("src/plugin.json")
-	if err != nil {
-		return "", err
-	}
-	defer func() {
-		_ = jsonFile.Close()
-	}()
-
-	byteValue, err := ioutil.ReadAll(jsonFile)
+	byteValue, err := readFileBytes(path.Join("src", "plugin.json"))
 	if err != nil {
 		return "", err
 	}
@@ -59,6 +52,18 @@ func getExecutableFromPluginJSON() (string, error) {
 		return "", err
 	}
 	return result["executable"].(string), nil
+}
+
+func readFileBytes(file string) ([]byte, error) {
+	jsonFile, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = jsonFile.Close()
+	}()
+
+	return ioutil.ReadAll(jsonFile)
 }
 
 func findRunningProcess(exe string) *goprocess.P {
@@ -84,7 +89,7 @@ func buildBackend(os string, arch string, enableDebug bool) error {
 	if enableDebug {
 		args = append(args, "-gcflags=all=-N -l")
 	} else {
-		args = append(args, []string{"-ldflags", "-w"}...)
+		args = append(args, "-ldflags", "-w")
 	}
 	args = append(args, "./pkg")
 
@@ -189,6 +194,33 @@ func Clean() error {
 	return nil
 }
 
+func checkLinuxPtraceScope() {
+	ptracePath := "/proc/sys/kernel/yama/ptrace_scope"
+	byteValue, err := readFileBytes(ptracePath)
+	if err != nil {
+		os.Stderr.WriteString("Unable to read ptrace_scope\n")
+	}
+	val := strings.TrimSpace(string(byteValue[:]))
+	if "0" != val {
+		os.Stderr.WriteString("WARNING: \n")
+		os.Stderr.WriteString(fmt.Sprintf("ptrace_scope set to value other than 0 (currenlty:%s), this might prevent debugger from connecting\n", val))
+		os.Stderr.WriteString(fmt.Sprintf("try writing \"0\" to %s\n", ptracePath))
+		os.Stderr.WriteString("Set ptrace_scope to 0? y/N (default N)\n")
+
+		scanner := bufio.NewScanner(os.Stdin)
+		if scanner.Scan() {
+			if scanner.Text() == "y" || scanner.Text() == "Y" {
+				// if err := sh.RunV("echo", "0", "|", "sudo", "tee", ptracePath); err != nil {
+				// 	return // Error?
+				// }
+				os.Stderr.WriteString("TODO, run: echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope\n")
+			} else {
+				os.Stderr.WriteString("Did not write\n")
+			}
+		}
+	}
+}
+
 // Debugger makes a new debug build and attaches dlv (go-delve).
 func Debugger() error {
 	// 1. kill any running instance
@@ -208,17 +240,11 @@ func Debugger() error {
 	mg.Deps(b.Debug)
 
 	if runtime.GOOS == "linux" {
-		log.Printf("On linux we should check ptrace_scope")
-		// 	ptrace_scope=`cat /proc/sys/kernel/yama/ptrace_scope`
-		// 	if [ "$ptrace_scope" != 0 ]; then
-		// 	  echo "WARNING: ptrace_scope set to value other than 0, this might prevent debugger from connecting, try writing \"0\" to /proc/sys/kernel/yama/ptrace_scope.
-		//   Read more at https://www.kernel.org/doc/Documentation/security/Yama.txt"
-		// 	  read -p "Set ptrace_scope to 0? y/N (default N)" set_ptrace_input
-		// 	  if [ "$set_ptrace_input" == "y" ] || [ "$set_ptrace_input" == "Y" ]; then
-		// 		echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope
-		// 	  fi
-		// 	fi
+		checkLinuxPtraceScope()
 	}
+
+	// kill dlv if already running
+	_ = sh.RunV("pkill", "dlv")
 
 	// Wait for grafana to start plugin
 	for i := 0; i < 20; i++ {
@@ -236,8 +262,8 @@ func Debugger() error {
 				"--log"); err != nil {
 				return err
 			}
-			// And then kill dvl
-			return sh.RunV("pkill", "dlv")
+			fmt.Printf("dlv finished running (%d)\n", process.PID)
+			return nil
 		}
 
 		log.Printf("waiting for grafana to start: %s...", exeName)
