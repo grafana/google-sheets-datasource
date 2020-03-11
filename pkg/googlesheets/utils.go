@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 )
 
-func findTimeField(frame *df.Frame) int {
+func findTimeField(frame *data.Frame) int {
 	for fieldIdx, f := range frame.Fields {
 		// The vector type is time.Time!
 		if f.Name == "time" { // DOOH!!  how do we check if it is a time field?
@@ -18,19 +18,19 @@ func findTimeField(frame *df.Frame) int {
 	return -1
 }
 
-func filterByTime(frame *df.Frame, timeRange backend.TimeRange) *df.Frame {
+func filterByTime(frame *data.Frame, timeRange backend.TimeRange) *data.Frame {
 	timeIndex := findTimeField(frame)
 	if timeIndex < 0 {
 		return frame // no time field... just leave it alone
 	}
 
-	timeVector := frame.Fields[timeIndex].Vector
-	length := timeVector.Len()
+	timeField := frame.Fields[timeIndex]
+	length := timeField.Len()
 	filteredIndex := make([]int, length)
 	filteredLen := 0
 
 	for i := 0; i < length; i++ {
-		val := timeVector.At(i).(time.Time)
+		val := timeField.At(i).(time.Time)
 		if val.Before(timeRange.From) || val.After(timeRange.To) {
 			continue
 		}
