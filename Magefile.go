@@ -198,14 +198,14 @@ func checkLinuxPtraceScope() {
 	ptracePath := "/proc/sys/kernel/yama/ptrace_scope"
 	byteValue, err := readFileBytes(ptracePath)
 	if err != nil {
-		os.Stderr.WriteString("Unable to read ptrace_scope\n")
+		fmt.Printf("Unable to read ptrace_scope\n")
 	}
 	val := strings.TrimSpace(string(byteValue[:]))
 	if "0" != val {
-		os.Stderr.WriteString("WARNING: \n")
-		os.Stderr.WriteString(fmt.Sprintf("ptrace_scope set to value other than 0 (currenlty:%s), this might prevent debugger from connecting\n", val))
-		os.Stderr.WriteString(fmt.Sprintf("try writing \"0\" to %s\n", ptracePath))
-		os.Stderr.WriteString("Set ptrace_scope to 0? y/N (default N)\n")
+		fmt.Printf("WARNING: \n")
+		fmt.Printf("ptrace_scope set to value other than 0 (currenlty:%s), this might prevent debugger from connecting\n", val)
+		fmt.Printf("try writing \"0\" to %s\n", ptracePath)
+		fmt.Printf("Set ptrace_scope to 0? y/N (default N)\n")
 
 		scanner := bufio.NewScanner(os.Stdin)
 		if scanner.Scan() {
@@ -213,9 +213,9 @@ func checkLinuxPtraceScope() {
 				// if err := sh.RunV("echo", "0", "|", "sudo", "tee", ptracePath); err != nil {
 				// 	return // Error?
 				// }
-				os.Stderr.WriteString("TODO, run: echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope\n")
+				fmt.Printf("TODO, run: echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope\n")
 			} else {
-				os.Stderr.WriteString("Did not write\n")
+				fmt.Printf("Did not write\n")
 			}
 		}
 	}
