@@ -913,19 +913,23 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@grafana/data@6.7.0-pre-6b61c65b58", "@grafana/data@canary":
-  version "6.7.0-pre-6b61c65b58"
-  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.7.0-pre-6b61c65b58.tgz#6c5ceb871fa58039ac4275dc22776da6c6a28418"
-  integrity sha512-gx1YGwQznh0p87HqzusdWlPyQFEgoTfnIUrUxls6939dT1QJBPdoX9Xhu2CFwfWumZhtrPGRtRVUgfbWqUVLWQ==
+"@grafana/data@7.0.0-pre.0-4fecf5a7a6", "@grafana/data@canary":
+  version "7.0.0-pre.0-4fecf5a7a6"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-7.0.0-pre.0-4fecf5a7a6.tgz#715d03c897b4b7f594b1332b68e58a5ca7bc68ae"
+  integrity sha512-hBc2kJ+17cp/7riK8Ds+uCvLU7oZVhX1b0R1NwScwN5sxbnyGh8NpOJBylXKCeX0v75+Qxp+nDjHoOdt/O7RYQ==
   dependencies:
     apache-arrow "0.15.1"
     lodash "4.17.15"
     rxjs "6.5.4"
 
-"@grafana/data@6.7.0-pre-ff6a082e23", "@grafana/data@^6.7.0-pre-6b61c65b58":
-  version "6.7.0-pre-ff6a082e23"
-  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.7.0-pre-ff6a082e23.tgz#26d7c928a5dc21bb8b830fa038a1c073b9df5eec"
-  integrity sha512-hFreGvFPFoRpYccJfTbwYxle3mxPD7Rh6VN8WutFnz+TMQuT8uZcHSSsTnE9VwbPPWh6x5u2hPinmmQiSFuVWQ==
+"@grafana/data@7.0.0-pre.0-9c5020d53f", "@grafana/data@^7.0.0-pre.0-4fecf5a7a6":
+  version "7.0.0-pre.0-9c5020d53f"
+  resolved "https://registry.yarnpkg.com/@grafana/data/-/data-7.0.0-pre.0-9c5020d53f.tgz#e1ef352e130007e25c6dbcab17313b61f9a53b85"
+  integrity sha512-KXM9/bXHjDN/I8a2wKGtKQAt3CF7ImbbxKqaWTlrqUSPfWtE4pvdWdd0vOgoFE6saapeILHZB16zj6EL+Sce2w==
+  dependencies:
+    apache-arrow "0.15.1"
+    lodash "4.17.15"
+    rxjs "6.5.4"
 
 "@grafana/eslint-config@^1.0.0-rc1":
   version "1.0.0-rc1"
@@ -933,12 +937,12 @@
   integrity sha512-xmcJR6mUYw1llq3m8gT2kE7xoq6yLMUgNf2Mf1yZvDCx2cXFSyaLlGs1dqjFWjJDbV46GdhYRAyRbyGR+J9QKg==
 
 "@grafana/runtime@canary":
-  version "6.7.0-pre-6b61c65b58"
-  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-6.7.0-pre-6b61c65b58.tgz#0a132db6d3a250f302b2cc5e1df488ce5ee18552"
-  integrity sha512-pRiiLgpnCbCAwFJWQtF1RwRvl9V2LJIg6RjbvMdkCr0eDY4yas2PYYWISma+U/quEghpLgDPT/KMuON0C9B0Eg==
+  version "7.0.0-pre.0-4fecf5a7a6"
+  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-7.0.0-pre.0-4fecf5a7a6.tgz#f60c25250575ed8714bb6d4aa3003228ac3becf6"
+  integrity sha512-jWPyAZuEDW3ofJck7BezouOwI2GN/S0mR4lTdxUiNf+THLyTuNBVsGRmcY91fBokn79onI50NYKxU1fDT2AAVw==
   dependencies:
-    "@grafana/data" "6.7.0-pre-6b61c65b58"
-    "@grafana/ui" "6.7.0-pre-6b61c65b58"
+    "@grafana/data" "7.0.0-pre.0-4fecf5a7a6"
+    "@grafana/ui" "7.0.0-pre.0-4fecf5a7a6"
     systemjs "0.20.19"
     systemjs-plugin-css "0.1.37"
 
@@ -965,16 +969,16 @@
     tiny-warning "^0.0.3"
 
 "@grafana/toolkit@canary":
-  version "6.7.0-pre-6b61c65b58"
-  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-6.7.0-pre-6b61c65b58.tgz#4fe50d66b23ebad2df30e1fc8204ecb028040d9b"
-  integrity sha512-m0oDz/6Il6VNzXljAXXurnBfPaXtrrHSQvzL06OXAvCowjtY5QOInQNSjDiYSMDMt8HAhIDh8WJQbjFsnMHgmA==
+  version "7.0.0-pre.0-4fecf5a7a6"
+  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-7.0.0-pre.0-4fecf5a7a6.tgz#b9a558ecb83bccfde3b76a9605ff5d9dc8ea71ed"
+  integrity sha512-7qTJY++fh5tAFomOmfQMmNz9gLsKzmIAQEmZTecAWJwCDl/UPCLQMZvk4SEqPrbep0bHfAlqEsGkeoxQg0HMZQ==
   dependencies:
     "@babel/core" "7.8.3"
     "@babel/preset-env" "7.8.3"
-    "@grafana/data" "^6.7.0-pre-6b61c65b58"
+    "@grafana/data" "^7.0.0-pre.0-4fecf5a7a6"
     "@grafana/eslint-config" "^1.0.0-rc1"
     "@grafana/tsconfig" "^1.0.0-rc1"
-    "@grafana/ui" "^6.7.0-pre-6b61c65b58"
+    "@grafana/ui" "^7.0.0-pre.0-4fecf5a7a6"
     "@types/command-exists" "^1.2.0"
     "@types/execa" "^0.9.0"
     "@types/expect-puppeteer" "3.3.1"
@@ -1056,13 +1060,13 @@
   resolved "https://registry.yarnpkg.com/@grafana/tsconfig/-/tsconfig-1.0.0-rc1.tgz#d07ea16755a50cae21000113f30546b61647a200"
   integrity sha512-nucKPGyzlSKYSiJk5RA8GzMdVWhdYNdF+Hh65AXxjD9PlY69JKr5wANj8bVdQboag6dgg0BFKqgKPyY+YtV4Iw==
 
-"@grafana/ui@6.7.0-pre-6b61c65b58", "@grafana/ui@canary":
-  version "6.7.0-pre-6b61c65b58"
-  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-6.7.0-pre-6b61c65b58.tgz#bca3a358bb55cd8d055bd3b5b9198cae02b4dbec"
-  integrity sha512-freEJMmuSz2XbrZplbvLunGcJy6ZYtwHbalVoxJJaUIRw5uR7c/ScVpbyM3qyEIE6DTwcnP6UKclExOTov/PHA==
+"@grafana/ui@7.0.0-pre.0-4fecf5a7a6", "@grafana/ui@canary":
+  version "7.0.0-pre.0-4fecf5a7a6"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-7.0.0-pre.0-4fecf5a7a6.tgz#24571a46e42e86ff7178b920eda43c3e7bcaa9eb"
+  integrity sha512-0Cgn/0EV75PfeVb7gjLw5/pbz8kMlA5LnaSGxq9/fWwxcjSd/3CLKOENW2CnMngAGEQdwWV+K9PBzo4T9g7eIg==
   dependencies:
     "@emotion/core" "^10.0.27"
-    "@grafana/data" "6.7.0-pre-6b61c65b58"
+    "@grafana/data" "7.0.0-pre.0-4fecf5a7a6"
     "@grafana/slate-react" "0.22.9-grafana"
     "@grafana/tsconfig" "^1.0.0-rc1"
     "@torkelo/react-select" "3.0.8"
@@ -1098,12 +1102,13 @@
     slate "0.47.8"
     tinycolor2 "1.4.1"
 
-"@grafana/ui@^6.7.0-pre-6b61c65b58":
-  version "6.7.0-pre-ff6a082e23"
-  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-6.7.0-pre-ff6a082e23.tgz#1a4addb560d3b77da931719ef28845ff5d23a547"
-  integrity sha512-D9vArWeFEMnRFt4vB6b3KGt8mVcUtUUuspdfHB+MMnwFiDb5moartSi9TI2NY+moDwwIopeAi7XR9RLD8RDpcA==
+"@grafana/ui@^7.0.0-pre.0-4fecf5a7a6":
+  version "7.0.0-pre.0-9c5020d53f"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-7.0.0-pre.0-9c5020d53f.tgz#651e9b8c0e0724c054de1a844a5f9f49506f8ee8"
+  integrity sha512-qaLR7aBCtXOxF3+xVTqrK60//8oBoo8TPKsN4DdzX5o7vxs9KFwid8+MsiSaEpVp37CZsjQznYRETChYzo39XA==
   dependencies:
-    "@grafana/data" "6.7.0-pre-ff6a082e23"
+    "@emotion/core" "^10.0.27"
+    "@grafana/data" "7.0.0-pre.0-9c5020d53f"
     "@grafana/slate-react" "0.22.9-grafana"
     "@grafana/tsconfig" "^1.0.0-rc1"
     "@torkelo/react-select" "3.0.8"
@@ -1123,9 +1128,10 @@
     papaparse "4.6.3"
     rc-cascader "0.17.5"
     rc-drawer "3.0.2"
+    rc-slider "8.7.1"
     rc-time-picker "^3.7.2"
     react "16.12.0"
-    react-calendar "2.18.1"
+    react-calendar "2.19.2"
     react-color "2.17.0"
     react-custom-scrollbars "4.2.1"
     react-dom "16.12.0"
@@ -5278,7 +5284,7 @@ get-stream@^4.0.0:
   dependencies:
     pump "^3.0.0"
 
-get-user-locale@^1.1.1, get-user-locale@^1.2.0:
+get-user-locale@^1.2.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/get-user-locale/-/get-user-locale-1.3.0.tgz#21ea740e413541281ae7b2b42e70ee523b7725b2"
   integrity sha512-c5N8P0upjxCF9unIC2vTA+B+8nN7kU/D/TeItMAVYhWIIksyoULM1aflKflXM3w+Ij6vF/JZys+QcwIoDuy3Ag==
@@ -7356,9 +7362,9 @@ minimist@0.0.8:
   integrity sha1-hX/Kv8M5fSYluCKCYuhqp6ARsF0=
 
 minimist@^1.1.1, minimist@^1.1.3, minimist@^1.2.0, minimist@~1.2.0:
-  version "1.2.3"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.3.tgz#3db5c0765545ab8637be71f333a104a965a9ca3f"
-  integrity sha512-+bMdgqjMN/Z77a6NlY/I3U5LlRDbnmaAk6lDveAPKwSpcPM4tKAuYsvYF8xjhOPXhOYGe/73vVLVez5PW+jqhw==
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.4.tgz#40357ef9582f8cd42ba8eaa274ddcf27f0c979b7"
+  integrity sha512-wTiNDqe4D2rbTJGZk1qcdZgFtY0/r+iuE6GDT7V0/+Gu5MLpIDm4+CssDECR79OJs/OxLPXMzdxy153b5Qy3hg==
 
 minipass@^2.6.0, minipass@^2.8.6, minipass@^2.9.0:
   version "2.9.0"
@@ -9261,16 +9267,6 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-calendar@2.18.1:
-  version "2.18.1"
-  resolved "https://registry.yarnpkg.com/react-calendar/-/react-calendar-2.18.1.tgz#f8ef9468d8566aa0d47d9d70c88917bb2030bcb9"
-  integrity sha512-J3tVim1gLpnsCOaeez+z4QJB5oK6UYLJj5TSMOStSJBvkWMEcTzj7bq7yCJJCNLUg2Vd3i11gJXish0LUFhXaw==
-  dependencies:
-    get-user-locale "^1.1.1"
-    merge-class-names "^1.1.1"
-    prop-types "^15.6.0"
-    react-lifecycles-compat "^3.0.4"
-
 react-calendar@2.19.2:
   version "2.19.2"
   resolved "https://registry.yarnpkg.com/react-calendar/-/react-calendar-2.19.2.tgz#496e78eb11a00aee1ae6b5d02d221ed1ca2db952"
@@ -9564,10 +9560,10 @@ reduce-flatten@^1.0.1:
   resolved "https://registry.yarnpkg.com/reduce-flatten/-/reduce-flatten-1.0.1.tgz#258c78efd153ddf93cb561237f61184f3696e327"
   integrity sha1-JYx479FT3fk8tWEjf2EYTzaW4yc=
 
-regenerate-unicode-properties@^8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/regenerate-unicode-properties/-/regenerate-unicode-properties-8.1.0.tgz#ef51e0f0ea4ad424b77bf7cb41f3e015c70a3f0e"
-  integrity sha512-LGZzkgtLY79GeXLm8Dp0BVLdQlWICzBnJz/ipWUgo59qBaZ+BHtq51P2q1uVZlppMuUAT37SDk39qUbjTWB7bA==
+regenerate-unicode-properties@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/regenerate-unicode-properties/-/regenerate-unicode-properties-8.2.0.tgz#e5de7111d655e7ba60c057dbe9ff37c87e65cdec"
+  integrity sha512-F9DjY1vKLo/tPePDycuH3dn9H1OTPIkVD9Kz4LODu+F2C75mgjAJ7x/gwy6ZcSNRAAkhNlJSOHRe8k3p+K9WhA==
   dependencies:
     regenerate "^1.4.0"
 
@@ -9621,28 +9617,28 @@ regexpp@^3.0.0:
   integrity sha512-Z+hNr7RAVWxznLPuA7DIh8UNX1j9CDrUQxskw9IrBE1Dxue2lyXT+shqEIeLUjrokxIP8CMy1WkjgG3rTsd5/g==
 
 regexpu-core@^4.6.0:
-  version "4.6.0"
-  resolved "https://registry.yarnpkg.com/regexpu-core/-/regexpu-core-4.6.0.tgz#2037c18b327cfce8a6fea2a4ec441f2432afb8b6"
-  integrity sha512-YlVaefl8P5BnFYOITTNzDvan1ulLOiXJzCNZxduTIosN17b87h3bvG9yHMoHaRuo88H4mQ06Aodj5VtYGGGiTg==
+  version "4.7.0"
+  resolved "https://registry.yarnpkg.com/regexpu-core/-/regexpu-core-4.7.0.tgz#fcbf458c50431b0bb7b45d6967b8192d91f3d938"
+  integrity sha512-TQ4KXRnIn6tz6tjnrXEkD/sshygKH/j5KzK86X8MkeHyZ8qst/LZ89j3X4/8HEIfHANTFIP/AbXakeRhWIl5YQ==
   dependencies:
     regenerate "^1.4.0"
-    regenerate-unicode-properties "^8.1.0"
-    regjsgen "^0.5.0"
-    regjsparser "^0.6.0"
+    regenerate-unicode-properties "^8.2.0"
+    regjsgen "^0.5.1"
+    regjsparser "^0.6.4"
     unicode-match-property-ecmascript "^1.0.4"
-    unicode-match-property-value-ecmascript "^1.1.0"
+    unicode-match-property-value-ecmascript "^1.2.0"
 
 regextras@^0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/regextras/-/regextras-0.6.1.tgz#9689641bbb338e0ff7001a5c507c6a2008df7b36"
   integrity sha512-EzIHww9xV2Kpqx+corS/I7OBmf2rZ0pKKJPsw5Dc+l6Zq1TslDmtRIP9maVn3UH+72MIXmn8zzDgP07ihQogUA==
 
-regjsgen@^0.5.0:
+regjsgen@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/regjsgen/-/regjsgen-0.5.1.tgz#48f0bf1a5ea205196929c0d9798b42d1ed98443c"
   integrity sha512-5qxzGZjDs9w4tzT3TPhCJqWdCc3RLYwy9J2NB0nm5Lz+S273lvWcpjaTGHsT1dc6Hhfq41uSEOw8wBmxrKOuyg==
 
-regjsparser@^0.6.0:
+regjsparser@^0.6.4:
   version "0.6.4"
   resolved "https://registry.yarnpkg.com/regjsparser/-/regjsparser-0.6.4.tgz#a769f8684308401a66e9b529d2436ff4d0666272"
   integrity sha512-64O87/dPDgfk8/RQqC4gkZoGyyWFIEUTTh80CU6CWuK5vkCGyekIx+oKcEIYtP/RAxSQltCZHCNu/mdd7fqlJw==
@@ -11131,15 +11127,15 @@ unicode-match-property-ecmascript@^1.0.4:
     unicode-canonical-property-names-ecmascript "^1.0.4"
     unicode-property-aliases-ecmascript "^1.0.4"
 
-unicode-match-property-value-ecmascript@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/unicode-match-property-value-ecmascript/-/unicode-match-property-value-ecmascript-1.1.0.tgz#5b4b426e08d13a80365e0d657ac7a6c1ec46a277"
-  integrity sha512-hDTHvaBk3RmFzvSl0UVrUmC3PuW9wKVnpoUDYH0JDkSIovzw+J5viQmeYHxVSBptubnr7PbH2e0fnpDRQnQl5g==
+unicode-match-property-value-ecmascript@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/unicode-match-property-value-ecmascript/-/unicode-match-property-value-ecmascript-1.2.0.tgz#0d91f600eeeb3096aa962b1d6fc88876e64ea531"
+  integrity sha512-wjuQHGQVofmSJv1uVISKLE5zO2rNGzM/KCYZch/QQvez7C1hUhBIuZ701fYXExuufJFMPhv2SyL8CyoIfMLbIQ==
 
 unicode-property-aliases-ecmascript@^1.0.4:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/unicode-property-aliases-ecmascript/-/unicode-property-aliases-ecmascript-1.0.5.tgz#a9cc6cc7ce63a0a3023fc99e341b94431d405a57"
-  integrity sha512-L5RAqCfXqAwR3RriF8pM0lU0w4Ryf/GgzONwi6KnL1taJQa7x1TCxdJnILX59WIGOwR57IVxn7Nej0fz1Ny6fw==
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/unicode-property-aliases-ecmascript/-/unicode-property-aliases-ecmascript-1.1.0.tgz#dd57a99f6207bedff4628abefb94c50db941c8f4"
+  integrity sha512-PqSoPh/pWetQ2phoj5RLiaqIk4kCNwoV3CI+LfGmWLKI3rE3kl1h59XpX2BjgDrmbxD9ARtQobPGU1SguCYuQg==
 
 union-value@^1.0.0:
   version "1.0.1"
