@@ -12,7 +12,7 @@ import (
 	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
 	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/hashicorp/go-hclog"
 	"github.com/patrickmn/go-cache"
 	"google.golang.org/api/sheets/v4"
@@ -25,7 +25,7 @@ type GoogleSheets struct {
 }
 
 // Query queries a spreadsheet and returns a corresponding data frame.
-func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*df.Frame, error) {
+func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*data.Frame, error) {
 	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create Google API client: %w", err)
@@ -104,25 +104,25 @@ func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.Gri
 	return data, map[string]interface{}{"hit": false}, nil
 }
 
-func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *QueryModel) (*df.Frame, error) {
-	fields := []*df.Field{}
+func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *QueryModel) (*data.Frame, error) {
+	fields := []*data.Field{}
 	columns, start := getColumnDefinitions(sheet.RowData)
 	warnings := []string{}
 
 	for _, column := range columns {
-		var field *df.Field
+		var field *data.Field
 		switch column.GetType() {
 		case "TIME":
-			field = df.NewField(column.Header, nil, make([]*time.Time, len(sheet.RowData)-start))
+			field = data.NewField(column.Header, nil, make([]*time.Time, len(sheet.RowData)-start))
 		case "NUMBER":
-			field = df.NewField(column.Header, nil, make([]*float64, len(sheet.RowData)-start))
+			field = data.NewField(column.Header, nil, make([]*float64, len(sheet.RowData)-start))
 		case "STRING":
-			field = df.NewField(column.Header, nil, make([]*string, len(sheet.RowData)-start))
+			field = data.NewField(column.Header, nil, make([]*string, len(sheet.RowData)-start))
 		default:
 			return nil, fmt.Errorf("unknown column type: %s", column.GetType())
 		}
 
-		field.Config = &df.FieldConfig{Unit: column.GetUnit()}
+		field.Config = &data.FieldConfig{Unit: column.GetUnit()}
 
 		if column.HasMixedTypes() {
 			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
@@ -139,7 +139,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		fields = append(fields, field)
 	}
 
-	frame := df.New(refID,
+	frame := data.NewFrame(refID,
 		fields...,
 	)
 
@@ -156,14 +156,14 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 					warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %d in column %q",
 						rowIndex+1, columns[columnIndex].Header))
 				} else {
-					frame.Fields[columnIndex].Vector.Set(rowIndex-start, &time)
+					frame.Fields[columnIndex].Set(rowIndex-start, &time)
 				}
 			case "NUMBER":
 				if cellData.EffectiveValue != nil {
-					frame.Fields[columnIndex].Vector.Set(rowIndex-start, &cellData.EffectiveValue.NumberValue)
+					frame.Fields[columnIndex].Set(rowIndex-start, &cellData.EffectiveValue.NumberValue)
 				}
 			case "STRING":
-				frame.Fields[columnIndex].Vector.Set(rowIndex-start, &cellData.FormattedValue)
+				frame.Fields[columnIndex].Set(rowIndex-start, &cellData.FormattedValue)
 			}
 		}
 	}
@@ -171,7 +171,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	meta["warnings"] = warnings
 	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
-	frame.Meta = &df.QueryResultMeta{Custom: meta}
+	frame.Meta = &data.QueryResultMeta{Custom: meta}
 	gs.Logger.Debug("frame.Meta", spew.Sdump(frame.Meta))
 
 	return frame, nil

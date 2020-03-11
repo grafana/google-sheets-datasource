@@ -3,9 +3,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -18,14 +21,44 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-const dsName string = "gp_sheets"
+var exname string = ""
 
 func getExecutableName(os string, arch string) string {
-	exeName := fmt.Sprintf("%s_%s_%s", dsName, os, arch)
+	if exname == "" {
+		var err error
+		exname, err = getExecutableFromPluginJSON()
+		if err != nil {
+			exname = "set_exe_name_in_plugin_json" // warning in the final name?
+		}
+	}
+
+	exeName := fmt.Sprintf("%s_%s_%s", exname, os, arch)
 	if "windows" == os {
 		exeName = fmt.Sprintf("%s.exe", exeName)
 	}
 	return exeName
+}
+
+func getExecutableFromPluginJSON() (string, error) {
+	jsonFile, err := os.Open("src/plugin.json")
+	if err != nil {
+		return "", err
+	}
+	defer func() {
+		_ = jsonFile.Close()
+	}()
+
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return "", err
+	}
+
+	var result map[string]interface{}
+	err = json.Unmarshal([]byte(byteValue), &result)
+	if err != nil {
+		return "", err
+	}
+	return result["executable"].(string), nil
 }
 
 func findRunningProcess(exe string) *goprocess.P {
@@ -46,7 +79,7 @@ func buildBackend(os string, arch string, enableDebug bool) error {
 	exeName := getExecutableName(os, arch)
 
 	args := []string{
-		"build", "-o", fmt.Sprintf("dist/%s", exeName), "-tags", "netgo",
+		"build", "-o", path.Join("dist", exeName), "-tags", "netgo",
 	}
 	if enableDebug {
 		args = append(args, "-gcflags=all=-N -l")
@@ -93,40 +126,21 @@ func (Build) Backend() {
 	mg.Deps(b.Linux, b.Windows, b.Darwin)
 }
 
-// // Frontend builds the front-end for production.
-// func (Build) Frontend() error {
-// 	mg.Deps(Deps)
-// 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:build")
-// }
-
-// // FrontendDev builds the front-end for development.
-// func (Build) FrontendDev() error {
-// 	mg.Deps(Deps)
-// 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev")
-// }
-
-// BuildAll builds both back-end and front-end components.
+// BuildAll builds production back-end components.
 func BuildAll() {
 	b := Build{}
 	mg.Deps(b.Backend)
 }
 
-// // Deps installs dependencies.
-// func Deps() error {
-// 	return nil //sh.RunV("yarn", "install")
-// }
-
-// Test run backend tests
+// Test runs backend tests.
 func Test() error {
-	//mg.Deps(Deps)
-
 	if err := sh.RunV("go", "test", "./pkg/..."); err != nil {
 		return nil
 	}
-	return nil // sh.RunV("yarn", "test")
+	return nil
 }
 
-// Coverage runs backend tests and make a coverage report
+// Coverage runs backend tests and makes a coverage report.
 func Coverage() error {
 	// Create a coverage file if it does not already exist
 	_ = os.MkdirAll(filepath.Join(".", "coverage"), os.ModePerm)
@@ -156,22 +170,6 @@ func Format() error {
 	return nil
 }
 
-// // Dev builds the plugin in dev mode.
-// func Dev() error {
-// 	b := Build{}
-// 	mg.Deps(b.BackendLinuxDebug, b.FrontendDev) // TODO: only the current architecture
-// 	return nil
-// }
-
-// // Watch will build the plugin in dev mode and then update when the frontend files change.
-// func Watch() error {
-// 	b := Build{}
-// 	mg.Deps(b.BackendLinuxDebug)
-
-// 	// The --watch will never return
-// 	return sh.RunV("./node_modules/.bin/grafana-toolkit", "plugin:dev", "--watch")
-// }
-
 // Clean cleans build artifacts, by deleting the dist directory.
 func Clean() error {
 	err := os.RemoveAll("dist")
@@ -191,7 +189,7 @@ func Clean() error {
 	return nil
 }
 
-// Debugger makes a new debug build and attaches dlv (go-delve)
+// Debugger makes a new debug build and attaches dlv (go-delve).
 func Debugger() error {
 	// 1. kill any running instance
 	exeName := getExecutableName(runtime.GOOS, runtime.GOARCH)
