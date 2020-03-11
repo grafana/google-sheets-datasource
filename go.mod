@@ -2,8 +2,6 @@ module github.com/grafana/google-sheets-datasource
 
 go 1.13
 
-replace github.com/grafana/grafana-plugin-sdk-go => github.com/grafana/grafana-plugin-sdk-go v0.25.1-0.20200310210607-fa9caa72f5af
-
 require (
 	cloud.google.com/go v0.52.0 // indirect
 	dmitri.shuralyov.com/route/github v0.0.0-20191123213020-a7795e5a0797 // indirect
@@ -73,7 +71,7 @@ require (
 	github.com/gonum/matrix v0.0.0-20181209220409-c518dec07be9 // indirect
 	github.com/google/gops v0.3.7
 	github.com/gorilla/mux v1.7.4 // indirect
-	github.com/grafana/grafana-plugin-sdk-go v0.0.0-00010101000000-000000000000
+	github.com/grafana/grafana-plugin-sdk-go v0.25.0
 	github.com/graph-gophers/graphql-go v0.0.0-20200309224638-dae41bde9ef9 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.14.2 // indirect

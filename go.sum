@@ -882,10 +882,8 @@ github.com/gorilla/sessions v1.2.0 h1:S7P+1Hm5V/AT9cjEcUD5uDaQSX0OE577aCXgoaKpYb
 github.com/gorilla/sessions v1.2.0/go.mod h1:dk2InVEVJ0sfLlnXv9EAgkf6ecYs/i80K/zI+bUmuGM=
 github.com/gorilla/websocket v1.4.0 h1:WDFjx/TMzVgy9VdMMQi2K2Emtwi2QcUQsztZ/zLaH/Q=
 github.com/gorilla/websocket v1.4.0/go.mod h1:E7qHFY5m1UJ88s3WnNqhKjPHQ0heANvMoAMk2YaljkQ=
-github.com/grafana/grafana-plugin-sdk-go v0.20.1-0.20200310201617-cf46af2fe57a h1:nMVkRi82JeeyhGNTqV4N3IGWmETCWpOSSsovuyOuW3U=
-github.com/grafana/grafana-plugin-sdk-go v0.20.1-0.20200310201617-cf46af2fe57a/go.mod h1:qsXCZtbFSuK9WsfudbC//U8Pljst2mraPctgOlpOdMU=
-github.com/grafana/grafana-plugin-sdk-go v0.25.1-0.20200310210607-fa9caa72f5af h1:1eESgIPNAlyW0WIsm/TzCoZSjvI1gR1JGmqElB2znNk=
-github.com/grafana/grafana-plugin-sdk-go v0.25.1-0.20200310210607-fa9caa72f5af/go.mod h1:qsXCZtbFSuK9WsfudbC//U8Pljst2mraPctgOlpOdMU=
+github.com/grafana/grafana-plugin-sdk-go v0.25.0 h1:kISUKYJarftlxQeaIIvE2h7pUCmXQYr4yLBxcZeuNSo=
+github.com/grafana/grafana-plugin-sdk-go v0.25.0/go.mod h1:G6Ov9M+FDOZXNw8eKXINO6XzqdUvTs7huwyQp5jLTBQ=
 github.com/graph-gophers/graphql-go v0.0.0-20200309224638-dae41bde9ef9 h1:kLnsdud6Fl1/7ZX/5oD23cqYAzBfuZBhNkGr2NvuEsU=
 github.com/graph-gophers/graphql-go v0.0.0-20200309224638-dae41bde9ef9/go.mod h1:9CQHMSxwO4MprSdzoIEobiHpoLtHm77vfxsvsIN5Vuc=
 github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7 h1:pdN6V1QBWetyv/0+wjACpqVH+eVULgEjkurDLq3goeM=

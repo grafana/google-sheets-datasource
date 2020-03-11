@@ -10,6 +10,7 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpresource"
+	p "github.com/grafana/grafana-plugin-sdk-go/backend/plugin"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
 	"github.com/prometheus/client_golang/prometheus"
@@ -23,7 +24,7 @@ const metricNamespace = "sheets_datasource"
 
 func main() {
 	// Setup the plugin environment
-	pluginLogger := SetupPluginEnvironment("google-sheets-datasource")
+	pluginLogger := p.SetupPluginEnvironment("google-sheets-datasource")
 
 	mux := http.NewServeMux()
 	ds := Init(pluginLogger, mux)
