@@ -39,7 +39,19 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 
 	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
 	if frame != nil && qm.UseTimeFilter {
-		return filterByTime(frame, timeRange), nil
+		timeIndex := findTimeField(frame)
+		if timeIndex >= 0 {
+			frame, err = frame.FilterRowsByField(timeIndex, func(i interface{}) (bool, error) {
+				val, ok := i.(time.Time)
+				if !ok {
+					return false, fmt.Errorf("time column is not a time value")
+				}
+				if val.Before(timeRange.From) || val.After(timeRange.To) {
+					return true, nil
+				}
+				return false, nil
+			})
+		}
 	}
 	return frame, err
 }
