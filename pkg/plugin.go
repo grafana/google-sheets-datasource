@@ -74,12 +74,11 @@ type GoogleSheetsDataSource struct {
 
 func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConfig, error) {
 	config := googlesheets.GoogleSheetConfig{}
-	if err := json.Unmarshal(pluginConfig.JSONData, &config); err != nil {
+	if err := json.Unmarshal(pluginConfig.DataSourceConfig.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
 	}
-
-	config.APIKey = pluginConfig.DecryptedSecureJSONData["apiKey"]
-	config.JWT = pluginConfig.DecryptedSecureJSONData["jwt"]
+	config.APIKey = pluginConfig.DataSourceConfig.DecryptedSecureJSONData["apiKey"]
+	config.JWT = pluginConfig.DataSourceConfig.DecryptedSecureJSONData["jwt"]
 	return &config, nil
 }
 
