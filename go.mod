@@ -10,7 +10,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.3.3 // indirect
 	github.com/google/gops v0.3.7
-	github.com/grafana/grafana-plugin-sdk-go v0.26.0
+	github.com/grafana/grafana-plugin-sdk-go v0.26.1-0.20200311152153-e5b33f7f7553
 	github.com/hashicorp/go-hclog v0.12.0
 	github.com/keybase/go-ps v0.0.0-20190827175125-91aafc93ba19 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
