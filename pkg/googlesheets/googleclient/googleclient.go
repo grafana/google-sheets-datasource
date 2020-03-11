@@ -14,6 +14,7 @@ import (
 type GoogleClient struct {
 	sheetsService *sheets.Service
 	driveService  *drive.Service
+	auth          *Auth
 }
 
 // Auth struct
@@ -47,16 +48,19 @@ func New(ctx context.Context, auth *Auth) (*GoogleClient, error) {
 	return &GoogleClient{
 		sheetsService: sheetsService,
 		driveService:  driveService,
+		auth:          auth,
 	}, nil
 }
 
 // TestClient checks that the client can connect to required services
 func (gc *GoogleClient) TestClient() error {
-	// Check the drive API (only the first page)
-	q := gc.driveService.Files.List().Q("mimeType='application/vnd.google-apps.spreadsheet'")
-	_, err := q.Do()
-	if err != nil {
-		return err
+	// When using JWT, check the drive API
+	if gc.auth.AuthType == "jwt" {
+		q := gc.driveService.Files.List().Q("mimeType='application/vnd.google-apps.spreadsheet'")
+		_, err := q.Do()
+		if err != nil {
+			return err
+		}
 	}
 
 	// TODO: check the sheets API
