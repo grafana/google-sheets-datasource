@@ -2,6 +2,8 @@ module github.com/grafana/google-sheets-datasource
 
 go 1.13
 
+replace github.com/grafana/grafana-plugin-sdk-go => github.com/grafana/grafana-plugin-sdk-go v0.25.1-0.20200310210607-fa9caa72f5af
+
 require (
 	cloud.google.com/go v0.52.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20190622164848-0fb0a474d195
@@ -9,12 +11,10 @@ require (
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
 	github.com/golang/protobuf v1.3.3 // indirect
-	github.com/google/gops v0.3.7
 	github.com/grafana/grafana-plugin-sdk-go v0.25.0
 	github.com/hashicorp/go-hclog v0.12.0
 	github.com/keybase/go-ps v0.0.0-20190827175125-91aafc93ba19 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
-	github.com/magefile/mage v1.9.0
 	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mitchellh/go-testing-interface v1.0.0 // indirect
 	github.com/oklog/run v1.1.0 // indirect
