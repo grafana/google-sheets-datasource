@@ -206,36 +206,7 @@ jobs:
           at: .
       - run:
           name: "Publish Release on GitHub"
-          command: |
-            # copy ci dist
-            cp -r ci/jobs/build_plugin/dist .
-            # copy ci artifacts
-            mkdir -p artifacts
-            cp -r ci/packages/* artifacts
-            apk add --update --no-cache jq
-            PLUGIN_NAME=`cat dist/plugin.json|jq '.id'| sed s/\"//g`
-            RELEASE_NOTES=`awk 'BEGIN {FS="##"; RS=""} FNR==4 {print; exit}' CHANGELOG.md`
-            VERSION=`cat dist/plugin.json|jq '.info.version'| sed s/\"//g`
-            git config user.email "eng@grafana.com"
-            git config user.name "CircleCI Automation"
-            git checkout -b release-${VERSION}
-            git add --force dist/
-            git add artifacts/
-            git commit -m "automated release $VERSION [skip ci]"
-            git push -f origin release-${VERSION}
-            # XXX: Should this be an annotated tag?
-            git tag -f v${VERSION}
-            git push -f origin v${VERSION}
-            ghr \
-              -t ${GITHUB_TOKEN} \
-              -u ${CIRCLE_PROJECT_USERNAME} \
-              -r ${CIRCLE_PROJECT_REPONAME} \
-              -c ${CIRCLE_SHA1} \
-              -n "${PLUGIN_NAME} v${VERSION}" \
-              -b "${RELEASE_NOTES}" \
-              -delete \
-              v${VERSION} \
-              ./artifacts/
+          command: npx grafana-toolkit plugin:github-publish
 
 workflows:
   version: 2
