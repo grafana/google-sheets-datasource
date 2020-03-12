@@ -104,7 +104,7 @@ jobs:
         name: Build Docs
         command: |
           mkdir ci # Avoid error if not exists
-          ./node_modules/.bin/grafana-toolkit plugin:ci-docs
+          npx grafana-toolkit plugin:ci-docs
     - save_cache:
         paths:
         - node_modules
@@ -127,7 +127,7 @@ jobs:
         name: Package Distribution
         command: |
           yarn install --pure-lockfile
-          ./node_modules/.bin/grafana-toolkit plugin:ci-package
+          npx grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
         paths:
@@ -165,7 +165,7 @@ jobs:
         name: Run e2e tests
         command: |
           yarn install --pure-lockfile
-          ./node_modules/.bin/grafana-toolkit plugin:ci-test
+          npx grafana-toolkit plugin:ci-test
     - persist_to_workspace:
         root: .
         paths:
@@ -189,7 +189,7 @@ jobs:
         name: Toolkit report
         command: |
           yarn install --pure-lockfile
-          ./node_modules/.bin/grafana-toolkit plugin:ci-report
+          npx grafana-toolkit plugin:ci-report
     - store_artifacts:
         path: ci
 
@@ -207,7 +207,7 @@ jobs:
             - yarn-packages-{{ checksum "yarn.lock" }}
       - run:
           name: "Publish Release on GitHub"
-          command: ./node_modules/.bin/grafana-toolkit plugin:github-publish
+          command: npx grafana-toolkit plugin:github-publish
 
 workflows:
   version: 2

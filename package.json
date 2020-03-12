@@ -8,10 +8,7 @@
     "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch"
   },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:grafana/google-sheets-datasource.git"
-  },
+  "repository": "github:grafana/google-sheets-datasource",
   "author": "Grafana Labs <team@grafana.com> (https://grafana.com)",
   "license": "Apache-2.0",
   "devDependencies": {
