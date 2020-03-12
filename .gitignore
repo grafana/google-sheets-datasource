@@ -1,4 +1,6 @@
 node_modules/
-dist/
 coverage/
 ci/
+cypress/screenshots/
+cypress/videos/
+dist/

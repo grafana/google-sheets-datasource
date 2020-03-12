@@ -5,6 +5,7 @@
   "scripts": {
     "build": "grafana-toolkit plugin:build",
     "test": "grafana-toolkit plugin:test",
+    "test:e2e": "grafana-e2e run",
     "dev": "grafana-toolkit plugin:dev",
     "watch": "grafana-toolkit plugin:dev --watch"
   },
@@ -13,6 +14,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@grafana/data": "next",
+    "@grafana/e2e": "next",
     "@grafana/runtime": "next",
     "@grafana/toolkit": "next",
     "@grafana/ui": "next",

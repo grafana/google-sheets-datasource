@@ -21,7 +21,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yarn install --pure-lockfile
+            yarn install --frozen-lockfile
       - run:
           name: Build and test frontend
           command:  |
@@ -29,7 +29,7 @@ jobs:
             npx grafana-toolkit plugin:ci-build --finish
       - save_cache:
           paths:
-            - node_modules
+            - ~/.cache
           key: yarn-packages-{{ checksum "yarn.lock" }}
       - persist_to_workspace:
           root: .
@@ -45,7 +45,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yarn install --pure-lockfile
+            yarn install --frozen-lockfile
 
             echo 'export PATH=$HOME/go/bin:/usr/local/go/bin:$PATH' >> $BASH_ENV
             source $BASH_ENV
@@ -83,7 +83,7 @@ jobs:
             npx grafana-toolkit plugin:ci-build --finish
       - save_cache:
           paths:
-            - node_modules
+            - ~/.cache
           key: yarn-packages-{{ checksum "yarn.lock" }}
       - persist_to_workspace:
           root: .
@@ -99,7 +99,7 @@ jobs:
     - run:
         name: Install dependencies
         command: |
-          yarn install --pure-lockfile
+          yarn install --frozen-lockfile
     - run:
         name: Build Docs
         command: |
@@ -107,7 +107,7 @@ jobs:
           npx grafana-toolkit plugin:ci-docs
     - save_cache:
         paths:
-        - node_modules
+        - ~/.cache
         key: yarn-packages-{{ checksum "yarn.lock" }}
     - persist_to_workspace:
         root: .
@@ -126,7 +126,7 @@ jobs:
     - run:
         name: Package Distribution
         command: |
-          yarn install --pure-lockfile
+          yarn install --frozen-lockfile
           npx grafana-toolkit plugin:ci-package
     - persist_to_workspace:
         root: .
@@ -162,10 +162,23 @@ jobs:
           sudo service grafana-server start
           sudo grafana-cli --version
     - run:
+        name: Install dependencies
+        command: yarn install --frozen-lockfile
+    - save_cache:
+          paths:
+            - ~/.cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+    - run:
         name: Run e2e tests
+        command: npx grafana-e2e run
+    - run:
+        name: Prepare task output dir
         command: |
-          yarn install --pure-lockfile
-          npx grafana-toolkit plugin:ci-test
+          # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
+          mkdir ci/jobs/test_integration
+          # only copy if they exist
+          cp cypress/screenshots/*.* ci/jobs/test_integration 2>/dev/null || :
+          cp cypress/videos/*.* ci/jobs/test_integration 2>/dev/null || :
     - persist_to_workspace:
         root: .
         paths:
@@ -188,7 +201,7 @@ jobs:
     - run:
         name: Toolkit report
         command: |
-          yarn install --pure-lockfile
+          yarn install --frozen-lockfile
           npx grafana-toolkit plugin:ci-report
     - store_artifacts:
         path: ci
