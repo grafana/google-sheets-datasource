@@ -12,8 +12,8 @@ import (
 	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
 	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
-	"github.com/hashicorp/go-hclog"
 	"github.com/patrickmn/go-cache"
 	"google.golang.org/api/sheets/v4"
 )
@@ -21,7 +21,7 @@ import (
 // GoogleSheets provides an interface to the Google Sheets API.
 type GoogleSheets struct {
 	Cache  *cache.Cache
-	Logger hclog.Logger
+	Logger log.Logger
 }
 
 // Query queries a spreadsheet and returns a corresponding data frame.
