@@ -176,8 +176,7 @@ jobs:
         path: ci/jobs/test_integration
 
   report:
-    docker:
-    - image: circleci/node:12
+    <<: *defaults
     steps:
     - checkout
     - attach_workspace:
@@ -187,9 +186,7 @@ jobs:
         - yarn-packages-{{ checksum "yarn.lock" }}
     - run:
         name: Toolkit report
-        command: |
-          yarn install --pure-lockfile
-          ./node_modules/.bin/grafana-toolkit plugin:ci-report
+        command: ./node_modules/.bin/grafana-toolkit plugin:ci-report
     - store_artifacts:
         path: ci
 
