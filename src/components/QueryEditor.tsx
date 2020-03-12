@@ -6,8 +6,6 @@ import { SheetsQuery, SheetsSourceOptions } from '../types';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, SheetsSourceOptions>;
 
-interface State {}
-
 export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery> {
   let idx = url?.indexOf('/d/');
   if (!idx) {
@@ -37,7 +35,7 @@ export function toGoogleURL(info: SheetsQuery): string {
   return url;
 }
 
-export class QueryEditor extends PureComponent<Props, State> {
+export class QueryEditor extends PureComponent<Props> {
   componentWillMount() {
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
       this.props.query.cacheDurationSeconds = 300;
@@ -69,11 +67,12 @@ export class QueryEditor extends PureComponent<Props, State> {
   };
 
   toggleUseTimeFilter = (event?: React.SyntheticEvent<HTMLInputElement>) => {
-    const { query } = this.props;
-    this.props.onChange({
+    const { query, onChange, onRunQuery } = this.props;
+    onChange({
       ...query,
       useTimeFilter: !query.useTimeFilter,
     });
+    onRunQuery();
   };
 
   render() {
