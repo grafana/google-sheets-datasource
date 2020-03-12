@@ -6,11 +6,23 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
+// ColumnType is the set of possible column types
+type ColumnType string
+
+const (
+	// ColumTypeTime is the TIME type
+	ColumTypeTime ColumnType = "TIME"
+	// ColumTypeNumber is the NUMBER type
+	ColumTypeNumber = "NUMBER"
+	// ColumTypeString is the STRING type
+	ColumTypeString = "STRING"
+)
+
 // ColumnDefinition represents a spreadsheet column definition.
 type ColumnDefinition struct {
 	Header      string
 	ColumnIndex int
-	types       map[string]bool
+	types       map[ColumnType]bool
 	units       map[string]bool
 }
 
@@ -19,7 +31,7 @@ func New(header string, index int) *ColumnDefinition {
 	return &ColumnDefinition{
 		Header:      header,
 		ColumnIndex: index,
-		types:       map[string]bool{},
+		types:       map[ColumnType]bool{},
 		units:       map[string]bool{},
 	}
 }
@@ -31,7 +43,7 @@ func (cd *ColumnDefinition) CheckCell(cell *sheets.CellData) {
 }
 
 // GetType gets the type of a ColumnDefinition.
-func (cd *ColumnDefinition) GetType() string {
+func (cd *ColumnDefinition) GetType() ColumnType {
 	if len(cd.types) == 1 {
 		for columnType := range cd.types {
 			return columnType
@@ -39,7 +51,7 @@ func (cd *ColumnDefinition) GetType() string {
 	}
 
 	//The column has mixed or no data types - fallback to string
-	return "STRING"
+	return ColumTypeString
 }
 
 // GetUnit gets the unit of a ColumnDefinition.
@@ -64,18 +76,24 @@ func (cd *ColumnDefinition) HasMixedUnits() bool {
 }
 
 func (cd *ColumnDefinition) checkType(cell *sheets.CellData) {
-	if cell == nil {
+	if cell == nil || cell.FormattedValue == "" {
 		return
 	}
 
-	if cell.UserEnteredFormat != nil && cell.UserEnteredFormat.NumberFormat != nil {
-		switch cell.UserEnteredFormat.NumberFormat.Type {
-		case "DATE", "DATE_TIME":
+	// Has a number value (will not detect 0)
+	hasNumberValue := cell.UserEnteredValue != nil && cell.UserEnteredValue.NumberValue != 0
+	hasNumberFormat := cell.UserEnteredFormat != nil && cell.UserEnteredFormat.NumberFormat != nil
+
+	if hasNumberFormat {
+		if cell.UserEnteredFormat.NumberFormat.Type == "DATE" || cell.UserEnteredFormat.NumberFormat.Type == "DATE_TIME" {
 			cd.types["TIME"] = true
-		case "NUMBER", "PERCENT", "CURRENCY":
-			cd.types["NUMBER"] = true
+			return
 		}
-	} else if cell.FormattedValue != "" {
+	}
+
+	if hasNumberFormat || hasNumberValue || "0" == cell.FormattedValue {
+		cd.types["NUMBER"] = true
+	} else {
 		cd.types["STRING"] = true
 	}
 }

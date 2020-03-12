@@ -3,7 +3,7 @@
   "name": "Google Sheets",
   "id": "google-sheets-datasource",
   "backend": true,
-  "executable": "gpx_sheets",
+  "executable": "gfx_sheets",
   "metrics": true,
 
   "info": {

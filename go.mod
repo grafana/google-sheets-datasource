@@ -8,11 +8,9 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
-	github.com/golang/protobuf v1.3.3 // indirect
-	github.com/google/gops v0.3.7
+	github.com/golang/protobuf v1.3.3 // indirect; indirect	github.com/grafana/grafana-plugin-sdk-go v0.28.0
 	github.com/grafana/grafana-plugin-sdk-go v0.28.0
 	github.com/hashicorp/go-hclog v0.12.0
-	github.com/keybase/go-ps v0.0.0-20190827175125-91aafc93ba19 // indirect
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/magefile/mage v1.9.0
 	github.com/mattn/go-isatty v0.0.12 // indirect
@@ -29,5 +27,4 @@ require (
 	google.golang.org/api v0.20.0
 	google.golang.org/genproto v0.0.0-20200128133413-58ce757ed39b // indirect
 	gopkg.in/yaml.v2 v2.2.8 // indirect
-	rsc.io/goversion v1.2.0 // indirect
 )

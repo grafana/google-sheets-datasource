@@ -42,14 +42,14 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 		timeIndex := findTimeField(frame)
 		if timeIndex >= 0 {
 			frame, err = frame.FilterRowsByField(timeIndex, func(i interface{}) (bool, error) {
-				val, ok := i.(time.Time)
+				val, ok := i.(*time.Time)
 				if !ok {
-					return false, fmt.Errorf("time column is not a time value")
+					return false, fmt.Errorf("invalid time column: %s", spew.Sdump(i))
 				}
-				if val.Before(timeRange.From) || val.After(timeRange.To) {
-					return true, nil
+				if val == nil || val.Before(timeRange.From) || val.After(timeRange.To) {
+					return false, nil
 				}
-				return false, nil
+				return true, nil
 			})
 		}
 	}
@@ -116,6 +116,21 @@ func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.Gri
 	return data, map[string]interface{}{"hit": false}, nil
 }
 
+func getExcelColumnName(columnNumber int) string {
+	dividend := columnNumber
+	columnName := ""
+	var modulo int
+
+	for dividend > 0 {
+		modulo = ((dividend - 1) % 26)
+		fmt.Printf("MOD %d\n", modulo)
+		columnName = string(65+modulo) + columnName
+		dividend = ((dividend - modulo) / 26)
+	}
+
+	return columnName
+}
+
 func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *QueryModel) (*data.Frame, error) {
 	fields := []*data.Field{}
 	columns, start := getColumnDefinitions(sheet.RowData)
@@ -123,18 +138,24 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 
 	for _, column := range columns {
 		var field *data.Field
+		fname := getExcelColumnName(column.ColumnIndex + int(sheet.StartColumn))
+		fname = column.Header
+
 		switch column.GetType() {
 		case "TIME":
-			field = data.NewField(column.Header, nil, make([]*time.Time, len(sheet.RowData)-start))
+			field = data.NewField(fname, nil, make([]*time.Time, len(sheet.RowData)-start))
 		case "NUMBER":
-			field = data.NewField(column.Header, nil, make([]*float64, len(sheet.RowData)-start))
+			field = data.NewField(fname, nil, make([]*float64, len(sheet.RowData)-start))
 		case "STRING":
-			field = data.NewField(column.Header, nil, make([]*string, len(sheet.RowData)-start))
+			field = data.NewField(fname, nil, make([]*string, len(sheet.RowData)-start))
 		default:
 			return nil, fmt.Errorf("unknown column type: %s", column.GetType())
 		}
 
-		field.Config = &data.FieldConfig{Unit: column.GetUnit()}
+		field.Config = &data.FieldConfig{
+			Unit:  column.GetUnit(),
+			Title: column.Header,
+		}
 
 		if column.HasMixedTypes() {
 			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
@@ -151,13 +172,19 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		fields = append(fields, field)
 	}
 
-	frame := data.NewFrame(refID,
+	frame := data.NewFrame(refID, // TODO: shoud set the name from metadata
 		fields...,
 	)
+	frame.RefID = refID
 
 	for rowIndex := start; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
 			if columnIndex >= len(columns) {
+				continue
+			}
+
+			// Skip any empty values
+			if "" == cellData.FormattedValue {
 				continue
 			}
 
@@ -166,7 +193,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 				time, err := dateparse.ParseLocal(cellData.FormattedValue)
 				if err != nil {
 					warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %d in column %q",
-						rowIndex+1, columns[columnIndex].Header))
+						rowIndex, columns[columnIndex].Header))
 				} else {
 					frame.Fields[columnIndex].Set(rowIndex-start, &time)
 				}
@@ -184,7 +211,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
 	frame.Meta = &data.QueryResultMeta{Custom: meta}
-	gs.Logger.Debug("frame.Meta", spew.Sdump(frame.Meta))
+	gs.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
 
 	return frame, nil
 }
