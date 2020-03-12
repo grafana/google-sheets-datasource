@@ -138,7 +138,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 
 	for _, column := range columns {
 		var field *data.Field
-		fname := getExcelColumnName(column.ColumnIndex + int(sheet.StartColumn))
+		// fname := getExcelColumnName(column.ColumnIndex + int(sheet.StartColumn))
 		fname = column.Header
 
 		switch column.GetType() {

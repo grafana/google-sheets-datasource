@@ -245,20 +245,18 @@ func Debugger() error {
 	exeName := getExecutableName(runtime.GOOS, runtime.GOARCH)
 
 	// Kill any running processs
-	killAllPIDs(findRunningPIDs(exeName))
+	_ = killAllPIDs(findRunningPIDs(exeName))
+	_ = sh.RunV("pkill", "dlv")
 
 	if runtime.GOOS == "linux" {
 		checkLinuxPtraceScope()
 	}
 
-	// kill dlv if already running
-	_ = sh.RunV("pkill", "dlv")
-
 	// Wait for grafana to start plugin
 	for i := 0; i < 20; i++ {
 		pids := findRunningPIDs(exeName)
 		if len(pids) > 1 {
-			return fmt.Errorf("Multiple instances already running!!!")
+			return fmt.Errorf("multiple instances already running")
 		}
 		if len(pids) > 0 {
 			pid := strconv.Itoa(pids[0])
