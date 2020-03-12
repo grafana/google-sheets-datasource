@@ -10,7 +10,8 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpresource"
-	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
+	p "github.com/grafana/grafana-plugin-sdk-go/backend/plugin"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -23,7 +24,7 @@ const metricNamespace = "sheets_datasource"
 
 func main() {
 	// Setup the plugin environment
-	pluginLogger := SetupPluginEnvironment("google-sheets-datasource")
+	pluginLogger := p.SetupPluginEnvironment("google-sheets-datasource")
 
 	mux := http.NewServeMux()
 	ds := Init(pluginLogger, mux)
@@ -31,7 +32,7 @@ func main() {
 
 	err := backend.Serve(backend.ServeOpts{
 		CallResourceHandler: httpResourceHandler,
-		DataQueryHandler:    ds,
+		QueryDataHandler:    ds,
 	})
 	if err != nil {
 		pluginLogger.Error(err.Error())
@@ -73,18 +74,17 @@ type GoogleSheetsDataSource struct {
 
 func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConfig, error) {
 	config := googlesheets.GoogleSheetConfig{}
-	if err := json.Unmarshal(pluginConfig.JSONData, &config); err != nil {
+	if err := json.Unmarshal(pluginConfig.DataSourceConfig.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
 	}
-
-	config.APIKey = pluginConfig.DecryptedSecureJSONData["apiKey"]
-	config.JWT = pluginConfig.DecryptedSecureJSONData["jwt"]
+	config.APIKey = pluginConfig.DataSourceConfig.DecryptedSecureJSONData["apiKey"]
+	config.JWT = pluginConfig.DataSourceConfig.DecryptedSecureJSONData["jwt"]
 	return &config, nil
 }
 
-// DataQuery queries for data.
-func (plugin *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backend.DataQueryRequest) (*backend.DataQueryResponse, error) {
-	res := &backend.DataQueryResponse{}
+// QueryData queries for data.
+func (plugin *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+	res := &backend.QueryDataResponse{}
 	config, err := getConfig(req.PluginConfig)
 	if err != nil {
 		return nil, err
@@ -108,7 +108,7 @@ func (plugin *GoogleSheetsDataSource) DataQuery(ctx context.Context, req *backen
 			continue
 		}
 
-		res.Frames = append(res.Frames, []*df.Frame{frame}...)
+		res.Frames = append(res.Frames, []*data.Frame{frame}...)
 	}
 
 	return res, nil

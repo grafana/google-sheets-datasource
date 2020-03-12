@@ -121,11 +121,11 @@ func TestGooglesheets(t *testing.T) {
 
 		t.Run("meta warnings field is populated correctly", func(t *testing.T) {
 			warnings := meta["warnings"].([]string)
-			assert.Equal(t, 4, len(warnings))
+			assert.Equal(t, 3, len(warnings))
 			assert.Equal(t, "Multiple data types found in column \"MixedDataTypes\". Using string data type", warnings[0])
-			assert.Equal(t, "Multiple data types found in column \"MixedUnits\". Using string data type", warnings[1])
-			assert.Equal(t, "Multiple units found in column \"MixedUnits\". Formatted value will be used", warnings[2])
-			assert.Equal(t, "Multiple units found in column \"Mixed currencies\". Formatted value will be used", warnings[3])
+			assert.Equal(t, "Multiple units found in column \"MixedUnits\". Formatted value will be used", warnings[1])
+			assert.Equal(t, "Multiple units found in column \"Mixed currencies\". Formatted value will be used", warnings[2])
+			//assert.Equal(t, "Multiple data types found in column \"MixedUnits\". Using string data type", warnings[2])
 		})
 	})
 
@@ -158,10 +158,19 @@ func TestGooglesheets(t *testing.T) {
 		})
 
 		t.Run("single value", func(t *testing.T) {
-			strVal, ok := frame.Fields[0].Vector.At(0).(*string)
+			strVal, ok := frame.Fields[0].At(0).(*string)
 			require.True(t, ok)
 			require.NotNil(t, strVal)
 			assert.Equal(t, "🌭", *strVal)
 		})
+	})
+
+	t.Run("column id formatting", func(t *testing.T) {
+		require.Equal(t, "A", getExcelColumnName(1))
+		require.Equal(t, "B", getExcelColumnName(2))
+		require.Equal(t, "AH", getExcelColumnName(34))
+		require.Equal(t, "BN", getExcelColumnName(66))
+		require.Equal(t, "ZW", getExcelColumnName(699))
+		require.Equal(t, "AJIL", getExcelColumnName(24582))
 	})
 }

@@ -12,7 +12,7 @@ import (
 	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
 	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	df "github.com/grafana/grafana-plugin-sdk-go/dataframe"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/hashicorp/go-hclog"
 	"github.com/patrickmn/go-cache"
 	"google.golang.org/api/sheets/v4"
@@ -25,18 +25,35 @@ type GoogleSheets struct {
 }
 
 // Query queries a spreadsheet and returns a corresponding data frame.
-func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*df.Frame, error) {
+func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*data.Frame, error) {
 	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create Google API client: %w", err)
 	}
 
+	// This result may be cached
 	data, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
 		return nil, err
 	}
 
-	return gs.transformSheetToDataFrame(data, meta, refID, qm)
+	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
+	if frame != nil && qm.UseTimeFilter {
+		timeIndex := findTimeField(frame)
+		if timeIndex >= 0 {
+			frame, err = frame.FilterRowsByField(timeIndex, func(i interface{}) (bool, error) {
+				val, ok := i.(*time.Time)
+				if !ok {
+					return false, fmt.Errorf("invalid time column: %s", spew.Sdump(i))
+				}
+				if val == nil || val.Before(timeRange.From) || val.After(timeRange.To) {
+					return false, nil
+				}
+				return true, nil
+			})
+		}
+	}
+	return frame, err
 }
 
 // TestAPI checks if the credentials can talk to the Google API
@@ -99,25 +116,46 @@ func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.Gri
 	return data, map[string]interface{}{"hit": false}, nil
 }
 
-func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *QueryModel) (*df.Frame, error) {
-	fields := []*df.Field{}
+func getExcelColumnName(columnNumber int) string {
+	dividend := columnNumber
+	columnName := ""
+	var modulo int
+
+	for dividend > 0 {
+		modulo = ((dividend - 1) % 26)
+		fmt.Printf("MOD %d\n", modulo)
+		columnName = string(65+modulo) + columnName
+		dividend = ((dividend - modulo) / 26)
+	}
+
+	return columnName
+}
+
+func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *QueryModel) (*data.Frame, error) {
+	fields := []*data.Field{}
 	columns, start := getColumnDefinitions(sheet.RowData)
 	warnings := []string{}
 
 	for _, column := range columns {
-		var field *df.Field
+		var field *data.Field
+		// fname := getExcelColumnName(column.ColumnIndex + int(sheet.StartColumn))
+		fname := column.Header
+
 		switch column.GetType() {
 		case "TIME":
-			field = df.NewField(column.Header, nil, make([]*time.Time, len(sheet.RowData)-start))
+			field = data.NewField(fname, nil, make([]*time.Time, len(sheet.RowData)-start))
 		case "NUMBER":
-			field = df.NewField(column.Header, nil, make([]*float64, len(sheet.RowData)-start))
+			field = data.NewField(fname, nil, make([]*float64, len(sheet.RowData)-start))
 		case "STRING":
-			field = df.NewField(column.Header, nil, make([]*string, len(sheet.RowData)-start))
+			field = data.NewField(fname, nil, make([]*string, len(sheet.RowData)-start))
 		default:
 			return nil, fmt.Errorf("unknown column type: %s", column.GetType())
 		}
 
-		field.Config = &df.FieldConfig{Unit: column.GetUnit()}
+		field.Config = &data.FieldConfig{
+			Unit:  column.GetUnit(),
+			Title: column.Header,
+		}
 
 		if column.HasMixedTypes() {
 			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
@@ -134,13 +172,19 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		fields = append(fields, field)
 	}
 
-	frame := df.New(refID,
+	frame := data.NewFrame(refID, // TODO: shoud set the name from metadata
 		fields...,
 	)
+	frame.RefID = refID
 
 	for rowIndex := start; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
 			if columnIndex >= len(columns) {
+				continue
+			}
+
+			// Skip any empty values
+			if "" == cellData.FormattedValue {
 				continue
 			}
 
@@ -149,16 +193,16 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 				time, err := dateparse.ParseLocal(cellData.FormattedValue)
 				if err != nil {
 					warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %d in column %q",
-						rowIndex+1, columns[columnIndex].Header))
+						rowIndex, columns[columnIndex].Header))
 				} else {
-					frame.Fields[columnIndex].Vector.Set(rowIndex-start, &time)
+					frame.Fields[columnIndex].Set(rowIndex-start, &time)
 				}
 			case "NUMBER":
 				if cellData.EffectiveValue != nil {
-					frame.Fields[columnIndex].Vector.Set(rowIndex-start, &cellData.EffectiveValue.NumberValue)
+					frame.Fields[columnIndex].Set(rowIndex-start, &cellData.EffectiveValue.NumberValue)
 				}
 			case "STRING":
-				frame.Fields[columnIndex].Vector.Set(rowIndex-start, &cellData.FormattedValue)
+				frame.Fields[columnIndex].Set(rowIndex-start, &cellData.FormattedValue)
 			}
 		}
 	}
@@ -166,8 +210,8 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	meta["warnings"] = warnings
 	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
-	frame.Meta = &df.QueryResultMeta{Custom: meta}
-	gs.Logger.Debug("frame.Meta", spew.Sdump(frame.Meta))
+	frame.Meta = &data.QueryResultMeta{Custom: meta}
+	gs.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
 
 	return frame, nil
 }
