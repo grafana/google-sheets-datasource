@@ -196,7 +196,7 @@ jobs:
   publish_github_release:
     working_directory: ~/google-sheets-datasource
     docker:
-      - image: cibuilds/github:0.13
+            - image: circleci/node:12
     steps:
       - checkout
       - add_ssh_keys:
@@ -204,9 +204,14 @@ jobs:
             - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
       - attach_workspace:
           at: .
+      - restore_cache:
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
       - run:
           name: "Publish Release on GitHub"
-          command: npx grafana-toolkit plugin:github-publish
+          command: | 
+           export GITHUB_TOKEN=6ebdfd4ddbc957525a69facdd39072d2fff1a932
+           npx grafana-toolkit plugin:github-publish
 
 workflows:
   version: 2
