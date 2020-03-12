@@ -914,21 +914,28 @@
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@grafana/data@7.0.0-pre.0-4fecf5a7a6", "@grafana/data@canary":
   version "7.0.0-pre.0-4fecf5a7a6"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-7.0.0-pre.0-4fecf5a7a6.tgz#715d03c897b4b7f594b1332b68e58a5ca7bc68ae"
   integrity sha512-hBc2kJ+17cp/7riK8Ds+uCvLU7oZVhX1b0R1NwScwN5sxbnyGh8NpOJBylXKCeX0v75+Qxp+nDjHoOdt/O7RYQ==
 =======
+=======
+>>>>>>> updated yarn.lock after merge
 "@grafana/data@6.7.0-pre-cf6adb8b54":
   version "6.7.0-pre-cf6adb8b54"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.7.0-pre-cf6adb8b54.tgz#6921792b63227437c170b58962995f4726717fbd"
   integrity sha512-Oku7QTIkf1II/rVGoR8uAj0uDZt+e3Pjow/OuLqiAUaBZn6L1bpTESGEqLxP+hyRyTfW7kZMW1EFPTuk4AWASw==
+<<<<<<< HEAD
 >>>>>>> adding ynew yarn.lock for build
+=======
+>>>>>>> updated yarn.lock after merge
   dependencies:
     apache-arrow "0.15.1"
     lodash "4.17.15"
     rxjs "6.5.4"
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 "@grafana/data@7.0.0-pre.0-9c5020d53f", "@grafana/data@^7.0.0-pre.0-4fecf5a7a6":
   version "7.0.0-pre.0-9c5020d53f"
@@ -939,11 +946,16 @@
     lodash "4.17.15"
     rxjs "6.5.4"
 =======
+=======
+>>>>>>> updated yarn.lock after merge
 "@grafana/data@6.7.0-pre-ff6a082e23", "@grafana/data@^6.7.0-pre-9824219a58":
   version "6.7.0-pre-ff6a082e23"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-6.7.0-pre-ff6a082e23.tgz#26d7c928a5dc21bb8b830fa038a1c073b9df5eec"
   integrity sha512-hFreGvFPFoRpYccJfTbwYxle3mxPD7Rh6VN8WutFnz+TMQuT8uZcHSSsTnE9VwbPPWh6x5u2hPinmmQiSFuVWQ==
+<<<<<<< HEAD
 >>>>>>> adding ynew yarn.lock for build
+=======
+>>>>>>> updated yarn.lock after merge
 
 "@grafana/data@7.0.0-pre.0-4fecf5a7a6", "@grafana/data@canary":
   version "7.0.0-pre.0-4fecf5a7a6"
@@ -961,6 +973,7 @@
 
 "@grafana/runtime@canary":
 <<<<<<< HEAD
+<<<<<<< HEAD
   version "7.0.0-pre.0-4fecf5a7a6"
   resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-7.0.0-pre.0-4fecf5a7a6.tgz#f60c25250575ed8714bb6d4aa3003228ac3becf6"
   integrity sha512-jWPyAZuEDW3ofJck7BezouOwI2GN/S0mR4lTdxUiNf+THLyTuNBVsGRmcY91fBokn79onI50NYKxU1fDT2AAVw==
@@ -975,6 +988,14 @@
     "@grafana/data" "6.7.0-pre-cf6adb8b54"
     "@grafana/ui" "6.7.0-pre-cf6adb8b54"
 >>>>>>> adding ynew yarn.lock for build
+=======
+  version "6.7.0-pre-cf6adb8b54"
+  resolved "https://registry.yarnpkg.com/@grafana/runtime/-/runtime-6.7.0-pre-cf6adb8b54.tgz#822721f36988adb5fccc9953aa687073f9c8d504"
+  integrity sha512-2uLUviy+yW282B3iad/Klu36TVB2vZpg5vAehYQsVI1hmBwkE6QUgVv+nx0R1V+KEWqtGZF3DSDN+FtU/gTo7w==
+  dependencies:
+    "@grafana/data" "6.7.0-pre-cf6adb8b54"
+    "@grafana/ui" "6.7.0-pre-cf6adb8b54"
+>>>>>>> updated yarn.lock after merge
     systemjs "0.20.19"
     systemjs-plugin-css "0.1.37"
 
@@ -1002,15 +1023,22 @@
 
 "@grafana/toolkit@canary":
 <<<<<<< HEAD
+<<<<<<< HEAD
   version "7.0.0-pre.0-4fecf5a7a6"
   resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-7.0.0-pre.0-4fecf5a7a6.tgz#b9a558ecb83bccfde3b76a9605ff5d9dc8ea71ed"
   integrity sha512-7qTJY++fh5tAFomOmfQMmNz9gLsKzmIAQEmZTecAWJwCDl/UPCLQMZvk4SEqPrbep0bHfAlqEsGkeoxQg0HMZQ==
+=======
+  version "6.7.0-pre-9824219a58"
+  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-6.7.0-pre-9824219a58.tgz#500b820cd0a095848fef126ae8554adb12c4f4f5"
+  integrity sha512-KhHFCZfd/E3K4HNKWIsgq+QurhVUZ9Wa9VVhhA1cdUIysWe4ejYWLOXyDfR6sW3iTpgOY+ibh12TO7aSC2nhZQ==
+>>>>>>> updated yarn.lock after merge
   dependencies:
     "@babel/core" "7.8.3"
     "@babel/preset-env" "7.8.3"
-    "@grafana/data" "^7.0.0-pre.0-4fecf5a7a6"
+    "@grafana/data" "^6.7.0-pre-9824219a58"
     "@grafana/eslint-config" "^1.0.0-rc1"
     "@grafana/tsconfig" "^1.0.0-rc1"
+<<<<<<< HEAD
     "@grafana/ui" "^7.0.0-pre.0-4fecf5a7a6"
 =======
   version "6.7.0-pre-9824219a58"
@@ -1024,10 +1052,12 @@
     "@grafana/tsconfig" "^1.0.0-rc1"
     "@grafana/ui" "^6.7.0-pre-9824219a58"
 >>>>>>> adding ynew yarn.lock for build
+=======
+    "@grafana/ui" "^6.7.0-pre-9824219a58"
+>>>>>>> updated yarn.lock after merge
     "@types/command-exists" "^1.2.0"
     "@types/execa" "^0.9.0"
     "@types/expect-puppeteer" "3.3.1"
-    "@types/fs-extra" "^8.1.0"
     "@types/inquirer" "^6.0.3"
     "@types/jest" "24.0.13"
     "@types/jest-cli" "^23.6.0"
@@ -1058,7 +1088,6 @@
     execa "^1.0.0"
     expect-puppeteer "4.1.1"
     file-loader "^4.0.0"
-    fs-extra "^8.1.0"
     globby "^10.0.1"
     html-loader "0.5.5"
     html-webpack-plugin "^3.2.0"
@@ -1106,6 +1135,7 @@
   integrity sha512-nucKPGyzlSKYSiJk5RA8GzMdVWhdYNdF+Hh65AXxjD9PlY69JKr5wANj8bVdQboag6dgg0BFKqgKPyY+YtV4Iw==
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@grafana/ui@7.0.0-pre.0-4fecf5a7a6", "@grafana/ui@canary":
   version "7.0.0-pre.0-4fecf5a7a6"
   resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-7.0.0-pre.0-4fecf5a7a6.tgz#24571a46e42e86ff7178b920eda43c3e7bcaa9eb"
@@ -1122,6 +1152,15 @@
     "@emotion/core" "^10.0.27"
     "@grafana/data" "6.7.0-pre-cf6adb8b54"
 >>>>>>> adding ynew yarn.lock for build
+=======
+"@grafana/ui@6.7.0-pre-cf6adb8b54":
+  version "6.7.0-pre-cf6adb8b54"
+  resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-6.7.0-pre-cf6adb8b54.tgz#a977a0d2b598ca901b3384a3a4b3ca390ac43610"
+  integrity sha512-UOvWm5tTWHRYObNSNxxX1/l704pG6O29tLkDU3qrQHBpYKR2p0ptRubyedQJHV/TFPfqWMxqiTZtuWUSU+5bhg==
+  dependencies:
+    "@emotion/core" "^10.0.27"
+    "@grafana/data" "6.7.0-pre-cf6adb8b54"
+>>>>>>> updated yarn.lock after merge
     "@grafana/slate-react" "0.22.9-grafana"
     "@grafana/tsconfig" "^1.0.0-rc1"
     "@torkelo/react-select" "3.0.8"
@@ -1158,19 +1197,24 @@
     tinycolor2 "1.4.1"
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 "@grafana/ui@^7.0.0-pre.0-4fecf5a7a6":
   version "7.0.0-pre.0-9c5020d53f"
   resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-7.0.0-pre.0-9c5020d53f.tgz#651e9b8c0e0724c054de1a844a5f9f49506f8ee8"
   integrity sha512-qaLR7aBCtXOxF3+xVTqrK60//8oBoo8TPKsN4DdzX5o7vxs9KFwid8+MsiSaEpVp37CZsjQznYRETChYzo39XA==
 =======
+=======
+>>>>>>> updated yarn.lock after merge
 "@grafana/ui@^6.7.0-pre-9824219a58":
   version "6.7.0-pre-ff6a082e23"
   resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-6.7.0-pre-ff6a082e23.tgz#1a4addb560d3b77da931719ef28845ff5d23a547"
   integrity sha512-D9vArWeFEMnRFt4vB6b3KGt8mVcUtUUuspdfHB+MMnwFiDb5moartSi9TI2NY+moDwwIopeAi7XR9RLD8RDpcA==
+<<<<<<< HEAD
 >>>>>>> adding ynew yarn.lock for build
+=======
+>>>>>>> updated yarn.lock after merge
   dependencies:
-    "@emotion/core" "^10.0.27"
-    "@grafana/data" "7.0.0-pre.0-9c5020d53f"
+    "@grafana/data" "6.7.0-pre-ff6a082e23"
     "@grafana/slate-react" "0.22.9-grafana"
     "@grafana/tsconfig" "^1.0.0-rc1"
     "@torkelo/react-select" "3.0.8"
@@ -1190,10 +1234,9 @@
     papaparse "4.6.3"
     rc-cascader "0.17.5"
     rc-drawer "3.0.2"
-    rc-slider "8.7.1"
     rc-time-picker "^3.7.2"
     react "16.12.0"
-    react-calendar "2.19.2"
+    react-calendar "2.18.1"
     react-color "2.17.0"
     react-custom-scrollbars "4.2.1"
     react-dom "16.12.0"
@@ -1596,13 +1639,6 @@
   version "1.10.0"
   resolved "https://registry.yarnpkg.com/@types/flatbuffers/-/flatbuffers-1.10.0.tgz#aa74e30ffdc86445f2f060e1808fc9d56b5603ba"
   integrity sha512-7btbphLrKvo5yl/5CC2OCxUSMx1wV1wvGT1qDXkSt7yi00/YW7E8k6qzXqJHsp+WU0eoG7r6MTQQXI9lIvd0qA==
-
-"@types/fs-extra@^8.1.0":
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-8.1.0.tgz#1114834b53c3914806cd03b3304b37b3bd221a4d"
-  integrity sha512-UoOfVEzAUpeSPmjm7h1uk5MH6KZma2z2O7a75onTGjnNvAvMVrPzPL/vBbT65iIGHWj6rokwfmYcmxmlSf2uwg==
-  dependencies:
-    "@types/node" "*"
 
 "@types/glob@*", "@types/glob@^7.1.1":
   version "7.1.1"
@@ -3096,6 +3132,7 @@ caniuse-api@^3.0.0:
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000939, caniuse-lite@^1.0.30000989, caniuse-lite@^1.0.30001020, caniuse-lite@^1.0.30001030:
 <<<<<<< HEAD
+<<<<<<< HEAD
   version "1.0.30001033"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001033.tgz#60c328fb56860de60f9a2cb419c31fb80587cba0"
   integrity sha512-8Ibzxee6ibc5q88cM1usPsMpJOG5CTq0s/dKOmlekPbDGKt+UrnOOTPSjQz3kVo6yL7N4SB5xd+FGLHQmbzh6A==
@@ -3104,6 +3141,11 @@ caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000939, caniuse-lite@^1.0.30000989, can
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001035.tgz#2bb53b8aa4716b2ed08e088d4dc816a5fe089a1e"
   integrity sha512-C1ZxgkuA4/bUEdMbU5WrGY4+UhMFFiXrgNAfxiMIqWgFTWfv/xsZCS2xEHT2LMq7xAZfuAnu6mcqyDl0ZR6wLQ==
 >>>>>>> adding ynew yarn.lock for build
+=======
+  version "1.0.30001035"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001035.tgz#2bb53b8aa4716b2ed08e088d4dc816a5fe089a1e"
+  integrity sha512-C1ZxgkuA4/bUEdMbU5WrGY4+UhMFFiXrgNAfxiMIqWgFTWfv/xsZCS2xEHT2LMq7xAZfuAnu6mcqyDl0ZR6wLQ==
+>>>>>>> updated yarn.lock after merge
 
 capture-exit@^2.0.0:
   version "2.0.0"
@@ -4508,6 +4550,7 @@ ecc-jsbn@~0.1.1:
 
 electron-to-chromium@^1.3.247, electron-to-chromium@^1.3.363:
 <<<<<<< HEAD
+<<<<<<< HEAD
   version "1.3.375"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.375.tgz#e290d59d316024e5499057944c10d05c518b7a24"
   integrity sha512-zmaFnYVBtfpF8bGRYxgPeVAlXB7N3On8rjBE2ROc6wOpTPpzRWaiHo6KkbJMvlH07CH33uks/TEb6kuMMn8q6A==
@@ -4516,6 +4559,11 @@ electron-to-chromium@^1.3.247, electron-to-chromium@^1.3.363:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.376.tgz#7cb7b5205564a06c8f8ecfbe832cbd47a1224bb1"
   integrity sha512-cv/PYVz5szeMz192ngilmezyPNFkUjuynuL2vNdiqIrio440nfTDdc0JJU0TS2KHLSVCs9gBbt4CFqM+HcBnjw==
 >>>>>>> adding ynew yarn.lock for build
+=======
+  version "1.3.376"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.376.tgz#7cb7b5205564a06c8f8ecfbe832cbd47a1224bb1"
+  integrity sha512-cv/PYVz5szeMz192ngilmezyPNFkUjuynuL2vNdiqIrio440nfTDdc0JJU0TS2KHLSVCs9gBbt4CFqM+HcBnjw==
+>>>>>>> updated yarn.lock after merge
 
 elliptic@^6.0.0:
   version "6.5.2"
@@ -5283,15 +5331,6 @@ from2@^2.1.0:
     inherits "^2.0.1"
     readable-stream "^2.0.0"
 
-fs-extra@^8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-8.1.0.tgz#49d43c45a88cd9677668cb7be1b46efdb8d2e1c0"
-  integrity sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==
-  dependencies:
-    graceful-fs "^4.2.0"
-    jsonfile "^4.0.0"
-    universalify "^0.1.0"
-
 fs-minipass@^1.2.5:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/fs-minipass/-/fs-minipass-1.2.7.tgz#ccff8570841e7fe4265693da88936c55aed7f7c7"
@@ -5400,7 +5439,7 @@ get-stream@^4.0.0:
   dependencies:
     pump "^3.0.0"
 
-get-user-locale@^1.2.0:
+get-user-locale@^1.1.1, get-user-locale@^1.2.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/get-user-locale/-/get-user-locale-1.3.0.tgz#21ea740e413541281ae7b2b42e70ee523b7725b2"
   integrity sha512-c5N8P0upjxCF9unIC2vTA+B+8nN7kU/D/TeItMAVYhWIIksyoULM1aflKflXM3w+Ij6vF/JZys+QcwIoDuy3Ag==
@@ -5534,7 +5573,7 @@ globule@^1.0.0:
     lodash "~4.17.12"
     minimatch "~3.0.2"
 
-graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0:
+graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.3.tgz#4a12ff1b60376ef09862c2093edd908328be8423"
   integrity sha512-a30VEBm4PEdx1dRB7MFK7BejejvCvBronbLjht+sHuGYj8PHs7M/5Z+rt5lw551vZ7yfTCj4Vuyy3mSJytDWRQ==
@@ -6915,13 +6954,6 @@ json5@^1.0.1:
   integrity sha512-aKS4WQjPenRxiQsC93MNfjx+nbF4PAdYzmd/1JIj8HYzqfbu86beTuNgXDzPknWk0n0uARlyewZo4s++ES36Ow==
   dependencies:
     minimist "^1.2.0"
-
-jsonfile@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-4.0.0.tgz#8771aae0799b64076b76640fca058f9c10e33ecb"
-  integrity sha1-h3Gq4HmbZAdrdmQPygWPnBDjPss=
-  optionalDependencies:
-    graceful-fs "^4.1.6"
 
 jsprim@^1.2.2:
   version "1.4.1"
@@ -9383,6 +9415,16 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-calendar@2.18.1:
+  version "2.18.1"
+  resolved "https://registry.yarnpkg.com/react-calendar/-/react-calendar-2.18.1.tgz#f8ef9468d8566aa0d47d9d70c88917bb2030bcb9"
+  integrity sha512-J3tVim1gLpnsCOaeez+z4QJB5oK6UYLJj5TSMOStSJBvkWMEcTzj7bq7yCJJCNLUg2Vd3i11gJXish0LUFhXaw==
+  dependencies:
+    get-user-locale "^1.1.1"
+    merge-class-names "^1.1.1"
+    prop-types "^15.6.0"
+    react-lifecycles-compat "^3.0.4"
+
 react-calendar@2.19.2:
   version "2.19.2"
   resolved "https://registry.yarnpkg.com/react-calendar/-/react-calendar-2.19.2.tgz#496e78eb11a00aee1ae6b5d02d221ed1ca2db952"
@@ -11286,11 +11328,6 @@ unique-slug@^2.0.0:
   integrity sha512-zoWr9ObaxALD3DOPfjPSqxt4fnZiWblxHIgeWqW8x7UqDzEtHEQLzji2cuJYQFCU6KmoJikOYAZlrTHHebjx2w==
   dependencies:
     imurmurhash "^0.1.4"
-
-universalify@^0.1.0:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
-  integrity sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==
 
 unquote@~1.1.1:
   version "1.1.1"
