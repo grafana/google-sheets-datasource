@@ -38,6 +38,8 @@ func TestColumnDefinition(t *testing.T) {
 			}
 
 			assert.True(t, column.HasMixedTypes())
+			assert.True(t, column.types["STRING"])
+			assert.True(t, column.types["NUMBER"])
 		})
 
 		t.Run("Mixed types not detected", func(t *testing.T) {

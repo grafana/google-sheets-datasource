@@ -47,6 +47,7 @@ export interface SheetsQuery extends DataQuery {
   spreadsheet: string;
   range?: string;
   cacheDurationSeconds?: number;
+  useTimeFilter?: boolean;
 }
 
 export interface SheetsSourceOptions extends GoogleCloudOptions {

@@ -9,6 +9,7 @@ type QueryModel struct {
 	Spreadsheet          string `json:"spreadsheet"`
 	Range                string `json:"range"`
 	CacheDurationSeconds int    `json:"cacheDurationSeconds"`
+	UseTimeFilter        bool   `json:"useTimeFilter"`
 }
 
 // GoogleSheetConfig contains Google Sheets API authentication properties.

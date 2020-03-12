@@ -1,13 +1,12 @@
 {
   "version": "0.2.0",
-  "configurations": [
+	"configurations": [
     {
-      "name": "Debug backend plugin",
+      "name": "Launch test package",
       "type": "go",
-      "request": "attach",
-      "mode": "remote",
-      "port": 3222,
-      "host": "127.0.0.1"
-    }
+      "request": "launch",
+      "mode": "test",
+      "program": "${workspaceFolder}"
+    },
   ]
 }

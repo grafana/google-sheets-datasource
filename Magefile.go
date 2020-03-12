@@ -17,7 +17,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/google/gops/goprocess"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
@@ -66,18 +65,33 @@ func readFileBytes(file string) ([]byte, error) {
 	return ioutil.ReadAll(jsonFile)
 }
 
-func findRunningProcess(exe string) *goprocess.P {
-	for _, process := range goprocess.FindAll() {
-		if strings.HasSuffix(process.Path, exe) {
-			return &process
+func findRunningPIDs(exe string) []int {
+	pids := []int{}
+	out, err := sh.Output("pgrep", exe[:15]) // full name does not match, only the prefix (on linux anyway)
+
+	if err != nil || out == "" {
+		return pids
+	}
+	for _, txt := range strings.Fields(out) {
+		pid, err := strconv.Atoi(txt)
+		if err == nil {
+			pids = append(pids, pid)
+		} else {
+			fmt.Printf("Unable to format %s (%s)", txt, err)
+		}
+	}
+	return pids
+}
+
+func killAllPIDs(pids []int) error {
+	for _, pid := range pids {
+		fmt.Printf("Killing process: %d\n", pid)
+		err := syscall.Kill(pid, 9)
+		if err != nil {
+			return err
 		}
 	}
 	return nil
-}
-
-func killProcess(process *goprocess.P) error {
-	log.Printf("Killing: %s (%d)", process.Path, process.PID)
-	return syscall.Kill(process.PID, 9)
 }
 
 func buildBackend(os string, arch string, enableDebug bool) error {
@@ -223,46 +237,42 @@ func checkLinuxPtraceScope() {
 
 // Debugger makes a new debug build and attaches dlv (go-delve).
 func Debugger() error {
+	// Debug build
+	b := Build{}
+	mg.Deps(b.Debug)
+
 	// 1. kill any running instance
 	exeName := getExecutableName(runtime.GOOS, runtime.GOARCH)
 
 	// Kill any running processs
-	process := findRunningProcess(exeName)
-	if process != nil {
-		err := killProcess(process)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Debug build
-	b := Build{}
-	mg.Deps(b.Debug)
+	_ = killAllPIDs(findRunningPIDs(exeName))
+	_ = sh.RunV("pkill", "dlv")
 
 	if runtime.GOOS == "linux" {
 		checkLinuxPtraceScope()
 	}
 
-	// kill dlv if already running
-	_ = sh.RunV("pkill", "dlv")
-
 	// Wait for grafana to start plugin
 	for i := 0; i < 20; i++ {
-		process := findRunningProcess(exeName)
-		if process != nil {
-			log.Printf("Running PID: %d", process.PID)
+		pids := findRunningPIDs(exeName)
+		if len(pids) > 1 {
+			return fmt.Errorf("multiple instances already running")
+		}
+		if len(pids) > 0 {
+			pid := strconv.Itoa(pids[0])
+			log.Printf("Running PID: %s", pid)
 
 			// dlv attach ${PLUGIN_PID} --headless --listen=:${PORT} --api-version 2 --log
 			if err := sh.RunV("dlv",
 				"attach",
-				strconv.Itoa(process.PID),
+				pid,
 				"--headless",
 				"--listen=:3222",
 				"--api-version", "2",
 				"--log"); err != nil {
 				return err
 			}
-			fmt.Printf("dlv finished running (%d)\n", process.PID)
+			fmt.Printf("dlv finished running (%s)\n", pid)
 			return nil
 		}
 
