@@ -9,6 +9,9 @@ aliases:
 defaults: &defaults
   docker:
     - image: registry.plugins.grafana.net/integrations-ci-build:latest
+      auth:
+        username: plugindev
+        password: plugindev
 
 jobs:
   build_plugin:
