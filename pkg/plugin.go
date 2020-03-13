@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
+
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpresource"
@@ -33,6 +35,7 @@ func main() {
 	err := backend.Serve(backend.ServeOpts{
 		CallResourceHandler: httpResourceHandler,
 		QueryDataHandler:    ds,
+		CheckHealthHandler:  ds,
 	})
 	if err != nil {
 		pluginLogger.Error(err.Error())
@@ -61,7 +64,6 @@ func Init(logger log.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
 		},
 	}
 
-	mux.HandleFunc("/test", ds.handleResourceTest)
 	mux.HandleFunc("/spreadsheets", ds.handleResourceSpreadsheets)
 	return ds
 }
@@ -80,6 +82,43 @@ func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConf
 	config.APIKey = pluginConfig.DataSourceConfig.DecryptedSecureJSONData["apiKey"]
 	config.JWT = pluginConfig.DataSourceConfig.DecryptedSecureJSONData["jwt"]
 	return &config, nil
+}
+
+// CheckHealth checks if the plugin is running properly
+func (plugin *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
+	res := &backend.CheckHealthResult{}
+
+	// Just checking that the plugin exe is alive and running
+	if req.PluginConfig.DataSourceConfig == nil {
+		res.Status = backend.HealthStatusOk
+		res.Message = "Plugin is Running"
+		return res, nil
+	}
+
+	config, err := getConfig(req.PluginConfig)
+	if err != nil {
+		res.Status = backend.HealthStatusError
+		res.Message = "Invalid config"
+		return res, nil
+	}
+
+	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
+	if err != nil {
+		res.Status = backend.HealthStatusError
+		res.Message = "Unable to create client"
+		return res, nil
+	}
+
+	err = client.TestClient()
+	if err != nil {
+		res.Status = backend.HealthStatusError
+		res.Message = "Permissions check failed"
+		return res, nil
+	}
+
+	res.Status = backend.HealthStatusOk
+	res.Message = "Success"
+	return res, nil
 }
 
 // QueryData queries for data.
@@ -151,21 +190,4 @@ func (plugin *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.Respons
 
 	res, err := plugin.googlesheet.GetSpreadsheets(ctx, config)
 	writeResult(rw, "spreadsheets", res, err)
-}
-
-func (plugin *GoogleSheetsDataSource) handleResourceTest(rw http.ResponseWriter, req *http.Request) {
-	plugin.logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
-	if req.Method != http.MethodGet {
-		return
-	}
-
-	ctx := req.Context()
-	config, err := getConfig(httpresource.PluginConfigFromContext(ctx))
-	if err != nil {
-		writeResult(rw, "?", nil, err)
-		return
-	}
-
-	err = plugin.googlesheet.TestAPI(ctx, config)
-	writeResult(rw, "test", "OK", err)
 }

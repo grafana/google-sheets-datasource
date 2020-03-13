@@ -56,15 +56,6 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 	return frame, err
 }
 
-// TestAPI checks if the credentials can talk to the Google API
-func (gs *GoogleSheets) TestAPI(ctx context.Context, config *GoogleSheetConfig) error {
-	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
-	if err != nil {
-		return err
-	}
-	return client.TestClient()
-}
-
 // GetSpreadsheets gets spreadsheets from the Google API.
 func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *GoogleSheetConfig) (map[string]string, error) {
 	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
