@@ -206,7 +206,7 @@ workflows:
             - build_plugin
       - package:
           requires:
-            - build_plugin
+            - build_backend
             - build_docs
       - test_integration:
           requires:
