@@ -8,7 +8,7 @@ aliases:
 
 defaults: &defaults
   docker:
-    - image: circleci/node:12
+    - image: srclosson/integrations-ci-build:latest
 
 jobs:
   build_plugin:
@@ -42,32 +42,6 @@ jobs:
       - restore_cache:
           keys:
           - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-      - run:
-          name: Install dependencies
-          command: |
-            yarn install --frozen-lockfile
-
-            echo 'export PATH=$HOME/go/bin:/usr/local/go/bin:$PATH' >> $BASH_ENV
-            source $BASH_ENV
-
-            cd /tmp
-
-            # Install Go
-            curl -fLO https://dl.google.com/go/go1.14.linux-amd64.tar.gz
-            echo 08df79b46b0adf498ea9f320a0f23d6ec59e9003660b4c9c1ce8e5e2c6f823ca go1.14.linux-amd64.tar.gz | sha256sum --check --status
-            sudo tar -C /usr/local -xf go1.14.linux-amd64.tar.gz
-
-            # Install golangci-lint
-            curl -fLO https://github.com/golangci/golangci-lint/releases/download/v1.23.7/golangci-lint-1.23.7-linux-amd64.tar.gz
-            echo 34df1794a2ea8e168b3c98eed3cc0f3e13ed4cba735e4e40ef141df5c41bc086 golangci-lint-1.23.7-linux-amd64.tar.gz | sha256sum --check --status
-            tar xf golangci-lint-1.23.7-linux-amd64.tar.gz
-            sudo mv golangci-lint-1.23.7-linux-amd64/golangci-lint /usr/local/bin
-
-            # Install Mage
-            mkdir -p ~/go/bin
-            git clone https://github.com/magefile/mage.git
-            cd mage
-            go run bootstrap.go
       - run:
           name: Build Backend
           command: |
@@ -189,8 +163,7 @@ jobs:
         path: ci/jobs/test_integration
 
   report:
-    docker:
-    - image: circleci/node:12
+    <<: *defaults
     steps:
     - checkout
     - attach_workspace:
