@@ -43,11 +43,17 @@ jobs:
           keys:
           - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
-          name: Build & Test Backend
+          name: Build Backend
           command: |
             mage -v buildAll
+      - run:
+          name: Test Backend
+          command: |
             mage -v lint
             mage -v coverage
+      - run:
+          name: Move results to ci folder
+          command:  |
             npx grafana-toolkit plugin:ci-build --finish
       - save_cache:
           paths:
@@ -193,13 +199,14 @@ workflows:
   version: 2
   plugin_workflow:
     jobs:
-      - build_plugin
       - build_backend
       - build_docs
+      - build_plugin
+          requires:
+            - build_backend
       - package:
           requires:
             - build_plugin
-            - build_backend
             - build_docs
       - test_integration:
           requires:
