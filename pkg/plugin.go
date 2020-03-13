@@ -88,6 +88,12 @@ func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConf
 func (plugin *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	res := &backend.CheckHealthResult{}
 
+	if true {
+		res.Status = backend.HealthStatusError
+		res.Message = "Plugin is Running"
+		return res, nil
+	}
+
 	// Just checking that the plugin exe is alive and running
 	if req.PluginConfig.DataSourceConfig == nil {
 		res.Status = backend.HealthStatusOk

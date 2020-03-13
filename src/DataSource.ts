@@ -1,7 +1,8 @@
 import { DataSourceInstanceSettings, SelectableValue } from '@grafana/data';
-import { DataSourceWithBackend } from '@grafana/runtime';
+import { DataSourceWithBackend, getBackendSrv } from '@grafana/runtime';
 
 import { SheetsQuery, SheetsSourceOptions } from './types';
+
 
 export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceOptions> {
   constructor(instanceSettings: DataSourceInstanceSettings<SheetsSourceOptions>) {
@@ -14,19 +15,32 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
     );
   }
 
-  async testDatasource() {
-    return this.getResource('test').then((rsp: any) => {
-      if (rsp.error) {
-        return {
-          status: 'fail',
-          message: rsp.error,
-        };
-      }
-
+  /**
+   * Checks the plugin health
+   */
+  async testDatasource(): Promise<any> {
+    return getBackendSrv().get(`/api/datasources/${this.id}/health`).then( res => {
+      console.log( 'TEST', res );
       return {
         status: 'success',
         message: 'Success',
       };
     });
   }
+
+  // async testDatasource() {
+  //   return this.getResource('test').then((rsp: any) => {
+  //     if (rsp.error) {
+  //       return {
+  //         status: 'fail',
+  //         message: rsp.error,
+  //       };
+  //     }
+
+  //     return {
+  //       status: 'success',
+  //       message: 'Success',
+  //     };
+  //   });
+  // }
 }
