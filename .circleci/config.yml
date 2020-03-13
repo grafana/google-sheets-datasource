@@ -26,7 +26,6 @@ jobs:
           name: Build and test frontend
           command:  |
             npx grafana-toolkit plugin:ci-build
-            npx grafana-toolkit plugin:ci-build --finish
       - save_cache:
           paths:
             - ~/.cache
@@ -51,10 +50,6 @@ jobs:
           command: |
             mage -v lint
             mage -v coverage
-      - run:
-          name: Move results to ci folder
-          command:  |
-            npx grafana-toolkit plugin:ci-build --finish
       - save_cache:
           paths:
             - ~/.cache
@@ -97,6 +92,9 @@ jobs:
     - restore_cache:
         keys:
         - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+    - run:
+        name: Move results to ci-folder
+          npx grafana-toolkit plugin:ci-build --finish
     - run:
         name: Package Distribution
         command: |
