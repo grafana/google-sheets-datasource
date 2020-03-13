@@ -4,7 +4,7 @@ services:
   # Use this service to test the circle-ci image against the plugin
   #
   build-env:
-    image: srclosson/integrations-ci-build:latest
+    image: d518c1ad9c7a
     network_mode: bridge 
     container_name: circle-ci-dev
     user: root
