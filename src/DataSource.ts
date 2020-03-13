@@ -4,9 +4,9 @@ import { DataSourceWithBackend, getBackendSrv } from '@grafana/runtime';
 import { SheetsQuery, SheetsSourceOptions } from './types';
 
 export enum HealthStatus {
-  UNKNOWN = 'UNKNOWN',
+  Unknown = 'UNKNOWN',
   OK = 'OK',
-  ERROR = 'ERROR',
+  Error = 'ERROR',
 }
 
 export interface HealthCheckResult {
@@ -30,8 +30,15 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
    * Run the datasource healthcheck
    */
   async callHealthCheck(): Promise<HealthCheckResult> {
-    // TODO: if the service is ERROR it returns 503... this causes a popup
-    return getBackendSrv().get(`/api/datasources/${this.id}/health`);
+    return getBackendSrv()
+      .get(`/api/datasources/${this.id}/health`)
+      .then(v => {
+        return v as HealthCheckResult;
+      })
+      .catch(err => {
+        err.isHandled = true; // Avoid extra popup warning
+        return err.data as HealthCheckResult;
+      });
   }
 
   /**

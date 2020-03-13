@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
@@ -86,6 +87,8 @@ func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConf
 // CheckHealth checks if the plugin is running properly
 func (plugin *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	res := &backend.CheckHealthResult{}
+
+	plugin.logger.Debug("CHECK Health", "config", spew.Sdump(req.PluginConfig))
 
 	// Just checking that the plugin exe is alive and running
 	if req.PluginConfig.DataSourceConfig == nil {
