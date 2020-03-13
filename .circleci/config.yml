@@ -52,6 +52,10 @@ jobs:
             mage -v lint
             mage -v coverage
       - run:
+          name: Install dependencies
+          command: |
+            yarn install --frozen-lockfile
+      - run:
           name: Move results to ci folder
           command:  |
             npx grafana-toolkit plugin:ci-build --finish
