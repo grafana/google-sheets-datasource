@@ -81,7 +81,7 @@ func (plugin *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *back
 		return res, nil
 	}
 
-	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
+	client, err := gc.New(ctx, config)
 	if err != nil {
 		res.Status = backend.HealthStatusError
 		res.Message = "Unable to create client"

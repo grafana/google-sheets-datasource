@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/grafana/google-sheets-datasource/pkg/core"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
@@ -14,27 +15,11 @@ import (
 type GoogleClient struct {
 	sheetsService *sheets.Service
 	driveService  *drive.Service
-	auth          *Auth
-}
-
-// Auth struct
-type Auth struct {
-	APIKey   string
-	AuthType string
-	JWT      string
-}
-
-// NewAuth creates a new auth struct
-func NewAuth(apiKey string, authType string, jwt string) *Auth {
-	return &Auth{
-		APIKey:   apiKey,
-		AuthType: authType,
-		JWT:      jwt,
-	}
+	auth          *core.GoogleSheetConfig
 }
 
 // New creates a new client and initializes a sheet service and a drive service
-func New(ctx context.Context, auth *Auth) (*GoogleClient, error) {
+func New(ctx context.Context, auth *core.GoogleSheetConfig) (*GoogleClient, error) {
 	sheetsService, err := createSheetsService(ctx, auth)
 	if err != nil {
 		return nil, err
@@ -100,7 +85,7 @@ func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 	return fs, nil
 }
 
-func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, error) {
+func createSheetsService(ctx context.Context, auth *core.GoogleSheetConfig) (*sheets.Service, error) {
 	if len(auth.AuthType) == 0 {
 		return nil, fmt.Errorf("missing AuthType setting")
 	}
@@ -127,7 +112,7 @@ func createSheetsService(ctx context.Context, auth *Auth) (*sheets.Service, erro
 	return nil, fmt.Errorf("invalid Auth Type: %s", auth.AuthType)
 }
 
-func createDriveService(ctx context.Context, auth *Auth) (*drive.Service, error) {
+func createDriveService(ctx context.Context, auth *core.GoogleSheetConfig) (*drive.Service, error) {
 	if len(auth.AuthType) == 0 {
 		return nil, fmt.Errorf("missing AuthType setting")
 	}

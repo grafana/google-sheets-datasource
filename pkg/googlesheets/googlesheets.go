@@ -28,7 +28,7 @@ type GoogleSheets struct {
 
 // Query queries a spreadsheet and returns a corresponding data frame.
 func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *core.QueryModel, config *core.GoogleSheetConfig, timeRange backend.TimeRange) (*data.Frame, error) {
-	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
+	client, err := gc.New(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create Google API client: %w", err)
 	}
@@ -60,7 +60,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *core.QueryM
 
 // GetSpreadsheets gets spreadsheets from the Google API.
 func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *core.GoogleSheetConfig) (map[string]string, error) {
-	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
+	client, err := gc.New(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Google API client: %w", err)
 	}
