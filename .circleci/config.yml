@@ -201,7 +201,7 @@ workflows:
     jobs:
       - build_backend
       - build_docs
-      - build_plugin
+      - build_plugin:
           requires:
             - build_backend
       - package:
