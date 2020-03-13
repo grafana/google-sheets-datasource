@@ -3,7 +3,6 @@ import { DataSourceWithBackend, getBackendSrv } from '@grafana/runtime';
 
 import { SheetsQuery, SheetsSourceOptions } from './types';
 
-
 export enum HealthStatus {
   UNKNOWN = 'UNKNOWN',
   OK = 'OK',
@@ -13,7 +12,7 @@ export enum HealthStatus {
 export interface HealthCheckResult {
   status: HealthStatus;
   message: string;
-  details?: Record<string,any>;
+  details?: Record<string, any>;
 }
 
 export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceOptions> {
@@ -32,25 +31,25 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
    */
   async callHealthCheck(): Promise<HealthCheckResult> {
     // TODO: if the service is ERROR it returns 503... this causes a popup
-    return getBackendSrv().get(`/api/datasources/${this.id}/health`)
+    return getBackendSrv().get(`/api/datasources/${this.id}/health`);
   }
 
   /**
    * Checks the plugin health
    */
   async testDatasource(): Promise<any> {
-    return this.callHealthCheck().then( res => {
-      console.log( 'TEST', res );
-      if(res.status === HealthStatus.OK) {
+    return this.callHealthCheck().then(res => {
+      console.log('TEST', res);
+      if (res.status === HealthStatus.OK) {
         return {
           status: 'success',
           message: res.message,
         };
       }
       return {
-          status: 'fail',
-          message: res.message,
-      }
+        status: 'fail',
+        message: res.message,
+      };
     });
   }
 }
