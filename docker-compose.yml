@@ -1,18 +1,20 @@
-version: '3'
+version: "3"
 services:
-  grafana:
-    image: grafana/grafana:master
-    ports:
-      - '3090:3000'
+  build-env:
+    image: srclosson/integrations-ci-build:latest
+    network_mode: bridge 
+    container_name: circle-ci-dev
+    user: root
     volumes:
-      - ./:/var/lib/grafana/plugins/google-sheets-datasource
-      - grafana-storage:/var/lib/grafana
-      # - ./provisioning:/etc/grafana/provisioning
+      - ${PWD}/../:/home/circleci/plugin
+    stdin_open: true
+    tty: true
+    user: node
     environment:
-      - COMPOSE_INTERACTIVE_NO_CLI=1
       - TERM=linux
       - GF_LOG_LEVEL=debug
       - GF_DATAPROXY_LOGGING=true
-      - GF_FEATURE_TOGGLES_ENABLE=expressions inspect transformations newEdit
-volumes:
-  grafana-storage:
+      - GF_SERVER_HTTP_PORT=${GRAFANA_PORT:-3000}
+      - GF_PATHS_PROVISIONING=/home/stephanie/src/provisioning
+      - GF_PATHS_PLUGINS=/home/stephanie/src/plugins
+      - GF_PATHS_DATA=/home/stephanie/src/grafana/data
