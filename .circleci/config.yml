@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Move results to ci folder
           command:  |
-          ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
+            ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
       - save_cache:
           paths:
             - ~/.cache
