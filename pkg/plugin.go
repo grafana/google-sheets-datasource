@@ -10,12 +10,11 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpresource"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	p "github.com/grafana/grafana-plugin-sdk-go/backend/plugin"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
 	"github.com/prometheus/client_golang/prometheus"
-
-	hclog "github.com/hashicorp/go-hclog"
 
 	"context"
 )
@@ -24,7 +23,8 @@ const metricNamespace = "sheets_datasource"
 
 func main() {
 	// Setup the plugin environment
-	pluginLogger := p.SetupPluginEnvironment("google-sheets-datasource")
+	_ = p.SetupPluginEnvironment("google-sheets-datasource")
+	pluginLogger := log.New()
 
 	mux := http.NewServeMux()
 	ds := Init(pluginLogger, mux)
@@ -41,7 +41,7 @@ func main() {
 }
 
 // Init creates the google sheets datasource and sets up all the routes
-func Init(logger hclog.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
+func Init(logger log.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
 	queriesTotal := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name:      "data_query_total",
@@ -68,7 +68,7 @@ func Init(logger hclog.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
 
 // GoogleSheetsDataSource handler for google sheets
 type GoogleSheetsDataSource struct {
-	logger      hclog.Logger
+	logger      log.Logger
 	googlesheet *googlesheets.GoogleSheets
 }
 
