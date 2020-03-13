@@ -199,11 +199,11 @@ workflows:
   version: 2
   plugin_workflow:
     jobs:
-      - build_backend
+      - build_plugin
       - build_docs
-      - build_plugin:
+      - build_backend:
           requires:
-            - build_backend
+            - build_plugin
       - package:
           requires:
             - build_plugin

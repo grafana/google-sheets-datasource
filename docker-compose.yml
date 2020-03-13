@@ -7,7 +7,6 @@ services:
     image: srclosson/integrations-ci-build 
     network_mode: bridge 
     container_name: circle-ci-dev
-    user: root
     volumes:
       - ${PWD}:/home/circleci/plugin
     stdin_open: true
