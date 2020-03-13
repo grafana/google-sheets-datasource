@@ -17,7 +17,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - yarn-packages-{{ checksum "yarn.lock" }}
+          - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Install dependencies
           command: |
@@ -30,7 +30,7 @@ jobs:
       - save_cache:
           paths:
             - ~/.cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
+          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - persist_to_workspace:
           root: .
           paths:
@@ -41,7 +41,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-          - yarn-packages-{{ checksum "yarn.lock" }}
+          - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Install dependencies
           command: |
@@ -84,7 +84,7 @@ jobs:
       - save_cache:
           paths:
             - ~/.cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
+          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - persist_to_workspace:
           root: .
           paths:
@@ -95,7 +95,7 @@ jobs:
     - checkout
     - restore_cache:
         keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
+        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Install dependencies
         command: |
@@ -108,7 +108,7 @@ jobs:
     - save_cache:
         paths:
         - ~/.cache
-        key: yarn-packages-{{ checksum "yarn.lock" }}
+        key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - persist_to_workspace:
         root: .
         paths:
@@ -122,7 +122,7 @@ jobs:
         at: .
     - restore_cache:
         keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
+        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Package Distribution
         command: |
@@ -145,7 +145,7 @@ jobs:
         at: .
     - restore_cache:
         keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
+        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Setup Grafana (local install)
         command: |
@@ -167,7 +167,7 @@ jobs:
     - save_cache:
           paths:
             - ~/.cache
-          key: yarn-packages-{{ checksum "yarn.lock" }}
+          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Run e2e tests
         command: npx grafana-e2e run
@@ -197,7 +197,7 @@ jobs:
         at: .
     - restore_cache:
         keys:
-        - yarn-packages-{{ checksum "yarn.lock" }}
+        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Toolkit report
         command: |
@@ -217,7 +217,7 @@ jobs:
           at: .
       - restore_cache:
           keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
+            - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: "Publish Release on GitHub"
           command: npx grafana-toolkit plugin:github-publish
