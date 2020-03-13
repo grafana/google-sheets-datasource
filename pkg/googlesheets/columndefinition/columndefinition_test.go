@@ -27,7 +27,7 @@ func loadTestSheet(path string) (*sheets.GridData, error) {
 }
 
 func TestColumnDefinition(t *testing.T) {
-	sheet, err := loadTestSheet("../testdata/mixed-data.json")
+	sheet, err := loadTestSheet("../../testdata/mixed-data.json")
 	require.Nil(t, err)
 
 	t.Run("TestDataTypes", func(t *testing.T) {

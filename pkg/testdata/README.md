@@ -1,3 +1,5 @@
+These are files used in the go tests...
+
 This output is generated from:
 
 https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get

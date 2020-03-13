@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/grafana/google-sheets-datasource/pkg/core"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ type fakeClient struct {
 }
 
 func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
-	return loadTestSheet("./testdata/mixed-data.json")
+	return loadTestSheet("../testdata/mixed-data.json")
 }
 
 func loadTestSheet(path string) (*sheets.Spreadsheet, error) {
@@ -56,7 +57,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
+			qm := core.QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
 			_, meta, err := gsd.getSheetData(client, &qm)
@@ -75,7 +76,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 0}
+			qm := core.QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 0}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
 			_, meta, err := gsd.getSheetData(client, &qm)
@@ -87,14 +88,14 @@ func TestGooglesheets(t *testing.T) {
 	})
 
 	t.Run("transformSheetToDataFrame", func(t *testing.T) {
-		sheet, err := loadTestSheet("./testdata/mixed-data.json")
+		sheet, err := loadTestSheet("../testdata/mixed-data.json")
 		require.NoError(t, err)
 
 		gsd := &GoogleSheets{
 			Cache:  cache.New(300*time.Second, 50*time.Second),
 			Logger: log.New(),
 		}
-		qm := QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
+		qm := core.QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
 
 		meta := make(map[string]interface{})
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
@@ -127,14 +128,14 @@ func TestGooglesheets(t *testing.T) {
 	})
 
 	t.Run("query single cell", func(t *testing.T) {
-		sheet, err := loadTestSheet("./testdata/single-cell.json")
+		sheet, err := loadTestSheet("../testdata/single-cell.json")
 		require.NoError(t, err)
 
 		gsd := &GoogleSheets{
 			Cache:  cache.New(300*time.Second, 50*time.Second),
 			Logger: log.New(),
 		}
-		qm := QueryModel{Range: "A2", Spreadsheet: "someid", CacheDurationSeconds: 10}
+		qm := core.QueryModel{Range: "A2", Spreadsheet: "someid", CacheDurationSeconds: 10}
 
 		meta := make(map[string]interface{})
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
@@ -157,14 +158,5 @@ func TestGooglesheets(t *testing.T) {
 			require.NotNil(t, strVal)
 			assert.Equal(t, "🌭", *strVal)
 		})
-	})
-
-	t.Run("column id formatting", func(t *testing.T) {
-		require.Equal(t, "A", getExcelColumnName(1))
-		require.Equal(t, "B", getExcelColumnName(2))
-		require.Equal(t, "AH", getExcelColumnName(34))
-		require.Equal(t, "BN", getExcelColumnName(66))
-		require.Equal(t, "ZW", getExcelColumnName(699))
-		require.Equal(t, "AJIL", getExcelColumnName(24582))
 	})
 }

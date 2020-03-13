@@ -1,12 +1,12 @@
-package main
+package datasource
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
+	"github.com/grafana/google-sheets-datasource/pkg/core"
 	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
@@ -22,24 +22,10 @@ import (
 
 const metricNamespace = "sheets_datasource"
 
-func main() {
-	// Setup the plugin environment
-	_ = backend.SetupPluginEnvironment("google-sheets-datasource")
-	pluginLogger := log.New()
-
-	mux := http.NewServeMux()
-	ds := Init(pluginLogger, mux)
-	httpResourceHandler := httpadapter.New(mux)
-
-	err := backend.Serve(backend.ServeOpts{
-		CallResourceHandler: httpResourceHandler,
-		QueryDataHandler:    ds,
-		CheckHealthHandler:  ds,
-	})
-	if err != nil {
-		pluginLogger.Error(err.Error())
-		os.Exit(1)
-	}
+// GoogleSheetsDataSource handler for google sheets
+type GoogleSheetsDataSource struct {
+	logger      log.Logger
+	googlesheet *googlesheets.GoogleSheets
 }
 
 // Init creates the google sheets datasource and sets up all the routes
@@ -67,14 +53,8 @@ func Init(logger log.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
 	return ds
 }
 
-// GoogleSheetsDataSource handler for google sheets
-type GoogleSheetsDataSource struct {
-	logger      log.Logger
-	googlesheet *googlesheets.GoogleSheets
-}
-
-func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConfig, error) {
-	config := googlesheets.GoogleSheetConfig{}
+func getConfig(pluginConfig backend.PluginConfig) (*core.GoogleSheetConfig, error) {
+	config := core.GoogleSheetConfig{}
 	if err := json.Unmarshal(pluginConfig.DataSourceConfig.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
 	}
@@ -129,7 +109,7 @@ func (plugin *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backen
 	}
 
 	for _, q := range req.Queries {
-		queryModel := &googlesheets.QueryModel{}
+		queryModel := &core.QueryModel{}
 		if err := json.Unmarshal(q.JSON, &queryModel); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal query: %w", err)
 		}

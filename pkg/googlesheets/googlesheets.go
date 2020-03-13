@@ -9,8 +9,10 @@ import (
 
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/grafana/google-sheets-datasource/pkg/core"
 	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
 	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
+	"github.com/grafana/google-sheets-datasource/pkg/utils"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
@@ -25,7 +27,7 @@ type GoogleSheets struct {
 }
 
 // Query queries a spreadsheet and returns a corresponding data frame.
-func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*data.Frame, error) {
+func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *core.QueryModel, config *core.GoogleSheetConfig, timeRange backend.TimeRange) (*data.Frame, error) {
 	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
 	if err != nil {
 		return nil, fmt.Errorf("unable to create Google API client: %w", err)
@@ -39,7 +41,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 
 	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
 	if frame != nil && qm.UseTimeFilter {
-		timeIndex := findTimeField(frame)
+		timeIndex := utils.FindTimeField(frame)
 		if timeIndex >= 0 {
 			frame, err = frame.FilterRowsByField(timeIndex, func(i interface{}) (bool, error) {
 				val, ok := i.(*time.Time)
@@ -57,7 +59,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 }
 
 // GetSpreadsheets gets spreadsheets from the Google API.
-func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *GoogleSheetConfig) (map[string]string, error) {
+func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *core.GoogleSheetConfig) (map[string]string, error) {
 	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Google API client: %w", err)
@@ -77,7 +79,7 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *GoogleSheet
 }
 
 // getSheetData gets grid data corresponding to a spreadsheet.
-func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.GridData, map[string]interface{}, error) {
+func (gs *GoogleSheets) getSheetData(client client, qm *core.QueryModel) (*sheets.GridData, map[string]interface{}, error) {
 	cacheKey := qm.Spreadsheet + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		return item.(*sheets.GridData), map[string]interface{}{
@@ -107,22 +109,7 @@ func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.Gri
 	return data, map[string]interface{}{"hit": false}, nil
 }
 
-func getExcelColumnName(columnNumber int) string {
-	dividend := columnNumber
-	columnName := ""
-	var modulo int
-
-	for dividend > 0 {
-		modulo = ((dividend - 1) % 26)
-		fmt.Printf("MOD %d\n", modulo)
-		columnName = string(65+modulo) + columnName
-		dividend = ((dividend - modulo) / 26)
-	}
-
-	return columnName
-}
-
-func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *QueryModel) (*data.Frame, error) {
+func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *core.QueryModel) (*data.Frame, error) {
 	fields := []*data.Field{}
 	columns, start := getColumnDefinitions(sheet.RowData)
 	warnings := []string{}
