@@ -9,10 +9,10 @@ services:
     container_name: circle-ci-dev
     user: root
     volumes:
-      - ${PWD}/../:/home/circleci/plugin
+      - ${PWD}:/home/circleci/plugin
     stdin_open: true
     tty: true
-    user: node
+    user: circleci
     environment:
       - TERM=linux
       - GF_LOG_LEVEL=debug
