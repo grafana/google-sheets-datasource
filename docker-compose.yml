@@ -1,5 +1,8 @@
 version: "3"
 services:
+  ##
+  # Use this service to test the circle-ci image against the plugin
+  #
   build-env:
     image: srclosson/integrations-ci-build:latest
     network_mode: bridge 
