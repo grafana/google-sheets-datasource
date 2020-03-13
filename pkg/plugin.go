@@ -11,9 +11,8 @@ import (
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/httpresource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
-	p "github.com/grafana/grafana-plugin-sdk-go/backend/plugin"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
 	"github.com/prometheus/client_golang/prometheus"
@@ -25,12 +24,12 @@ const metricNamespace = "sheets_datasource"
 
 func main() {
 	// Setup the plugin environment
-	_ = p.SetupPluginEnvironment("google-sheets-datasource")
+	_ = backend.SetupPluginEnvironment("google-sheets-datasource")
 	pluginLogger := log.New()
 
 	mux := http.NewServeMux()
 	ds := Init(pluginLogger, mux)
-	httpResourceHandler := httpresource.New(mux)
+	httpResourceHandler := httpadapter.New(mux)
 
 	err := backend.Serve(backend.ServeOpts{
 		CallResourceHandler: httpResourceHandler,
@@ -188,7 +187,7 @@ func (plugin *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.Respons
 	}
 
 	ctx := req.Context()
-	config, err := getConfig(httpresource.PluginConfigFromContext(ctx))
+	config, err := getConfig(httpadapter.PluginConfigFromContext(ctx))
 	if err != nil {
 		writeResult(rw, "?", nil, err)
 		return
