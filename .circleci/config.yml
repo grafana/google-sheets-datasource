@@ -26,6 +26,7 @@ jobs:
           name: Build and test frontend
           command:  |
             npx grafana-toolkit plugin:ci-build
+            npx grafana-toolkit plugin:ci-build --finish
       - save_cache:
           paths:
             - ~/.cache
@@ -42,14 +43,12 @@ jobs:
           keys:
           - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
-          name: Build Backend
+          name: Build & Test Backend
           command: |
             mage -v buildAll
-      - run:
-          name: Test Backend
-          command: |
             mage -v lint
             mage -v coverage
+            npx grafana-toolkit plugin:ci-build --finish
       - save_cache:
           paths:
             - ~/.cache
@@ -81,7 +80,7 @@ jobs:
     - persist_to_workspace:
         root: .
         paths:
-        - ci
+          - ci
 
   package:
     <<: *defaults
@@ -92,9 +91,6 @@ jobs:
     - restore_cache:
         keys:
         - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Move results to ci-folder
-          npx grafana-toolkit plugin:ci-build --finish
     - run:
         name: Package Distribution
         command: |
