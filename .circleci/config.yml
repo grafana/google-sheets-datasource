@@ -191,7 +191,9 @@ jobs:
             - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: "Publish Release on GitHub"
-          command: npx grafana-toolkit plugin:github-publish
+          command: |
+            yarn install --frozen-lockfile
+            npx grafana-toolkit plugin:github-publish
 
 workflows:
   version: 2
