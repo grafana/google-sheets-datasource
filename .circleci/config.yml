@@ -22,8 +22,7 @@ jobs:
           name: Install dependencies
           command: |
             # Clean the yarn cache first on each run to ensure dependencies are correct.
-            yarn cache clean
-            yarn install --frozen-lockfile
+            yarn cache clean && yarn install --frozen-lockfile
       - run:
           name: Build and test frontend
           command:  |
@@ -56,7 +55,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yarn install --frozen-lockfile
+            yarn cache clean && yarn install --frozen-lockfile
       - run:
           name: Move results to ci folder
           command:  |
@@ -79,7 +78,7 @@ jobs:
     - run:
         name: Install dependencies
         command: |
-          yarn install --frozen-lockfile
+          yarn cache clean && yarn install --frozen-lockfile
     - run:
         name: Build Docs
         command: |
@@ -129,7 +128,7 @@ jobs:
     - run:
         name: Setup Grafana (local install)
         command: |
-          sudo dpkg -i /usr/local/grafana/grafana_6.6.2_amd64.deb
+          sudo dpkg -i /usr/local/grafana/deb/grafana_6.6.2_amd64.deb
           sudo updatedb
           sudo locate grafana
           sudo cat /etc/grafana/grafana.ini
