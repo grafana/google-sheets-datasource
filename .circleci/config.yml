@@ -129,7 +129,7 @@ jobs:
     - run:
         name: Setup Grafana (local install)
         command: |
-          sudo dpkg -i /usr/local/grafana/grafana_6.6.3_amd64.deb
+          sudo dpkg -i /usr/local/grafana/grafana_6.6.2_amd64.deb
           sudo updatedb
           sudo locate grafana
           sudo cat /etc/grafana/grafana.ini
