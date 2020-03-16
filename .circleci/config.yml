@@ -173,7 +173,11 @@ jobs:
         name: Toolkit report
         command: |
           yarn install --frozen-lockfile
-          npx grafana-toolkit plugin:ci-report
+          if [ "$(curl -s https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/releases/latest | jq -r '.tag_name')" = "v$(cat ci/dist/plugin.json | jq -r '.info.version')" ]; then
+            npx grafana-toolkit plugin:github-publish --recreate
+          else
+            npx grafana-toolkit plugin:github-publish
+          fi
     - store_artifacts:
         path: ci
 
