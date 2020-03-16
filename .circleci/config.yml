@@ -8,7 +8,7 @@ aliases:
 
 defaults: &defaults
   docker:
-    - image: srclosson/integrations-ci-build:latest
+    - image: srclosson/grafana-plugin-ci:latest
 
 jobs:
   build_plugin:
@@ -21,8 +21,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # Clean the yarn cache first on each run to ensure dependencies are correct.
-            yarn cache clean && yarn install --frozen-lockfile
+            yarn install --frozen-lockfile
       - run:
           name: Build and test frontend
           command:  |
@@ -55,7 +54,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yarn cache clean && yarn install --frozen-lockfile
+            yarn install --frozen-lockfile
       - run:
           name: Move results to ci folder
           command:  |
@@ -78,7 +77,7 @@ jobs:
     - run:
         name: Install dependencies
         command: |
-          yarn cache clean && yarn install --frozen-lockfile
+          yarn install --frozen-lockfile
     - run:
         name: Build Docs
         command: |
@@ -130,7 +129,6 @@ jobs:
           sudo dpkg -i /usr/local/grafana/deb/grafana_6.6.2_amd64.deb
           sudo updatedb
           sudo locate grafana
-          sudo cat /etc/grafana/grafana.ini
           sudo cp ci/grafana-test-env/custom.ini /usr/share/grafana/conf/custom.ini
           sudo cp ci/grafana-test-env/custom.ini /etc/grafana/grafana.ini
           sudo service grafana-server start
