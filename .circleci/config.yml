@@ -52,6 +52,10 @@ jobs:
             mage -v lint
             mage -v coverage
       - run:
+          name: Install dependencies
+          command: |
+            yarn install --frozen-lockfile
+      - run:
           name: Move results to ci folder
           command:  |
             npx grafana-toolkit plugin:ci-build --finish
@@ -86,7 +90,7 @@ jobs:
     - persist_to_workspace:
         root: .
         paths:
-        - ci
+          - ci
 
   package:
     <<: *defaults
@@ -200,8 +204,8 @@ workflows:
   plugin_workflow:
     jobs:
       - build_plugin
-      - build_backend
       - build_docs
+      - build_backend
       - package:
           requires:
             - build_plugin
