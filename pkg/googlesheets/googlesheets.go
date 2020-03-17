@@ -106,21 +106,6 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 	return data, map[string]interface{}{"hit": false}, nil
 }
 
-func getExcelColumnName(columnNumber int) string {
-	dividend := columnNumber
-	columnName := ""
-	var modulo int
-
-	for dividend > 0 {
-		modulo = ((dividend - 1) % 26)
-		fmt.Printf("MOD %d\n", modulo)
-		columnName = string(65+modulo) + columnName
-		dividend = ((dividend - modulo) / 26)
-	}
-
-	return columnName
-}
-
 func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {
 	fields := []*data.Field{}
 	columns, start := getColumnDefinitions(sheet.RowData)

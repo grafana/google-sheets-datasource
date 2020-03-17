@@ -1,8 +1,6 @@
 package googlesheets
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,14 +8,9 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
-func loadTestSheet(path string) (*sheets.GridData, error) {
-	jsonBody, err := ioutil.ReadFile(path)
+func loadTestGridData(path string) (*sheets.GridData, error) {
+	data, err := loadTestSheet(path)
 	if err != nil {
-		return nil, err
-	}
-
-	var data sheets.Spreadsheet
-	if err := json.Unmarshal(jsonBody, &data); err != nil {
 		return nil, err
 	}
 
@@ -27,7 +20,7 @@ func loadTestSheet(path string) (*sheets.GridData, error) {
 }
 
 func TestColumnDefinition(t *testing.T) {
-	sheet, err := loadTestSheet("../testdata/mixed-data.json")
+	sheet, err := loadTestGridData("./testdata/mixed-data.json")
 	require.Nil(t, err)
 
 	t.Run("TestDataTypes", func(t *testing.T) {
