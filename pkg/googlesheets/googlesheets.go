@@ -11,7 +11,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
 	"google.golang.org/api/sheets/v4"
@@ -19,8 +18,7 @@ import (
 
 // GoogleSheets provides an interface to the Google Sheets API.
 type GoogleSheets struct {
-	Cache  *cache.Cache
-	Logger log.Logger
+	Cache *cache.Cache
 }
 
 // Query queries a spreadsheet and returns a corresponding data frame.
@@ -135,13 +133,13 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		if column.HasMixedTypes() {
 			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
 			warnings = append(warnings, warning)
-			gs.Logger.Warn(warning)
+			backend.Logger.Warn(warning)
 		}
 
 		if column.HasMixedUnits() {
 			warning := fmt.Sprintf("Multiple units found in column %q. Formatted value will be used", column.Header)
 			warnings = append(warnings, warning)
-			gs.Logger.Warn(warning)
+			backend.Logger.Warn(warning)
 		}
 
 		fields = append(fields, field)
@@ -186,7 +184,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
 	frame.Meta = &data.QueryResultMeta{Custom: meta}
-	gs.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
+	backend.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
 
 	return frame, nil
 }

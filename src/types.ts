@@ -22,9 +22,6 @@ export const googleAuthTypes = [
   { label: 'Google JWT File', value: GoogleAuthType.JWT },
 ];
 
-export interface GoogleCloudOptions extends DataSourceJsonData {
-  authenticationType: GoogleAuthType;
-}
 export interface CacheInfo {
   hit: boolean;
   count: number;
@@ -50,7 +47,7 @@ export interface SheetsQuery extends DataQuery {
   useTimeFilter?: boolean;
 }
 
-export interface SheetsSourceOptions extends GoogleCloudOptions {
+export interface SheetsSourceOptions extends DataSourceJsonData {
   authType: GoogleAuthType;
 }
 

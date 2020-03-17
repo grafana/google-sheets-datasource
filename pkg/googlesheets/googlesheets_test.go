@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -92,8 +91,7 @@ func TestGooglesheets(t *testing.T) {
 		require.NoError(t, err)
 
 		gsd := &GoogleSheets{
-			Cache:  cache.New(300*time.Second, 50*time.Second),
-			Logger: log.New(),
+			Cache: cache.New(300*time.Second, 50*time.Second),
 		}
 		qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
 
@@ -132,8 +130,7 @@ func TestGooglesheets(t *testing.T) {
 		require.NoError(t, err)
 
 		gsd := &GoogleSheets{
-			Cache:  cache.New(300*time.Second, 50*time.Second),
-			Logger: log.New(),
+			Cache: cache.New(300*time.Second, 50*time.Second),
 		}
 		qm := models.QueryModel{Range: "A2", Spreadsheet: "someid", CacheDurationSeconds: 10}
 

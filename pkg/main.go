@@ -9,10 +9,10 @@ import (
 )
 
 func main() {
-	pluginLogger := backend.SetupPluginEnvironment("google-sheets-datasource")
+	_ = backend.SetupPluginEnvironment("google-sheets-datasource")
 
 	mux := http.NewServeMux()
-	ds := NewDataSource(pluginLogger, mux)
+	ds := NewDataSource(mux)
 	httpResourceHandler := httpadapter.New(mux)
 
 	err := backend.Serve(backend.ServeOpts{
@@ -21,7 +21,7 @@ func main() {
 		CheckHealthHandler:  ds,
 	})
 	if err != nil {
-		pluginLogger.Error(err.Error())
+		backend.Logger.Error(err.Error())
 		os.Exit(1)
 	}
 }

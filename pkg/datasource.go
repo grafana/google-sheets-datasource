@@ -9,7 +9,6 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
@@ -22,12 +21,11 @@ const metricNamespace = "sheets_datasource"
 
 // GoogleSheetsDataSource handler for google sheets
 type GoogleSheetsDataSource struct {
-	logger      log.Logger
 	googlesheet *googlesheets.GoogleSheets
 }
 
 // NewDataSource creates the google sheets datasource and sets up all the routes
-func NewDataSource(logger log.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
+func NewDataSource(mux *http.ServeMux) *GoogleSheetsDataSource {
 	queriesTotal := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name:      "data_query_total",
@@ -40,10 +38,8 @@ func NewDataSource(logger log.Logger, mux *http.ServeMux) *GoogleSheetsDataSourc
 
 	cache := cache.New(300*time.Second, 5*time.Second)
 	ds := &GoogleSheetsDataSource{
-		logger: logger,
 		googlesheet: &googlesheets.GoogleSheets{
-			Cache:  cache,
-			Logger: logger,
+			Cache: cache,
 		},
 	}
 
@@ -126,7 +122,7 @@ func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.Qu
 
 		frame, err := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
 		if err != nil {
-			ds.logger.Error("Query failed", "refId", q.RefID, "error", err)
+			backend.Logger.Error("Query failed", "refId", q.RefID, "error", err)
 			// TEMP: at the moment, the only way to return an error is by using meta
 			res.Metadata = map[string]string{"error": err.Error()}
 			continue
@@ -161,7 +157,7 @@ func writeResult(rw http.ResponseWriter, path string, val interface{}, err error
 }
 
 func (ds *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.ResponseWriter, req *http.Request) {
-	ds.logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
+	backend.Logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
 	if req.Method != http.MethodGet {
 		return
 	}
