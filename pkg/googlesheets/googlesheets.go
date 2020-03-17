@@ -9,8 +9,7 @@ import (
 
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
-	cd "github.com/grafana/google-sheets-datasource/pkg/googlesheets/columndefinition"
-	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
+	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
@@ -25,8 +24,8 @@ type GoogleSheets struct {
 }
 
 // Query queries a spreadsheet and returns a corresponding data frame.
-func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel, config *GoogleSheetConfig, timeRange backend.TimeRange) (*data.Frame, error) {
-	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
+func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config *models.GoogleSheetConfig, timeRange backend.TimeRange) (*data.Frame, error) {
+	client, err := NewGoogleClient(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("unable to create Google API client: %w", err)
 	}
@@ -57,8 +56,8 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *QueryModel,
 }
 
 // GetSpreadsheets gets spreadsheets from the Google API.
-func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *GoogleSheetConfig) (map[string]string, error) {
-	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
+func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *models.GoogleSheetConfig) (map[string]string, error) {
+	client, err := NewGoogleClient(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Google API client: %w", err)
 	}
@@ -77,7 +76,7 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *GoogleSheet
 }
 
 // getSheetData gets grid data corresponding to a spreadsheet.
-func (gs *GoogleSheets) getSheetData(client client, qm *QueryModel) (*sheets.GridData, map[string]interface{}, error) {
+func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*sheets.GridData, map[string]interface{}, error) {
 	cacheKey := qm.Spreadsheet + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		return item.(*sheets.GridData), map[string]interface{}{
@@ -122,7 +121,7 @@ func getExcelColumnName(columnNumber int) string {
 	return columnName
 }
 
-func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *QueryModel) (*data.Frame, error) {
+func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {
 	fields := []*data.Field{}
 	columns, start := getColumnDefinitions(sheet.RowData)
 	warnings := []string{}
@@ -227,8 +226,8 @@ func getUniqueColumnName(formattedName string, columnIndex int, columns map[stri
 	return name
 }
 
-func getColumnDefinitions(rows []*sheets.RowData) ([]*cd.ColumnDefinition, int) {
-	columns := []*cd.ColumnDefinition{}
+func getColumnDefinitions(rows []*sheets.RowData) ([]*ColumnDefinition, int) {
+	columns := []*ColumnDefinition{}
 	columnMap := map[string]bool{}
 	headerRow := rows[0].Values
 
@@ -238,13 +237,13 @@ func getColumnDefinitions(rows []*sheets.RowData) ([]*cd.ColumnDefinition, int) 
 		for columnIndex, headerCell := range headerRow {
 			name := getUniqueColumnName(strings.TrimSpace(headerCell.FormattedValue), columnIndex, columnMap)
 			columnMap[name] = true
-			columns = append(columns, cd.New(name, columnIndex))
+			columns = append(columns, NewColumnDefinition(name, columnIndex))
 		}
 	} else {
 		for columnIndex := range headerRow {
 			name := getUniqueColumnName("", columnIndex, columnMap)
 			columnMap[name] = true
-			columns = append(columns, cd.New(name, columnIndex))
+			columns = append(columns, NewColumnDefinition(name, columnIndex))
 		}
 	}
 

@@ -1,4 +1,4 @@
-package columndefinition
+package googlesheets
 
 import (
 	"strings"
@@ -27,7 +27,7 @@ type ColumnDefinition struct {
 }
 
 // New creates a new ColumnDefinition.
-func New(header string, index int) *ColumnDefinition {
+func NewColumnDefinition(header string, index int) *ColumnDefinition {
 	return &ColumnDefinition{
 		Header:      header,
 		ColumnIndex: index,

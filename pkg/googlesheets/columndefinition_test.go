@@ -1,4 +1,4 @@
-package columndefinition
+package googlesheets
 
 import (
 	"encoding/json"
@@ -32,7 +32,7 @@ func TestColumnDefinition(t *testing.T) {
 
 	t.Run("TestDataTypes", func(t *testing.T) {
 		t.Run("Mixed types detected", func(t *testing.T) {
-			column := New(sheet.RowData[0].Values[10].FormattedValue, 10)
+			column := NewColumnDefinition(sheet.RowData[0].Values[10].FormattedValue, 10)
 			for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 				column.CheckCell(sheet.RowData[rowIndex].Values[column.ColumnIndex])
 			}
@@ -43,7 +43,7 @@ func TestColumnDefinition(t *testing.T) {
 		})
 
 		t.Run("Mixed types not detected", func(t *testing.T) {
-			column := New(sheet.RowData[0].Values[0].FormattedValue, 0)
+			column := NewColumnDefinition(sheet.RowData[0].Values[0].FormattedValue, 0)
 			for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 				column.CheckCell(sheet.RowData[rowIndex].Values[column.ColumnIndex])
 			}
@@ -54,7 +54,7 @@ func TestColumnDefinition(t *testing.T) {
 
 	t.Run("TestUnits", func(t *testing.T) {
 		t.Run("Mixed units detected", func(t *testing.T) {
-			column := New(sheet.RowData[0].Values[11].FormattedValue, 11)
+			column := NewColumnDefinition(sheet.RowData[0].Values[11].FormattedValue, 11)
 			for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 				column.CheckCell(sheet.RowData[rowIndex].Values[column.ColumnIndex])
 			}
@@ -63,7 +63,7 @@ func TestColumnDefinition(t *testing.T) {
 		})
 
 		t.Run("Mixed units not detected", func(t *testing.T) {
-			column := New(sheet.RowData[0].Values[0].FormattedValue, 0)
+			column := NewColumnDefinition(sheet.RowData[0].Values[0].FormattedValue, 0)
 			for rowIndex := 1; rowIndex < len(sheet.RowData); rowIndex++ {
 				column.CheckCell(sheet.RowData[rowIndex].Values[column.ColumnIndex])
 			}
@@ -75,49 +75,49 @@ func TestColumnDefinition(t *testing.T) {
 			const currencyColumnIndex int = 14
 
 			t.Run("SEK", func(t *testing.T) {
-				column := New("SEK", currencyColumnIndex)
+				column := NewColumnDefinition("SEK", currencyColumnIndex)
 				column.CheckCell(sheet.RowData[1].Values[currencyColumnIndex])
 				assert.Equal(t, "currencySEK", column.GetUnit())
 			})
 
 			t.Run("USD", func(t *testing.T) {
-				column := New("USD", currencyColumnIndex)
+				column := NewColumnDefinition("USD", currencyColumnIndex)
 				column.CheckCell(sheet.RowData[4].Values[currencyColumnIndex])
 				assert.Equal(t, "currencyUSD", column.GetUnit())
 			})
 
 			t.Run("GBP", func(t *testing.T) {
-				column := New("GBP", currencyColumnIndex)
+				column := NewColumnDefinition("GBP", currencyColumnIndex)
 				column.CheckCell(sheet.RowData[5].Values[currencyColumnIndex])
 				assert.Equal(t, "currencyGBP", column.GetUnit())
 			})
 
 			t.Run("EUR", func(t *testing.T) {
-				column := New("EUR", currencyColumnIndex)
+				column := NewColumnDefinition("EUR", currencyColumnIndex)
 				column.CheckCell(sheet.RowData[6].Values[currencyColumnIndex])
 				assert.Equal(t, "currencyEUR", column.GetUnit())
 			})
 
 			t.Run("JPY", func(t *testing.T) {
-				column := New("JPY", currencyColumnIndex)
+				column := NewColumnDefinition("JPY", currencyColumnIndex)
 				column.CheckCell(sheet.RowData[7].Values[currencyColumnIndex])
 				assert.Equal(t, "currencyJPY", column.GetUnit())
 			})
 
 			t.Run("RUB", func(t *testing.T) {
-				column := New("RUB", currencyColumnIndex)
+				column := NewColumnDefinition("RUB", currencyColumnIndex)
 				column.CheckCell(sheet.RowData[8].Values[currencyColumnIndex])
 				assert.Equal(t, "currencyRUB", column.GetUnit())
 			})
 
 			t.Run("CHF", func(t *testing.T) {
-				column := New("CHF", currencyColumnIndex)
+				column := NewColumnDefinition("CHF", currencyColumnIndex)
 				column.CheckCell(sheet.RowData[9].Values[currencyColumnIndex])
 				assert.Equal(t, "currencyCHF", column.GetUnit())
 			})
 
 			t.Run("INR", func(t *testing.T) {
-				column := New("INR", currencyColumnIndex)
+				column := NewColumnDefinition("INR", currencyColumnIndex)
 				column.CheckCell(sheet.RowData[10].Values[currencyColumnIndex])
 				assert.Equal(t, "currencyINR", column.GetUnit())
 			})
