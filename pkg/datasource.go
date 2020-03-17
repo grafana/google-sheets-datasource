@@ -51,7 +51,7 @@ func NewDataSource(logger log.Logger, mux *http.ServeMux) *GoogleSheetsDataSourc
 	return ds
 }
 
-func getConfig(pluginConfig backend.PluginConfig) (*models.GoogleSheetConfig, error) {
+func readConfig(pluginConfig backend.PluginConfig) (*models.GoogleSheetConfig, error) {
 	config := models.GoogleSheetConfig{}
 	if err := json.Unmarshal(pluginConfig.DataSourceConfig.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
@@ -59,6 +59,14 @@ func getConfig(pluginConfig backend.PluginConfig) (*models.GoogleSheetConfig, er
 	config.APIKey = pluginConfig.DataSourceConfig.DecryptedSecureJSONData["apiKey"]
 	config.JWT = pluginConfig.DataSourceConfig.DecryptedSecureJSONData["jwt"]
 	return &config, nil
+}
+
+func readQuery(q backend.DataQuery) (*models.QueryModel, error) {
+	queryModel := models.QueryModel{}
+	if err := json.Unmarshal(q.JSON, &queryModel); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal query: %w", err)
+	}
+	return &queryModel, nil
 }
 
 // CheckHealth checks if the plugin is running properly
@@ -72,7 +80,7 @@ func (ds *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.
 		return res, nil
 	}
 
-	config, err := getConfig(req.PluginConfig)
+	config, err := readConfig(req.PluginConfig)
 	if err != nil {
 		res.Status = backend.HealthStatusError
 		res.Message = "Invalid config"
@@ -101,15 +109,15 @@ func (ds *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.
 // QueryData queries for data.
 func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	res := &backend.QueryDataResponse{}
-	config, err := getConfig(req.PluginConfig)
+	config, err := readConfig(req.PluginConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, q := range req.Queries {
-		queryModel := &models.QueryModel{}
-		if err := json.Unmarshal(q.JSON, &queryModel); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal query: %w", err)
+		queryModel, err := readQuery(q)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read query: %w", err)
 		}
 
 		if len(queryModel.Spreadsheet) < 1 {
@@ -159,7 +167,7 @@ func (ds *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.ResponseWri
 	}
 
 	ctx := req.Context()
-	config, err := getConfig(httpadapter.PluginConfigFromContext(ctx))
+	config, err := readConfig(httpadapter.PluginConfigFromContext(ctx))
 	if err != nil {
 		writeResult(rw, "?", nil, err)
 		return
