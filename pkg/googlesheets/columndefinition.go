@@ -26,7 +26,7 @@ type ColumnDefinition struct {
 	units       map[string]bool
 }
 
-// New creates a new ColumnDefinition.
+// NewColumnDefinition creates a new ColumnDefinition.
 func NewColumnDefinition(header string, index int) *ColumnDefinition {
 	return &ColumnDefinition{
 		Header:      header,
