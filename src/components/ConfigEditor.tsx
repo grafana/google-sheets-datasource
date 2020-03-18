@@ -78,19 +78,19 @@ export class ConfigEditor extends PureComponent<Props> {
         <div className="grafana-info-box" style={{ marginTop: 24 }}>
           {jsonData.authType === GoogleAuthType.JWT ? (
             <>
-              <h4>How to generate a JWT file</h4>
+              <h4>Generate a JWT file</h4>
               <ol style={{ listStylePosition: 'inside' }}>
                 <li>
-                  Open the <a href="https://console.developers.google.com/apis/credentials">Credentials page</a> in the API Console.
+                  Open the <a href="https://console.developers.google.com/apis/credentials">Credentials</a> page in the Google API Console.
                 </li>
                 <li>
-                  Click on the <code>Create credentials</code> dropdown/button and choose the <code>Service account key</code> option.
+                  Click <strong>Create Credentials</strong> then click <strong>Service account</strong>.
                 </li>
+                
                 <li>
-                  On the <code>Create service account key</code> page, choose key type <code>JSON</code>. Then in the <code>Service Account</code>{' '}
-                  dropdown, choose the <code>New service account</code> option:
+                  On the Create service account page, enter the Service account details.
                 </li>
-                <li>Click the Create button. A JSON key file will be created and downloaded to your computer</li>
+                <li>Click <strong>Create</strong>. A JSON key file is created and downloaded to your computer.</li> 
 
                 <li>
                   Open the <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet">Google Sheets</a> in API Library and
@@ -99,9 +99,9 @@ export class ConfigEditor extends PureComponent<Props> {
 
                 <li>
                   Open the <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive">Google Drive</a> in API Library and
-                  enable access for your account. Access to the Google Drive API is used to list all spreadsheets that you have access to
+                  enable access for your account. Access to the Google Drive API is used to list all spreadsheets that you have access to.
                 </li>
-                <li>Drag'n drop the file on the dotted zone below. The file contents will be encrypted and saved in the Grafana database.</li>
+                <li>Drag the file to the dotted zone below. The file contents are encrypted and saved in the Grafana database.</li>
               </ol>
             </>
           ) : (
@@ -109,12 +109,12 @@ export class ConfigEditor extends PureComponent<Props> {
               <h4>How to generate an API key</h4>
               <ol style={{ listStylePosition: 'inside' }}>
                 <li>
-                  Open the <a href="https://console.developers.google.com/apis/credentials">Credentials page</a> in the API Console.
+                  Open the <a href="https://console.developers.google.com/apis/credentials">Credentials page</a> in the Google API Console.
                 </li>
                 <li>
-                  Click on the <code>Create credentials</code> dropdown/button and choose the <code>API key</code> option.
+                  Click <strong>Create Credentials</strong> and then click <strong>API key</strong>.
                 </li>
-                <li>Copy the key and paste it in the API Key field above. The file contents will be encrypted and saved in the Grafana database.</li>
+                <li>Copy the key and paste it in the API Key field above. The file contents are encrypted and saved in the Grafana database.</li>
               </ol>
             </>
           )}
