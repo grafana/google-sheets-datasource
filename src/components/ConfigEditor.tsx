@@ -106,7 +106,7 @@ export class ConfigEditor extends PureComponent<Props> {
             </>
           ) : (
             <>
-              <h4>How to generate an API key</h4>
+              <h4>Generate an API key</h4>
               <ol style={{ listStylePosition: 'inside' }}>
                 <li>
                   Open the <a href="https://console.developers.google.com/apis/credentials">Credentials page</a> in the Google API Console.
