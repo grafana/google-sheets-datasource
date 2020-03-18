@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
+	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -56,7 +56,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
+			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
 			_, meta, err := gsd.getSheetData(client, &qm)
@@ -75,7 +75,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 0}
+			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 0}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
 			_, meta, err := gsd.getSheetData(client, &qm)
@@ -91,10 +91,9 @@ func TestGooglesheets(t *testing.T) {
 		require.NoError(t, err)
 
 		gsd := &GoogleSheets{
-			Cache:  cache.New(300*time.Second, 50*time.Second),
-			Logger: log.New(),
+			Cache: cache.New(300*time.Second, 50*time.Second),
 		}
-		qm := QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
+		qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
 
 		meta := make(map[string]interface{})
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
@@ -131,10 +130,9 @@ func TestGooglesheets(t *testing.T) {
 		require.NoError(t, err)
 
 		gsd := &GoogleSheets{
-			Cache:  cache.New(300*time.Second, 50*time.Second),
-			Logger: log.New(),
+			Cache: cache.New(300*time.Second, 50*time.Second),
 		}
-		qm := QueryModel{Range: "A2", Spreadsheet: "someid", CacheDurationSeconds: 10}
+		qm := models.QueryModel{Range: "A2", Spreadsheet: "someid", CacheDurationSeconds: 10}
 
 		meta := make(map[string]interface{})
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)

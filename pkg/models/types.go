@@ -1,8 +1,4 @@
-package googlesheets
-
-import (
-	"google.golang.org/api/sheets/v4"
-)
+package models
 
 // QueryModel represents a spreadsheet query.
 type QueryModel struct {
@@ -17,8 +13,4 @@ type GoogleSheetConfig struct {
 	AuthType string `json:"authType"` // jwt | key
 	APIKey   string `json:"apiKey"`
 	JWT      string `json:"jwt"`
-}
-
-type client interface {
-	GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error)
 }

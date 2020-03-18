@@ -4,14 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
-	gc "github.com/grafana/google-sheets-datasource/pkg/googlesheets/googleclient"
-
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
+	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
@@ -22,28 +19,13 @@ import (
 
 const metricNamespace = "sheets_datasource"
 
-func main() {
-	// Setup the plugin environment
-	_ = backend.SetupPluginEnvironment("google-sheets-datasource")
-	pluginLogger := log.New()
-
-	mux := http.NewServeMux()
-	ds := Init(pluginLogger, mux)
-	httpResourceHandler := httpadapter.New(mux)
-
-	err := backend.Serve(backend.ServeOpts{
-		CallResourceHandler: httpResourceHandler,
-		QueryDataHandler:    ds,
-		CheckHealthHandler:  ds,
-	})
-	if err != nil {
-		pluginLogger.Error(err.Error())
-		os.Exit(1)
-	}
+// GoogleSheetsDataSource handler for google sheets
+type GoogleSheetsDataSource struct {
+	googlesheet *googlesheets.GoogleSheets
 }
 
-// Init creates the google sheets datasource and sets up all the routes
-func Init(logger log.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
+// NewDataSource creates the google sheets datasource and sets up all the routes
+func NewDataSource(mux *http.ServeMux) *GoogleSheetsDataSource {
 	queriesTotal := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name:      "data_query_total",
@@ -56,10 +38,8 @@ func Init(logger log.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
 
 	cache := cache.New(300*time.Second, 5*time.Second)
 	ds := &GoogleSheetsDataSource{
-		logger: logger,
 		googlesheet: &googlesheets.GoogleSheets{
-			Cache:  cache,
-			Logger: logger,
+			Cache: cache,
 		},
 	}
 
@@ -67,14 +47,8 @@ func Init(logger log.Logger, mux *http.ServeMux) *GoogleSheetsDataSource {
 	return ds
 }
 
-// GoogleSheetsDataSource handler for google sheets
-type GoogleSheetsDataSource struct {
-	logger      log.Logger
-	googlesheet *googlesheets.GoogleSheets
-}
-
-func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConfig, error) {
-	config := googlesheets.GoogleSheetConfig{}
+func readConfig(pluginConfig backend.PluginConfig) (*models.GoogleSheetConfig, error) {
+	config := models.GoogleSheetConfig{}
 	if err := json.Unmarshal(pluginConfig.DataSourceConfig.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
 	}
@@ -83,8 +57,16 @@ func getConfig(pluginConfig backend.PluginConfig) (*googlesheets.GoogleSheetConf
 	return &config, nil
 }
 
+func readQuery(q backend.DataQuery) (*models.QueryModel, error) {
+	queryModel := models.QueryModel{}
+	if err := json.Unmarshal(q.JSON, &queryModel); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal query: %w", err)
+	}
+	return &queryModel, nil
+}
+
 // CheckHealth checks if the plugin is running properly
-func (plugin *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
+func (ds *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	res := &backend.CheckHealthResult{}
 
 	// Just checking that the plugin exe is alive and running
@@ -94,14 +76,14 @@ func (plugin *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *back
 		return res, nil
 	}
 
-	config, err := getConfig(req.PluginConfig)
+	config, err := readConfig(req.PluginConfig)
 	if err != nil {
 		res.Status = backend.HealthStatusError
 		res.Message = "Invalid config"
 		return res, nil
 	}
 
-	client, err := gc.New(ctx, gc.NewAuth(config.APIKey, config.AuthType, config.JWT))
+	client, err := googlesheets.NewGoogleClient(ctx, config)
 	if err != nil {
 		res.Status = backend.HealthStatusError
 		res.Message = "Unable to create client"
@@ -121,26 +103,26 @@ func (plugin *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *back
 }
 
 // QueryData queries for data.
-func (plugin *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	res := &backend.QueryDataResponse{}
-	config, err := getConfig(req.PluginConfig)
+	config, err := readConfig(req.PluginConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, q := range req.Queries {
-		queryModel := &googlesheets.QueryModel{}
-		if err := json.Unmarshal(q.JSON, &queryModel); err != nil {
-			return nil, fmt.Errorf("failed to unmarshal query: %w", err)
+		queryModel, err := readQuery(q)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read query: %w", err)
 		}
 
 		if len(queryModel.Spreadsheet) < 1 {
 			continue // not query really exists
 		}
 
-		frame, err := plugin.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
+		frame, err := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
 		if err != nil {
-			plugin.logger.Error("Query failed", "refId", q.RefID, "error", err)
+			backend.Logger.Error("Query failed", "refId", q.RefID, "error", err)
 			// TEMP: at the moment, the only way to return an error is by using meta
 			res.Metadata = map[string]string{"error": err.Error()}
 			continue
@@ -174,19 +156,19 @@ func writeResult(rw http.ResponseWriter, path string, val interface{}, err error
 	rw.WriteHeader(code)
 }
 
-func (plugin *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.ResponseWriter, req *http.Request) {
-	plugin.logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
+func (ds *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.ResponseWriter, req *http.Request) {
+	backend.Logger.Debug("Received resource call", "url", req.URL.String(), "method", req.Method)
 	if req.Method != http.MethodGet {
 		return
 	}
 
 	ctx := req.Context()
-	config, err := getConfig(httpadapter.PluginConfigFromContext(ctx))
+	config, err := readConfig(httpadapter.PluginConfigFromContext(ctx))
 	if err != nil {
 		writeResult(rw, "?", nil, err)
 		return
 	}
 
-	res, err := plugin.googlesheet.GetSpreadsheets(ctx, config)
+	res, err := ds.googlesheet.GetSpreadsheets(ctx, config)
 	writeResult(rw, "spreadsheets", res, err)
 }
