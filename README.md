@@ -1,24 +1,25 @@
 # Google Sheets Datasource
 
-⚠️ Work in Progress ⚠️ 
+Visualize your Google Spreadsheets with Grafana
 
-This aims to be the first production ready plugin using the new https://github.com/grafana/grafana-plugin-sdk-go and will become the best practice example for grafana 6.7+
+![Visualize temperature date in Grafana Google Spreadsheets data source](./src/docs/img/dashboard.png)
 
-In particular, the code style and tooling needs work before it should be widely replicated.
+![Average temperatures in Google Sheets](./src/docs/img/spreadsheet.png)
 
 ## Development
 
 You need to install the following first:
 
-* [Mage](https://magefile.org/)
-* [Yarn](https://yarnpkg.com/)
-* [Docker Compose](https://docs.docker.com/compose/)
+- [Mage](https://magefile.org/)
+- [Yarn](https://yarnpkg.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
 ```
 mage watch
 ```
 
 In another terminal
+
 ```
 docker-compose up
 ```
