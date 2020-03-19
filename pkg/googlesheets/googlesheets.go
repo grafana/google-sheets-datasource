@@ -25,7 +25,7 @@ type GoogleSheets struct {
 func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config *models.GoogleSheetConfig, timeRange backend.TimeRange) (*data.Frame, error) {
 	client, err := NewGoogleClient(ctx, config)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create Google API client: %w", err)
+		return nil, err
 	}
 
 	// This result may be cached
