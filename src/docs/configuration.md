@@ -1,4 +1,4 @@
-# Configuring the Google Sheets Datasource
+# Configuring the Google Sheets data source
 
 The Google Sheets data source is using the [Google Sheet API](https://developers.google.com/sheets/api) to access spreadsheets. The data source supports two ways of authenticating against the Google Sheets API. **API Key** auth is used to access public spreadsheets, and **Google JWT File** auth using a service account is used to access private files.
 
@@ -16,7 +16,7 @@ Whenever access to private spreadsheets is necessary, service account auth using
 
 The project that the service account is associated with needs to be granted access to the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) and the [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive).
 
-The Google Sheets datasource uses the scope `https://www.googleapis.com/auth/spreadsheets.readonly` to get read-only access to spreadsheets. It also uses the scope `https://www.googleapis.com/auth/drive.metadata.readonly` to list all spreadsheets that the service account has access to in Google Drive.
+The Google Sheets data source uses the scope `https://www.googleapis.com/auth/spreadsheets.readonly` to get read-only access to spreadsheets. It also uses the scope `https://www.googleapis.com/auth/drive.metadata.readonly` to list all spreadsheets that the service account has access to in Google Drive.
 
 To create a service account, generate a Google JWT file and enable the APIs, follow the steps in the Google Sheets data source configuration page.
 

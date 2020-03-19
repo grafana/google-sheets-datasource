@@ -1,4 +1,4 @@
-# Google Sheets Datasource
+# Google Sheets data source
 
 Visualize your Google Spreadsheets in Grafana!
 
