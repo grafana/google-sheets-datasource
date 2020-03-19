@@ -123,9 +123,7 @@ func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.Qu
 		frame, err := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
 		if err != nil {
 			backend.Logger.Error("Query failed", "refId", q.RefID, "error", err)
-			// TEMP: at the moment, the only way to return an error is by using meta
-			res.Metadata = map[string]string{"error": err.Error()}
-			continue
+			return nil, err
 		}
 
 		res.Frames = append(res.Frames, []*data.Frame{frame}...)
