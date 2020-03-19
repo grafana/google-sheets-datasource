@@ -25,7 +25,7 @@ type GoogleSheets struct {
 func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config *models.GoogleSheetConfig, timeRange backend.TimeRange) (*data.Frame, error) {
 	client, err := NewGoogleClient(ctx, config)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to create Google API client: %w", err)
 	}
 
 	// This result may be cached
@@ -85,7 +85,7 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 
 	result, err := client.GetSpreadsheet(qm.Spreadsheet, qm.Range, true)
 	if err != nil {
-		return nil, nil, fmt.Errorf("unable to get spreadsheet: %w", err)
+		return nil, nil, err
 	}
 
 	if result.Properties.TimeZone != "" {
