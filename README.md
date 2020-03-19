@@ -30,3 +30,7 @@ docker-compose up
 
 To restart after backend changes:
 `./scripts/restart-plugin.sh`
+
+### Test spreadsheet
+
+Need at publicly available spreadsheet to play around with? Feel free to use [this](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing) demo spreadsheet that is suitable for visualization in graphs and in tables.
