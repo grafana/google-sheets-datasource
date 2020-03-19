@@ -23,7 +23,32 @@
         "url": "https://github.com/grafana/google-sheets-datasource"
       }
     ],
-    "screenshots": [],
+    "screenshots": [
+      {
+        "name": "Average temperature dashboard example",
+        "path": "img/dashboard.png"
+      },
+      {
+        "name": "Average temperature spreadsheet example",
+        "path": "img/spreadsheet.png"
+      },
+      {
+        "name": "Average temperature table example",
+        "path": "img/table.png"
+      },
+      {
+        "name": "Average temperature graph example",
+        "path": "img/graph.png"
+      },
+      {
+        "name": "Query editor",
+        "path": "img/query-editor.png"
+      },
+      {
+        "name": "Config page - Google JWT File auth",
+        "path": "img/config-page.png"
+      }
+    ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
