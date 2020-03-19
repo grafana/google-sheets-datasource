@@ -4,11 +4,11 @@ Visualize your Google Spreadsheets in Grafana!
 
 ## Configuration
 
-Please refer to the [configuration](./docs/configuration.md) document.
+Please refer to the [configuration](https://github.com/grafana/google-sheets-datasource/blob/master/docs/configuration.md) document.
 
 ## Using the editor
 
-Please refer to the [Using the editor](./docs/using-the-editor.md) document.
+Please refer to the [Using the editor](https://github.com/grafana/google-sheets-datasource/blob/master/docs/using-the-editor.md) document.
 
 ## Quota
 
