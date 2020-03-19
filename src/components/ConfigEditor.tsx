@@ -86,17 +86,14 @@ export class ConfigEditor extends PureComponent<Props> {
                 <li>
                   Click <strong>Create Credentials</strong> then click <strong>Service account</strong>.
                 </li>
-                
+                <li>On the Create service account page, enter the Service account details.</li>
                 <li>
-                  On the Create service account page, enter the Service account details.
+                  Click <strong>Create</strong>. A JSON key file is created and downloaded to your computer.
                 </li>
-                <li>Click <strong>Create</strong>. A JSON key file is created and downloaded to your computer.</li> 
-
                 <li>
                   Open the <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet">Google Sheets</a> in API Library and
                   enable access for your account
                 </li>
-
                 <li>
                   Open the <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive">Google Drive</a> in API Library and
                   enable access for your account. Access to the Google Drive API is used to list all spreadsheets that you have access to.
