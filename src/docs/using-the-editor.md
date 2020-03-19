@@ -1,6 +1,6 @@
 # Using the editor
 
-![Visualize temperature date in Grafana Google Spreadsheets data source](./img/query-editor.png =600x)
+![Visualize temperature date in Grafana Google Spreadsheets data source](./img/query-editor.png)
 
 Please refer to the Google Sheets api [common terms](https://developers.google.com/sheets/api/guides/concepts#spreadsheet_id) to get detailed information on what **spreadsheet ID** and **range** is.
 
@@ -11,9 +11,9 @@ Once the **Spreadsheet ID** field is clicked, you have the following options:
 - Enter a spreadsheet ID
 - Enter a spreadsheet URL. The query editor will then extract the spreadsheet ID from the URL.
 - Select a spreadsheet from the dropdown. The dropdown will only be populated if [Google JWT File](./configuration.md) auth is used and as long as spreadsheets are shared with the service account. Read about configuring JWT Auth [here](./configuration.md).
-  ![Available spreadsheets listed in a dropdown](./img/spreadsheets-list.png =600x)
+  ![Available spreadsheets listed in a dropdown](./img/spreadsheets-list.png)
 - Enter a link to a certain range. The query editor will then extract both spreadsheet ID and range from the URL. To copy a range, open the Spreadsheet and select the cells that you want to include. Then right click and select `Get link to this range`. The link will be stored in the clipboard.  
-  ![Available spreadsheets listed in a dropdown](./img/copy-range.png =600x)
+  ![Available spreadsheets listed in a dropdown](./img/copy-range.png)
 
 Right next to the Spreadsheet ID input field there's <i class="fa fa-external-link"></i> button. If you click on that button, the spreadsheet will be opened in Google Sheets in a separate tab.
 
