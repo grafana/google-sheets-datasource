@@ -35,10 +35,22 @@ export function toGoogleURL(info: SheetsQuery): string {
   return url;
 }
 
+const defaultCacheDuration = 300;
+
+export const formatCacheTimeLabel = (s: number = defaultCacheDuration) => {
+  if (s < 60) {
+    return s + 's';
+  } else if (s < 3600) {
+    return s / 60 + 'm';
+  }
+
+  return s / 3600 + 'h';
+};
+
 export class QueryEditor extends PureComponent<Props> {
   componentWillMount() {
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
-      this.props.query.cacheDurationSeconds = 300;
+      this.props.query.cacheDurationSeconds = defaultCacheDuration;
     }
   }
 
@@ -144,9 +156,9 @@ export class QueryEditor extends PureComponent<Props> {
             Cache Time
           </FormLabel>
           <Segment
-            value={{ label: `${query.cacheDurationSeconds}s`, value: query.cacheDurationSeconds }}
-            options={[0, 5, 10, 30, 60, 120, 300, 600, 3600].map(value => ({
-              label: `${value}s`,
+            value={{ label: formatCacheTimeLabel(query.cacheDurationSeconds), value: query.cacheDurationSeconds }}
+            options={[0, 5, 10, 30, 60, 60 * 2, 60 * 5, 60 * 10, 60 * 30, 3600, 3600 * 2, 3600 * 5].map(value => ({
+              label: formatCacheTimeLabel(value),
               value,
               description: value ? '' : 'Response is not cached at all',
             }))}
