@@ -8,7 +8,7 @@ If a spreadsheet is shared publicly on the Internet, it can be accessed in the G
 
 To generate an API Key, follow the steps in the Google Sheets data source configuration page.
 
-If you want to know how share a file or folder, read about that in the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
+If you want to know how to share a file or folder, read about that in the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
 
 ## Google JWT File
 
@@ -22,6 +22,6 @@ To create a service account, generate a Google JWT file and enable the APIs, fol
 
 ### Sharing
 
-By default, the service account doesn't have access to any spreadsheets within the account/organization that it is associated with. To grant the service account access to files and/or folders in Google Drive, you need to share the file/folder with the service account's email address. The email is specified in the Google JWT File. If you want to know how share a file or folder, please refer to the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
+By default, the service account doesn't have access to any spreadsheets within the account/organization that it is associated with. To grant the service account access to files and/or folders in Google Drive, you need to share the file/folder with the service account's email address. The email is specified in the Google JWT File. If you want to know how to share a file or folder, please refer to the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
 
 > **_:warning:_** Beware that once a file/folder is shared with the service account, all users in Grafana will be able to see the spreadsheet/spreadsheets.

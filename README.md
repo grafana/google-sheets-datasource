@@ -6,6 +6,10 @@ Visualize your Google Spreadsheets with Grafana
 
 ![Average temperatures in Google Sheets](./src/docs/img/spreadsheet.png)
 
+## Documentation
+
+Check the [docs](https://github.com/grafana/google-sheets-datasource/blob/master/src/README.md) for information on how to use the data source.
+
 ## Development
 
 You need to install the following first:
