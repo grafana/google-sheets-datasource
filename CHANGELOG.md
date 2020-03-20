@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.9.0
+
+- Official Release
+
 ## v0.1.0
 
-- Initial Release
+- Initial Release (preview)
