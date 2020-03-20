@@ -1,7 +1,7 @@
 {
   "type": "datasource",
   "name": "Google Sheets",
-  "id": "google-sheets-datasource",
+  "id": "grafana-googlesheets-datasource",
   "backend": true,
   "executable": "gfx_sheets",
   "metrics": true,
@@ -12,7 +12,9 @@
       "name": "Grafana Labs",
       "url": "https://grafana.com"
     },
-    "keywords": [],
+    "keywords": [
+      "google", "sheets", "spreadsheets", "excel"
+    ],
     "logos": {
       "small": "img/sheets.svg",
       "large": "img/sheets.svg"
