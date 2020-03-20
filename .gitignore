@@ -4,3 +4,4 @@ ci/
 cypress/screenshots/
 cypress/videos/
 dist/
+provisioning/

@@ -6,6 +6,10 @@ Visualize your Google Spreadsheets in Grafana!
 
 Please refer to the [configuration](https://github.com/grafana/google-sheets-datasource/blob/master/src/docs/configuration.md) document.
 
+## Provisioning
+
+Please refer to the [provisioning](https://github.com/grafana/google-sheets-datasource/blob/master/src/docs/provisioning.md) document.
+
 ## Using the editor
 
 Please refer to the [Using the editor](https://github.com/grafana/google-sheets-datasource/blob/master/src/docs/using-the-editor.md) document.
