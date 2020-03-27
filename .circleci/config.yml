@@ -1,4 +1,8 @@
-version: 2
+version: 2.1
+parameters:
+  ssh-fingerprint:
+    type: string
+    default: "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
 
 aliases:
   # Workflow filters
@@ -120,7 +124,7 @@ jobs:
     - checkout
     - add_ssh_keys:
         fingerprints:
-          - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
+          - << pipeline.parameters.ssh-fingerprint >>
     - run:
         name: Checkout provisioning files
         command: git clone git@github.com:grafana/plugin-provisioning.git
@@ -207,7 +211,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
+            - << pipeline.parameters.ssh-fingerprint >>
       - attach_workspace:
           at: .
       - restore_cache:
@@ -220,7 +224,6 @@ jobs:
             npx grafana-toolkit plugin:github-publish
 
 workflows:
-  version: 2
   plugin_workflow:
     jobs:
       - build_plugin
