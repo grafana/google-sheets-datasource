@@ -142,6 +142,7 @@ jobs:
         name: Run e2e tests
         command: npx grafana-e2e run
     - run:
+        when: always
         name: Prepare task output dir
         command: |
           # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
