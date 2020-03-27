@@ -114,7 +114,7 @@ jobs:
         - ci/dist
         - ci/grafana-test-env
 
-  test_integration:
+  test_e2e:
     <<: *defaults
     steps:
     - checkout
@@ -147,18 +147,18 @@ jobs:
         name: Prepare task output dir
         command: |
           # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
-          mkdir ci/jobs/test_integration
+          mkdir ci/jobs/test_e2e
           # only copy if they exist
-          cp cypress/screenshots/*.* ci/jobs/test_integration 2>/dev/null || :
-          cp cypress/videos/*.* ci/jobs/test_integration 2>/dev/null || :
+          cp cypress/screenshots/*.* ci/jobs/test_e2e 2>/dev/null || :
+          cp cypress/videos/*.* ci/jobs/test_e2e 2>/dev/null || :
     - persist_to_workspace:
         root: .
         paths:
-        - ci/jobs/test_integration
+        - ci/jobs/test_e2e
     - store_test_results:
-        path: ci/jobs/test_integration
+        path: ci/jobs/test_e2e
     - store_artifacts:
-        path: ci/jobs/test_integration
+        path: ci/jobs/test_e2e
 
   report:
     <<: *defaults
@@ -207,12 +207,13 @@ workflows:
             - build_plugin
             - build_backend
             - build_docs
-      - test_integration:
+      - test_e2e:
           requires:
             - package
+            - provisioning
       - report:
           requires:
-            - test_integration
+            - test_e2e
       - approve_release:
           type: approval
           requires:
