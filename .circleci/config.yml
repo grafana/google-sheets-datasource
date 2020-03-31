@@ -1,4 +1,8 @@
-version: 2
+version: 2.1
+parameters:
+  ssh-fingerprint:
+    type: string
+    default: "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
 
 aliases:
   # Workflow filters
@@ -114,7 +118,29 @@ jobs:
         - ci/dist
         - ci/grafana-test-env
 
-  test_integration:
+  provisioning:
+    <<: *defaults
+    steps:
+    - checkout
+    - add_ssh_keys:
+        fingerprints:
+          - << pipeline.parameters.ssh-fingerprint >>
+    - run:
+        name: Checkout provisioning files
+        command: git clone git@github.com:grafana/plugin-provisioning.git
+    - run:
+        name: Prepare task output dir
+        command: |
+          mkdir ci # Avoid error if not exists
+          mkdir ci/jobs # Avoid error if not exists
+          mkdir ci/jobs/provisioning
+          mv plugin-provisioning/plugins/google-sheets/provisioning/* ci/jobs/provisioning
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/provisioning
+
+  test_e2e:
     <<: *defaults
     steps:
     - checkout
@@ -126,9 +152,7 @@ jobs:
     - run:
         name: Setup Grafana (local install)
         command: |
-          sudo dpkg -i /usr/local/grafana/deb/grafana_6.6.2_amd64.deb
-          sudo updatedb
-          sudo locate grafana
+          sudo dpkg -i /usr/local/grafana/deb/grafana_6.7.1_amd64.deb
           sudo cp ci/grafana-test-env/custom.ini /usr/share/grafana/conf/custom.ini
           sudo cp ci/grafana-test-env/custom.ini /etc/grafana/grafana.ini
           sudo service grafana-server start
@@ -141,24 +165,28 @@ jobs:
             - ~/.cache
           key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
+        name: Copy provisioning files
+        command: cp -r ci/jobs/provisioning provisioning/
+    - run:
         name: Run e2e tests
         command: npx grafana-e2e run
     - run:
+        when: always
         name: Prepare task output dir
         command: |
           # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
-          mkdir ci/jobs/test_integration
+          mkdir ci/jobs/test_e2e
           # only copy if they exist
-          cp cypress/screenshots/*.* ci/jobs/test_integration 2>/dev/null || :
-          cp cypress/videos/*.* ci/jobs/test_integration 2>/dev/null || :
+          cp cypress/screenshots/*.* ci/jobs/test_e2e 2>/dev/null || :
+          cp cypress/videos/*.* ci/jobs/test_e2e 2>/dev/null || :
     - persist_to_workspace:
         root: .
         paths:
-        - ci/jobs/test_integration
+        - ci/jobs/test_e2e
     - store_test_results:
-        path: ci/jobs/test_integration
+        path: ci/jobs/test_e2e
     - store_artifacts:
-        path: ci/jobs/test_integration
+        path: ci/jobs/test_e2e
 
   report:
     <<: *defaults
@@ -183,7 +211,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
+            - << pipeline.parameters.ssh-fingerprint >>
       - attach_workspace:
           at: .
       - restore_cache:
@@ -196,7 +224,6 @@ jobs:
             npx grafana-toolkit plugin:github-publish
 
 workflows:
-  version: 2
   plugin_workflow:
     jobs:
       - build_plugin
@@ -207,12 +234,14 @@ workflows:
             - build_plugin
             - build_backend
             - build_docs
-      - test_integration:
+      - provisioning
+      - test_e2e:
           requires:
             - package
+            - provisioning
       - report:
           requires:
-            - test_integration
+            - test_e2e
       - approve_release:
           type: approval
           requires:
