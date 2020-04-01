@@ -91,9 +91,10 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 	if result.Properties.TimeZone != "" {
 		loc, err := time.LoadLocation(result.Properties.TimeZone)
 		if err != nil {
-			return nil, nil, fmt.Errorf("error while loading timezone: %w", err)
+			backend.Logger.Warn("could not load timezone from spreadsheet: %w", err)
+		} else {
+			time.Local = loc
 		}
-		time.Local = loc
 	}
 
 	data := result.Sheets[0].Data[0]
