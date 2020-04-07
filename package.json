@@ -23,5 +23,8 @@
   },
   "dependencies": {
     "react-dropzone": "^10.2.1"
+  },
+  "resolutions": {
+    "rxjs": "6.5.4"
   }
 }
