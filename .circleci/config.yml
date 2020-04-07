@@ -1,4 +1,8 @@
-version: 2
+version: 2.1
+parameters:
+  ssh-fingerprint:
+    type: string
+    default: "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
 
 aliases:
   # Workflow filters
@@ -114,6 +118,28 @@ jobs:
         - ci/dist
         - ci/grafana-test-env
 
+  provisioning:
+    <<: *defaults
+    steps:
+    - checkout
+    - add_ssh_keys:
+        fingerprints:
+          - << pipeline.parameters.ssh-fingerprint >>
+    - run:
+        name: Checkout provisioning files
+        command: git clone git@github.com:grafana/plugin-provisioning.git
+    - run:
+        name: Prepare task output dir
+        command: |
+          mkdir ci # Avoid error if not exists
+          mkdir ci/jobs # Avoid error if not exists
+          mkdir ci/jobs/provisioning
+          mv plugin-provisioning/plugins/google-sheets/provisioning/* ci/jobs/provisioning
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/provisioning
+
   e2e_latest:
     <<: *defaults
     steps:
@@ -139,9 +165,13 @@ jobs:
             - ~/.cache
           key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
+        name: Copy provisioning files
+        command: cp -r ci/jobs/provisioning provisioning/
+    - run:
         name: Run e2e tests
         command: npx grafana-e2e run
     - run:
+        when: always
         name: Prepare task output dir
         command: |
           # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
@@ -181,7 +211,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
+            - << pipeline.parameters.ssh-fingerprint >>
       - attach_workspace:
           at: .
       - restore_cache:
@@ -194,7 +224,6 @@ jobs:
             npx grafana-toolkit plugin:github-publish
 
 workflows:
-  version: 2
   plugin_workflow:
     jobs:
       - build_plugin
@@ -205,9 +234,11 @@ workflows:
             - build_plugin
             - build_backend
             - build_docs
+      - provisioning
       - e2e_latest:
           requires:
             - package
+            - provisioning
       - report:
           requires:
             - e2e_latest
