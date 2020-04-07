@@ -159,7 +159,9 @@ jobs:
           sudo grafana-cli --version
     - run:
         name: Install dependencies
-        command: yarn install --frozen-lockfile
+        command: |
+          # TODO.... should be frozen-lockfile
+          yarn install --pure-lockfile
     - save_cache:
           paths:
             - ~/.cache
