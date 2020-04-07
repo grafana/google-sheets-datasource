@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	_ = backend.SetupPluginEnvironment("google-sheets-datasource")
+	backend.SetupPluginEnvironment("google-sheets-datasource")
 
 	mux := http.NewServeMux()
 	ds := NewDataSource(mux)

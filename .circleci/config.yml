@@ -140,7 +140,7 @@ jobs:
         paths:
         - ci/jobs/provisioning
 
-  test_e2e:
+  e2e_latest:
     <<: *defaults
     steps:
     - checkout
@@ -152,14 +152,16 @@ jobs:
     - run:
         name: Setup Grafana (local install)
         command: |
-          sudo dpkg -i /usr/local/grafana/deb/grafana_6.7.1_amd64.deb
+          gget latest
           sudo cp ci/grafana-test-env/custom.ini /usr/share/grafana/conf/custom.ini
           sudo cp ci/grafana-test-env/custom.ini /etc/grafana/grafana.ini
           sudo service grafana-server start
           sudo grafana-cli --version
     - run:
         name: Install dependencies
-        command: yarn install --frozen-lockfile
+        command: |
+          # TODO.... should be frozen-lockfile
+          yarn install --pure-lockfile
     - save_cache:
           paths:
             - ~/.cache
@@ -175,18 +177,18 @@ jobs:
         name: Prepare task output dir
         command: |
           # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
-          mkdir ci/jobs/test_e2e
+          mkdir ci/jobs/e2e_latest
           # only copy if they exist
-          cp cypress/screenshots/*.* ci/jobs/test_e2e 2>/dev/null || :
-          cp cypress/videos/*.* ci/jobs/test_e2e 2>/dev/null || :
+          cp cypress/screenshots/*.* ci/jobs/e2e_latest 2>/dev/null || :
+          cp cypress/videos/*.* ci/jobs/e2e_latest 2>/dev/null || :
     - persist_to_workspace:
         root: .
         paths:
-        - ci/jobs/test_e2e
+        - ci/jobs/e2e_latest
     - store_test_results:
-        path: ci/jobs/test_e2e
+        path: ci/jobs/e2e_latest
     - store_artifacts:
-        path: ci/jobs/test_e2e
+        path: ci/jobs/e2e_latest
 
   report:
     <<: *defaults
@@ -235,13 +237,13 @@ workflows:
             - build_backend
             - build_docs
       - provisioning
-      - test_e2e:
+      - e2e_latest:
           requires:
             - package
             - provisioning
       - report:
           requires:
-            - test_e2e
+            - e2e_latest
       - approve_release:
           type: approval
           requires:
