@@ -81,11 +81,12 @@ func (cd *ColumnDefinition) checkType(cell *sheets.CellData) {
 	}
 
 	// Has a number value (will not detect 0)
-	hasNumberValue := cell.UserEnteredValue != nil && cell.UserEnteredValue.NumberValue != 0
-	hasNumberFormat := cell.UserEnteredFormat != nil && cell.UserEnteredFormat.NumberFormat != nil
+	hasNumberValue := cell.EffectiveValue != nil && cell.EffectiveValue.NumberValue != 0
+	hasNumberFormat := cell.EffectiveFormat != nil && cell.EffectiveFormat.NumberFormat != nil
 
 	if hasNumberFormat {
-		if cell.UserEnteredFormat.NumberFormat.Type == "DATE" || cell.UserEnteredFormat.NumberFormat.Type == "DATE_TIME" {
+		if cell.EffectiveFormat.NumberFormat.Type == "DATE" ||
+			cell.EffectiveFormat.NumberFormat.Type == "DATE_TIME" {
 			cd.types["TIME"] = true
 			return
 		}
