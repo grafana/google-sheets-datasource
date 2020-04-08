@@ -48,7 +48,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 	if qm.UseTimeFilter {
 		timeIndex := findTimeField(frame)
 		if timeIndex >= 0 {
-			frame, err = frame.FilterRowsByField(timeIndex, func(i interface{}) (bool, error) {
+			frame, dr.Error = frame.FilterRowsByField(timeIndex, func(i interface{}) (bool, error) {
 				val, ok := i.(*time.Time)
 				if !ok {
 					return false, fmt.Errorf("invalid time column: %s", spew.Sdump(i))
