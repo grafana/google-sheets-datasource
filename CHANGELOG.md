@@ -2,12 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## v0.9.1
+## v1.0.0
+- Works with Grafana 7+
 - Avoid crashing on unknown timezone (#69)
+- improved support for formula values
 
 ## v0.9.0
 
-- Official Release
+- First official release (grafana 6.7)
 
 ## v0.1.0
 
