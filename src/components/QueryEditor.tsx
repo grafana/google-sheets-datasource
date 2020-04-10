@@ -111,14 +111,9 @@ export class QueryEditor extends PureComponent<Props> {
             allowCustomValue={true}
             onChange={this.onSpreadsheetIDChange}
           ></SegmentAsync>
-          <LinkButton
-            style={{ marginTop: 1 }}
-            disabled={!query.spreadsheet}
-            variant="link"
-            icon="fa fa-external-link"
-            href={toGoogleURL(query)}
-            target="_blank"
-          ></LinkButton>
+          {query.spreadsheet && (
+            <LinkButton style={{ marginTop: 1 }} variant="link" icon="link" href={toGoogleURL(query)} target="_blank"></LinkButton>
+          )}
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>
@@ -169,13 +164,9 @@ export class QueryEditor extends PureComponent<Props> {
           </div>
         </div>
         <div className="gf-form-inline">
-          <Switch
-            label="Use Time Filter"
-            tooltip="Apply the dashboard time range to the first time field"
-            labelClass={'width-10  query-keyword'}
-            checked={query.useTimeFilter === true}
-            onChange={this.toggleUseTimeFilter}
-          />
+          {/* tooltip="Apply the dashboard time range to the first time field" 
+            labelClass={'width-10  query-keyword'}*/}
+          <Switch label="Use Time Filter" checked={query.useTimeFilter === true} onChange={this.toggleUseTimeFilter} />
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
           </div>
