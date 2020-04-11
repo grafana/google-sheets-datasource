@@ -22,23 +22,33 @@ type GoogleSheets struct {
 }
 
 // Query queries a spreadsheet and returns a corresponding data frame.
-func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config *models.GoogleSheetConfig, timeRange backend.TimeRange) (*data.Frame, error) {
+func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config *models.GoogleSheetConfig, timeRange backend.TimeRange) (dr *backend.DataResponse) {
+	dr = &backend.DataResponse{}
 	client, err := NewGoogleClient(ctx, config)
 	if err != nil {
-		return nil, fmt.Errorf("unable to create Google API client: %w", err)
+		dr.Error = fmt.Errorf("unable to create Google API client: %w", err)
+		return
 	}
 
 	// This result may be cached
 	data, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
-		return nil, err
+		dr.Error = err
+		return
 	}
 
 	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
-	if frame != nil && qm.UseTimeFilter {
+	if err != nil {
+		dr.Error = err
+		return
+	}
+	if frame == nil {
+		return
+	}
+	if qm.UseTimeFilter {
 		timeIndex := findTimeField(frame)
 		if timeIndex >= 0 {
-			frame, err = frame.FilterRowsByField(timeIndex, func(i interface{}) (bool, error) {
+			frame, dr.Error = frame.FilterRowsByField(timeIndex, func(i interface{}) (bool, error) {
 				val, ok := i.(*time.Time)
 				if !ok {
 					return false, fmt.Errorf("invalid time column: %s", spew.Sdump(i))
@@ -50,7 +60,8 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 			})
 		}
 	}
-	return frame, err
+	dr.Frames = append(dr.Frames, frame)
+	return
 }
 
 // GetSpreadsheets gets spreadsheets from the Google API.
@@ -184,7 +195,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	meta["warnings"] = warnings
 	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
-	frame.Meta = &data.QueryResultMeta{Custom: meta}
+	frame.Meta = &data.FrameMeta{Custom: meta}
 	backend.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
 
 	return frame, nil

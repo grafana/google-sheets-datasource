@@ -10,7 +10,6 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
-	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -104,7 +103,9 @@ func (ds *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.
 
 // QueryData queries for data.
 func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
-	res := &backend.QueryDataResponse{}
+	res := &backend.QueryDataResponse{
+		Responses: make(map[string]*backend.DataResponse),
+	}
 	config, err := readConfig(req.PluginConfig)
 	if err != nil {
 		return nil, err
@@ -119,14 +120,11 @@ func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.Qu
 		if len(queryModel.Spreadsheet) < 1 {
 			continue // not query really exists
 		}
-
-		frame, err := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
-		if err != nil {
+		dr := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
+		if dr.Error != nil {
 			backend.Logger.Error("Query failed", "refId", q.RefID, "error", err)
-			return nil, err
 		}
-
-		res.Frames = append(res.Frames, []*data.Frame{frame}...)
+		res.Responses[q.RefID] = dr
 	}
 
 	return res, nil

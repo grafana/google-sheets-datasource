@@ -6,9 +6,7 @@ require (
 	cloud.google.com/go v0.52.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20190622164848-0fb0a474d195
 	github.com/davecgh/go-spew v1.1.1
-	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
-	github.com/golang/protobuf v1.3.3 // indirect; indirect	github.com/grafana/grafana-plugin-sdk-go v0.28.0
-	github.com/grafana/grafana-plugin-sdk-go v0.34.0
+	github.com/grafana/grafana-plugin-sdk-go v0.39.0
 	github.com/mitchellh/go-testing-interface v1.0.0 // indirect
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
