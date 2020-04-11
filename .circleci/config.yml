@@ -11,7 +11,7 @@ aliases:
       only: master
   - &filter-only-release
     branches:
-      only: /^v[0-9]$/
+      only: /^v[0-9]*$/
 
 defaults: &defaults
   docker:
