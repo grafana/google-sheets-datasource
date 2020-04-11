@@ -1,10 +1,17 @@
-version: 2
+version: 2.1
+parameters:
+  ssh-fingerprint:
+    type: string
+    default: "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
 
 aliases:
   # Workflow filters
   - &filter-only-master
     branches:
       only: master
+  - &filter-only-release
+    branches:
+      only: /^v[0-9]+(\.[0-9]+){2}(-.+|[^-.]*)$/
 
 defaults: &defaults
   docker:
@@ -114,7 +121,29 @@ jobs:
         - ci/dist
         - ci/grafana-test-env
 
-  test_integration:
+  provisioning:
+    <<: *defaults
+    steps:
+    - checkout
+    - add_ssh_keys:
+        fingerprints:
+          - << pipeline.parameters.ssh-fingerprint >>
+    - run:
+        name: Checkout provisioning files
+        command: git clone git@github.com:grafana/plugin-provisioning.git
+    - run:
+        name: Prepare task output dir
+        command: |
+          mkdir ci # Avoid error if not exists
+          mkdir ci/jobs # Avoid error if not exists
+          mkdir ci/jobs/provisioning
+          mv plugin-provisioning/plugins/google-sheets/provisioning/* ci/jobs/provisioning
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/provisioning
+
+  e2e_latest:
     <<: *defaults
     steps:
     - checkout
@@ -126,39 +155,43 @@ jobs:
     - run:
         name: Setup Grafana (local install)
         command: |
-          sudo dpkg -i /usr/local/grafana/deb/grafana_6.6.2_amd64.deb
-          sudo updatedb
-          sudo locate grafana
+          gget latest
           sudo cp ci/grafana-test-env/custom.ini /usr/share/grafana/conf/custom.ini
           sudo cp ci/grafana-test-env/custom.ini /etc/grafana/grafana.ini
           sudo service grafana-server start
           sudo grafana-cli --version
     - run:
         name: Install dependencies
-        command: yarn install --frozen-lockfile
+        command: |
+          # TODO.... should be frozen-lockfile
+          yarn install --pure-lockfile
     - save_cache:
           paths:
             - ~/.cache
           key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
-        name: Run e2e tests
-        command: npx grafana-e2e run
+        name: Copy provisioning files
+        command: cp -r ci/jobs/provisioning provisioning/
     - run:
+        name: Run e2e tests
+        command: echo TODO npx grafana-e2e run
+    - run:
+        when: always
         name: Prepare task output dir
         command: |
           # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
-          mkdir ci/jobs/test_integration
+          mkdir ci/jobs/e2e_latest
           # only copy if they exist
-          cp cypress/screenshots/*.* ci/jobs/test_integration 2>/dev/null || :
-          cp cypress/videos/*.* ci/jobs/test_integration 2>/dev/null || :
+          cp cypress/screenshots/*.* ci/jobs/e2e_latest 2>/dev/null || :
+          cp cypress/videos/*.* ci/jobs/e2e_latest 2>/dev/null || :
     - persist_to_workspace:
         root: .
         paths:
-        - ci/jobs/test_integration
+        - ci/jobs/e2e_latest
     - store_test_results:
-        path: ci/jobs/test_integration
+        path: ci/jobs/e2e_latest
     - store_artifacts:
-        path: ci/jobs/test_integration
+        path: ci/jobs/e2e_latest
 
   report:
     <<: *defaults
@@ -183,7 +216,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
+            - << pipeline.parameters.ssh-fingerprint >>
       - attach_workspace:
           at: .
       - restore_cache:
@@ -196,7 +229,6 @@ jobs:
             npx grafana-toolkit plugin:github-publish
 
 workflows:
-  version: 2
   plugin_workflow:
     jobs:
       - build_plugin
@@ -207,18 +239,21 @@ workflows:
             - build_plugin
             - build_backend
             - build_docs
-      - test_integration:
+      - provisioning
+      - e2e_latest:
           requires:
             - package
+            - provisioning
       - report:
           requires:
-            - test_integration
+            - e2e_latest
       - approve_release:
           type: approval
           requires:
             - report
-          filters: *filter-only-master
+          filters: *filter-only-release
       - publish_github_release:
           requires:
             - approve_release
-          filters: *filter-only-master
+          filters: *filter-only-release
+          
