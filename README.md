@@ -18,9 +18,6 @@ You need to install the following first:
 - [Yarn](https://yarnpkg.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
-```BASH
-mage watch
-```
 
 In another terminal
 
