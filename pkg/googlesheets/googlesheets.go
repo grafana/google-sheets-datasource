@@ -235,7 +235,7 @@ var numberConverter = data.FieldConverter{
 var converterMap = map[ColumnType]data.FieldConverter{
 	"TIME":   timeConverter,
 	"STRING": stringConverter,
-	"NUMBER": stringConverter,
+	"NUMBER": numberConverter,
 }
 
 func getUniqueColumnName(formattedName string, columnIndex int, columns map[string]bool) string {
