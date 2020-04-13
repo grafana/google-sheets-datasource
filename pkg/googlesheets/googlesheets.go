@@ -122,20 +122,20 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	warnings := []string{}
 
 	for _, column := range columns {
-		var field *data.Field
-		// fname := getExcelColumnName(column.ColumnIndex + int(sheet.StartColumn))
-		fname := column.Header
-
+		var fType data.FieldType
 		switch column.GetType() {
 		case "TIME":
-			field = data.NewField(fname, nil, make([]*time.Time, len(sheet.RowData)-start))
+			fType = data.FieldTypeNullableTime
 		case "NUMBER":
-			field = data.NewField(fname, nil, make([]*float64, len(sheet.RowData)-start))
+			fType = data.FieldTypeNullableFloat64
 		case "STRING":
-			field = data.NewField(fname, nil, make([]*string, len(sheet.RowData)-start))
+			fType = data.FieldTypeNullableString
 		default:
 			return nil, fmt.Errorf("unknown column type: %s", column.GetType())
 		}
+
+		field := data.NewFieldFromFieldType(fType, len(sheet.RowData)-start)
+		field.Name = column.Header
 
 		field.Config = &data.FieldConfig{
 			Unit:  column.GetUnit(),
@@ -157,10 +157,11 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		fields = append(fields, field)
 	}
 
-	frame := data.NewFrame(refID, // TODO: shoud set the name from metadata
-		fields...,
-	)
-	frame.RefID = refID
+	frame := &data.Frame{
+		Name:   refID, // TODO: should set the name from metadata
+		RefID:  refID,
+		Fields: fields,
+	}
 
 	for rowIndex := start; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
@@ -180,14 +181,14 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 					warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %d in column %q",
 						rowIndex, columns[columnIndex].Header))
 				} else {
-					frame.Fields[columnIndex].Set(rowIndex-start, &time)
+					frame.Set(columnIndex, rowIndex-start, &time)
 				}
 			case "NUMBER":
 				if cellData.EffectiveValue != nil {
-					frame.Fields[columnIndex].Set(rowIndex-start, &cellData.EffectiveValue.NumberValue)
+					frame.Set(columnIndex, rowIndex-start, &cellData.EffectiveValue.NumberValue)
 				}
 			case "STRING":
-				frame.Fields[columnIndex].Set(rowIndex-start, &cellData.FormattedValue)
+				frame.Set(columnIndex, rowIndex-start, &cellData.FormattedValue)
 			}
 		}
 	}
