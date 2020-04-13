@@ -15,7 +15,7 @@ aliases:
 
 defaults: &defaults
   docker:
-    - image: srclosson/grafana-plugin-ci:latest
+    - image: srclosson/grafana-plugin-ci-alpine:latest
 
 jobs:
   build_plugin:
@@ -143,7 +143,7 @@ jobs:
         paths:
         - ci/jobs/provisioning
 
-  e2e_latest:
+  e2e_canary:
     <<: *defaults
     steps:
     - checkout
@@ -155,7 +155,7 @@ jobs:
     - run:
         name: Setup Grafana (local install)
         command: |
-          gget latest
+          gget canary
           sudo cp ci/grafana-test-env/custom.ini /usr/share/grafana/conf/custom.ini
           sudo cp ci/grafana-test-env/custom.ini /etc/grafana/grafana.ini
           sudo service grafana-server start
@@ -180,18 +180,18 @@ jobs:
         name: Prepare task output dir
         command: |
           # TODO: probably move all of this to `@grafana/toolkit plugin:ci-test`
-          mkdir ci/jobs/e2e_latest
+          mkdir ci/jobs/e2e_canary
           # only copy if they exist
-          cp cypress/screenshots/*.* ci/jobs/e2e_latest 2>/dev/null || :
-          cp cypress/videos/*.* ci/jobs/e2e_latest 2>/dev/null || :
+          cp cypress/screenshots/*.* ci/jobs/e2e_canary 2>/dev/null || :
+          cp cypress/videos/*.* ci/jobs/e2e_canary 2>/dev/null || :
     - persist_to_workspace:
         root: .
         paths:
-        - ci/jobs/e2e_latest
+        - ci/jobs/e2e_canary
     - store_test_results:
-        path: ci/jobs/e2e_latest
+        path: ci/jobs/e2e_canary
     - store_artifacts:
-        path: ci/jobs/e2e_latest
+        path: ci/jobs/e2e_canary
 
   report:
     <<: *defaults
@@ -240,13 +240,13 @@ workflows:
             - build_backend
             - build_docs
       - provisioning
-      - e2e_latest:
+      - e2e_canary:
           requires:
             - package
             - provisioning
       - report:
           requires:
-            - e2e_latest
+            - e2e_canary
       - approve_release:
           type: approval
           requires:
