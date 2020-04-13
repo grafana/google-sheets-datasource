@@ -129,12 +129,16 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		converters[i] = fc
 	}
 
-	frameBuilder, err := data.NewFrameInputConverter(converters, len(sheet.RowData)-start)
+	inputConverter, err := data.NewFrameInputConverter(converters, len(sheet.RowData)-start)
 	if err != nil {
 		return nil, err
 	}
+	frame := inputConverter.Frame
+	frame.RefID = refID
+	frame.Name = refID // TODO: should set the name from metadata
+
 	for i, column := range columns {
-		field := frameBuilder.Frame.Fields[i]
+		field := frame.Fields[i]
 		field.Name = column.Header
 		field.Config = &data.FieldConfig{
 			Title: column.Header,
@@ -153,8 +157,6 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		}
 	}
 
-	frameBuilder.Frame.RefID = refID
-
 	for rowIndex := start; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
 			if columnIndex >= len(columns) {
@@ -165,119 +167,24 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 			if cellData.FormattedValue == "" {
 				continue
 			}
-			err := frameBuilder.Set(columnIndex, rowIndex-start, cellData)
+
+			err := inputConverter.Set(columnIndex, rowIndex-start, cellData)
 			if err != nil {
 				warnings = append(warnings, err.Error())
 			}
-			// if columnIndex >= len(columns) {
-			// 	continue
-			// }
-
-			// // Skip any empty values
-			// if "" == cellData.FormattedValue {
-			// 	continue
-			// }
-
-			// switch columns[columnIndex].GetType() {
-			// case "TIME":
-			// 	time, err := dateparse.ParseLocal(cellData.FormattedValue)
-			// 	if err != nil {
-			// 		warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %d in column %q",
-			// 			rowIndex, columns[columnIndex].Header))
-			// 	} else {
-			// 		frame.Set(columnIndex, rowIndex-start, &time)
-			// 	}
-			// case "NUMBER":
-			// 	if cellData.EffectiveValue != nil {
-			// 		frame.Set(columnIndex, rowIndex-start, &cellData.EffectiveValue.NumberValue)
-			// 	}
-			// case "STRING":
-			// 	frame.Set(columnIndex, rowIndex-start, &cellData.FormattedValue)
-			// }
 		}
 	}
-
-	// for _, column := range columns {
-	// 	var fType data.FieldType
-	// 	switch column.GetType() {
-	// 	case "TIME":
-	// 		fType = data.FieldTypeNullableTime
-	// 	case "NUMBER":
-	// 		fType = data.FieldTypeNullableFloat64
-	// 	case "STRING":
-	// 		fType = data.FieldTypeNullableString
-	// 	default:
-	// 		return nil, fmt.Errorf("unknown column type: %s", column.GetType())
-	// 	}
-
-	// 	field := data.NewFieldFromFieldType(fType, len(sheet.RowData)-start)
-	// 	field.Name = column.Header
-
-	// 	field.Config = &data.FieldConfig{
-	// 		Unit:  column.GetUnit(),
-	// 		Title: column.Header,
-	// 	}
-
-	// 	if column.HasMixedTypes() {
-	// 		warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
-	// 		warnings = append(warnings, warning)
-	// 		backend.Logger.Warn(warning)
-	// 	}
-
-	// 	if column.HasMixedUnits() {
-	// 		warning := fmt.Sprintf("Multiple units found in column %q. Formatted value will be used", column.Header)
-	// 		warnings = append(warnings, warning)
-	// 		backend.Logger.Warn(warning)
-	// 	}
-
-	// 	fields = append(fields, field)
-	// }
-
-	// frame := &data.Frame{
-	// 	Name:   refID, // TODO: should set the name from metadata
-	// 	RefID:  refID,
-	// 	Fields: fields,
-	// }
-
-	// for rowIndex := start; rowIndex < len(sheet.RowData); rowIndex++ {
-	// 	for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
-	// 		if columnIndex >= len(columns) {
-	// 			continue
-	// 		}
-
-	// 		// Skip any empty values
-	// 		if "" == cellData.FormattedValue {
-	// 			continue
-	// 		}
-
-	// 		switch columns[columnIndex].GetType() {
-	// 		case "TIME":
-	// 			time, err := dateparse.ParseLocal(cellData.FormattedValue)
-	// 			if err != nil {
-	// 				warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %d in column %q",
-	// 					rowIndex, columns[columnIndex].Header))
-	// 			} else {
-	// 				frame.Set(columnIndex, rowIndex-start, &time)
-	// 			}
-	// 		case "NUMBER":
-	// 			if cellData.EffectiveValue != nil {
-	// 				frame.Set(columnIndex, rowIndex-start, &cellData.EffectiveValue.NumberValue)
-	// 			}
-	// 		case "STRING":
-	// 			frame.Set(columnIndex, rowIndex-start, &cellData.FormattedValue)
-	// 		}
-	// 	}
-	// }
 
 	meta["warnings"] = warnings
 	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
-	frameBuilder.Frame.Meta = &data.FrameMeta{Custom: meta}
-	backend.Logger.Debug("frame.Meta: %s", spew.Sdump(frameBuilder.Frame.Meta))
-	backend.Logger.Debug(spew.Sdump(frameBuilder.Frame))
-	return frameBuilder.Frame, nil
+	frame.Meta = &data.FrameMeta{Custom: meta}
+	backend.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
+	backend.Logger.Debug(spew.Sdump(frame))
+	return frame, nil
 }
 
+// timeConverter handles sheets TIME column types.
 var timeConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableTime,
 	Converter: func(i interface{}) (interface{}, error) {
@@ -294,6 +201,7 @@ var timeConverter = data.FieldConverter{
 	},
 }
 
+// stringConverter handles sheets STRING column types.
 var stringConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableString,
 	Converter: func(i interface{}) (interface{}, error) {
@@ -306,6 +214,7 @@ var stringConverter = data.FieldConverter{
 	},
 }
 
+// numberConverter handles sheets STRING column types.
 var numberConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableFloat64,
 	Converter: func(i interface{}) (interface{}, error) {
@@ -321,6 +230,8 @@ var numberConverter = data.FieldConverter{
 	},
 }
 
+// converterMap is a map sheets.ColumnType to fieldConverter and
+// is used to create a data.FrameInputConverter for a returned sheet.
 var converterMap = map[ColumnType]data.FieldConverter{
 	"TIME":   timeConverter,
 	"STRING": stringConverter,
