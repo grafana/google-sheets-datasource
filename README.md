@@ -19,7 +19,7 @@ You need to install the following first:
 - [Docker Compose](https://docs.docker.com/compose/)
 
 ```BASH
-mage watch
+mage buildAll
 ```
 
 In another terminal
