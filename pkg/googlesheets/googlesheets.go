@@ -117,31 +117,33 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 }
 
 func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {
-	fields := []*data.Field{}
 	columns, start := getColumnDefinitions(sheet.RowData)
 	warnings := []string{}
 
-	for _, column := range columns {
-		var field *data.Field
-		// fname := getExcelColumnName(column.ColumnIndex + int(sheet.StartColumn))
-		fname := column.Header
-
-		switch column.GetType() {
-		case "TIME":
-			field = data.NewField(fname, nil, make([]*time.Time, len(sheet.RowData)-start))
-		case "NUMBER":
-			field = data.NewField(fname, nil, make([]*float64, len(sheet.RowData)-start))
-		case "STRING":
-			field = data.NewField(fname, nil, make([]*string, len(sheet.RowData)-start))
-		default:
+	converters := make([]data.FieldConverter, len(columns))
+	for i, column := range columns {
+		fc, ok := converterMap[column.GetType()]
+		if !ok {
 			return nil, fmt.Errorf("unknown column type: %s", column.GetType())
 		}
+		converters[i] = fc
+	}
 
+	inputConverter, err := data.NewFrameInputConverter(converters, len(sheet.RowData)-start)
+	if err != nil {
+		return nil, err
+	}
+	frame := inputConverter.Frame
+	frame.RefID = refID
+	frame.Name = refID // TODO: should set the name from metadata
+
+	for i, column := range columns {
+		field := frame.Fields[i]
+		field.Name = column.Header
 		field.Config = &data.FieldConfig{
-			Unit:  column.GetUnit(),
 			Title: column.Header,
+			Unit:  column.GetUnit(),
 		}
-
 		if column.HasMixedTypes() {
 			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
 			warnings = append(warnings, warning)
@@ -153,14 +155,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 			warnings = append(warnings, warning)
 			backend.Logger.Warn(warning)
 		}
-
-		fields = append(fields, field)
 	}
-
-	frame := data.NewFrame(refID, // TODO: shoud set the name from metadata
-		fields...,
-	)
-	frame.RefID = refID
 
 	for rowIndex := start; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
@@ -169,25 +164,13 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 			}
 
 			// Skip any empty values
-			if "" == cellData.FormattedValue {
+			if cellData.FormattedValue == "" {
 				continue
 			}
 
-			switch columns[columnIndex].GetType() {
-			case "TIME":
-				time, err := dateparse.ParseLocal(cellData.FormattedValue)
-				if err != nil {
-					warnings = append(warnings, fmt.Sprintf("Error while parsing date at row %d in column %q",
-						rowIndex, columns[columnIndex].Header))
-				} else {
-					frame.Fields[columnIndex].Set(rowIndex-start, &time)
-				}
-			case "NUMBER":
-				if cellData.EffectiveValue != nil {
-					frame.Fields[columnIndex].Set(rowIndex-start, &cellData.EffectiveValue.NumberValue)
-				}
-			case "STRING":
-				frame.Fields[columnIndex].Set(rowIndex-start, &cellData.FormattedValue)
+			err := inputConverter.Set(columnIndex, rowIndex-start, cellData)
+			if err != nil {
+				warnings = append(warnings, err.Error())
 			}
 		}
 	}
@@ -197,8 +180,61 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	meta["range"] = qm.Range
 	frame.Meta = &data.FrameMeta{Custom: meta}
 	backend.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
-
 	return frame, nil
+}
+
+// timeConverter handles sheets TIME column types.
+var timeConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableTime,
+	Converter: func(i interface{}) (interface{}, error) {
+		var t *time.Time
+		cellData, ok := i.(*sheets.CellData)
+		if !ok {
+			return t, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
+		}
+		parsedTime, err := dateparse.ParseLocal(cellData.FormattedValue)
+		if err != nil {
+			return t, fmt.Errorf("Error while parsing date '%v'", cellData.FormattedValue)
+		}
+		return &parsedTime, nil
+	},
+}
+
+// stringConverter handles sheets STRING column types.
+var stringConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableString,
+	Converter: func(i interface{}) (interface{}, error) {
+		var s *string
+		cellData, ok := i.(*sheets.CellData)
+		if !ok {
+			return s, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
+		}
+		return &cellData.FormattedValue, nil
+	},
+}
+
+// numberConverter handles sheets STRING column types.
+var numberConverter = data.FieldConverter{
+	OutputFieldType: data.FieldTypeNullableFloat64,
+	Converter: func(i interface{}) (interface{}, error) {
+		var f *float64
+		cellData, ok := i.(*sheets.CellData)
+		if !ok {
+			return f, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
+		}
+		if &cellData.EffectiveValue.NumberValue != nil {
+			f = &cellData.EffectiveValue.NumberValue
+		}
+		return f, nil
+	},
+}
+
+// converterMap is a map sheets.ColumnType to fieldConverter and
+// is used to create a data.FrameInputConverter for a returned sheet.
+var converterMap = map[ColumnType]data.FieldConverter{
+	"TIME":   timeConverter,
+	"STRING": stringConverter,
+	"NUMBER": numberConverter,
 }
 
 func getUniqueColumnName(formattedName string, columnIndex int, columns map[string]bool) string {

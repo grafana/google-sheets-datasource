@@ -5,13 +5,11 @@ import (
 )
 
 func findTimeField(frame *data.Frame) int {
-	for fieldIdx, f := range frame.Fields {
-		ftype := f.Type()
-		if ftype == data.FieldTypeTime || ftype == data.FieldTypeNullableTime {
-			return fieldIdx
-		}
+	timeIndices := frame.TypeIndices(data.FieldTypeTime, data.FieldTypeNullableTime)
+	if len(timeIndices) == 0 {
+		return -1
 	}
-	return -1
+	return timeIndices[0]
 }
 
 func getExcelColumnName(columnNumber int) string {

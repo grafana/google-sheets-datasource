@@ -80,6 +80,8 @@ github.com/googleapis/gax-go/v2 v2.0.5 h1:sjZBwGj9Jlw33ImPtvFviGYvseOtDM7hkSKB7+
 github.com/googleapis/gax-go/v2 v2.0.5/go.mod h1:DWXyrwAJ9X0FpwwEdw+IPEYBICEFu5mhpdKc/us6bOk=
 github.com/grafana/grafana-plugin-sdk-go v0.39.0 h1:tPP83HeY9gN4q8O3tYka1vd82OQ/3CFdwx4QeEhJ0Qc=
 github.com/grafana/grafana-plugin-sdk-go v0.39.0/go.mod h1:xRhfTHl+Dkqf2Py6Lr4pcHBC5pm8/N+IwPJ0R/iAHMM=
+github.com/grafana/grafana-plugin-sdk-go v0.42.0 h1:8oiAQa/uABBFT70GDAv3BnqHfdMOxy/P8SzYVURJH6Y=
+github.com/grafana/grafana-plugin-sdk-go v0.42.0/go.mod h1:xRhfTHl+Dkqf2Py6Lr4pcHBC5pm8/N+IwPJ0R/iAHMM=
 github.com/hashicorp/go-hclog v0.0.0-20180709165350-ff2cf002a8dd h1:rNuUHR+CvK1IS89MMtcF0EpcVMZtjKfPRp4MEmt/aTs=
 github.com/hashicorp/go-hclog v0.0.0-20180709165350-ff2cf002a8dd/go.mod h1:9bjs9uLqI8l75knNv3lV1kA55veR+WUPSiKIWcQHudI=
 github.com/hashicorp/go-plugin v1.2.2 h1:mgDpq0PkoK5gck2w4ivaMpWRHv/matdOR4xmeScmf/w=

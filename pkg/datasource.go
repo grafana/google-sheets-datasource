@@ -103,9 +103,7 @@ func (ds *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.
 
 // QueryData queries for data.
 func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
-	res := &backend.QueryDataResponse{
-		Responses: make(map[string]*backend.DataResponse),
-	}
+	res := backend.NewQueryDataResponse(0)
 	config, err := readConfig(req.PluginConfig)
 	if err != nil {
 		return nil, err
@@ -122,12 +120,12 @@ func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.Qu
 		}
 		dr := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
 		if dr.Error != nil {
-			backend.Logger.Error("Query failed", "refId", q.RefID, "error", err)
+			backend.Logger.Error("Query failed", "refId", q.RefID, "error", dr.Error)
 		}
 		res.Responses[q.RefID] = dr
 	}
 
-	return res, nil
+	return &res, nil
 }
 
 func writeResult(rw http.ResponseWriter, path string, val interface{}, err error) {
