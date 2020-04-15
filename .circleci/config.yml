@@ -153,7 +153,7 @@ jobs:
         keys:
         - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
-        name: Setup Grafana (local install)
+        name: Setup Grafana (canary - local install)
         command: |
           ginstall canary
           /opt/grafana/bin/grafana-server -config ci/grafana-test-env/custom.ini -homepath /opt/grafana &
