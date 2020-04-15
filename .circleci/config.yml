@@ -15,7 +15,7 @@ aliases:
 
 defaults: &defaults
   docker:
-    - image: srclosson/grafana-plugin-ci-alpine:latest
+    - image: srclosson/grafana-plugin-ci-e2e:latest
 
 jobs:
   build_plugin:
