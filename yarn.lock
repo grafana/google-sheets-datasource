@@ -1016,7 +1016,7 @@
     lodash "4.17.15"
     rxjs "6.5.5"
 
-"@grafana/data@7.0.0-pre.ryan-7b33e46c54", "@grafana/data@^7.0.0-pre.0-17059489d8":
+"@grafana/data@7.0.0-pre.ryan-7b33e46c54", "@grafana/data@^7.0.0-pre.0-82fc2803f0":
   version "7.0.0-pre.ryan-7b33e46c54"
   resolved "https://registry.yarnpkg.com/@grafana/data/-/data-7.0.0-pre.ryan-7b33e46c54.tgz#ce85ee8bf2db693c44422836505c6b23b43949f8"
   integrity sha512-toFZeXFrRilHJY2klmcJ4IrOwXIgktw/MWBNi3/jKtl9iUjmBGEn8Slud3/qlRVGqV6jPLieVjKXbGHBh5GlpA==
@@ -1078,16 +1078,16 @@
     tiny-warning "^0.0.3"
 
 "@grafana/toolkit@canary":
-  version "7.0.0-pre.0-17059489d8"
-  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-7.0.0-pre.0-17059489d8.tgz#3b2215dfff04078a54f6baf24982f172c3d3b009"
-  integrity sha512-R+AsZeyCbl1jDy+s8wQ37tXZvQR3ideTUdqwJgTNaHkpD9eXmicMkp8n1D5c1CHbCROKPWGpCMoX9BwtKJPh2A==
+  version "7.0.0-pre.0-82fc2803f0"
+  resolved "https://registry.yarnpkg.com/@grafana/toolkit/-/toolkit-7.0.0-pre.0-82fc2803f0.tgz#c252c21f16758b756b12957ac75709207c99472e"
+  integrity sha512-pZ+200uQ58jI4/nQg/FJyeWLW5VQJHPvaZYZnI7eR12lYA/O6p/ppKBgdqdXU5zXN9YJUOALbRgeur6aAIrmOA==
   dependencies:
     "@babel/core" "7.9.0"
     "@babel/preset-env" "7.9.0"
-    "@grafana/data" "^7.0.0-pre.0-17059489d8"
+    "@grafana/data" "^7.0.0-pre.0-82fc2803f0"
     "@grafana/eslint-config" "^1.0.0-rc1"
     "@grafana/tsconfig" "^1.0.0-rc1"
-    "@grafana/ui" "^7.0.0-pre.0-17059489d8"
+    "@grafana/ui" "^7.0.0-pre.0-82fc2803f0"
     "@types/command-exists" "^1.2.0"
     "@types/execa" "^0.9.0"
     "@types/expect-puppeteer" "3.3.1"
@@ -1216,7 +1216,7 @@
     storybook-dark-mode "0.4.0"
     tinycolor2 "1.4.1"
 
-"@grafana/ui@^7.0.0-pre.0-17059489d8":
+"@grafana/ui@^7.0.0-pre.0-82fc2803f0":
   version "7.0.0-pre.ryan-7b33e46c54"
   resolved "https://registry.yarnpkg.com/@grafana/ui/-/ui-7.0.0-pre.ryan-7b33e46c54.tgz#823f1980fcf8b71756a1ef91d5cbfefdd88b35fc"
   integrity sha512-MSaDDSt2nkrrza7bzmxaBCZSCH0N9PqzRbC2uHEM/X80Aw14njToj4ZLIk6l43X0BEYzMm/v8qHeo5qUK4qQgw==
@@ -5060,9 +5060,9 @@ estraverse@^4.1.0, estraverse@^4.1.1, estraverse@^4.2.0:
   integrity sha512-39nnKffWz8xN1BU/2c79n9nB9HDzo0niYUqx6xyqUnyoAnQyyWpOTdZEeiCch8BBu515t4wp9ZmgVfVhn9EBpw==
 
 estraverse@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/estraverse/-/estraverse-5.0.0.tgz#ac81750b482c11cca26e4b07e83ed8f75fbcdc22"
-  integrity sha512-j3acdrMzqrxmJTNj5dbr1YbjacrYgAxVMeF0gK16E3j494mOe7xygM/ZLIguEQ0ETwAg2hlJCtHRGav+y0Ny5A==
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/estraverse/-/estraverse-5.1.0.tgz#374309d39fd935ae500e7b92e8a6b4c720e59642"
+  integrity sha512-FyohXK+R0vE+y1nHLoBM7ZTyqRpqAlhdZHCWIWEviFLiGB8b04H6bQs8G+XTthacvT8VuwvteiP7RJSxMs8UEw==
 
 esutils@^2.0.2:
   version "2.0.3"
