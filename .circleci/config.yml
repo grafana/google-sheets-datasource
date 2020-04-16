@@ -1,8 +1,4 @@
 version: 2.1
-parameters:
-  ssh-fingerprint:
-    type: string
-    default: "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
 
 aliases:
   # Workflow filters
@@ -13,116 +9,90 @@ aliases:
     branches:
       only: /^v[1-9]*[0-9]+\.[1-9]*[0-9]+\.x$/
 
-defaults: &defaults
-  docker:
-    - image: srclosson/grafana-plugin-ci-e2e:latest
+workflows:
+  version: 2
+  plugin_workflow:
+    jobs:
+      - compile_dependencies
+      - build_plugin:
+          requires: 
+            - compile_dependencies
+      - provisioning:
+          requires:
+            - package_and_report
+      - e2e_canary:
+          requires:
+            - provisioning
+      - package_and_report:
+          requires:
+            - e2e_canary
+      - approve_release:
+          type: approval
+          requires:
+            - test_integration
+          filters: *filter-only-release
+      - publish_github_release:
+          requires:
+            - approve_release
+          filters: *filter-only-release
+
+executors:
+  default_exec: # declares a reusable executor
+    docker:
+      - image: srclosson/grafana-plugin-ci-alpine:latest
+  e2e_exec:
+    docker:
+      - image: srclosson/grafana-plugin-ci-e2e:latest
 
 jobs:
-  build_plugin:
-    <<: *defaults
+  compile_dependencies:
+    executor: default_exec
     steps:
       - checkout
       - restore_cache:
           keys:
-          - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Install dependencies
           command: |
-            yarn install --frozen-lockfile
-      - run:
-          name: Build and test frontend
-          command:  |
-            npx grafana-toolkit plugin:ci-build
-            npx grafana-toolkit plugin:ci-build --finish
+            mkdir ci
+            [ -L ~/project/node_modules/.bin/grafana-toolkit ] || yarn install --frozen-lockfile
       - save_cache:
           paths:
-            - ~/.cache
-          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-      - persist_to_workspace:
-          root: .
-          paths:
-            - ci
-  build_backend:
-    <<: *defaults
+            - ~/project/node_modules
+          key: build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      
+  build_plugin:
+    executor: default_exec
     steps:
       - checkout
       - restore_cache:
           keys:
-          - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
-          name: Build Backend
-          command: |
-            mage -v buildAll
+          name: Build and test frontend and docs
+          command:  |
+            npx grafana-toolkit plugin:ci-docs
+            npx grafana-toolkit plugin:ci-build
       - run:
-          name: Test Backend
+          name: Build and test Backend
           command: |
-            mage -v lint
-            mage -v coverage
-      - run:
-          name: Install dependencies
-          command: |
-            yarn install --frozen-lockfile
+            if [ -f "Magefile.go" ]; then
+              mage -v buildAll
+              mage -v lint
+              mage -v coverage
+            fi
       - run:
           name: Move results to ci folder
           command:  |
             npx grafana-toolkit plugin:ci-build --finish
-      - save_cache:
-          paths:
-            - ~/.cache
-          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - persist_to_workspace:
           root: .
           paths:
             - ci
-  build_docs:
-    <<: *defaults
-    steps:
-    - checkout
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Install dependencies
-        command: |
-          yarn install --frozen-lockfile
-    - run:
-        name: Build Docs
-        command: |
-          mkdir ci # Avoid error if not exists
-          npx grafana-toolkit plugin:ci-docs
-    - save_cache:
-        paths:
-        - ~/.cache
-        key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - persist_to_workspace:
-        root: .
-        paths:
-          - ci
-
-  package:
-    <<: *defaults
-    steps:
-    - checkout
-    - attach_workspace:
-        at: .
-    - restore_cache:
-        keys:
-        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-    - run:
-        name: Package Distribution
-        command: |
-          yarn install --frozen-lockfile
-          npx grafana-toolkit plugin:ci-package
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci/jobs/package
-        - ci/packages
-        - ci/dist
-        - ci/grafana-test-env
 
   provisioning:
-    <<: *defaults
+    executor: default_exec
     steps:
     - checkout
     - add_ssh_keys:
@@ -144,29 +114,20 @@ jobs:
         - ci/jobs/provisioning
 
   e2e_canary:
-    <<: *defaults
+    executor: default_exec
     steps:
     - checkout
     - attach_workspace:
         at: .
     - restore_cache:
         keys:
-        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+        - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Setup Grafana (canary - local install)
         command: |
           ginstall canary
           /opt/grafana/bin/grafana-server -config ci/grafana-test-env/custom.ini -homepath /opt/grafana &
           /opt/grafana/bin/grafana-cli --version
-    - run:
-        name: Install dependencies
-        command: |
-          # TODO.... should be frozen-lockfile
-          yarn install --pure-lockfile
-    - save_cache:
-          paths:
-            - ~/.cache
-          key: yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Copy provisioning files
         command: cp -r ci/jobs/provisioning provisioning/
@@ -191,66 +152,48 @@ jobs:
     - store_artifacts:
         path: ci/jobs/e2e_canary
 
-  report:
-    <<: *defaults
+  package_and_report:
+    executor: default_exec
     steps:
     - checkout
-    - attach_workspace:
-        at: .
     - restore_cache:
         keys:
-        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+        - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+    - attach_workspace:
+        at: .
+    - run:
+        name: Package distribution
+        command: |
+          npx grafana-toolkit plugin:ci-package
     - run:
         name: Toolkit report
         command: |
-          yarn install --frozen-lockfile
           npx grafana-toolkit plugin:ci-report
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/package
+        - ci/packages
+        - ci/dist
+        - ci/grafana-test-env
     - store_artifacts:
         path: ci
 
+
   publish_github_release:
-    <<: *defaults
+    executor: default_exec
     steps:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - << pipeline.parameters.ssh-fingerprint >>
+            - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
       - attach_workspace:
           at: .
       - restore_cache:
           keys:
-            - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: "Publish Release on GitHub"
           command: |
-            yarn install --frozen-lockfile
             npx grafana-toolkit plugin:github-publish
 
-workflows:
-  plugin_workflow:
-    jobs:
-      - build_plugin
-      - build_docs
-      - build_backend
-      - package:
-          requires:
-            - build_plugin
-            - build_backend
-            - build_docs
-      - provisioning
-      - e2e_canary:
-          requires:
-            - package
-            - provisioning
-      - report:
-          requires:
-            - e2e_canary
-      - approve_release:
-          type: approval
-          requires:
-            - report
-          filters: *filter-only-release
-      - publish_github_release:
-          requires:
-            - approve_release
-          filters: *filter-only-release
