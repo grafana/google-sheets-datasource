@@ -212,4 +212,3 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             npx grafana-toolkit plugin:github-publish
-
