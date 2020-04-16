@@ -142,7 +142,7 @@ jobs:
           ginstall canary
           /opt/grafana/bin/grafana-server -config ci/grafana-test-env/custom.ini -homepath /opt/grafana &
           ## To make sure grafana has started up
-          sleep 5
+          while ! $(netstat -tulpn | grep 3000 >/dev/null 2>&1); do sleep 1; done 
           /opt/grafana/bin/grafana-cli --version
     - run:
         name: Copy provisioning files
