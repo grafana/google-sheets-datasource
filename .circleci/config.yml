@@ -31,7 +31,7 @@ workflows:
       - e2e_canary:
           requires:
             - provisioning
-            - build_plugin
+            - package
       - report:
           requires:
             - e2e_canary
