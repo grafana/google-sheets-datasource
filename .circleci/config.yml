@@ -22,19 +22,23 @@ workflows:
       - build_plugin:
           requires: 
             - compile_dependencies
+      - package:
+          requires:
+            - build-plugin
       - provisioning:
           requires:
             - build_plugin
       - e2e_canary:
           requires:
             - provisioning
-      - package_and_report:
+            - build-plugin
+      - report:
           requires:
             - e2e_canary
       - approve_release:
           type: approval
           requires:
-            - package_and_report
+            - report
           filters: *filter-only-release
       - publish_github_release:
           requires:
@@ -99,6 +103,29 @@ jobs:
           root: .
           paths:
             - ci
+
+  package:
+    executor: default_exec
+    steps:
+    - checkout
+    - restore_cache:
+        keys:
+        - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+    - attach_workspace:
+        at: .
+    - run:
+        name: Package distribution
+        command: |
+          npx grafana-toolkit plugin:ci-package
+    - persist_to_workspace:
+        root: .
+        paths:
+        - ci/jobs/package
+        - ci/packages
+        - ci/dist
+        - ci/grafana-test-env
+    - store_artifacts:
+        path: ci
 
   provisioning:
     executor: default_exec
@@ -168,7 +195,7 @@ jobs:
     - store_artifacts:
         path: ci/jobs/e2e_canary
 
-  package_and_report:
+  report:
     executor: default_exec
     steps:
     - checkout
@@ -178,23 +205,11 @@ jobs:
     - attach_workspace:
         at: .
     - run:
-        name: Package distribution
-        command: |
-          npx grafana-toolkit plugin:ci-package
-    - run:
         name: Toolkit report
         command: |
           npx grafana-toolkit plugin:ci-report
-    - persist_to_workspace:
-        root: .
-        paths:
-        - ci/jobs/package
-        - ci/packages
-        - ci/dist
-        - ci/grafana-test-env
     - store_artifacts:
         path: ci
-
 
   publish_github_release:
     executor: default_exec
