@@ -9,6 +9,11 @@ aliases:
     branches:
       only: /^v[1-9]*[0-9]+\.[1-9]*[0-9]+\.x$/
 
+parameters:
+  ssh-fingerprint:
+    type: string
+    default: "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
+
 workflows:
   version: 2
   plugin_workflow:
