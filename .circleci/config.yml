@@ -123,15 +123,19 @@ jobs:
         - ci/jobs/provisioning
 
   e2e_canary:
-    executor: default_exec
+    executor: e2e_exec
     steps:
     - checkout
     - attach_workspace:
         at: .
     - restore_cache:
+        name: Restore build cache
         keys:
-        - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
-        - yarn-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+    - restore_cache:
+        name: Restore yarn cache
+        keys:
+          - yarn-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Setup Grafana (canary - local install)
         command: |
