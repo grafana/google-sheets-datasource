@@ -24,7 +24,7 @@ workflows:
             - compile_dependencies
       - package:
           requires:
-            - build-plugin
+            - build_plugin
       - provisioning:
           requires:
             - build_plugin
