@@ -24,7 +24,7 @@ workflows:
             - compile_dependencies
       - provisioning:
           requires:
-            - package_and_report
+            - build_plugin
       - e2e_canary:
           requires:
             - provisioning
