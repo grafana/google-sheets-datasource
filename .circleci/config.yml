@@ -34,7 +34,7 @@ workflows:
       - approve_release:
           type: approval
           requires:
-            - test_integration
+            - package_and_report
           filters: *filter-only-release
       - publish_github_release:
           requires:
