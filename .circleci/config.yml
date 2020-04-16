@@ -66,6 +66,10 @@ jobs:
           paths:
             - ~/project/node_modules
           key: build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - save_cache:
+          paths:
+            - ~/.cache
+          key: yarn-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       
   build_plugin:
     executor: default_exec
@@ -127,6 +131,7 @@ jobs:
     - restore_cache:
         keys:
         - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+        - yarn-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Setup Grafana (canary - local install)
         command: |
