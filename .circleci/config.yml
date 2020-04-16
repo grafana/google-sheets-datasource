@@ -141,6 +141,8 @@ jobs:
         command: |
           ginstall canary
           /opt/grafana/bin/grafana-server -config ci/grafana-test-env/custom.ini -homepath /opt/grafana &
+          ## To make sure grafana has started up
+          sleep 5
           /opt/grafana/bin/grafana-cli --version
     - run:
         name: Copy provisioning files
