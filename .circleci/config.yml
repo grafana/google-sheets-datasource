@@ -229,7 +229,12 @@ jobs:
         command: cp -r ci/jobs/provisioning provisioning/
     - run:
         name: Run e2e tests
-        command: ./node_modules/.bin/grafana-e2e run
+        command: |
+          # If the tests fail, but GRAFANACI_STRICT_E2E=0, don't worry about it
+          ./node_modules/.bin/grafana-e2e run \
+          || (
+            [ "$GRAFANACI_STRICT_E2E" -eq 0 ] && echo "Bypassing fail. ci-nostrict enabled"
+          )
     - run:
         when: always
         name: Prepare task output dir
