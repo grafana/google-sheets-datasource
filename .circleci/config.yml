@@ -200,7 +200,7 @@ jobs:
         at: .
     - restore_cache:
         keys:
-        - yarn-packages-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+        - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Exit if no e2e tests configured
         command: |
