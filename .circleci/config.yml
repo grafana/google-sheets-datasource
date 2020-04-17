@@ -83,6 +83,11 @@ jobs:
           paths:
             - ~/project/node_modules
           key: build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - save_cache:
+          name: save cypress cache
+          paths:
+            - ~/.cache/Cypress
+          key: cypress-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
 
   build_docs:
     executor: default_exec
@@ -199,8 +204,13 @@ jobs:
     - attach_workspace:
         at: .
     - restore_cache:
+        name: Restore node_modules
         keys:
         - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+    - restore_cache:
+        name: Restore cypress cache
+        keys:
+        - cypress-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
     - run:
         name: Exit if no e2e tests configured
         command: |
