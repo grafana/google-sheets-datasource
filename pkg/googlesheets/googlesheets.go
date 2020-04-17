@@ -22,8 +22,7 @@ type GoogleSheets struct {
 }
 
 // Query queries a spreadsheet and returns a corresponding data frame.
-func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config *models.GoogleSheetConfig, timeRange backend.TimeRange) (dr *backend.DataResponse) {
-	dr = &backend.DataResponse{}
+func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config *models.GoogleSheetConfig, timeRange backend.TimeRange) (dr backend.DataResponse) {
 	client, err := NewGoogleClient(ctx, config)
 	if err != nil {
 		dr.Error = fmt.Errorf("unable to create Google API client: %w", err)
