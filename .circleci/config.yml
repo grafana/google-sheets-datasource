@@ -216,7 +216,7 @@ jobs:
         command: cp -r ci/jobs/provisioning provisioning/
     - run:
         name: Run e2e tests
-        command: ./node_modules/.bin/grafana-e2e.js run
+        command: ./node_modules/.bin/grafana-e2e run
     - run:
         when: always
         name: Prepare task output dir
