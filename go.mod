@@ -6,11 +6,10 @@ require (
 	cloud.google.com/go v0.52.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20190622164848-0fb0a474d195
 	github.com/davecgh/go-spew v1.1.1
-	github.com/grafana/grafana-plugin-sdk-go v0.42.0
+	github.com/grafana/grafana-plugin-sdk-go v0.55.0
 	github.com/mitchellh/go-testing-interface v1.0.0 // indirect
 	github.com/oklog/run v1.1.0 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.3.0
 	github.com/stretchr/testify v1.5.1
 	go.opencensus.io v0.22.3 // indirect

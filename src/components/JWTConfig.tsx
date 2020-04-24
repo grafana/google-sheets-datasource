@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { startCase, isObject } from 'lodash';
-import { FormLabel, Button } from '@grafana/ui';
+import { Button, InlineFormLabel } from '@grafana/ui';
 import { DropZone } from './';
 // import { JWTFile } from '../types';
 
@@ -64,7 +64,7 @@ export function JWTConfig({ onChange, isConfigured }: Props) {
     <>
       {configKeys.map(key => (
         <div className="gf-form">
-          <FormLabel width={10}>{startCase(key)}</FormLabel>
+          <InlineFormLabel width={10}>{startCase(key)}</InlineFormLabel>
           <input disabled className="gf-form-input width-30" value="configured" />
         </div>
       ))}
