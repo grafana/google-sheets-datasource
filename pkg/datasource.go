@@ -46,13 +46,13 @@ func NewDataSource(mux *http.ServeMux) *GoogleSheetsDataSource {
 	return ds
 }
 
-func readConfig(pluginConfig backend.PluginConfig) (*models.GoogleSheetConfig, error) {
+func readConfig(settings *backend.DataSourceInstanceSettings) (*models.GoogleSheetConfig, error) {
 	config := models.GoogleSheetConfig{}
-	if err := json.Unmarshal(pluginConfig.DataSourceConfig.JSONData, &config); err != nil {
+	if err := json.Unmarshal(settings.JSONData, &config); err != nil {
 		return nil, fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)
 	}
-	config.APIKey = pluginConfig.DataSourceConfig.DecryptedSecureJSONData["apiKey"]
-	config.JWT = pluginConfig.DataSourceConfig.DecryptedSecureJSONData["jwt"]
+	config.APIKey = settings.DecryptedSecureJSONData["apiKey"]
+	config.JWT = settings.DecryptedSecureJSONData["jwt"]
 	return &config, nil
 }
 
@@ -69,13 +69,13 @@ func (ds *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.
 	res := &backend.CheckHealthResult{}
 
 	// Just checking that the plugin exe is alive and running
-	if req.PluginConfig.DataSourceConfig == nil {
+	if req.PluginContext.DataSourceInstanceSettings == nil {
 		res.Status = backend.HealthStatusOk
 		res.Message = "Plugin is Running"
 		return res, nil
 	}
 
-	config, err := readConfig(req.PluginConfig)
+	config, err := readConfig(req.PluginContext.DataSourceInstanceSettings)
 	if err != nil {
 		res.Status = backend.HealthStatusError
 		res.Message = "Invalid config"
@@ -104,7 +104,7 @@ func (ds *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.
 // QueryData queries for data.
 func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	res := backend.NewQueryDataResponse()
-	config, err := readConfig(req.PluginConfig)
+	config, err := readConfig(req.PluginContext.DataSourceInstanceSettings)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +157,7 @@ func (ds *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.ResponseWri
 	}
 
 	ctx := req.Context()
-	config, err := readConfig(httpadapter.PluginConfigFromContext(ctx))
+	config, err := readConfig(httpadapter.PluginConfigFromContext(ctx).DataSourceInstanceSettings)
 	if err != nil {
 		writeResult(rw, "?", nil, err)
 		return

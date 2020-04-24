@@ -38,7 +38,14 @@ export interface Props extends DropzoneOptions {
   rejectStyle?: Style;
 }
 
-export function DropZone({ children, baseStyle = {}, activeStyle = {}, acceptStyle = {}, rejectStyle = {}, ...rest }: Props) {
+export function DropZone({
+  children,
+  baseStyle = {},
+  activeStyle = {},
+  acceptStyle = {},
+  rejectStyle = {},
+  ...rest
+}: Props) {
   const { getRootProps, getInputProps, isDragActive, isDragAccept, isDragReject } = useDropzone(rest);
 
   const style = useMemo(
