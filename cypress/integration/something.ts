@@ -4,7 +4,7 @@ import { e2e } from '@grafana/e2e';
 const addGoogleSheetsDataSource = (apiKey: string) => {
   const fillApiKey = () => getByPlaceholder('Enter API Key').scrollIntoView().type(apiKey);
 
-  // This get auto-removed within `afterEach` of @grafana/e2e
+  // This gets auto-removed within `afterEach` of @grafana/e2e
   e2e.flows.addDataSource({
     checkHealth: true,
     expectedAlertMessage: 'Success',
@@ -29,7 +29,7 @@ const addGoogleSheetsPanel = (spreadsheetId: string) => {
   // @todo remove `@ts-ignore` when possible
   // @ts-ignore
   e2e.getScenarioContext().then(({ lastAddedDataSource }) => {
-    // This get auto-removed within `afterEach` of @grafana/e2e
+    // This gets auto-removed within `afterEach` of @grafana/e2e
     e2e.flows.addPanel({
       dataSourceName: lastAddedDataSource,
       queriesForm: () => fillSpreadsheetID(),
