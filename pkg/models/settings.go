@@ -14,6 +14,7 @@ type DatasourceSettings struct {
 	JWT      string `json:"jwt"`
 }
 
+// LoadSettings gets the relevant settings from the plugin context
 func LoadSettings(ctx backend.PluginContext) (*DatasourceSettings, error) {
 	model := &DatasourceSettings{}
 
