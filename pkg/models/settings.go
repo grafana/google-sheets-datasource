@@ -7,7 +7,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
-// GoogleSheetConfig contains Google Sheets API authentication properties.
+// DatasourceSettings contains Google Sheets API authentication properties.
 type DatasourceSettings struct {
 	AuthType string `json:"authType"` // jwt | key
 	APIKey   string `json:"apiKey"`
