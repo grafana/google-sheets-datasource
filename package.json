@@ -3,7 +3,7 @@
   "version": "1.0.0-dev",
   "description": "Load data from google sheets in grafana",
   "scripts": {
-    "build": "grafana-toolkit plugin:build",
+    "build": "rm -rf dist && grafana-toolkit plugin:build && mage",
     "test": "grafana-toolkit plugin:test",
     "test:e2e": "grafana-e2e run",
     "dev": "grafana-toolkit plugin:dev",
@@ -23,5 +23,8 @@
   },
   "dependencies": {
     "react-dropzone": "^10.2.1"
+  },
+  "volta": {
+    "node": "12.16.3"
   }
 }
