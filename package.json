@@ -23,5 +23,8 @@
   },
   "dependencies": {
     "react-dropzone": "^10.2.1"
+  },
+  "volta": {
+    "node": "12.16.3"
   }
 }
