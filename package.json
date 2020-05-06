@@ -15,6 +15,7 @@
   "devDependencies": {
     "@grafana/data": "canary",
     "@grafana/e2e": "canary",
+    "@grafana/e2e-selectors": "canary",
     "@grafana/runtime": "canary",
     "@grafana/toolkit": "canary",
     "@grafana/ui": "canary",

@@ -1082,7 +1082,7 @@
     rxjs "6.5.5"
     xss "1.0.6"
 
-"@grafana/e2e-selectors@^7.1.0-pre.0-314d442dc7", "@grafana/e2e-selectors@^7.1.0-pre.0-fae2356a86":
+"@grafana/e2e-selectors@^7.1.0-pre.0-314d442dc7", "@grafana/e2e-selectors@^7.1.0-pre.0-fae2356a86", "@grafana/e2e-selectors@canary":
   version "7.1.0-pre.0-314d442dc7"
   resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-7.1.0-pre.0-314d442dc7.tgz#3d51f9558e6cb0da465ab219159065c44f8808ae"
   integrity sha512-IEEoxE9A7T2D5NV9mQ4D+JrP8tJf0dOrhDIZJnxj5RGUni5MfSoP4WQg8BADWTN2acPiNVAGc4HwE4LJ1WTWCw==
