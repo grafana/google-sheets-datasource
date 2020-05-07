@@ -221,7 +221,7 @@ jobs:
     - run:
         name: Exit if no e2e tests configured
         command: |
-          [ -d cypress ] || circleci-agent step halt
+          circleci-agent step halt
     - run:
         name: Setup Grafana (local install)
         command: |
