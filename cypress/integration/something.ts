@@ -15,15 +15,21 @@ const addGoogleSheetsDataSource = (apiKey: string) => {
 
 const addGoogleSheetsPanel = (spreadsheetId: string) => {
   const fillSpreadsheetID = () => {
-    e2e()
+    const getContainer = e2e.components.QueryTab.content;
+
+    getContainer()
       .contains('.gf-form-label', 'Enter SpreadsheetID')
       .parent('.gf-form') // the <Label/>
       .click();
-    e2e()
+
+    getContainer()
       .contains('.gf-form-input', 'Choose')
       .find('.gf-form-select-box__input input')
       .scrollIntoView()
       .type(spreadsheetId);
+
+    // Persist the value
+    getContainer().click();
   };
 
   // @todo remove `@ts-ignore` when possible
