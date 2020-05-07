@@ -76,7 +76,7 @@ jobs:
           name: Install dependencies
           command: |
             mkdir ci
-            [ -f ~/project/node_modules/.bin/grafana-toolkit ] || yarn install --frozen-lockfile
+            [ -f ~/project/node_modules/.bin/grafana-toolkit ] || yarn install 
       - save_cache:
           name: save node_modules
           paths:
