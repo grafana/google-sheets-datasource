@@ -13,10 +13,10 @@
   "author": "Grafana Labs <team@grafana.com> (https://grafana.com)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@grafana/data": "next",
+    "@grafana/data": "canary",
     "@grafana/e2e": "canary",
-    "@grafana/runtime": "next",
-    "@grafana/toolkit": "next",
+    "@grafana/runtime": "canary",
+    "@grafana/toolkit": "canary",
     "@grafana/ui": "canary",
     "@types/lodash": "latest",
     "@types/react-dropzone": "^5.1.0"
