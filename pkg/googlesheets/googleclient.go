@@ -15,7 +15,7 @@ import (
 type GoogleClient struct {
 	sheetsService *sheets.Service
 	driveService  *drive.Service
-	auth          *models.GoogleSheetConfig
+	auth          *models.DatasourceSettings
 }
 
 type client interface {
@@ -23,7 +23,7 @@ type client interface {
 }
 
 // NewGoogleClient creates a new client and initializes a sheet service and a drive service
-func NewGoogleClient(ctx context.Context, auth *models.GoogleSheetConfig) (*GoogleClient, error) {
+func NewGoogleClient(ctx context.Context, auth *models.DatasourceSettings) (*GoogleClient, error) {
 	sheetsService, err := createSheetsService(ctx, auth)
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 	return fs, nil
 }
 
-func createSheetsService(ctx context.Context, auth *models.GoogleSheetConfig) (*sheets.Service, error) {
+func createSheetsService(ctx context.Context, auth *models.DatasourceSettings) (*sheets.Service, error) {
 	if len(auth.AuthType) == 0 {
 		return nil, fmt.Errorf("missing AuthType setting")
 	}
@@ -116,7 +116,7 @@ func createSheetsService(ctx context.Context, auth *models.GoogleSheetConfig) (*
 	return nil, fmt.Errorf("invalid Auth Type: %s", auth.AuthType)
 }
 
-func createDriveService(ctx context.Context, auth *models.GoogleSheetConfig) (*drive.Service, error) {
+func createDriveService(ctx context.Context, auth *models.DatasourceSettings) (*drive.Service, error) {
 	if len(auth.AuthType) == 0 {
 		return nil, fmt.Errorf("missing AuthType setting")
 	}
