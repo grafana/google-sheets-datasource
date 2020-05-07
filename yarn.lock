@@ -1082,10 +1082,10 @@
     rxjs "6.5.5"
     xss "1.0.6"
 
-"@grafana/e2e-selectors@^7.1.0-pre.0-5e50409000", "@grafana/e2e-selectors@^7.1.0-pre.0-fc0c717bfb":
-  version "7.1.0-pre.0-5e50409000"
-  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-7.1.0-pre.0-5e50409000.tgz#5e5ded291c9839346f96fa08339225d47d9dced5"
-  integrity sha512-w2rSCd20QSSFDCMo48wyNit1XlGfzZu/WNWNT8+6y77FObKO0usrLNV35N7oIwjGcImovpbyDijP5/usm2I48w==
+"@grafana/e2e-selectors@7.0.0-beta.2", "@grafana/e2e-selectors@^7.1.0-pre.0-5e50409000", "@grafana/e2e-selectors@^7.1.0-pre.0-fc0c717bfb":
+  version "7.0.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@grafana/e2e-selectors/-/e2e-selectors-7.0.0-beta.2.tgz#fae262f448293cb72c92d0ea094727e0327b6874"
+  integrity sha512-+6roTpME1xchUuJjvRmgK3poGS1igCGz0fO4gHZnoakD4qPWQ9ZpenW4aMfsVXK6wPPrxX+U18omumsVzUCFcg==
   dependencies:
     "@grafana/tsconfig" "^1.0.0-rc1"
     commander "5.0.0"

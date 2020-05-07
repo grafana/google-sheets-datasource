@@ -26,5 +26,8 @@
   },
   "volta": {
     "node": "12.16.3"
-  }
+  },
+	"resolutions": {
+		"@grafana/e2e-selectors": "7.0.0-beta.2"
+	}
 }
