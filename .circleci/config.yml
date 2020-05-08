@@ -112,9 +112,6 @@ jobs:
     executor: default_exec
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints:
-            - ${GITHUB_SSH_FINGERPRINT}
       - attach_workspace:
           at: .
       - restore_cache:
