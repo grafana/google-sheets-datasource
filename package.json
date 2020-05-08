@@ -13,11 +13,11 @@
   "author": "Grafana Labs <team@grafana.com> (https://grafana.com)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@grafana/data": "canary",
-    "@grafana/e2e": "canary",
-    "@grafana/runtime": "canary",
-    "@grafana/toolkit": "canary",
-    "@grafana/ui": "canary",
+    "@grafana/data": "next",
+    "@grafana/e2e": "next",
+    "@grafana/runtime": "next",
+    "@grafana/toolkit": "next",
+    "@grafana/ui": "next",
     "@types/lodash": "latest",
     "@types/react-dropzone": "^5.1.0"
   },
@@ -26,8 +26,5 @@
   },
   "volta": {
     "node": "12.16.3"
-  },
-	"resolutions": {
-		"@grafana/e2e-selectors": "7.0.0-beta.2"
-	}
+  }
 }
