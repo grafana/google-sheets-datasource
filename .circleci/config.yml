@@ -121,8 +121,6 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            ## I'm really hacky, but don't remove me right. This environment variable stores
-            ## A fix allowing the github-publish upload to succeed because it sets the maxContentLength to be
-            ## Appropriately large.
-            [ -n "${TEMP_TOOLKIT_HACK" ] && echo "${TEMP_TOOLKIT_HACK}" > node_modules/@grafana/toolkit/src/cli/utils/githubRelease.js
+            ## I'm really hacky, but don't remove me right now. 
+            [ -n "${TEMP_TOOLKIT_HACK}" ] && cp /usr/local/bin/githubRelease.js node_modules/@grafana/toolkit/src/cli/utils/githubRelease.js
             ./node_modules/.bin/grafana-toolkit plugin:github-publish
