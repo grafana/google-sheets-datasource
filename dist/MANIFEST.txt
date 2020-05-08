@@ -1,0 +1,31 @@
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+{
+  "plugin": "grafana-googlesheets-datasource",
+  "version": "1.0.0-dev",
+  "files": {
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "README.md": "00f8ead915a9283946d4c7a22c1e3106511a61f9ad760015345871347cabfbb4",
+    "gfx_sheets_darwin_amd64": "b9804a0f031660251783dd312468ea9908c4a3c95b18bb32c5526f67926d2184",
+    "gfx_sheets_linux_amd64": "f6ddff67aebdf19e0c6b6e03536ed1ee588328ca914bcf3dab7fcea04445fa31",
+    "gfx_sheets_windows_amd64.exe": "b9a24f194d2eb7c681731083b98106ad85df4ac79372bcc9b62fd2a2d88b93d6",
+    "module.js": "6c53313b48be00406d0f6953e6098bfa012447a9c4bae067a18ce391678abd48",
+    "module.js.LICENSE.txt": "0d8f66cd4afb566cb5b7e1540c68f43b939d3eba12ace290f18abc4f4cb53ed0",
+    "module.js.map": "b96e08a2a17f2a495afd7d938a8f89bb30dda3d195f44132f2d33c459f69a164",
+    "plugin.json": "1942aaecc909511a8392f0107faa4ad1a18d1e3b9b560e5f0d1bb7c12b75042a"
+  },
+  "time": 1588968793003,
+  "keyId": "7e4d0c6a708866e7"
+}
+-----BEGIN PGP SIGNATURE-----
+Version: OpenPGP.js v4.10.1
+Comment: https://openpgpjs.org
+
+wqIEARMKAAYFAl61vVkACgkQfk0ManCIZuetKQIJAdvEsJ7aYznwRexf8FwQ
+tdtbHG/0F/vevLHbH5MaG8SAgnMYDSuE56Z6LLwmrwyoGxI85wj91O8hICAD
+Wt6DcSp+AgkBqhCmfF4PaqwxhYOXL5KODXD1F60GPACWaHQICEHzXk4MqTh5
+PgXGUkbOzBJf+iWMkmGkFX/cJyXEohpsEwdn9EY=
+=Ck4i
+-----END PGP SIGNATURE-----

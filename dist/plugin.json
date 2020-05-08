@@ -1,0 +1,70 @@
+{
+  "type": "datasource",
+  "name": "Google Sheets",
+  "id": "grafana-googlesheets-datasource",
+  "backend": true,
+  "executable": "gfx_sheets",
+  "metrics": true,
+  "info": {
+    "description": "Show data from google sheets",
+    "author": {
+      "name": "Grafana Labs",
+      "url": "https://grafana.com"
+    },
+    "keywords": [
+      "google",
+      "sheets",
+      "spreadsheets",
+      "excel"
+    ],
+    "logos": {
+      "small": "img/sheets.svg",
+      "large": "img/sheets.svg"
+    },
+    "links": [
+      {
+        "name": "Website",
+        "url": "https://github.com/grafana/google-sheets-datasource"
+      }
+    ],
+    "screenshots": [
+      {
+        "name": "Average temperature dashboard example",
+        "path": "img/dashboard.png"
+      },
+      {
+        "name": "Average temperature spreadsheet example",
+        "path": "img/spreadsheet.png"
+      },
+      {
+        "name": "Average temperature table example",
+        "path": "img/table.png"
+      },
+      {
+        "name": "Average temperature graph example",
+        "path": "img/graph.png"
+      },
+      {
+        "name": "Query editor",
+        "path": "img/query-editor.png"
+      },
+      {
+        "name": "Config page - Google JWT File auth",
+        "path": "img/config-page.png"
+      }
+    ],
+    "version": "1.0.0-dev",
+    "updated": "2020-05-08",
+    "build": {
+      "time": 1588968792708,
+      "repo": "git@github.com:grafana/google-sheets-datasource.git",
+      "branch": "v1.0.x",
+      "hash": "702ac387dcf470bf42c87dfa7968abbdd9c093d8",
+      "number": 2576
+    }
+  },
+  "dependencies": {
+    "grafanaVersion": "7.0.x",
+    "plugins": []
+  }
+}
