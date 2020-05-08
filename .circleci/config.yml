@@ -116,6 +116,7 @@ jobs:
           fingerprints:
             - << pipeline.parameters.ssh-fingerprint >>
             - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
+            - ${GITHUB_SSH_FINGERPRINT}
       - attach_workspace:
           at: .
       - restore_cache:
