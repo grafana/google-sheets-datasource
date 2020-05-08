@@ -1,10 +1,5 @@
 version: 2.1
 
-parameters:
-  ssh-fingerprint:
-    type: string
-    default: ${GITHUB_SSH_FINGERPRINT}
-
 aliases:
   # Workflow filters
   - &filter-only-master
@@ -59,7 +54,7 @@ executors:
   default_exec: # declares a reusable executor
     docker:
       - image: srclosson/grafana-plugin-ci-alpine:latest
-  e2e_exec:
+  e2e_exec: 
     docker:
       - image: srclosson/grafana-plugin-ci-e2e:latest
 
@@ -180,7 +175,7 @@ jobs:
     - checkout
     - add_ssh_keys:
         fingerprints:
-          - << pipeline.parameters.ssh-fingerprint >>
+          - ${GITHUB_SSH_FINGERPRINT}
     - run:
         name: Continue if this plugin has a provisioning path
         command: |
@@ -221,7 +216,7 @@ jobs:
     - run:
         name: Exit if no e2e tests configured
         command: |
-          circleci-agent step halt
+          [ -d cypress ] || circleci-agent step halt
     - run:
         name: Setup Grafana (local install)
         command: |
@@ -282,8 +277,7 @@ jobs:
       - checkout
       - add_ssh_keys:
           fingerprints:
-            - << pipeline.parameters.ssh-fingerprint >>
-            - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
+            - ${GITHUB_SSH_FINGERPRINT}
       - attach_workspace:
           at: .
       - restore_cache:
