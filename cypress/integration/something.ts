@@ -20,7 +20,7 @@ const addGoogleSheetsPanel = (spreadsheetId: string) => {
     getContainer()
       .contains('.gf-form-label', 'Enter SpreadsheetID')
       .parent('.gf-form') // the <Label/>
-      .click();
+      .click({ force: true }); // https://github.com/cypress-io/cypress/issues/7306
 
     getContainer()
       .contains('.gf-form-input', 'Choose')
