@@ -1,7 +1,8 @@
 node_modules/
 coverage/
 ci/
-cypress/screenshots/
+cypress/report.json
+cypress/screenshots/actual
 cypress/videos/
 dist/
 provisioning
