@@ -15,15 +15,26 @@ const addGoogleSheetsDataSource = (apiKey: string) => {
 
 const addGoogleSheetsPanel = (spreadsheetId: string) => {
   const fillSpreadsheetID = () => {
-    e2e()
+    const getContainer = e2e.components.QueryTab.content;
+
+    e2e().server();
+    e2e().route('POST', '/api/ds/query').as('chartData');
+
+    getContainer()
       .contains('.gf-form-label', 'Enter SpreadsheetID')
       .parent('.gf-form') // the <Label/>
-      .click();
-    e2e()
+      .click({ force: true }); // https://github.com/cypress-io/cypress/issues/7306
+
+    getContainer()
       .contains('.gf-form-input', 'Choose')
       .find('.gf-form-select-box__input input')
       .scrollIntoView()
       .type(spreadsheetId);
+
+    // Persist the value
+    getContainer().click();
+
+    e2e().wait('@chartData');
   };
 
   // @todo remove `@ts-ignore` when possible
@@ -33,6 +44,11 @@ const addGoogleSheetsPanel = (spreadsheetId: string) => {
     e2e.flows.addPanel({
       dataSourceName: lastAddedDataSource,
       queriesForm: () => fillSpreadsheetID(),
+      visualizationName: 'Table',
+    }).then((panelTitle: string) => {
+      e2e.components.PanelEditor.OptionsPane.close().click();
+      e2e.components.Panels.Panel.containerByTitle(panelTitle).find('.panel-content').screenshot('chart');
+      e2e().compareScreenshots('chart');
     });
   });
 };
