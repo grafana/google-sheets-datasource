@@ -29,10 +29,7 @@ const addGoogleSheetsPanel = (spreadsheetId: string) => {
       .contains('.gf-form-input', 'Choose')
       .find('.gf-form-select-box__input input')
       .scrollIntoView()
-      .type(spreadsheetId);
-
-    // Persist the value
-    getContainer().click();
+      .type(`${spreadsheetId}{enter}`);
 
     e2e().wait('@chartData');
   };
