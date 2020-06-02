@@ -9,15 +9,12 @@ const addGoogleSheetsDataSource = (apiKey: string) => {
     checkHealth: true,
     expectedAlertMessage: 'Success',
     form: () => fillApiKey(),
-    name: 'Google Sheets',
+    type: 'Google Sheets',
   });
 };
 
 const addGoogleSheetsPanel = (spreadsheetId: string) => {
   const fillSpreadsheetID = () => {
-    e2e().server();
-    e2e().route('POST', '/api/ds/query').as('chartData');
-
     e2e.components.QueryTab.content().within(() => {
       e2e()
         .contains('.gf-form-label', 'Enter SpreadsheetID')
@@ -30,23 +27,16 @@ const addGoogleSheetsPanel = (spreadsheetId: string) => {
         .scrollIntoView()
         .type(`${spreadsheetId}{enter}`);
     });
-
-    e2e().wait('@chartData');
   };
 
-  // @todo remove `@ts-ignore` when possible
-  // @ts-ignore
-  e2e.getScenarioContext().then(({ lastAddedDataSource }) => {
-    // This gets auto-removed within `afterEach` of @grafana/e2e
-    e2e.flows.addPanel({
-      dataSourceName: lastAddedDataSource,
-      queriesForm: () => fillSpreadsheetID(),
-      visualizationName: 'Table',
-    }).then((panelTitle: string) => {
-      e2e.components.PanelEditor.OptionsPane.close().click();
-      e2e.components.Panels.Panel.containerByTitle(panelTitle).find('.panel-content').screenshot('chart');
-      e2e().compareScreenshots('chart');
-    });
+  // This gets auto-removed within `afterEach` of @grafana/e2e
+  e2e.flows.addPanel({
+    queriesForm: () => fillSpreadsheetID(),
+  }).then(({ config }: any) => {
+    e2e.components.Panels.Panel.containerByTitle(config.panelTitle)
+      .find('.panel-content')
+      .screenshot('chart');
+    e2e().compareScreenshots('chart');
   });
 };
 
