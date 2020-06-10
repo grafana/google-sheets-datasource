@@ -15,21 +15,21 @@ const addGoogleSheetsDataSource = (apiKey: string) => {
 
 const addGoogleSheetsPanel = (spreadsheetId: string) => {
   const fillSpreadsheetID = () => {
-    const getContainer = e2e.components.QueryTab.content;
-
     e2e().server();
     e2e().route('POST', '/api/ds/query').as('chartData');
 
-    getContainer()
-      .contains('.gf-form-label', 'Enter SpreadsheetID')
-      .parent('.gf-form') // the <Label/>
-      .click({ force: true }); // https://github.com/cypress-io/cypress/issues/7306
+    e2e.components.QueryTab.content().within(() => {
+      e2e()
+        .contains('.gf-form-label', 'Enter SpreadsheetID')
+        .parent('.gf-form') // the <Label/>
+        .click({ force: true }); // https://github.com/cypress-io/cypress/issues/7306
 
-    getContainer()
-      .contains('.gf-form-input', 'Choose')
-      .find('.gf-form-select-box__input input')
-      .scrollIntoView()
-      .type(`${spreadsheetId}{enter}`);
+      e2e()
+        .contains('.gf-form-input', 'Choose')
+        .find('.gf-form-select-box__input input')
+        .scrollIntoView()
+        .type(`${spreadsheetId}{enter}`);
+    });
 
     e2e().wait('@chartData');
   };
@@ -56,13 +56,11 @@ e2e.scenario({
   describeName: 'Smoke tests',
   itName: 'Login, create data source, dashboard and panel',
   scenario: () => {
-    // Paths are relative to <project-root>/provisioning
-    const provisionPaths = [
+    e2e().readProvisions([
+      // Paths are relative to <project-root>/provisioning
       'datasources/google-sheets-datasource-API-key.yml',
       'datasources/google-sheets-datasource-jwt.yml',
-    ];
-
-    e2e().readProvisions(provisionPaths).then(([apiKeyProvision, jwtProvision]) => {
+    ]).then(([apiKeyProvision, jwtProvision]) => {
       addGoogleSheetsDataSource(apiKeyProvision.datasources[0].secureJsonData.apiKey);
       e2e.flows.addDashboard();
       addGoogleSheetsPanel('1Kn_9WKsuT-H0aJL3fvqukt27HlizMLd-KQfkNgeWj4U');
