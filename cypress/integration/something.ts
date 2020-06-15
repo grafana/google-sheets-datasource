@@ -1,14 +1,27 @@
 /// <reference path="../../node_modules/@grafana/e2e/cypress/support/index.d.ts" />
 import { e2e } from '@grafana/e2e';
 
-const addGoogleSheetsDataSource = (apiKey: string) => {
-  const fillApiKey = () => getByPlaceholder('Enter API Key').scrollIntoView().type(apiKey);
+const addGoogleSheetsDataSource = (config: { apiKey: string } | { jwtPath: string }) => {
+  const fillApiKey = (apiKey: string) => getByPlaceholder('Enter API Key').scrollIntoView().type(apiKey);
+
+  const fillJwt = (jwtPath: string) => {
+    e2e().contains('.gf-form-group', 'Auth').within(() => {
+      e2e.flows.selectOption(e2e.components.Select.option(), 'Google JWT File');
+      e2e().get('input[type=file]').attachFile(jwtPath);
+    });
+  };
 
   // This gets auto-removed within `afterEach` of @grafana/e2e
   e2e.flows.addDataSource({
     checkHealth: true,
     expectedAlertMessage: 'Success',
-    form: () => fillApiKey(),
+    form: () => {
+      if ('apiKey' in config) {
+        fillApiKey(config.apiKey);
+      } else if ('jwtPath' in config) {
+        fillJwt(config.jwtPath);
+      }
+    },
     type: 'Google Sheets',
   });
 };
@@ -51,9 +64,20 @@ e2e.scenario({
       'datasources/google-sheets-datasource-API-key.yml',
       'datasources/google-sheets-datasource-jwt.yml',
     ]).then(([apiKeyProvision, jwtProvision]) => {
-      addGoogleSheetsDataSource(apiKeyProvision.datasources[0].secureJsonData.apiKey);
+      const { apiKey } = apiKeyProvision.datasources[0].secureJsonData;
+      const { jwt } = jwtProvision.datasources[0].secureJsonData;
+      const sheetId = '1Kn_9WKsuT-H0aJL3fvqukt27HlizMLd-KQfkNgeWj4U';
+
+      const jwtPath = 'jwt.json';
+      e2e().writeFile(`${Cypress.config('fixturesFolder')}/${jwtPath}`, jwt);
+
+      addGoogleSheetsDataSource({ apiKey });
       e2e.flows.addDashboard();
-      addGoogleSheetsPanel('1Kn_9WKsuT-H0aJL3fvqukt27HlizMLd-KQfkNgeWj4U');
+      addGoogleSheetsPanel(sheetId);
+
+      addGoogleSheetsDataSource({ jwtPath });
+      e2e.flows.addDashboard();
+      addGoogleSheetsPanel(sheetId);
     });
   },
 });
