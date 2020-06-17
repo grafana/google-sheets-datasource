@@ -65,19 +65,19 @@ e2e.scenario({
       'datasources/google-sheets-datasource-jwt.yml',
     ]).then(([apiKeyProvision, jwtProvision]) => {
       const { apiKey } = apiKeyProvision.datasources[0].secureJsonData;
-      const { jwt } = jwtProvision.datasources[0].secureJsonData;
+      //const { jwt } = jwtProvision.datasources[0].secureJsonData;
       const sheetId = '1Kn_9WKsuT-H0aJL3fvqukt27HlizMLd-KQfkNgeWj4U';
 
-      const jwtPath = 'jwt.json';
-      e2e().writeFile(`${Cypress.config('fixturesFolder')}/${jwtPath}`, jwt);
+      //const jwtPath = 'jwt.json';
+      //e2e().writeFile(`${Cypress.config('fixturesFolder')}/${jwtPath}`, jwt);
 
       addGoogleSheetsDataSource({ apiKey });
       e2e.flows.addDashboard();
       addGoogleSheetsPanel(sheetId);
 
-      addGoogleSheetsDataSource({ jwtPath });
-      e2e.flows.addDashboard();
-      addGoogleSheetsPanel(sheetId);
+      //addGoogleSheetsDataSource({ jwtPath });
+      //e2e.flows.addDashboard();
+      //addGoogleSheetsPanel(sheetId);
     });
   },
 });
