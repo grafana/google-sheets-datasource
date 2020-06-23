@@ -140,8 +140,8 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		field := frame.Fields[i]
 		field.Name = column.Header
 		field.Config = &data.FieldConfig{
-			Title: column.Header,
-			Unit:  column.GetUnit(),
+			DisplayName: column.Header,
+			Unit:        column.GetUnit(),
 		}
 		if column.HasMixedTypes() {
 			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
