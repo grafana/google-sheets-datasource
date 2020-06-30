@@ -1,4 +1,3 @@
-/// <reference path="../../node_modules/@grafana/e2e/cypress/support/index.d.ts" />
 import { e2e } from '@grafana/e2e';
 
 const addGoogleSheetsDataSource = (config: { apiKey: string } | { jwtPath: string }) => {
@@ -53,7 +52,7 @@ const addGoogleSheetsPanel = (spreadsheetId: string) => {
   });
 };
 
-export const getByPlaceholder = (placeholder: string) => e2e().get(`[placeholder="${placeholder}"]`);
+const getByPlaceholder = (placeholder: string) => e2e().get(`[placeholder="${placeholder}"]`);
 
 e2e.scenario({
   describeName: 'Smoke tests',
