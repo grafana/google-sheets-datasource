@@ -81,7 +81,7 @@ func (cd *ColumnDefinition) checkType(cell *sheets.CellData) {
 	}
 
 	// Has a number value (will not detect 0)
-	hasNumberValue := cell.EffectiveValue != nil && cell.EffectiveValue.NumberValue != 0
+	hasNumberValue := cell.EffectiveValue != nil && cell.EffectiveValue.NumberValue != nil && *cell.EffectiveValue.NumberValue != 0
 	hasNumberFormat := cell.EffectiveFormat != nil && cell.EffectiveFormat.NumberFormat != nil
 
 	if hasNumberFormat {

@@ -216,15 +216,14 @@ var stringConverter = data.FieldConverter{
 var numberConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableFloat64,
 	Converter: func(i interface{}) (interface{}, error) {
-		var f *float64
 		cellData, ok := i.(*sheets.CellData)
 		if !ok {
-			return f, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
+			return nil, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
 		}
 		if &cellData.EffectiveValue.NumberValue != nil {
-			f = &cellData.EffectiveValue.NumberValue
+			return cellData.EffectiveValue.NumberValue, nil
 		}
-		return f, nil
+		return nil, nil
 	},
 }
 
