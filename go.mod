@@ -3,7 +3,7 @@ module github.com/grafana/google-sheets-datasource
 go 1.14
 
 require (
-	cloud.google.com/go v0.63.0 // indirect
+	cloud.google.com/go v0.64.0 // indirect
 	github.com/araddon/dateparse v0.0.0-20200409225146-d820a6159ab1
 	github.com/davecgh/go-spew v1.1.1
 	github.com/grafana/grafana-plugin-sdk-go v0.76.0
