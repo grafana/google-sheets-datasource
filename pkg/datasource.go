@@ -122,8 +122,10 @@ func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.Qu
 
 		frame, err := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
 		if err != nil {
+			// here we need to return an empty dataframe
 			backend.Logger.Error("Query failed", "refId", q.RefID, "error", err)
-			return nil, err
+			res.Frames = append(res.Frames, []*data.Frame{}...)
+			return res, nil
 		}
 
 		res.Frames = append(res.Frames, []*data.Frame{frame}...)
