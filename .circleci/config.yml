@@ -66,7 +66,7 @@ jobs:
           key: cypress-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build and test frontend
-          command: 
+          command: | 
             rm -rf ~/node_modules/@grafana/data/node_modules
             ./node_modules/.bin/grafana-toolkit plugin:ci-build
       - run:
