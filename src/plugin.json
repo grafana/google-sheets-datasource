@@ -1,4 +1,6 @@
 {
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+
   "type": "datasource",
   "name": "Google Sheets",
   "id": "grafana-googlesheets-datasource",
@@ -57,6 +59,7 @@
   },
   "dependencies": {
     "grafanaVersion": "7.0.x",
+    "grafanaDependency": ">7.0",
     "plugins": []
   }
 }
