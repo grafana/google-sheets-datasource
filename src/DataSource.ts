@@ -8,6 +8,8 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
     super(instanceSettings);
   }
 
+  annotations = {};
+
   // Support template variables for spreadsheet and range
   applyTemplateVariables(query: SheetsQuery) {
     const templateSrv = getTemplateSrv();
