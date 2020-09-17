@@ -1,6 +1,6 @@
 {
   "name": "grafana-google-sheets-datasource",
-  "version": "1.0.0-dev",
+  "version": "1.0.1-dev",
   "description": "Load data from google sheets in grafana",
   "scripts": {
     "build": "rm -rf dist && grafana-toolkit plugin:build && mage",
