@@ -56,7 +56,7 @@ export function DropZone({
       ...(isDragAccept ? { ...defaultAcceptStyle, ...acceptStyle } : {}),
       ...(isDragReject ? { ...defaultRejectStyle, ...rejectStyle } : {}),
     }),
-    [isDragActive, isDragReject]
+    [isDragActive, isDragAccept, isDragReject, activeStyle, acceptStyle, rejectStyle, baseStyle]
   );
 
   return (

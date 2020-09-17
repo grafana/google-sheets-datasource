@@ -19,7 +19,7 @@ func getExcelColumnName(columnNumber int) string {
 
 	for dividend > 0 {
 		modulo = ((dividend - 1) % 26)
-		columnName = string(65+modulo) + columnName
+		columnName = string(rune(65+modulo)) + columnName
 		dividend = ((dividend - modulo) / 26)
 	}
 
