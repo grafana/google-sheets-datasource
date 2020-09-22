@@ -35,23 +35,38 @@ const addGoogleSheetsDataSource = (config: { apiKey: string } | { jwtPath: strin
   });
 };
 
-const addGoogleSheetsPanel = (spreadsheetId: string) => {
-  const fillSpreadsheetID = () =>
-    e2e.components.QueryEditorRows.rows().within(() => {
-      e2e()
-        .get('.gf-form:has(.gf-form-label:contains("Enter SpreadsheetID"))') // the <Label/>
-        .click({ force: true }); // https://github.com/cypress-io/cypress/issues/7306
-      e2e()
-        .contains('.gf-form-input', 'Choose')
-        .find('.gf-form-select-box__input input')
-        .scrollIntoView()
-        .type(`${spreadsheetId}{enter}`);
-    });
+interface GoogleSheetsPanelConfig {
+  sheetId: string;
+  sheetIdVariable: string;
+}
 
+const addGoogleSheetsPanel = ({ sheetId, sheetIdVariable }: GoogleSheetsPanelConfig) => {
+  const fillSpreadsheetID = (newValue: string, previousValue = 'Enter SpreadsheetID', avoidFlakiness = false) =>
+    e2e.components.QueryEditorRows.rows()
+      .contains('.gf-form-inline', 'Spreadsheet ID')
+      .within(() => {
+        e2e()
+          .get(`.gf-form:has(.gf-form-label:contains("${previousValue}"))`) // the <Label/>
+          .click({ force: avoidFlakiness });
+        e2e()
+          .get('input')
+          .scrollIntoView()
+          .type(`${newValue}{enter}`);
+      });
+
+  // Assert sheet id
   e2e.flows.addPanel({
     matchScreenshot: true,
-    queriesForm: () => fillSpreadsheetID(),
+    queriesForm: () => fillSpreadsheetID(sheetId),
     visualizationName: e2e.flows.VISUALIZATION_TABLE,
+  }).then(({ config: { panelTitle } }: any) => {
+    // Assert template variable as sheet id
+    e2e.flows.editPanel({
+      matchScreenshot: true,
+      panelTitle,
+      queriesForm: () => fillSpreadsheetID(`$${sheetIdVariable}`, sheetId, true),
+      visitDashboardAtStart: false,
+    });
   });
 };
 
@@ -67,19 +82,32 @@ e2e.scenario({
       const { apiKey } = apiKeyProvision.datasources[0].secureJsonData;
       //const { jwt } = jwtProvision.datasources[0].secureJsonData;
       const sheetId = '1Kn_9WKsuT-H0aJL3fvqukt27HlizMLd-KQfkNgeWj4U';
+      const sheetIdVariable = 'sheetId';
 
       //const jwtPath = 'jwt.json';
       //e2e().writeFile(`${Cypress.config('fixturesFolder')}/${jwtPath}`, jwt);
 
-      // These gets auto-removed within `afterEach` of @grafana/e2e
+      // This gets auto-removed within `afterEach` of @grafana/e2e
       addGoogleSheetsDataSource({ apiKey });
-      e2e.flows.addDashboard();
-      addGoogleSheetsPanel(sheetId);
 
-      // These gets auto-removed within `afterEach` of @grafana/e2e
+      // This gets auto-removed within `afterEach` of @grafana/e2e
+      e2e.flows.addDashboard({
+        variables: [
+          {
+            constantValue: sheetId,
+            label: 'Template Variable',
+            name: sheetIdVariable,
+            type: e2e.flows.VARIABLE_TYPE_CONSTANT,
+          },
+        ],
+      });
+
+      // This gets auto-removed within `afterEach` of @grafana/e2e
+      addGoogleSheetsPanel({ sheetId, sheetIdVariable });
+
+      // These get auto-removed within `afterEach` of @grafana/e2e
       //addGoogleSheetsDataSource({ jwtPath });
-      //e2e.flows.addDashboard();
-      //addGoogleSheetsPanel(sheetId);
+      //addGoogleSheetsPanel({ sheetId, sheetIdVariable });
     });
   },
 });
