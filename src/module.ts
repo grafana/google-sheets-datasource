@@ -6,4 +6,5 @@ import { SheetsQuery, SheetsSourceOptions } from './types';
 export const plugin = new DataSourcePlugin<DataSource, SheetsQuery, SheetsSourceOptions>(DataSource)
   .setConfigEditor(ConfigEditor)
   .setQueryEditor(QueryEditor)
+  .setVariableQueryEditor(QueryEditor)
   .setMetadataInspector(MetaInspector);

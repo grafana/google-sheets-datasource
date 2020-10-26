@@ -178,7 +178,6 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
 	frame.Meta = &data.FrameMeta{Custom: meta}
-	backend.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
 	return frame, nil
 }
 

@@ -49,8 +49,23 @@ export const formatCacheTimeLabel = (s: number = defaultCacheDuration) => {
 
 export class QueryEditor extends PureComponent<Props> {
   componentWillMount() {
-    if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
-      this.props.query.cacheDurationSeconds = defaultCacheDuration;
+    const { query } = this.props;
+
+    // When using template variables, the old query may be a raw string :(
+    if (typeof query === 'string' || query instanceof String) {
+      this.props.onChange({} as SheetsQuery);
+      return;
+    }
+
+    if (!query.hasOwnProperty('cacheDurationSeconds')) {
+      this.props.onChange({ ...query, cacheDurationSeconds: defaultCacheDuration });
+    }
+  }
+
+  // In the template variable editor, `onRunQuery` is not configured
+  onRunQuery = () => {
+    if(this.props.onRunQuery) {
+      this.props.onRunQuery();
     }
   }
 
@@ -62,7 +77,7 @@ export class QueryEditor extends PureComponent<Props> {
   };
 
   onSpreadsheetIDChange = (item: any) => {
-    const { query, onRunQuery, onChange } = this.props;
+    const { query, onChange } = this.props;
 
     if (!item.value) {
       return; // ignore delete?
@@ -75,20 +90,22 @@ export class QueryEditor extends PureComponent<Props> {
     } else {
       onChange({ ...query, spreadsheet: v });
     }
-    onRunQuery();
+
+    this.onRunQuery();
   };
 
   toggleUseTimeFilter = (event?: React.SyntheticEvent<HTMLInputElement>) => {
-    const { query, onChange, onRunQuery } = this.props;
+    const { query, onChange } = this.props;
     onChange({
       ...query,
       useTimeFilter: !query.useTimeFilter,
     });
-    onRunQuery();
+
+    this.onRunQuery();
   };
 
   render() {
-    const { query, onRunQuery, onChange, datasource } = this.props;
+    const { query, onChange, datasource } = this.props;
     return (
       <>
         <div className="gf-form-inline">
@@ -143,7 +160,7 @@ export class QueryEditor extends PureComponent<Props> {
             value={query.range || ''}
             placeholder="ie: Class Data!A2:E"
             onChange={this.onRangeChange}
-            onBlur={onRunQuery}
+            onBlur={this.onRunQuery}
           ></input>
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
