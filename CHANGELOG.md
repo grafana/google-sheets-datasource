@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.0
+- Adding support for annotations with Grafana 7.2+
+
 ## v1.0.0
 - Works with Grafana 7+
 - Avoid crashing on unknown timezone (#69)

@@ -8,6 +8,7 @@
   "backend": true,
   "executable": "gfx_sheets",
   "metrics": true,
+  "annotations": true,
 
   "info": {
     "description": "Show data from google sheets",

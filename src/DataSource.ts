@@ -8,6 +8,9 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
     super(instanceSettings);
   }
 
+  // Enables default annotation support for 7.2+
+  annotations = {};
+
   // Support template variables for spreadsheet and range
   applyTemplateVariables(query: SheetsQuery) {
     const templateSrv = getTemplateSrv();
