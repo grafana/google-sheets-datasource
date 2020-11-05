@@ -3,12 +3,12 @@
   "version": "1.0.1-dev",
   "description": "Load data from google sheets in grafana",
   "scripts": {
-    "build": "rm -rf dist && grafana-toolkit plugin:build && mage",
+    "build": "rm -rf node_modules/@grafana/data/node_modules; grafana-toolkit plugin:build && mage",
     "dev": "rm -rf node_modules/@grafana/data/node_modules; grafana-toolkit plugin:dev",
     "test": "grafana-toolkit plugin:test",
     "test:e2e": "grafana-e2e run",
     "test:e2e:update": "grafana-e2e run --update-screenshots",
-    "watch": "grafana-toolkit plugin:dev --watch"
+    "watch": "rm -rf node_modules/@grafana/data/node_modules; grafana-toolkit plugin:dev --watch"
   },
   "repository": "github:grafana/google-sheets-datasource",
   "author": "Grafana Labs <team@grafana.com> (https://grafana.com)",
