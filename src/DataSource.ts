@@ -1,4 +1,4 @@
-import { DataSourceInstanceSettings, SelectableValue } from '@grafana/data';
+import { DataSourceInstanceSettings, SelectableValue, ScopedVars } from '@grafana/data';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 
 import { SheetsQuery, SheetsSourceOptions } from './types';
@@ -12,12 +12,12 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
   annotations = {};
 
   // Support template variables for spreadsheet and range
-  applyTemplateVariables(query: SheetsQuery) {
+  applyTemplateVariables(query: SheetsQuery, scopedVars: ScopedVars) {
     const templateSrv = getTemplateSrv();
     return {
       ...query,
-      spreadsheet: templateSrv.replace(query.spreadsheet),
-      range: query.range ? templateSrv.replace(query.range) : '',
+      spreadsheet: templateSrv.replace(query.spreadsheet, scopedVars),
+      range: query.range ? templateSrv.replace(query.range, scopedVars) : '',
     };
   }
 
