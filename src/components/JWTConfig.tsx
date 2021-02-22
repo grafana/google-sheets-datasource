@@ -22,7 +22,7 @@ export interface Props {
   isConfigured: boolean;
 }
 
-const validateJson = (json: { [key: string]: string }) => isObject(json) && configKeys.every(key => !!json[key]);
+const validateJson = (json: { [key: string]: string }) => isObject(json) && configKeys.every((key) => !!json[key]);
 
 export function JWTConfig({ onChange, isConfigured }: Props) {
   const [enableUpload, setEnableUpload] = useState<boolean>(!isConfigured);
@@ -33,7 +33,7 @@ export function JWTConfig({ onChange, isConfigured }: Props) {
       <DropZone
         baseStyle={{ marginTop: '24px' }}
         accept="application/json"
-        onDrop={acceptedFiles => {
+        onDrop={(acceptedFiles) => {
           const reader = new FileReader();
           if (acceptedFiles.length === 1) {
             reader.onloadend = (e: any) => {
@@ -62,8 +62,8 @@ export function JWTConfig({ onChange, isConfigured }: Props) {
     </>
   ) : (
     <>
-      {configKeys.map(key => (
-        <div className="gf-form">
+      {configKeys.map((key) => (
+        <div className="gf-form" key={key}>
           <InlineFormLabel width={10}>{startCase(key)}</InlineFormLabel>
           <input disabled className="gf-form-input width-30" value="configured" />
         </div>
