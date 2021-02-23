@@ -12,7 +12,9 @@ aliases:
   # Workflow filters
   - &filter-only-master
     branches:
-      only: master
+      only:
+        - main
+        - master
   - &filter-only-release
     branches:
       only: /^v[1-9]*[0-9]+\.[1-9]*[0-9]+\.x$/
@@ -30,48 +32,72 @@ workflows:
       - build_backend:
           requires:
             - yarn_install
+      - security_scan:
+          context:
+            - Plugins
+          requires:
+            - build_backend
+            - build_frontend
       - package:
+          context:
+            - Plugins
           requires:
             - build_frontend
             - build_backend
             - build_docs
       - publish_artifacts_to_gcs:
+          context:
+            - Plugins
+          requires:
+            - package
+      - publish_screenshots_to_gcs:
+          context:
+            - Plugins
           requires:
             - package
       - report:
+          context:
+            - Plugins
           requires:
-            - package
+            - publish_artifacts_to_gcs
+            - publish_screenshots_to_gcs
       - approve_release:
           type: approval
           requires:
             - report
           filters: *filter-only-release
       - publish_github_release:
+          context:
+            - Plugins
           requires:
-          - approve_release
+            - approve_release
           filters: *filter-only-release
       - publish_gcs_release:
           requires:
             - approve_release
           filters: *filter-only-release
       - approve_publish_to_gcom:
+          context:
+            - Plugins
           type: approval
           requires:
-          - publish_github_release
-          - publish_gcs_release
+            - publish_github_release
+            - publish_gcs_release
           filters: *filter-only-release
       - publish_to_gcom:
+          context:
+            - Plugins
           requires:
-          - approve_publish_to_gcom
+            - approve_publish_to_gcom
           filters: *filter-only-release
 
 executors:
-  default_exec: # declares a reusable executor
+  default_exec:
     docker:
-      - image: srclosson/grafana-plugin-ci-alpine:latest
+      - image: grafana/grafana-plugin-ci:1.1.3-alpine
   e2e_exec:
     docker:
-      - image: srclosson/grafana-plugin-ci-e2e:latest
+      - image: grafana/grafana-plugin-ci-e2e:latest
   python_exec:
     docker:
       - image: circleci/python:stretch
@@ -80,7 +106,7 @@ executors:
       - image: google/cloud-sdk
   grafana_publisher:
     docker:
-      - image: briangann/integration-grafana-publisher:latest
+      - image: grafana/integration-grafana-publisher:latest
 
 jobs:
   yarn_install:
@@ -138,7 +164,7 @@ jobs:
           command: |
             # hack for rxjs issue
             rm -rf ./node_modules/@grafana/data/node_modules/rxjs
-            ./node_modules/.bin/grafana-toolkit plugin:ci-build
+            ./node_modules/.bin/grafana-toolkit plugin:ci-build --maxJestWorkers=1
             ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
       - persist_to_workspace:
           root: .
@@ -172,6 +198,38 @@ jobs:
           paths:
             - ci/jobs/build_backend
 
+  security_scan:
+    executor: default_exec
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          name: restore node_modules
+          keys:
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Run Veracode scan
+          command: |
+            apk add curl
+            # Increase heap size or the scanner will die.
+            export _JAVA_OPTIONS=-Xmx4g
+            mkdir -p ci/jobs/security_scan
+            curl -sSL https://download.sourceclear.com/ci.sh | sh | tee ci/jobs/security_scan/sourclear_scan.out
+            ##
+            # Not failing builds now if we detect items we deem a problem in the scan output, but the following
+            # Would be an example
+            #
+            # grep "High Risk" ci/jobs/security_scan/sourclear_scan.out && false || true
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci/jobs/security_scan
+      - store_test_results:
+          path: ci/jobs/security_scan
+      - store_artifacts:
+          path: ci/jobs/security_scan
+
   package:
     executor: e2e_exec
     steps:
@@ -185,7 +243,12 @@ jobs:
       - run:
           name: Package Distribution (for signing/etc)
           command: |
-            EXEC_PREFIX=gfx_sheets
+            EXEC_PREFIX=`cat ci/jobs/build_frontend/dist/plugin.json|jq '.executable'| sed s/\"//g`
+            PLUGIN_NAME=`cat ci/jobs/build_frontend/dist/plugin.json|jq '.id'| sed s/\"//g`
+            VERSION=`cat ci/jobs/build_frontend/dist/plugin.json|jq '.info.version'| sed s/\"//g`
+            echo "Plugin Name: ${PLUGIN_NAME}"
+            echo "Plugin Version: ${VERSION}"
+            echo "Plugin Exec Prefix: ${EXEC_PREFIX}"
             #
             # ci-package will create the zip file
             #
@@ -196,12 +259,6 @@ jobs:
             mv ci/jobs/build_backend/dist/${EXEC_PREFIX}_windows_amd64.exe .
             #
             ./node_modules/.bin/grafana-toolkit plugin:ci-package
-            #
-            #
-            PLUGIN_NAME=`cat ci/dist/plugin.json|jq '.id'| sed s/\"//g`
-            VERSION=`cat ci/dist/plugin.json|jq '.info.version'| sed s/\"//g`
-            echo "Plugin Name: ${PLUGIN_NAME}"
-            echo "Plugin Version: ${VERSION}"
             #
             # Building separate linux and windows zip files
             #
@@ -299,6 +356,8 @@ jobs:
             cp -p ci/jobs/build_backend/dist/${EXEC_PREFIX}* ci/dist/${PLUGIN_NAME}/
             echo final dist for GHR
             ls -lR ci/dist
+            # TODO - somehow here we missed linux_amd64
+            cp -p ci/jobs/build_backend/dist/${EXEC_PREFIX}_linux_amd64 ci/grafana-test-env/plugins/${PLUGIN_NAME}/${PLUGIN_NAME}/
       - persist_to_workspace:
           root: .
           paths:
@@ -366,7 +425,6 @@ jobs:
             fi
 
   publish_github_release:
-    working_directory: ~/sheets-datasource
     docker:
       - image: cibuilds/github:0.13.0
     steps:
@@ -385,8 +443,15 @@ jobs:
           command: |
             # copy ci artifacts
             mkdir -p artifacts
-            cp ci/packages/linux/* artifacts
-            cp ci/packages/windows/* artifacts
+            if [ -d ci/packages/any ]; then
+              cp ci/packages/any/* artifacts
+            fi
+            if [ -d ci/packages/linux ]; then
+              cp ci/packages/linux/* artifacts
+            fi
+            if [ -d ci/packages/window ]; then
+              cp ci/packages/windows/* artifacts
+            fi
             if [ -d ci/packages/darwin ]; then
               cp ci/packages/darwin/* artifacts
             fi
@@ -396,8 +461,8 @@ jobs:
             VERSION=`cat ci/dist/plugin.json|jq '.info.version'| sed s/\"//g`
             echo "Plugin Version: ${VERSION}"
             RELEASE_NOTES=`awk 'BEGIN {FS="##"; RS=""} FNR==4 {print; exit}' CHANGELOG.md`
-            git config user.email "eng@grafana.com"
-            git config user.name "CircleCI Automation"
+            git config user.email "bot@grafana.com"
+            git config user.name "CircleCI Automation - grafanabot"
             git checkout -b release-${VERSION}
             # add dist, it is needed to get the right plugin.json info during gcom publish
             mkdir -p dist
@@ -451,14 +516,44 @@ jobs:
             echo "Copying artifacts to ${PLUGIN_NAME}/${VERSION}/${CIRCLE_BRANCH}/latest"
             gsutil -m cp -r ci/packages/** gs://integration-artifacts/${PLUGIN_NAME}/${VERSION}/${CIRCLE_BRANCH}/latest
             # special handling for master
-            if [ ${CIRCLE_BRANCH} == "master" ]; then
-              echo "Cleaning master latest"
+            if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "main" ]; then
+              echo "Cleaning ${CIRCLE_BRANCH} latest"
               gsutil rm -f gs://integration-artifacts/${PLUGIN_NAME}/${CIRCLE_BRANCH}/latest/** || true
-              echo "Copying artifacts to master latest"
+              echo "Copying artifacts to ${CIRCLE_BRANCH} latest"
               gsutil -m cp -r ci/packages/** gs://integration-artifacts/${PLUGIN_NAME}/${CIRCLE_BRANCH}/latest
             fi
             gsutil ls -r gs://integration-artifacts/${PLUGIN_NAME}
 
+  publish_screenshots_to_gcs:
+    executor: cloud_sdk_exec
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Copy Screenshots to GCS Bucket"
+          command: |
+            if [ ! -d src/screenshots ] && [ ! -d src/img ]; then
+              exit 0
+            fi
+            if [ -z "${GCLOUD_SERVICE_KEY}" ]; then
+              echo "Missing GCS Publish Key"
+              exit -1
+            fi
+            apt update
+            apt install -y jq git-lfs
+            PLUGIN_NAME=`cat ci/dist/plugin.json|jq '.id'| sed s/\"//g`
+            echo ${GCLOUD_SERVICE_KEY} | gcloud auth activate-service-account --key-file=-
+            if [ -d src/screenshots ]; then
+              echo "Copying screenshots to gs://integration-artifacts/${PLUGIN_NAME}/screenshots/"
+              gsutil -m cp -r src/screenshots/** gs://integration-artifacts/${PLUGIN_NAME}/screenshots/
+              gsutil ls -r gs://integration-artifacts/${PLUGIN_NAME}/screenshots
+            fi
+            if [ -d src/img ]; then
+              echo "Copying img to gs://integration-artifacts/${PLUGIN_NAME}/img/"
+              gsutil -m cp -r src/img/** gs://integration-artifacts/${PLUGIN_NAME}/img
+              gsutil ls -r gs://integration-artifacts/${PLUGIN_NAME}/img
+            fi
   publish_to_gcom:
     executor: grafana_publisher
     steps:
