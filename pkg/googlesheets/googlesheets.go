@@ -220,10 +220,7 @@ var numberConverter = data.FieldConverter{
 		if !ok {
 			return nil, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
 		}
-		if &cellData.EffectiveValue.NumberValue != nil {
-			return cellData.EffectiveValue.NumberValue, nil
-		}
-		return nil, nil
+		return cellData.EffectiveValue.NumberValue, nil
 	},
 }
 

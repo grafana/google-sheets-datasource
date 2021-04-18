@@ -1,6 +1,6 @@
 {
   "name": "grafana-google-sheets-datasource",
-  "version": "1.0.1-dev",
+  "version": "1.1.0-dev",
   "description": "Load data from google sheets in grafana",
   "scripts": {
     "build": "rm -rf node_modules/@grafana/data/node_modules; grafana-toolkit plugin:build && mage",
@@ -14,11 +14,11 @@
   "author": "Grafana Labs <team@grafana.com> (https://grafana.com)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@grafana/data": "next",
-    "@grafana/e2e": "7.3.1",
-    "@grafana/runtime": "next",
-    "@grafana/toolkit": "next",
-    "@grafana/ui": "next",
+    "@grafana/data": "7.2.0",
+    "@grafana/runtime": "7.2.0",
+    "@grafana/ui": "7.2.0",
+    "@grafana/e2e": "7.2.0",
+    "@grafana/toolkit": "latest",
     "@types/lodash": "latest",
     "@types/react-dropzone": "^5.1.0"
   },

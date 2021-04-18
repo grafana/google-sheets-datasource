@@ -48,9 +48,9 @@ export const formatCacheTimeLabel = (s: number = defaultCacheDuration) => {
 };
 
 export class QueryEditor extends PureComponent<Props> {
-  componentWillMount() {
+  componentDidMount() {
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
-      this.props.query.cacheDurationSeconds = defaultCacheDuration;
+      this.props.query.cacheDurationSeconds = defaultCacheDuration; // um :(
     }
   }
 
@@ -98,7 +98,7 @@ export class QueryEditor extends PureComponent<Props> {
             tooltip={
               <p>
                 The <code>spreadsheetId</code> is used to identify which spreadsheet is to be accessed or altered. This
-                ID is the value between the "/d/" and the "/edit" in the URL of your spreadsheet.
+                ID is the value between the &quot/d/&quot and the &quot/edit&quot in the URL of your spreadsheet.
               </p>
             }
           >
@@ -131,8 +131,8 @@ export class QueryEditor extends PureComponent<Props> {
             tooltip={
               <p>
                 A string like <code>Sheet1!A1:B2</code>, that refers to a group of cells in the spreadsheet, and is
-                typically used in formulas.Named ranges are also supported. When a named range conflicts with a sheet's
-                name, the named range is preferred.
+                typically used in formulas. Named ranges are also supported. When a named range conflicts with a
+                sheet&rsquo;s name, the named range is preferred.
               </p>
             }
           >
@@ -159,7 +159,7 @@ export class QueryEditor extends PureComponent<Props> {
           </InlineFormLabel>
           <Segment
             value={{ label: formatCacheTimeLabel(query.cacheDurationSeconds), value: query.cacheDurationSeconds }}
-            options={[0, 5, 10, 30, 60, 60 * 2, 60 * 5, 60 * 10, 60 * 30, 3600, 3600 * 2, 3600 * 5].map(value => ({
+            options={[0, 5, 10, 30, 60, 60 * 2, 60 * 5, 60 * 10, 60 * 30, 3600, 3600 * 2, 3600 * 5].map((value) => ({
               label: formatCacheTimeLabel(value),
               value,
               description: value ? '' : 'Response is not cached at all',

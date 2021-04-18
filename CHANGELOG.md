@@ -3,7 +3,9 @@
 All notable changes to this project will be documented in this file.
 
 ## v1.1.0
-- Adding support for annotations with Grafana 7.2+
+- Targeting Grafana 7.2+
+- Adding support for annotations
+- Include arm builds
 
 ## v1.0.0
 - Works with Grafana 7+

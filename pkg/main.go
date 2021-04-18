@@ -5,17 +5,17 @@ import (
 	"os"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental"
 )
 
 func main() {
-	backend.SetupPluginEnvironment("google-sheets-datasource")
-
 	mux := http.NewServeMux()
 	ds := NewDataSource(mux)
 	httpResourceHandler := httpadapter.New(mux)
 
-	err := backend.Serve(backend.ServeOpts{
+	err := experimental.DoGRPC("google-sheets-datasource", datasource.ServeOpts{
 		CallResourceHandler: httpResourceHandler,
 		QueryDataHandler:    ds,
 		CheckHealthHandler:  ds,

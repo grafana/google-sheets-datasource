@@ -4,12 +4,17 @@ parameters:
   ssh-fingerprint:
     type: string
     default: ${GITHUB_SSH_FINGERPRINT}
+  codeclimate-reporter-id:
+    type: string
+    default: ${CC_TEST_REPORTER_ID}
 
 aliases:
   # Workflow filters
   - &filter-only-master
     branches:
-      only: master
+      only:
+        - main
+        - master
   - &filter-only-release
     branches:
       only: /^v[1-9]*[0-9]+\.[1-9]*[0-9]+\.x$/
@@ -17,43 +22,106 @@ aliases:
 workflows:
   plugin_workflow:
     jobs:
-      - build
-      - report:
+      - yarn_install
+      - build_docs:
           requires:
-            - build
+            - yarn_install
+      - build_frontend:
+          requires:
+            - yarn_install
+      - build_backend:
+          requires:
+            - yarn_install
+      - security_scan:
+          context:
+            - Plugins
+          requires:
+            - build_backend
+            - build_frontend
+      - package:
+          context:
+            - Plugins
+          requires:
+            - build_frontend
+            - build_backend
+            - build_docs
+      - publish_artifacts_to_gcs:
+          context:
+            - Plugins
+          requires:
+            - package
+      - publish_screenshots_to_gcs:
+          context:
+            - Plugins
+          requires:
+            - package
+      - report:
+          context:
+            - Plugins
+          requires:
+            - publish_artifacts_to_gcs
+            - publish_screenshots_to_gcs
       - approve_release:
           type: approval
           requires:
             - report
           filters: *filter-only-release
       - publish_github_release:
+          context:
+            - Plugins
           requires:
             - approve_release
           filters: *filter-only-release
+      - publish_gcs_release:
+          requires:
+            - approve_release
+          filters: *filter-only-release
+      - approve_publish_to_gcom:
+          context:
+            - Plugins
+          type: approval
+          requires:
+            - publish_github_release
+            - publish_gcs_release
+          filters: *filter-only-release
+      - publish_to_gcom:
+          context:
+            - Plugins
+          requires:
+            - approve_publish_to_gcom
+          filters: *filter-only-release
 
 executors:
-  default_exec: # declares a reusable executor
+  default_exec:
     docker:
-      - image: srclosson/grafana-plugin-ci-alpine:latest
+      - image: grafana/grafana-plugin-ci:1.1.3-alpine
   e2e_exec:
     docker:
-      - image: srclosson/grafana-plugin-ci-e2e:latest
+      - image: grafana/grafana-plugin-ci-e2e:latest
+  python_exec:
+    docker:
+      - image: circleci/python:stretch
+  cloud_sdk_exec:
+    docker:
+      - image: google/cloud-sdk
+  grafana_publisher:
+    docker:
+      - image: grafana/integration-grafana-publisher:latest
 
 jobs:
-  build:
+  yarn_install:
     executor: default_exec
     steps:
       - checkout
       - restore_cache:
           name: restore node_modules
           keys:
-          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Install dependencies
           command: |
             mkdir ci
             [ -f ~/project/node_modules/.bin/grafana-toolkit ] || yarn install --frozen-lockfile
-            rm -rf ~/project/node_modules/@grafana/data/node_modules
       - save_cache:
           name: save node_modules
           paths:
@@ -64,14 +132,58 @@ jobs:
           paths:
             - ~/.cache/Cypress
           key: cypress-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+
+  build_docs:
+    executor: default_exec
+    steps:
+      - checkout
+      - restore_cache:
+          name: restore node_modules
+          keys:
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Build docs
+          command: |
+            ./node_modules/.bin/grafana-toolkit plugin:ci-docs
+            [ -d "dist" ] || circleci-agent step halt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - dist
+
+  build_frontend:
+    executor: default_exec
+    steps:
+      - checkout
+      - restore_cache:
+          name: restore node_modules
+          keys:
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build and test frontend
-          command: | 
-            rm -rf ~/node_modules/@grafana/data/node_modules
-            ./node_modules/.bin/grafana-toolkit plugin:ci-build
+          command: |
+            # hack for rxjs issue
+            rm -rf ./node_modules/@grafana/data/node_modules/rxjs
+            ./node_modules/.bin/grafana-toolkit plugin:ci-build --maxJestWorkers=1
+            ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci
+
+  build_backend:
+    executor: e2e_exec
+    steps:
+      - checkout
+      - restore_cache:
+          name: restore node_modules
+          keys:
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: Build backend
-          command: mage -v buildAll
+          command: |
+            git config --global --add url."git@github.com:".insteadOf "https://github.com/"
+            mage -v buildAll
       - run:
           name: Test backend
           command: |
@@ -79,20 +191,183 @@ jobs:
             mage -v coverage
       - run:
           name: Move results to ci folder
-          command: ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
-      - run:
-          name: Package distribution
           command: |
-            ./node_modules/.bin/grafana-toolkit plugin:ci-package
+            ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
       - persist_to_workspace:
           root: .
           paths:
-          - ci/jobs/package
-          - ci/packages
-          - ci/dist
-          - ci/grafana-test-env
+            - ci/jobs/build_backend
+
+  security_scan:
+    executor: default_exec
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          name: restore node_modules
+          keys:
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Run Veracode scan
+          command: |
+            apk add curl
+            # Increase heap size or the scanner will die.
+            export _JAVA_OPTIONS=-Xmx4g
+            mkdir -p ci/jobs/security_scan
+            curl -sSL https://download.sourceclear.com/ci.sh | sh | tee ci/jobs/security_scan/sourclear_scan.out
+            ##
+            # Not failing builds now if we detect items we deem a problem in the scan output, but the following
+            # Would be an example
+            #
+            # grep "High Risk" ci/jobs/security_scan/sourclear_scan.out && false || true
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci/jobs/security_scan
+      - store_test_results:
+          path: ci/jobs/security_scan
       - store_artifacts:
-          path: ci
+          path: ci/jobs/security_scan
+
+  package:
+    executor: e2e_exec
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - restore_cache:
+          name: restore node_modules
+          keys:
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: Package Distribution (for signing/etc)
+          command: |
+            EXEC_PREFIX=`cat ci/jobs/build_frontend/dist/plugin.json|jq '.executable'| sed s/\"//g`
+            PLUGIN_NAME=`cat ci/jobs/build_frontend/dist/plugin.json|jq '.id'| sed s/\"//g`
+            VERSION=`cat ci/jobs/build_frontend/dist/plugin.json|jq '.info.version'| sed s/\"//g`
+            echo "Plugin Name: ${PLUGIN_NAME}"
+            echo "Plugin Version: ${VERSION}"
+            echo "Plugin Exec Prefix: ${EXEC_PREFIX}"
+            #
+            # ci-package will create the zip file
+            #
+            # move darwin/windows binaries aside
+            #
+            ls -l ci/jobs/build_backend/dist
+            mv ci/jobs/build_backend/dist/${EXEC_PREFIX}_darwin_amd64 .
+            mv ci/jobs/build_backend/dist/${EXEC_PREFIX}_windows_amd64.exe .
+            #
+            ./node_modules/.bin/grafana-toolkit plugin:ci-package
+            #
+            # Building separate linux and windows zip files
+            #
+            # 1. rename to linux package
+            #
+            mv ci/packages/${PLUGIN_NAME}-${VERSION}.zip \
+              ci/packages/${PLUGIN_NAME}-${VERSION}.linux_amd64.zip
+            mv ci/packages/${PLUGIN_NAME}-${VERSION}.zip.sha1 \
+              ci/packages/${PLUGIN_NAME}-${VERSION}.linux_amd64.zip.sha1
+            #
+            # 2. update info.json with new zip file name
+            #
+            sed -i 's/zip/linux_amd64\.zip/g' ci/packages/info.json
+            #
+            # 3. move into linux subdir
+            #
+            mkdir -p temp_ci/packages/linux
+            cp -p ci/packages/info.json temp_ci/packages/linux
+            cp -p ci/packages/info.json temp_ci/packages/linux/info-linux.json
+            mv ci/packages/${PLUGIN_NAME}* temp_ci/packages/linux
+            #
+            # now create the windows package
+            #
+            # 4. re-run ci-package to create the windows-only zip
+            #
+            ls -l ci/jobs/build_backend/dist
+            mv ci/jobs/build_backend/dist/${EXEC_PREFIX}_linux_amd64 .
+            ls -l ${EXEC_PREFIX}*
+            mv ${EXEC_PREFIX}_windows_amd64.exe ci/jobs/build_backend/dist
+            ls -l ci/jobs/build_backend/dist
+            ./node_modules/.bin/grafana-toolkit plugin:ci-package
+            #
+            # 5. rename zip
+            #
+            mv ci/packages/${PLUGIN_NAME}-${VERSION}.zip \
+              ci/packages/${PLUGIN_NAME}-${VERSION}.windows_amd64.zip
+            mv ci/packages/${PLUGIN_NAME}-${VERSION}.zip.sha1 \
+              ci/packages/${PLUGIN_NAME}-${VERSION}.windows_amd64.zip.sha1
+            #
+            # update info.json with new zip file name
+            #
+            sed -i 's/zip/windows_amd64\.zip/g' ci/packages/info.json
+            #
+            # 6. move into windows subdir
+            #
+            mkdir temp_ci/packages/windows
+            # report needs info.json, so keep a copy here
+            cp ci/packages/info.json temp_ci/packages/windows
+            cp ci/packages/info.json temp_ci/packages/windows/info-windows.json
+            mv ci/packages/${PLUGIN_NAME}* temp_ci/packages/windows
+            #
+            # now create the darwin package
+            #
+            # 7. re-run ci-package to create the darwin-only zip
+            #
+            ls -l ci/jobs/build_backend/dist
+            mv ci/jobs/build_backend/dist/${EXEC_PREFIX}_windows_amd64.exe .
+            mv ${EXEC_PREFIX}_darwin_amd64 ci/jobs/build_backend/dist
+            ls -l ci/jobs/build_backend/dist
+            ./node_modules/.bin/grafana-toolkit plugin:ci-package
+            #
+            # 8. rename zip
+            #
+            mv ci/packages/${PLUGIN_NAME}-${VERSION}.zip \
+              ci/packages/${PLUGIN_NAME}-${VERSION}.darwin_amd64.zip
+            mv ci/packages/${PLUGIN_NAME}-${VERSION}.zip.sha1 \
+              ci/packages/${PLUGIN_NAME}-${VERSION}.darwin_amd64.zip.sha1
+            #
+            # update info.json with new zip file name
+            #
+            sed -i 's/zip/darwin_amd64\.zip/g' ci/packages/info.json
+            #
+            # 9. move into windows subdir
+            #
+            mkdir ci/packages/darwin
+            # report needs info.json, so keep a copy here
+            cp ci/packages/info.json ci/packages/darwin
+            cp ci/packages/info.json ci/packages/darwin/info-darwin.json
+            mv ci/packages/${PLUGIN_NAME}* ci/packages/darwin
+            #
+            # 10. put the builds back into place
+            #
+            mv temp_ci/packages/linux ci/packages
+            mv temp_ci/packages/windows ci/packages
+            # DONE
+            echo Packages
+            ls -lR ci/packages
+            # put the executables back for GHR to use
+            echo Contents of ci/jobs/build_backend/dist
+            ls -lR ci/jobs/build_backend/dist
+            ls -l ${EXEC_PREFIX}*
+            mv ${EXEC_PREFIX}_linux_amd64 ci/jobs/build_backend/dist
+            mv ${EXEC_PREFIX}_windows_amd64.exe ci/jobs/build_backend/dist
+            ls -l ci/jobs/build_backend/dist
+            cp -p ci/jobs/build_backend/dist/${EXEC_PREFIX}* ci/dist/${PLUGIN_NAME}/
+            echo final dist for GHR
+            ls -lR ci/dist
+            # TODO - somehow here we missed linux_amd64
+            cp -p ci/jobs/build_backend/dist/${EXEC_PREFIX}_linux_amd64 ci/grafana-test-env/plugins/${PLUGIN_NAME}/${PLUGIN_NAME}/
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ci/dist
+            - ci/jobs/package
+            - ci/jobs/build_backend/dist
+            - ci/grafana-test-env
+            - ci/packages
+      - store_artifacts:
+          path: ci/packages
 
   report:
     executor: default_exec
@@ -108,25 +383,200 @@ jobs:
           name: Toolkit report
           command: |
             ./node_modules/.bin/grafana-toolkit plugin:ci-report
-      - store_artifacts:
-          path: ci
+
+  publish_gcs_release:
+    executor: cloud_sdk_exec
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Copy Artifacts to GCP Release Bucket"
+          command: |
+            ls -l ci/jobs/build_frontend/dist/plugin.json
+            echo "Contents of ci/jobs/build_frontend/dist/plugin.json"
+            cat ci/jobs/build_frontend/dist/plugin.json
+            ls -lR ci/packages
+            apt update
+            apt install -y jq git-lfs
+            PLUGIN_NAME=`cat ci/dist/plugin.json|jq '.id'| sed s/\"//g`
+            echo "Plugin Name: ${PLUGIN_NAME}"
+            VERSION=`cat ci/dist/plugin.json|jq '.info.version'| sed s/\"//g`
+            echo "Plugin Version: ${VERSION}"
+            # copy
+            if [ -z "${GCLOUD_SERVICE_KEY}" ]; then
+              echo "Missing GCS Publish Key"
+              exit -1
+            fi
+            echo ${GCLOUD_SERVICE_KEY} | gcloud auth activate-service-account --key-file=-
+            echo "Contents of artifacts"
+            echo "Copying artifacts to ${PLUGIN_NAME}/${VERSION}/${CIRCLE_BRANCH}/${CIRCLE_SHA1}"
+            if [ -d ci/packages/linux ]; then
+              gsutil -m cp -r ci/packages/linux/** gs://integration-artifacts/${PLUGIN_NAME}/release/${VERSION}/linux
+            fi
+            if [ -d ci/packages/windows ]; then
+              gsutil -m cp -r ci/packages/windows/** gs://integration-artifacts/${PLUGIN_NAME}/release/${VERSION}/windows
+            fi
+            if [ -d ci/packages/darwin ]; then
+              gsutil -m cp -r ci/packages/darwin/** gs://integration-artifacts/${PLUGIN_NAME}/release/${VERSION}/darwin
+            fi
+            if [ -d ci/packages/any ]; then
+              gsutil -m cp -r ci/packages/any/** gs://integration-artifacts/${PLUGIN_NAME}/release/${VERSION}/any
+            fi
 
   publish_github_release:
-    executor: default_exec
+    docker:
+      - image: cibuilds/github:0.13.0
     steps:
       - checkout
       - add_ssh_keys:
           fingerprints:
             - << pipeline.parameters.ssh-fingerprint >>
-            - "dc:60:ab:c7:2d:8c:82:50:2a:2a:97:1a:c0:66:83:14"
-            - ${GITHUB_SSH_FINGERPRINT}
       - attach_workspace:
           at: .
       - restore_cache:
           name: restore node_modules
           keys:
-          - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
+            - build-cache-{{ .Environment.CACHE_VERSION }}-{{ checksum "yarn.lock" }}
       - run:
           name: "Publish Release on GitHub"
           command: |
-            ./node_modules/.bin/grafana-toolkit plugin:github-publish
+            # copy ci artifacts
+            mkdir -p artifacts
+            if [ -d ci/packages/any ]; then
+              cp ci/packages/any/* artifacts
+            fi
+            if [ -d ci/packages/linux ]; then
+              cp ci/packages/linux/* artifacts
+            fi
+            if [ -d ci/packages/window ]; then
+              cp ci/packages/windows/* artifacts
+            fi
+            if [ -d ci/packages/darwin ]; then
+              cp ci/packages/darwin/* artifacts
+            fi
+            apk add --update --no-cache jq git-lfs
+            PLUGIN_NAME=`cat ci/dist/plugin.json|jq '.id'| sed s/\"//g`
+            echo "Plugin Name: ${PLUGIN_NAME}"
+            VERSION=`cat ci/dist/plugin.json|jq '.info.version'| sed s/\"//g`
+            echo "Plugin Version: ${VERSION}"
+            RELEASE_NOTES=`awk 'BEGIN {FS="##"; RS=""} FNR==4 {print; exit}' CHANGELOG.md`
+            git config user.email "bot@grafana.com"
+            git config user.name "CircleCI Automation - grafanabot"
+            git checkout -b release-${VERSION}
+            # add dist, it is needed to get the right plugin.json info during gcom publish
+            mkdir -p dist
+            cp -rp ci/dist/${PLUGIN_NAME}/* dist/
+            git add --force dist/
+            git commit -m "automated release $VERSION [skip ci]"
+            git push -f origin release-${VERSION}
+            git tag -f v${VERSION}
+            git push -f origin v${VERSION}
+            ghr \
+              -t ${GITHUB_TOKEN} \
+              -u ${CIRCLE_PROJECT_USERNAME} \
+              -r ${CIRCLE_PROJECT_REPONAME} \
+              -c ${CIRCLE_SHA1} \
+              -n "${PLUGIN_NAME} v${VERSION}" \
+              -b "${RELEASE_NOTES}" \
+              -delete \
+              v${VERSION} \
+              ./artifacts/
+
+  publish_artifacts_to_gcs:
+    executor: cloud_sdk_exec
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Copy Artifacts to GCP Bucket"
+          command: |
+            ls -l ci/jobs/build_frontend/dist/plugin.json
+            echo "Contents of ci/jobs/build_frontend/dist/plugin.json"
+            cat ci/jobs/build_frontend/dist/plugin.json
+            ls -lR ci/packages
+            apt update
+            apt install -y jq git-lfs
+            PLUGIN_NAME=`cat ci/dist/plugin.json|jq '.id'| sed s/\"//g`
+            echo "Plugin Name: ${PLUGIN_NAME}"
+            VERSION=`cat ci/dist/plugin.json|jq '.info.version'| sed s/\"//g`
+            echo "Plugin Version: ${VERSION}"
+            # copy
+            if [ -z "${GCLOUD_SERVICE_KEY}" ]; then
+              echo "Missing GCS Publish Key"
+              exit -1
+            fi
+            echo ${GCLOUD_SERVICE_KEY} | gcloud auth activate-service-account --key-file=-
+            echo "Contents of artifacts"
+            echo "Copying artifacts to ${PLUGIN_NAME}/${VERSION}/${CIRCLE_BRANCH}/${CIRCLE_SHA1}"
+            gsutil -m cp -r ci/packages/** gs://integration-artifacts/${PLUGIN_NAME}/${VERSION}/${CIRCLE_BRANCH}/${CIRCLE_SHA1}
+            echo "Cleaning latest"
+            gsutil rm -f gs://integration-artifacts/${PLUGIN_NAME}/${VERSION}/${CIRCLE_BRANCH}/latest/** || true
+            echo "Copying artifacts to ${PLUGIN_NAME}/${VERSION}/${CIRCLE_BRANCH}/latest"
+            gsutil -m cp -r ci/packages/** gs://integration-artifacts/${PLUGIN_NAME}/${VERSION}/${CIRCLE_BRANCH}/latest
+            # special handling for master
+            if [ ${CIRCLE_BRANCH} == "master" ] || [ ${CIRCLE_BRANCH} == "main" ]; then
+              echo "Cleaning ${CIRCLE_BRANCH} latest"
+              gsutil rm -f gs://integration-artifacts/${PLUGIN_NAME}/${CIRCLE_BRANCH}/latest/** || true
+              echo "Copying artifacts to ${CIRCLE_BRANCH} latest"
+              gsutil -m cp -r ci/packages/** gs://integration-artifacts/${PLUGIN_NAME}/${CIRCLE_BRANCH}/latest
+            fi
+            gsutil ls -r gs://integration-artifacts/${PLUGIN_NAME}
+
+  publish_screenshots_to_gcs:
+    executor: cloud_sdk_exec
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Copy Screenshots to GCS Bucket"
+          command: |
+            if [ ! -d src/screenshots ] && [ ! -d src/img ]; then
+              exit 0
+            fi
+            if [ -z "${GCLOUD_SERVICE_KEY}" ]; then
+              echo "Missing GCS Publish Key"
+              exit -1
+            fi
+            apt update
+            apt install -y jq git-lfs
+            PLUGIN_NAME=`cat ci/dist/plugin.json|jq '.id'| sed s/\"//g`
+            echo ${GCLOUD_SERVICE_KEY} | gcloud auth activate-service-account --key-file=-
+            if [ -d src/screenshots ]; then
+              echo "Copying screenshots to gs://integration-artifacts/${PLUGIN_NAME}/screenshots/"
+              gsutil -m cp -r src/screenshots/** gs://integration-artifacts/${PLUGIN_NAME}/screenshots/
+              gsutil ls -r gs://integration-artifacts/${PLUGIN_NAME}/screenshots
+            fi
+            if [ -d src/img ]; then
+              echo "Copying img to gs://integration-artifacts/${PLUGIN_NAME}/img/"
+              gsutil -m cp -r src/img/** gs://integration-artifacts/${PLUGIN_NAME}/img
+              gsutil ls -r gs://integration-artifacts/${PLUGIN_NAME}/img
+            fi
+  publish_to_gcom:
+    executor: grafana_publisher
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: "Publish to GCOM"
+          command: |
+            if [ -z "${GCOM_PUBLISH_TOKEN}" ]; then
+              echo "Missing GCOM Publish Key"
+              exit -1
+            fi
+            if [ -z "${GITHUB_TOKEN}" ]; then
+              echo "Missing GITHUB_TOKEN"
+              exit -1
+            fi
+            if [ -z "${GCLOUD_SERVICE_KEY}" ]; then
+              echo "Missing GCLOUD_SERVICE_KEY"
+              exit -1
+            fi
+            PLUGIN_NAME=`cat ci/dist/plugin.json|jq '.id'| sed s/\"//g`
+            PLUGIN_VERSION=`cat ci/dist/plugin.json|jq '.info.version'| sed s/\"//g`
+            echo ${GCLOUD_SERVICE_KEY} | gcloud auth activate-service-account --key-file=-
+            echo "Publishing to GCOM: $PLUGIN_NAME $PLUGIN_VERSION"
+            /root/app/bin/grafana-publisher.js --auto publishremote $PLUGIN_NAME $PLUGIN_VERSION

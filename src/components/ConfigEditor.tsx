@@ -11,13 +11,6 @@ import { JWTConfig } from './';
 export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions, GoogleSheetsSecureJsonData>;
 
 export class ConfigEditor extends PureComponent<Props> {
-  componentWillMount() {
-    // Set the default values
-    if (!this.props.options.jsonData.hasOwnProperty('authType')) {
-      this.props.options.jsonData.authType = GoogleAuthType.KEY;
-    }
-  }
-
   onResetApiKey = () => {
     const { options } = this.props;
     this.props.onOptionsChange({
@@ -36,6 +29,11 @@ export class ConfigEditor extends PureComponent<Props> {
   render() {
     const { options, onOptionsChange } = this.props;
     const { secureJsonFields, jsonData } = options;
+
+    if (!jsonData.hasOwnProperty('authType')) {
+      jsonData.authType = GoogleAuthType.KEY;
+    }
+
     const secureJsonData = options.secureJsonData as GoogleSheetsSecureJsonData;
     return (
       <div className="gf-form-group">
@@ -43,9 +41,9 @@ export class ConfigEditor extends PureComponent<Props> {
           <InlineFormLabel className="width-10">Auth</InlineFormLabel>
           <Select
             className="width-30"
-            value={googleAuthTypes.find(x => x.value === jsonData.authType) || googleAuthTypes[0]}
+            value={googleAuthTypes.find((x) => x.value === jsonData.authType) || googleAuthTypes[0]}
             options={googleAuthTypes}
-            defaultValue={options.jsonData.authType}
+            defaultValue={jsonData.authType}
             onChange={onUpdateDatasourceJsonDataOptionSelect(this.props, 'authType')}
           />
         </div>
@@ -68,7 +66,7 @@ export class ConfigEditor extends PureComponent<Props> {
         {jsonData.authType === GoogleAuthType.JWT && (
           <JWTConfig
             isConfigured={(secureJsonFields && !!secureJsonFields.jwt) as boolean}
-            onChange={jwt => {
+            onChange={(jwt) => {
               onOptionsChange({
                 ...options,
                 secureJsonData: {
@@ -97,8 +95,8 @@ export class ConfigEditor extends PureComponent<Props> {
                   then click <code>Create</code>
                 </li>
                 <li>
-                  On the <code>Service account permissions</code> page, don't add a role to the service account. Just
-                  click <code>Continue</code>
+                  On the <code>Service account permissions</code> page, don&rsquo;t add a role to the service account.
+                  Just click <code>Continue</code>
                 </li>
                 <li>
                   In the next step, click <code>Create Key</code>. Choose key type <code>JSON</code> and click{' '}
