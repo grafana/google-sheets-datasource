@@ -256,7 +256,7 @@ jobs:
             mv ci/jobs/build_backend/dist/${EXEC_PREFIX}_darwin_amd64 .
             mv ci/jobs/build_backend/dist/${EXEC_PREFIX}_windows_amd64.exe .
             #
-            ./node_modules/.bin/grafana-toolkit plugin:ci-package
+            npx ./node_modules/.bin/grafana-toolkit plugin:ci-package
             #
             # Building separate linux and windows zip files
             #
@@ -287,7 +287,7 @@ jobs:
             ls -l ${EXEC_PREFIX}*
             mv ${EXEC_PREFIX}_windows_amd64.exe ci/jobs/build_backend/dist
             ls -l ci/jobs/build_backend/dist
-            ./node_modules/.bin/grafana-toolkit plugin:ci-package
+            npx ./node_modules/.bin/grafana-toolkit plugin:ci-package
             #
             # 5. rename zip
             #
@@ -316,7 +316,7 @@ jobs:
             mv ci/jobs/build_backend/dist/${EXEC_PREFIX}_windows_amd64.exe .
             mv ${EXEC_PREFIX}_darwin_amd64 ci/jobs/build_backend/dist
             ls -l ci/jobs/build_backend/dist
-            ./node_modules/.bin/grafana-toolkit plugin:ci-package
+            npx ./node_modules/.bin/grafana-toolkit plugin:ci-package
             #
             # 8. rename zip
             #
@@ -380,7 +380,7 @@ jobs:
       - run:
           name: Toolkit report
           command: |
-            ./node_modules/.bin/grafana-toolkit plugin:ci-report
+            npx ./node_modules/.bin/grafana-toolkit plugin:ci-report
 
   publish_gcs_release:
     executor: cloud_sdk_exec
