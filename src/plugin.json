@@ -4,7 +4,7 @@
   "type": "datasource",
   "name": "Google Sheets",
   "id": "grafana-googlesheets-datasource",
-  
+
   "backend": true,
   "executable": "gfx_sheets",
   "metrics": true,
@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "grafanaVersion": "7.x",
-    "grafanaDependency": ">7.2",
+    "grafanaDependency": ">=7.2.0",
     "plugins": []
   }
 }
