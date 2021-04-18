@@ -162,10 +162,8 @@ jobs:
       - run:
           name: Build and test frontend
           command: |
-            # hack for rxjs issue
-            rm -rf ./node_modules/@grafana/data/node_modules/rxjs
-            ./node_modules/.bin/grafana-toolkit plugin:ci-build --maxJestWorkers=1
-            ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
+            npx ./node_modules/.bin/grafana-toolkit plugin:ci-build --maxJestWorkers=1
+            npx ./node_modules/.bin/grafana-toolkit plugin:ci-build --finish
       - persist_to_workspace:
           root: .
           paths:
