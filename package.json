@@ -19,7 +19,7 @@
     "@grafana/runtime": "7.4.0",
     "@grafana/ui": "7.4.0",
     "@grafana/toolkit": "next",
-    "@types/lodash": "latest",
+    "@types/lodash": "^4.14.146",
     "@types/react-dropzone": "^5.1.0"
   },
   "dependencies": {
