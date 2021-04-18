@@ -14,12 +14,12 @@
   "author": "Grafana Labs <team@grafana.com> (https://grafana.com)",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@grafana/data": "7.4.0",
-    "@grafana/e2e": "7.4.0",
-    "@grafana/runtime": "7.4.0",
-    "@grafana/ui": "7.4.0",
-    "@grafana/toolkit": "next",
-    "@types/lodash": "^4.14.146",
+    "@grafana/data": "7.5.0",
+    "@grafana/e2e": "7.5.0",
+    "@grafana/runtime": "7.5.0",
+    "@grafana/ui": "7.5.0",
+    "@grafana/toolkit": "7.5.0",
+    "@types/lodash": "latest",
     "@types/react-dropzone": "^5.1.0"
   },
   "dependencies": {
