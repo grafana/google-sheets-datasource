@@ -73,6 +73,8 @@ workflows:
             - approve_release
           filters: *filter-only-release
       - publish_gcs_release:
+          context:
+            - Plugins
           requires:
             - approve_release
           filters: *filter-only-release
