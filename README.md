@@ -2,13 +2,13 @@
 
 Visualize your Google Spreadsheets with Grafana
 
-![Visualize temperature date in Grafana Google Spreadsheets data source](https://raw.githubusercontent.com/grafana/google-sheets-datasource/master/src/docs/img/dashboard.png)
+![Visualize temperature date in Grafana Google Spreadsheets data source](https://raw.githubusercontent.com/grafana/google-sheets-datasource/main/src/docs/img/dashboard.png)
 
-![Average temperatures in Google Sheets](https://raw.githubusercontent.com/grafana/google-sheets-datasource/master/src/docs/img/spreadsheet.png)
+![Average temperatures in Google Sheets](https://raw.githubusercontent.com/grafana/google-sheets-datasource/main/src/docs/img/spreadsheet.png)
 
 ## Documentation
 
-Check the [docs](https://github.com/grafana/google-sheets-datasource/blob/master/src/README.md) for information on how to use the data source.
+Check the [docs](https://github.com/grafana/google-sheets-datasource/blob/main/src/README.md) for information on how to use the data source.
 
 ## Development
 
