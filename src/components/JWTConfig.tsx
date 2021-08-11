@@ -1,28 +1,11 @@
+import { Button } from '@grafana/ui';
 import React, { useState } from 'react';
-import { startCase, isObject } from 'lodash';
-import { Button, InlineFormLabel } from '@grafana/ui';
 import { DropZone } from './';
-// import { JWTFile } from '../types';
-
-const configKeys = [
-  'type',
-  'project_id',
-  'private_key_id',
-  'private_key',
-  'client_email',
-  'client_id',
-  'auth_uri',
-  'token_uri',
-  'auth_provider_x509_cert_url',
-  'client_x509_cert_url',
-];
 
 export interface Props {
   onChange: (jwt: string) => void;
   isConfigured: boolean;
 }
-
-const validateJson = (json: { [key: string]: string }) => isObject(json) && configKeys.every((key) => !!json[key]);
 
 export function JWTConfig({ onChange, isConfigured }: Props) {
   const [enableUpload, setEnableUpload] = useState<boolean>(!isConfigured);
@@ -37,13 +20,8 @@ export function JWTConfig({ onChange, isConfigured }: Props) {
           const reader = new FileReader();
           if (acceptedFiles.length === 1) {
             reader.onloadend = (e: any) => {
-              const json = JSON.parse(e.target.result);
-              if (validateJson(json)) {
-                onChange(e.target.result);
-                setEnableUpload(false);
-              } else {
-                setError('Invalid JWT file');
-              }
+              onChange(e.target.result);
+              setEnableUpload(false);
             };
             reader.readAsText(acceptedFiles[0]);
           } else if (acceptedFiles.length > 1) {
@@ -62,12 +40,12 @@ export function JWTConfig({ onChange, isConfigured }: Props) {
     </>
   ) : (
     <>
-      {configKeys.map((key) => (
+      {/* {configKeys.map((key) => (
         <div className="gf-form" key={key}>
           <InlineFormLabel width={10}>{startCase(key)}</InlineFormLabel>
           <input disabled className="gf-form-input width-30" value="configured" />
         </div>
-      ))}
+      ))} */}
       <Button style={{ marginTop: 12 }} variant="secondary" onClick={() => setEnableUpload(true)}>
         Upload another JWT file
       </Button>
