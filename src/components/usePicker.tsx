@@ -1,55 +1,70 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLoadGapi } from './useLoadGapi';
 
-export function usePicker({ pickerCallback }: { pickerCallback: (data: google.picker.ResponseObject) => void }) {
-  useLoadGapi();
-  const [oAuthToken, setOAuthToken] = useState<string>();
-  const [isPickerApiLoaded, setIsPickerApiLoaded] = useState(false);
+type UsePickerOptions = {
+  pickerCallback: (data: google.picker.ResponseObject) => void;
+  appId: string;
+  apiKey: string;
+  clientId: string;
+};
 
-  function handleAuthResult(authResult: GoogleApiOAuth2TokenObject) {
-    if (authResult && !authResult.error) {
-      setOAuthToken(authResult.access_token);
-      createPicker();
-    }
-  }
+export function usePicker({ pickerCallback, apiKey, appId, clientId }: UsePickerOptions) {
+  const [picker, setPicker] = useState<google.picker.Picker>();
+  const [isPickerLoaded, setIsPickerLoaded] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
-  function createPicker() {
-    if (isPickerApiLoaded && oAuthToken) {
-      const view = new google.picker.DocsView(google.picker.ViewId.SPREADSHEETS);
-      const picker = new google.picker.PickerBuilder()
-        .enableFeature(google.picker.Feature.MINE_ONLY)
-        .setAppId('appid')
-        .setOAuthToken(oAuthToken)
-        .addView(view)
-        .setDeveloperKey('developerkey')
-        .setCallback(pickerCallback)
-        .build();
-      picker.setVisible(true);
-    }
-  }
-
-  const openPicker = () => {
-    if (!window.gapi) {
-      throw new Error('Google api is not loaded.');
-    }
-    gapi.load('auth', {
+  useLoadGapi(() => {
+    gapi.load('client:auth2', {
       callback: () => {
-        window.gapi.auth.authorize(
-          {
-            client_id: 'clientid',
-            scope: ['https://www.googleapis.com/auth/drive.file'],
-            immediate: false,
-          },
-          handleAuthResult
-        );
+        gapi.client
+          .init({
+            apiKey,
+            clientId: clientId,
+            scope: 'https://www.googleapis.com/auth/drive.file',
+          })
+          .then(() => {
+            gapi.auth2.getAuthInstance().isSignedIn.listen((isSigned) => {
+              setIsSignedIn(isSigned);
+            });
+
+            // Handle the initial sign-in state.
+            setIsSignedIn(gapi.auth2.getAuthInstance().isSignedIn.get());
+          });
       },
     });
     gapi.load('picker', {
       callback: () => {
-        setIsPickerApiLoaded(true);
+        setIsPickerLoaded(true);
       },
     });
+  });
+
+  // Create picker
+  useEffect(() => {
+    if (isPickerLoaded && isSignedIn) {
+      const { access_token } = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse();
+      const pickerBuilder = new google.picker.PickerBuilder()
+        .setAppId(appId)
+        .setOAuthToken(access_token)
+        .addView(google.picker.ViewId.SPREADSHEETS)
+        .setDeveloperKey(apiKey)
+        .setCallback(pickerCallback)
+        .build();
+
+      setPicker(pickerBuilder);
+    }
+  }, [apiKey, appId, isPickerLoaded, isSignedIn, pickerCallback]);
+
+  // Dispose picker
+  useEffect(() => {
+    return () => {
+      picker?.dispose();
+    };
+  }, [picker]);
+
+  const openPicker = () => {
+    picker?.setVisible(true);
   };
 
-  return { openPicker };
+  return { openPicker, isSignedIn };
 }

@@ -4,12 +4,12 @@ import React from 'react';
 import { GoogleAuthType, googleAuthTypes, GoogleSheetsSecureJsonData, SheetsSourceOptions } from '../../types';
 import { APIAuth } from './APIAuth';
 import { JWTAuth } from './JWTAuth';
+import { OAuth } from './OAuth';
 
 export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions, GoogleSheetsSecureJsonData>;
 
 export function ConfigEditor(props: Props) {
-  const { options, onOptionsChange } = props;
-  const { jsonData } = options;
+  const { jsonData } = props.options;
 
   if (!jsonData.hasOwnProperty('authType')) {
     jsonData.authType = GoogleAuthType.KEY;
@@ -18,9 +18,11 @@ export function ConfigEditor(props: Props) {
   const renderBody = () => {
     switch (jsonData.authType) {
       case GoogleAuthType.JWT:
-        return <JWTAuth onOptionsChange={onOptionsChange} options={options} />;
+        return <JWTAuth {...props} />;
       case GoogleAuthType.KEY:
-        return <APIAuth onOptionsChange={onOptionsChange} options={options} />;
+        return <APIAuth {...props} />;
+      case GoogleAuthType.OAUTH:
+        return <OAuth {...props} />;
     }
   };
 

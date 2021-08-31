@@ -1,10 +1,10 @@
 import { DataSourceInstanceSettings, SelectableValue, ScopedVars } from '@grafana/data';
-import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
+import { DataSourceWithBackend, getTemplateSrv, HealthStatus } from '@grafana/runtime';
 
-import { SheetsQuery, SheetsSourceOptions } from './types';
+import { GoogleAuthType, SheetsQuery, SheetsSourceOptions } from './types';
 
 export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceOptions> {
-  constructor(instanceSettings: DataSourceInstanceSettings<SheetsSourceOptions>) {
+  constructor(public instanceSettings: DataSourceInstanceSettings<SheetsSourceOptions>) {
     super(instanceSettings);
   }
 
@@ -27,5 +27,16 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
         ? Object.entries(spreadsheets).map(([value, label]) => ({ label, value } as SelectableValue<string>))
         : []
     );
+  }
+
+  async callHealthCheck() {
+    if (this.instanceSettings.jsonData.authType === GoogleAuthType.OAUTH && window.gapi) {
+      if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+        return Promise.resolve({ status: HealthStatus.OK, message: 'Data source is working.' });
+      }
+
+      return Promise.resolve({ status: HealthStatus.Error, message: 'You need to sign in here.' });
+    }
+    return super.callHealthCheck();
   }
 }

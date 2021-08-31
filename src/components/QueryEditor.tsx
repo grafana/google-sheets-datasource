@@ -1,6 +1,6 @@
-import React, { useEffect, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { LinkButton, InlineFormLabel, Segment, SegmentAsync, LegacyForms, Button } from '@grafana/ui';
+import { Button, InlineFormLabel, LegacyForms, LinkButton, Segment, SegmentAsync } from '@grafana/ui';
+import React, { ChangeEvent, useEffect, useMemo } from 'react';
 import { DataSource } from '../DataSource';
 import { SheetsQuery, SheetsSourceOptions } from '../types';
 import { usePicker } from './usePicker';
@@ -49,13 +49,21 @@ export const formatCacheTimeLabel = (s: number = defaultCacheDuration) => {
 };
 
 export function QueryEditor({ onChange, onRunQuery, query, datasource }: Props) {
-  const { openPicker } = usePicker({
-    pickerCallback: (data) => {
-      if (data.action === google.picker.Action.PICKED) {
-        onChange({ ...query, spreadsheet: data.docs[0].id });
-        onRunQuery();
-      }
-    },
+  const pickerCallback = useMemo(
+    () =>
+      function (data: google.picker.ResponseObject) {
+        if (data.action === google.picker.Action.PICKED) {
+          onChange({ ...query, spreadsheet: data.docs[0].id });
+          onRunQuery();
+        }
+      },
+    [onChange, onRunQuery, query]
+  );
+  const { openPicker, isSignedIn } = usePicker({
+    pickerCallback,
+    apiKey: 'AIzaSyBIrTrkOlfFbW9F8HavV528ca8_GZybL7E',
+    appId: datasource.instanceSettings.jsonData.appId!,
+    clientId: datasource.instanceSettings.jsonData.clientId!,
   });
 
   useEffect(() => {
@@ -98,16 +106,6 @@ export function QueryEditor({ onChange, onRunQuery, query, datasource }: Props) 
   return (
     <>
       <div className="gf-form-inline">
-        <Button
-          type="button"
-          onClick={() => {
-            openPicker();
-          }}
-        >
-          Open picker
-        </Button>
-      </div>
-      <div className="gf-form-inline">
         <InlineFormLabel
           width={10}
           className="query-keyword"
@@ -127,6 +125,16 @@ export function QueryEditor({ onChange, onRunQuery, query, datasource }: Props) 
           allowCustomValue={true}
           onChange={onSpreadsheetIDChange}
         ></SegmentAsync>
+        {isSignedIn ? (
+          <Button
+            type="button"
+            onClick={() => {
+              openPicker();
+            }}
+          >
+            Open picker
+          </Button>
+        ) : null}
         {query.spreadsheet && (
           <LinkButton
             style={{ marginTop: 1 }}

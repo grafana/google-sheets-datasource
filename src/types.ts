@@ -15,11 +15,13 @@ export interface JWT {
 export enum GoogleAuthType {
   JWT = 'jwt',
   KEY = 'key',
+  OAUTH = 'oauth',
 }
 
 export const googleAuthTypes = [
   { label: 'API Key', value: GoogleAuthType.KEY },
   { label: 'Google JWT File', value: GoogleAuthType.JWT },
+  { label: 'Google OAuth', value: GoogleAuthType.OAUTH },
 ];
 
 export interface CacheInfo {
@@ -49,6 +51,8 @@ export interface SheetsQuery extends DataQuery {
 
 export interface SheetsSourceOptions extends DataSourceJsonData {
   authType: GoogleAuthType;
+  appId?: string;
+  clientId?: string;
 }
 
 export interface GoogleSheetsSecureJsonData {
