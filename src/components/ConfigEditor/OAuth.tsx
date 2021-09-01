@@ -1,9 +1,5 @@
-import {
-  DataSourceSettings,
-  onUpdateDatasourceJsonDataOption,
-  onUpdateDatasourceSecureJsonDataOption,
-} from '@grafana/data';
-import { Button, InlineFormLabel, Input, LegacyForms } from '@grafana/ui';
+import { DataSourceSettings, onUpdateDatasourceJsonDataOption } from '@grafana/data';
+import { Button, InlineFormLabel, Input } from '@grafana/ui';
 import { useLoadGapi } from 'components/useLoadGapi';
 import React, { useCallback, useEffect, useState } from 'react';
 import { GoogleSheetsSecureJsonData, SheetsSourceOptions } from 'types';
@@ -14,56 +10,39 @@ type Props = {
 };
 
 export function OAuth(props: Props) {
-  const { options, onOptionsChange } = props;
-  const [isSignedIn, setIsSignedIn] = useState(false);
+  const {
+    options: {
+      jsonData: { developerKey, appId, clientId },
+    },
+  } = props;
+  const [currentUser, setCurrentUser] = useState<gapi.auth2.BasicProfile>();
 
   useLoadGapi(() => {
-    gapi.load('client:auth2', {
+    gapi.load('client', {
       callback: () => {
         initClient();
       },
     });
   });
 
-  const onResetApiKey = () => {
-    onOptionsChange({
-      ...options,
-      secureJsonData: {
-        ...options.secureJsonData,
-        apiKey: '',
-      },
-      secureJsonFields: {
-        ...options.secureJsonFields,
-        apiKey: false,
-      },
-    });
-  };
-
   const initClient = useCallback(() => {
-    if (!options.jsonData.clientId || !options.jsonData.appId || !options.secureJsonFields?.apiKey) {
+    if (!clientId || !appId || !developerKey) {
       return;
     }
     gapi.client
       .init({
-        apiKey: options.secureJsonData?.apiKey,
-        clientId: options.jsonData.clientId,
+        apiKey: developerKey,
+        clientId: clientId,
         scope: 'https://www.googleapis.com/auth/drive.file',
       })
       .then(function () {
-        // Listen for sign-in state changes.
-        gapi.auth2.getAuthInstance().isSignedIn.listen((isSigned) => {
-          setIsSignedIn(isSigned);
-        });
-
-        // Handle the initial sign-in state.
-        setIsSignedIn(gapi.auth2.getAuthInstance().isSignedIn.get());
+        if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+          setCurrentUser(gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile());
+        } else {
+          setCurrentUser(undefined);
+        }
       });
-  }, [
-    options.jsonData.appId,
-    options.jsonData.clientId,
-    options.secureJsonData?.apiKey,
-    options.secureJsonFields?.apiKey,
-  ]);
+  }, [appId, clientId, developerKey]);
 
   useEffect(() => {
     if (window.gapi) {
@@ -74,15 +53,12 @@ export function OAuth(props: Props) {
   return (
     <>
       <div className="gf-form">
-        <LegacyForms.SecretFormField
-          isConfigured={options.secureJsonFields?.apiKey}
-          value={options.secureJsonData?.apiKey || ''}
-          label="API Key"
-          labelWidth={10}
-          inputWidth={30}
-          placeholder="Enter API Key"
-          onReset={onResetApiKey}
-          onChange={onUpdateDatasourceSecureJsonDataOption(props, 'apiKey')}
+        <InlineFormLabel className="width-10">Developer key / API key</InlineFormLabel>
+        <Input
+          css={{}}
+          className="width-30"
+          value={developerKey || ''}
+          onChange={onUpdateDatasourceJsonDataOption(props, 'developerKey')}
         />
       </div>
       <div className="gf-form">
@@ -90,7 +66,7 @@ export function OAuth(props: Props) {
         <Input
           css={{}}
           className="width-30"
-          value={options.jsonData.appId}
+          value={appId || ''}
           onChange={onUpdateDatasourceJsonDataOption(props, 'appId')}
         />
       </div>
@@ -99,39 +75,52 @@ export function OAuth(props: Props) {
         <Input
           css={{}}
           className="width-30"
-          value={options.jsonData.clientId}
+          value={clientId || ''}
           onChange={onUpdateDatasourceJsonDataOption(props, 'clientId')}
         />
       </div>
-      <div className="gf-form">
+      <div className="gf-form" style={{ alignItems: 'center' }}>
         <InlineFormLabel className="width-10">Google Sign In</InlineFormLabel>
-        {!isSignedIn ? (
+        {currentUser ? (
+          <>
+            <div style={{ margin: '0 8px' }}>
+              You are logged in with:{' '}
+              <img
+                referrerPolicy="no-referrer"
+                src={currentUser.getImageUrl()}
+                alt="avatar icon"
+                style={{ borderRadius: 50, width: 24 }}
+              />{' '}
+              {currentUser.getName()} ({currentUser.getEmail()})
+            </div>
+            <Button
+              type="button"
+              onClick={() => {
+                gapi.auth2.getAuthInstance().signOut();
+                setCurrentUser(undefined);
+              }}
+            >
+              Sign Out
+            </Button>
+          </>
+        ) : developerKey && appId && clientId ? (
           <Button
             type="button"
             onClick={() => {
-              gapi.auth2.getAuthInstance().signIn();
+              gapi.auth2
+                .getAuthInstance()
+                .signIn()
+                .then((user) => {
+                  setCurrentUser(user.getBasicProfile());
+                });
             }}
           >
             Authorize
           </Button>
-        ) : (
-          <Button
-            type="button"
-            onClick={() => {
-              gapi.auth2.getAuthInstance().signOut();
-            }}
-          >
-            Sign Out
-          </Button>
-        )}
+        ) : null}
       </div>
       <div className="grafana-info-box" style={{ marginTop: 24 }}>
         <h4>Using OAuth</h4>
-        {isSignedIn ? (
-          <div>
-            You are logged in with: {gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile().getName()}
-          </div>
-        ) : null}
       </div>
     </>
   );

@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 
-export function useLoadGapi(onLoad?: () => void) {
+export function useLoadGapi(onLoad?: () => void, shouldRun?: boolean) {
   useEffect(() => {
+    if (shouldRun === false) {
+      return;
+    }
+
     if (window.gapi) {
       onLoad?.();
       return;
@@ -15,5 +19,5 @@ export function useLoadGapi(onLoad?: () => void) {
     return () => {
       document.body.removeChild(script);
     };
-  }, [onLoad]);
+  }, [onLoad, shouldRun]);
 }

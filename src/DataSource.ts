@@ -30,7 +30,7 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
   }
 
   async callHealthCheck() {
-    if (this.instanceSettings.jsonData.authType === GoogleAuthType.OAUTH && window.gapi) {
+    if (this.instanceSettings.jsonData.authType === GoogleAuthType.OAUTH && window.gapi?.auth2) {
       if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
         return Promise.resolve({ status: HealthStatus.OK, message: 'Data source is working.' });
       }

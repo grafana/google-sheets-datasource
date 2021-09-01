@@ -61,9 +61,9 @@ export function QueryEditor({ onChange, onRunQuery, query, datasource }: Props) 
   );
   const { openPicker, isSignedIn } = usePicker({
     pickerCallback,
-    apiKey: 'AIzaSyBIrTrkOlfFbW9F8HavV528ca8_GZybL7E',
-    appId: datasource.instanceSettings.jsonData.appId!,
-    clientId: datasource.instanceSettings.jsonData.clientId!,
+    apiKey: datasource.instanceSettings.jsonData.developerKey,
+    appId: datasource.instanceSettings.jsonData.appId,
+    clientId: datasource.instanceSettings.jsonData.clientId,
   });
 
   useEffect(() => {

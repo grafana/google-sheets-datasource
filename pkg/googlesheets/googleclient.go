@@ -101,6 +101,13 @@ func createSheetsService(ctx context.Context, auth *models.DatasourceSettings) (
 		return sheets.NewService(ctx, option.WithAPIKey(auth.APIKey))
 	}
 
+	if auth.AuthType == "oauth" {
+		if len(auth.DeveloperKey) == 0 {
+			return nil, fmt.Errorf("missing Developer key")
+		}
+		return sheets.NewService(ctx, option.WithAPIKey(auth.DeveloperKey))
+	}
+
 	if auth.AuthType == "jwt" {
 		jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT),
 			// Only need readonly access to spreadsheets (and drive?)
@@ -126,6 +133,13 @@ func createDriveService(ctx context.Context, auth *models.DatasourceSettings) (*
 			return nil, fmt.Errorf("missing API Key")
 		}
 		return drive.NewService(ctx, option.WithAPIKey(auth.APIKey))
+	}
+
+	if auth.AuthType == "oauth" {
+		if len(auth.DeveloperKey) == 0 {
+			return nil, fmt.Errorf("missing Developer key")
+		}
+		return drive.NewService(ctx, option.WithAPIKey(auth.DeveloperKey))
 	}
 
 	if auth.AuthType == "jwt" {

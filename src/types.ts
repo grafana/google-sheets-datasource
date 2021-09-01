@@ -52,6 +52,7 @@ export interface SheetsQuery extends DataQuery {
 export interface SheetsSourceOptions extends DataSourceJsonData {
   authType: GoogleAuthType;
   appId?: string;
+  developerKey?: string;
   clientId?: string;
 }
 

@@ -9,9 +9,10 @@ import (
 
 // DatasourceSettings contains Google Sheets API authentication properties.
 type DatasourceSettings struct {
-	AuthType string `json:"authType"` // jwt | key
-	APIKey   string `json:"apiKey"`
-	JWT      string `json:"jwt"`
+	AuthType     string `json:"authType"` // jwt | key | oauth
+	APIKey       string `json:"apiKey"`
+	JWT          string `json:"jwt"`
+	DeveloperKey string `json:"developerKey"`
 }
 
 // LoadSettings gets the relevant settings from the plugin context
