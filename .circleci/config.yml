@@ -96,7 +96,7 @@ workflows:
 executors:
   default_exec:
     docker:
-      - image: grafana/grafana-plugin-ci:1.1.3-alpine
+      - image: grafana/grafana-plugin-ci:1.2.1-alpine
   e2e_exec:
     docker:
       - image: grafana/grafana-plugin-ci-e2e:latest
