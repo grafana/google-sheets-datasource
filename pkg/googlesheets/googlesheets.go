@@ -22,8 +22,8 @@ type GoogleSheets struct {
 }
 
 // Query queries a spreadsheet and returns a corresponding data frame.
-func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config *models.DatasourceSettings, timeRange backend.TimeRange) (dr backend.DataResponse) {
-	client, err := NewGoogleClient(ctx, config)
+func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config *models.DatasourceSettings, timeRange backend.TimeRange, oAuthToken []string) (dr backend.DataResponse) {
+	client, err := NewGoogleClient(ctx, config, &oAuthToken)
 	if err != nil {
 		dr.Error = fmt.Errorf("unable to create Google API client: %w", err)
 		return
@@ -65,7 +65,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 
 // GetSpreadsheets gets spreadsheets from the Google API.
 func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *models.DatasourceSettings) (map[string]string, error) {
-	client, err := NewGoogleClient(ctx, config)
+	client, err := NewGoogleClient(ctx, config, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Google API client: %w", err)
 	}

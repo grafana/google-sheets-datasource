@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
@@ -23,13 +25,14 @@ type client interface {
 }
 
 // NewGoogleClient creates a new client and initializes a sheet service and a drive service
-func NewGoogleClient(ctx context.Context, auth *models.DatasourceSettings) (*GoogleClient, error) {
-	sheetsService, err := createSheetsService(ctx, auth)
+func NewGoogleClient(ctx context.Context, auth *models.DatasourceSettings, oAuthToken *[]string) (*GoogleClient, error) {
+	backend.Logger.Info("Auth", "token", oAuthToken, "apikey", auth.APIKey, "authType", auth.AuthType)
+	sheetsService, err := createSheetsService(ctx, auth, oAuthToken)
 	if err != nil {
 		return nil, err
 	}
 
-	driveService, err := createDriveService(ctx, auth)
+	driveService, err := createDriveService(ctx, auth, oAuthToken)
 	if err != nil {
 		return nil, err
 	}
@@ -89,9 +92,14 @@ func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 	return fs, nil
 }
 
-func createSheetsService(ctx context.Context, auth *models.DatasourceSettings) (*sheets.Service, error) {
+func createSheetsService(ctx context.Context, auth *models.DatasourceSettings, oAuthToken *[]string) (*sheets.Service, error) {
 	if len(auth.AuthType) == 0 {
 		return nil, fmt.Errorf("missing AuthType setting")
+	}
+
+	if oAuthToken != nil && len(*oAuthToken) != 0 {
+		backend.Logger.Info("createSheetsService oAuthToken")
+		return sheets.NewService(ctx, option.WithTokenSource(oauth2.StaticTokenSource(&oauth2.Token{AccessToken: (*oAuthToken)[1], TokenType: (*oAuthToken)[0]})))
 	}
 
 	if auth.AuthType == "key" {
@@ -123,9 +131,13 @@ func createSheetsService(ctx context.Context, auth *models.DatasourceSettings) (
 	return nil, fmt.Errorf("invalid Auth Type: %s", auth.AuthType)
 }
 
-func createDriveService(ctx context.Context, auth *models.DatasourceSettings) (*drive.Service, error) {
+func createDriveService(ctx context.Context, auth *models.DatasourceSettings, oAuthToken *[]string) (*drive.Service, error) {
 	if len(auth.AuthType) == 0 {
 		return nil, fmt.Errorf("missing AuthType setting")
+	}
+
+	if oAuthToken != nil && len(*oAuthToken) != 0 {
+		return drive.NewService(ctx, option.WithTokenSource(oauth2.StaticTokenSource(&oauth2.Token{AccessToken: (*oAuthToken)[1], TokenType: (*oAuthToken)[0]})))
 	}
 
 	if auth.AuthType == "key" {

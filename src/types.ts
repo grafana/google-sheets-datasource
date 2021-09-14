@@ -54,6 +54,7 @@ export interface SheetsSourceOptions extends DataSourceJsonData {
   appId?: string;
   developerKey?: string;
   clientId?: string;
+  oauthPassThru?: boolean;
 }
 
 export interface GoogleSheetsSecureJsonData {

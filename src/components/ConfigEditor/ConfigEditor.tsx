@@ -1,5 +1,9 @@
-import { DataSourcePluginOptionsEditorProps, onUpdateDatasourceJsonDataOptionSelect } from '@grafana/data';
-import { InlineFormLabel, Select } from '@grafana/ui';
+import {
+  DataSourcePluginOptionsEditorProps,
+  onUpdateDatasourceJsonDataOptionChecked,
+  onUpdateDatasourceJsonDataOptionSelect,
+} from '@grafana/data';
+import { InlineFormLabel, LegacyForms, Select } from '@grafana/ui';
 import React from 'react';
 import { GoogleAuthType, googleAuthTypes, GoogleSheetsSecureJsonData, SheetsSourceOptions } from '../../types';
 import { APIAuth } from './APIAuth';
@@ -36,6 +40,15 @@ export function ConfigEditor(props: Props) {
           options={googleAuthTypes}
           defaultValue={jsonData.authType}
           onChange={onUpdateDatasourceJsonDataOptionSelect(props, 'authType')}
+        />
+      </div>
+      <div className="gf-form">
+        <LegacyForms.Switch
+          label="Forward OAuth Identity"
+          labelClass="width-13"
+          checked={jsonData.oauthPassThru || false}
+          onChange={onUpdateDatasourceJsonDataOptionChecked(props, 'oauthPassThru')}
+          tooltip="Forward the user's upstream OAuth identity to the data source (Their access token gets passed along)."
         />
       </div>
       {renderBody()}

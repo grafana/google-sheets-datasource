@@ -4,19 +4,25 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/patrickmn/go-cache"
-	"github.com/prometheus/client_golang/prometheus"
 
 	"context"
 )
 
 const metricNamespace = "sheets_datasource"
+
+var (
+	_ backend.QueryDataHandler   = (*GoogleSheetsDataSource)(nil)
+	_ backend.CheckHealthHandler = (*GoogleSheetsDataSource)(nil)
+)
 
 // GoogleSheetsDataSource handler for google sheets
 type GoogleSheetsDataSource struct {
@@ -24,16 +30,17 @@ type GoogleSheetsDataSource struct {
 }
 
 // NewDataSource creates the google sheets datasource and sets up all the routes
-func NewDataSource(mux *http.ServeMux) *GoogleSheetsDataSource {
-	queriesTotal := prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name:      "data_query_total",
-			Help:      "data query counter",
-			Namespace: metricNamespace,
-		},
-		[]string{"scenario"},
-	)
-	prometheus.MustRegister(queriesTotal)
+func NewDataSource(_ backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+	// This is causing a panic if there are 2 different data sources in the same dashboard
+	// queriesTotal := prometheus.NewCounterVec(
+	// 	prometheus.CounterOpts{
+	// 		Name:      "data_query_total",
+	// 		Help:      "data query counter",
+	// 		Namespace: metricNamespace,
+	// 	},
+	// 	[]string{"scenario"},
+	// )
+	// prometheus.MustRegister(queriesTotal)
 
 	cache := cache.New(300*time.Second, 5*time.Second)
 	ds := &GoogleSheetsDataSource{
@@ -42,8 +49,8 @@ func NewDataSource(mux *http.ServeMux) *GoogleSheetsDataSource {
 		},
 	}
 
-	mux.HandleFunc("/spreadsheets", ds.handleResourceSpreadsheets)
-	return ds
+	// mux.HandleFunc("/spreadsheets", ds.handleResourceSpreadsheets)
+	return ds, nil
 }
 
 // CheckHealth checks if the plugin is running properly
@@ -64,7 +71,7 @@ func (ds *GoogleSheetsDataSource) CheckHealth(ctx context.Context, req *backend.
 		return res, nil
 	}
 
-	client, err := googlesheets.NewGoogleClient(ctx, config)
+	client, err := googlesheets.NewGoogleClient(ctx, config, nil)
 	if err != nil {
 		res.Status = backend.HealthStatusError
 		res.Message = "Unable to create client"
@@ -93,6 +100,8 @@ func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.Qu
 
 	for _, q := range req.Queries {
 		queryModel, err := models.GetQueryModel(q)
+
+		token := strings.Fields(req.Headers["Authorization"])
 		if err != nil {
 			return nil, fmt.Errorf("failed to read query: %w", err)
 		}
@@ -100,7 +109,7 @@ func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.Qu
 		if len(queryModel.Spreadsheet) < 1 {
 			continue // not query really exists
 		}
-		dr := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
+		dr := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange, token)
 		if dr.Error != nil {
 			backend.Logger.Error("Query failed", "refId", q.RefID, "error", dr.Error)
 		}
