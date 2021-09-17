@@ -18,8 +18,8 @@ export enum GoogleAuthType {
 }
 
 export const googleAuthTypes = [
-  { label: 'API Key', value: GoogleAuthType.KEY },
-  { label: 'Google JWT File', value: GoogleAuthType.JWT },
+  { label: 'API Key (public spreadsheets)', value: GoogleAuthType.KEY },
+  { label: 'Google JWT File (public and private spreadsheets)', value: GoogleAuthType.JWT },
 ];
 
 export interface CacheInfo {
