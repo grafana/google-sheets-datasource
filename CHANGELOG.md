@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.2
+- Change release pipeline
+
 ## v1.1.1
 - Targeting Grafana 8.1+
 - Documentation and link fixes
