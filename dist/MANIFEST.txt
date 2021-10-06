@@ -1,0 +1,49 @@
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+{
+  "manifestVersion": "2.0.0",
+  "signatureType": "grafana",
+  "signedByOrg": "grafana",
+  "signedByOrgName": "Grafana Labs",
+  "plugin": "grafana-googlesheets-datasource",
+  "version": "1.1.1",
+  "time": 1633517376864,
+  "keyId": "7e4d0c6a708866e7",
+  "files": {
+    "gfx_sheets_linux_arm64": "7871faacabe2e09cdf73668dda5f12bdebb3c8f103c1142605780dd37b61c962",
+    "gfx_sheets_linux_arm": "c30b5c4562b3a6d5915338daef2f5aaaa0f9dedf51ad460fd3e0a3745c21a30e",
+    "gfx_sheets_darwin_amd64": "c42e7f395aaece52a6a087024e7a965ccb5d7ec0638454dd56129cf48a74b676",
+    "gfx_sheets_darwin_arm64": "6b996bdb57342310fa3339581af18cf0b286fa27bcb5937a2729db0df8eab7aa",
+    "docs/img/spreadsheet.png": "430cdb2480801cede184c94ac3cf0e10f29814840ee6b254b9f8108d5561ce5f",
+    "docs/img/spreadsheets-list.png": "977888792f4aaa2f882e1ba75b73c2f58e3a02f576e1d065a03a207014a39a95",
+    "docs/img/copy-range.png": "ebd11c3716d299229fc1c538bd2989a5ddf586474a7a241998331db6d3907dfb",
+    "docs/img/query-editor.png": "f1e6f096ac968142e746a3844fec343255c25d5314d76f90b9476d6c1edad32c",
+    "docs/img/dashboard.png": "dbff0318b2eda2cab278a48f5c596e470129ea2a673b0910c6449286826138ca",
+    "module.js": "d144e58dfb88069dbd417f0f6801fc2eb0041fc55d9b8b8cb748719ef67912cb",
+    "module.js.LICENSE.txt": "0d8f66cd4afb566cb5b7e1540c68f43b939d3eba12ace290f18abc4f4cb53ed0",
+    "module.js.map": "b455dd5de9cf5d79e4a4f2aba9f93d9cebb518d515fd9c0ab6a5126c859439e1",
+    "README.md": "932beaded450592b22d07f5876f3f2e95ba2f1e4609ac39fd4c32daeb35b8ef2",
+    "plugin.json": "2f26cef83770509c0337d050ffad75655efa4034fdda2868f8d376106afb46c6",
+    "LICENSE": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+    "CHANGELOG.md": "f75fcdb21a3477225a07ef854278b85352eb707e385cf894db9ea827d99b55a4",
+    "img/query-editor.png": "f1e6f096ac968142e746a3844fec343255c25d5314d76f90b9476d6c1edad32c",
+    "img/sheets.svg": "def5332889972ca9b45635121574dc710b0ef7c82baaa70b2478f79eda0b6699",
+    "img/spreadsheet.png": "430cdb2480801cede184c94ac3cf0e10f29814840ee6b254b9f8108d5561ce5f",
+    "img/graph.png": "e265eea7c7535202b91376c963493029860975ccad086efdfaee7cd8008dbace",
+    "img/config-page.png": "8853ab483094720cc2a34fd2c31abb4cef16b9e6b461fa2f1271e98ad9371ee9",
+    "img/dashboard.png": "dbff0318b2eda2cab278a48f5c596e470129ea2a673b0910c6449286826138ca",
+    "img/table.png": "e8278e0ea8da1f7ad097cbf00d7732e76cd32ae0cf99565c37deea525e08df28"
+  }
+}
+-----BEGIN PGP SIGNATURE-----
+Version: OpenPGP.js v4.10.1
+Comment: https://openpgpjs.org
+
+wqEEARMKAAYFAmFdf0EACgkQfk0ManCIZueM6gIJAbT5h/0hfq06fcRWglcl
+ilw8LoLYs019rpLKVfng+5tczbI3JgiWs3bmwFLJbznleUQ0/ac0cmxfWsQA
+29a6XjCQAgiVxmJPxJJlzRpXVoTkwB9NIaVQcdjUr3YdZII96zFsxTGMB3jw
+0/d79VtuBPiNEJ00ftRIidFvzWJWoj6Gn9ckVA==
+=nR4c
+-----END PGP SIGNATURE-----
