@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.1
+- Targeting Grafana 8.1+
+- Documentation and link fixes
+- Add explicit explanation to the auth constraint
+
 ## v1.1.0
 - Targeting Grafana 7.2+
 - Adding support for annotations

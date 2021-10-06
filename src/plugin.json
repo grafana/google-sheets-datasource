@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
 
   "type": "datasource",
   "name": "Google Sheets",
@@ -59,8 +59,7 @@
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaVersion": "7.x",
-    "grafanaDependency": ">=7.2.0",
+    "grafanaDependency": ">=8.1.0",
     "plugins": []
   }
 }
