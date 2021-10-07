@@ -29,7 +29,12 @@ export function ConfigEditor(props: Props) {
   return (
     <div className="gf-form-group">
       <div className="gf-form">
-        <InlineFormLabel className="width-10">Auth</InlineFormLabel>
+        <InlineFormLabel
+          className="width-10"
+          tooltip="API Key auth is used to access public spreadsheets, and Google JWT File auth using a service account is used to access private files."
+        >
+          Auth
+        </InlineFormLabel>
         <Select
           className="width-30"
           value={googleAuthTypes.find((x) => x.value === jsonData.authType) || googleAuthTypes[0]}

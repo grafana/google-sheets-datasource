@@ -1,7 +1,8 @@
-import { Button, InlineFormLabel } from '@grafana/ui';
+import { css } from '@emotion/css';
+import { GrafanaTheme2 } from '@grafana/data';
+import { Button, FileDropzone, FileListItem, InlineFormLabel, useStyles2 } from '@grafana/ui';
 import { isObject, startCase } from 'lodash';
 import React, { useState } from 'react';
-import { DropZone } from '..';
 
 export interface Props {
   onChange: (jwt: string) => void;
@@ -26,39 +27,31 @@ const validateJson = (json: { [key: string]: string }) => isObject(json) && conf
 export function JWTConfig({ onChange, isConfigured }: Props) {
   const [enableUpload, setEnableUpload] = useState<boolean>(!isConfigured);
   const [error, setError] = useState<string>();
+  const styles = useStyles2(getStyles);
 
   return enableUpload ? (
-    <>
-      <DropZone
-        baseStyle={{ marginTop: '24px' }}
-        accept="application/json"
-        onDrop={(acceptedFiles) => {
-          const reader = new FileReader();
-          if (acceptedFiles.length === 1) {
-            reader.onloadend = (e: any) => {
-              const json = JSON.parse(e.target.result);
-              if (validateJson(json)) {
-                onChange(e.target.result);
-                setEnableUpload(false);
-              } else {
-                setError('Invalid JWT file');
-              }
-            };
-            reader.readAsText(acceptedFiles[0]);
-          } else if (acceptedFiles.length > 1) {
-            setError('You can only upload one file');
+    <div className={styles.dropzone}>
+      <FileDropzone
+        options={{
+          multiple: false,
+        }}
+        onLoad={(result) => {
+          const json = JSON.parse(result as string);
+          if (validateJson(json)) {
+            onChange(result as string);
+            setEnableUpload(false);
+          } else {
+            setError('Invalid JWT file');
           }
         }}
-      >
-        <p style={{ margin: 0, fontSize: 18 }}>Drop the file here, or click to use the file explorer</p>
-      </DropZone>
-
-      {error && (
-        <pre style={{ margin: '12px 0 0' }} className="gf-form-pre alert alert-error">
-          {error}
-        </pre>
-      )}
-    </>
+        fileListRenderer={(file, removeFile) => {
+          if (error) {
+            return <FileListItem file={{ ...file, error: new DOMException(error) }} removeFile={removeFile} />;
+          }
+          return <FileListItem file={file} removeFile={removeFile} />;
+        }}
+      />
+    </div>
   ) : (
     <>
       {configKeys.map((key) => (
@@ -72,4 +65,12 @@ export function JWTConfig({ onChange, isConfigured }: Props) {
       </Button>
     </>
   );
+}
+
+function getStyles(theme: GrafanaTheme2) {
+  return {
+    dropzone: css`
+      margin-top: ${theme.spacing(2)};
+    `,
+  };
 }
