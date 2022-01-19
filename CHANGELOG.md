@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.3
+- Bump grafana dependencies to 8.3.4
+
 ## v1.1.2
 - Change release pipeline
 
