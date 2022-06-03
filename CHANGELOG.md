@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.4
+- Fix: deprecated link variant button for v9
+
 ## v1.1.3
 - Bump grafana dependencies to 8.3.4
 
