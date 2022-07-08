@@ -88,7 +88,7 @@ export class ConfigEditor extends PureComponent<Props> {
               <h4>Generate a JWT file</h4>
               <ol style={{ listStylePosition: 'inside' }}>
                 <li>
-                  Open the <a href="https://console.developers.google.com/apis/credentials" target="_blank">Credentials</a> page in the
+                  Open the <a href="https://console.developers.google.com/apis/credentials" target="_blank" rel="noreferrer noopener">Credentials</a> page in the
                   Google API Console.
                 </li>
                 <li>
@@ -109,14 +109,14 @@ export class ConfigEditor extends PureComponent<Props> {
                 </li>
                 <li>
                   Open the{' '}
-                  <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet" target="_blank">
+                  <a href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet" target="_blank" rel="noreferrer noopener">
                     Google Sheets
                   </a>{' '}
                   in API Library and enable access for your account
                 </li>
                 <li>
                   Open the{' '}
-                  <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive" target="_blank">Google Drive</a>{' '}
+                  <a href="https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive" target="_blank" rel="noreferrer noopener">Google Drive</a>{' '}
                   in API Library and enable access for your account. Access to the Google Drive API is used to list all
                   spreadsheets that you have access to.
                 </li>
@@ -131,7 +131,7 @@ export class ConfigEditor extends PureComponent<Props> {
               <h4>Generate an API key</h4>
               <ol style={{ listStylePosition: 'inside' }}>
                 <li>
-                  Open the <a href="https://console.developers.google.com/apis/credentials" target="_blank">Credentials page</a> in the
+                  Open the <a href="https://console.developers.google.com/apis/credentials" target="_blank" rel="noreferrer noopener">Credentials page</a> in the
                   Google API Console.
                 </li>
                 <li>
