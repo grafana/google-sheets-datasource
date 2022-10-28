@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.5
+
+- **Chore**: Update to Golang 1.19 #160
+
 ## v1.1.4
 - Fix: deprecated link variant button for v9
 
