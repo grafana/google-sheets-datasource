@@ -2,7 +2,7 @@ package googlesheets
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -21,7 +21,7 @@ func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, inc
 }
 
 func loadTestSheet(path string) (*sheets.Spreadsheet, error) {
-	jsonBody, err := ioutil.ReadFile(path)
+	jsonBody, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
