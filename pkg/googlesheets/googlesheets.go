@@ -255,6 +255,9 @@ func getUniqueColumnName(formattedName string, columnIndex int, columns map[stri
 func getColumnDefinitions(rows []*sheets.RowData) ([]*ColumnDefinition, int) {
 	columns := []*ColumnDefinition{}
 	columnMap := map[string]bool{}
+	if len(rows) < 1 {
+		return columns, 0
+	}
 	headerRow := rows[0].Values
 
 	start := 0

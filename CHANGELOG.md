@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.6
+- Fix: Don't panic when the user selects a range of empty cells.
+
 ## v1.1.5
 
 - **Chore**: Update to Golang 1.19 #160
