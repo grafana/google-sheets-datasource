@@ -7,7 +7,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/grafana/grafana-plugin-sdk-go v0.92.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/prometheus/client_golang v1.10.0
+	github.com/prometheus/client_golang v1.11.1
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/oauth2 v0.0.0-20210413134643-5e61552d6c78
 	google.golang.org/api v0.44.0
@@ -29,7 +29,7 @@ require (
 	github.com/hashicorp/go-hclog v0.0.0-20180709165350-ff2cf002a8dd // indirect
 	github.com/hashicorp/go-plugin v1.2.2 // indirect
 	github.com/hashicorp/yamux v0.0.0-20181012175058-2f1d1f20f75d // indirect
-	github.com/json-iterator/go v1.1.10 // indirect
+	github.com/json-iterator/go v1.1.11 // indirect
 	github.com/magefile/mage v1.11.0 // indirect
 	github.com/mattetti/filebuffer v1.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.10 // indirect
@@ -41,7 +41,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.20.0 // indirect
+	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/rivo/uniseg v0.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
