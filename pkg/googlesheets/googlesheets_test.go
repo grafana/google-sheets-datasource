@@ -56,7 +56,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
+			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
 			_, meta, err := gsd.getSheetData(client, &qm)
@@ -75,7 +75,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 0}
+			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 0}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
 			_, meta, err := gsd.getSheetData(client, &qm)
@@ -93,7 +93,7 @@ func TestGooglesheets(t *testing.T) {
 		gsd := &GoogleSheets{
 			Cache: cache.New(300*time.Second, 50*time.Second),
 		}
-		qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someid", CacheDurationSeconds: 10}
+		qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
 		meta := make(map[string]interface{})
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
@@ -132,7 +132,7 @@ func TestGooglesheets(t *testing.T) {
 		gsd := &GoogleSheets{
 			Cache: cache.New(300*time.Second, 50*time.Second),
 		}
-		qm := models.QueryModel{Range: "A2", Spreadsheet: "someid", CacheDurationSeconds: 10}
+		qm := models.QueryModel{Range: "A2", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
 		meta := make(map[string]interface{})
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
@@ -163,6 +163,7 @@ func TestGooglesheets(t *testing.T) {
 		require.Equal(t, "AH", getExcelColumnName(34))
 		require.Equal(t, "BN", getExcelColumnName(66))
 		require.Equal(t, "ZW", getExcelColumnName(699))
+		// cspell:disable-next-line
 		require.Equal(t, "AJIL", getExcelColumnName(24582))
 	})
 }

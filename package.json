@@ -8,6 +8,7 @@
     "test": "grafana-toolkit plugin:test",
     "test:e2e": "grafana-e2e run",
     "test:e2e:update": "grafana-e2e run --update-screenshots",
+    "spellcheck": "cspell -c cspell.config.json \"**/*.{ts,tsx,js,go,md,mdx,yml,yaml,json,scss,css}\"",
     "watch": "rm -rf node_modules/@grafana/data/node_modules; grafana-toolkit plugin:dev --watch"
   },
   "repository": "github:grafana/google-sheets-datasource",
@@ -18,7 +19,8 @@
     "@grafana/runtime": "8.3.4",
     "@grafana/ui": "8.3.4",
     "@grafana/e2e": "8.3.4",
-    "@grafana/toolkit": "8.3.4"
+    "@grafana/toolkit": "8.3.4",
+    "cspell": "^6.26.3"
   },
   "dependencies": {
     "@emotion/css": "11.1.3"
