@@ -17,7 +17,8 @@
     "Sdump",
     "stackdriver",
     "stretchr",
-    "testdata"
+    "testdata",
+    "typecheck"
   ],
   "language": "en-US"
 }
