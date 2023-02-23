@@ -193,7 +193,7 @@ var timeConverter = data.FieldConverter{
 		}
 		parsedTime, err := dateparse.ParseLocal(cellData.FormattedValue)
 		if err != nil {
-			return t, fmt.Errorf("Error while parsing date '%v'", cellData.FormattedValue)
+			return t, fmt.Errorf("error while parsing date '%v'", cellData.FormattedValue)
 		}
 		return &parsedTime, nil
 	},

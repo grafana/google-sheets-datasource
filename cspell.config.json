@@ -1,0 +1,23 @@
+{
+  "ignorePaths": [
+    "node_modules/**",
+    "pkg/googlesheets/testdata",
+    "dist/**"
+  ],
+  "words": [
+    "araddon",
+    "datasource",
+    "datasources",
+    "dataproxy",
+    "dateparse",
+    "davecgh",
+    "googlesheets",
+    "httpadapter",
+    "patrickmn",
+    "Sdump",
+    "stackdriver",
+    "stretchr",
+    "testdata"
+  ],
+  "language": "en-US"
+}

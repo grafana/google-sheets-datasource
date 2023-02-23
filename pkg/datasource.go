@@ -20,7 +20,7 @@ const metricNamespace = "sheets_datasource"
 
 // GoogleSheetsDataSource handler for google sheets
 type GoogleSheetsDataSource struct {
-	googlesheet *googlesheets.GoogleSheets
+	googlesheets *googlesheets.GoogleSheets
 }
 
 // NewDataSource creates the google sheets datasource and sets up all the routes
@@ -37,7 +37,7 @@ func NewDataSource(mux *http.ServeMux) *GoogleSheetsDataSource {
 
 	cache := cache.New(300*time.Second, 5*time.Second)
 	ds := &GoogleSheetsDataSource{
-		googlesheet: &googlesheets.GoogleSheets{
+		googlesheets: &googlesheets.GoogleSheets{
 			Cache: cache,
 		},
 	}
@@ -100,7 +100,7 @@ func (ds *GoogleSheetsDataSource) QueryData(ctx context.Context, req *backend.Qu
 		if len(queryModel.Spreadsheet) < 1 {
 			continue // not query really exists
 		}
-		dr := ds.googlesheet.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
+		dr := ds.googlesheets.Query(ctx, q.RefID, queryModel, config, q.TimeRange)
 		if dr.Error != nil {
 			backend.Logger.Error("Query failed", "refId", q.RefID, "error", dr.Error)
 		}
@@ -145,6 +145,6 @@ func (ds *GoogleSheetsDataSource) handleResourceSpreadsheets(rw http.ResponseWri
 		return
 	}
 
-	res, err := ds.googlesheet.GetSpreadsheets(ctx, config)
+	res, err := ds.googlesheets.GetSpreadsheets(ctx, config)
 	writeResult(rw, "spreadsheets", res, err)
 }
