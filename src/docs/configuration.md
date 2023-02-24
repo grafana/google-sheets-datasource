@@ -18,7 +18,7 @@ The project that the service account is associated with needs to be granted acce
 
 The Google Sheets data source uses the scope `https://www.googleapis.com/auth/spreadsheets.readonly` to get read-only access to spreadsheets. It also uses the scope `https://www.googleapis.com/auth/drive.metadata.readonly` to list all spreadsheets that the service account has access to in Google Drive.
 
-To create a service account, generate a Google JWT file and enable the APIs. For more detailed instructions, refer to the steps documented for the Google Sheets data source in the "Add a data source" page in Grafana.  
+To create a service account, generate a Google JWT file and enable the APIs. For more detailed instructions, refer to the steps documented for the Google Sheets data source in the "Add a data source" page in Grafana.
 
 ### Sharing
 
