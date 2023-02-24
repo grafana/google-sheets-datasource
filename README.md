@@ -18,8 +18,8 @@ You need to install the following first:
 - [Yarn](https://yarnpkg.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
-
 ### Building the Plug-In
+
 In order to build the plug-in, both front-end and back-end parts, do the following:
 
 ```
@@ -30,6 +30,7 @@ yarn build
 The built plug-in will be in the dist/ directory.
 
 ### Testing the Plug-In w/ Docker Compose
+
 To test the plug-in running inside Grafana, we recommend using our Docker Compose setup:
 
 ```BASH

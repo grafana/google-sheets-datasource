@@ -1,9 +1,5 @@
 {
-  "ignorePaths": [
-    "node_modules/**",
-    "pkg/googlesheets/testdata",
-    "dist/**"
-  ],
+  "ignorePaths": ["node_modules/**", "pkg/googlesheets/testdata", "dist/**"],
   "words": [
     "araddon",
     "datasource",

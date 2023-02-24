@@ -16,9 +16,7 @@
       "name": "Grafana Labs",
       "url": "https://grafana.com"
     },
-    "keywords": [
-      "google", "sheets", "spreadsheets", "excel"
-    ],
+    "keywords": ["google", "sheets", "spreadsheets", "excel"],
     "logos": {
       "small": "img/sheets.svg",
       "large": "img/sheets.svg"

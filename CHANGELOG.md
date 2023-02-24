@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## v1.1.6
+
 - Fix: Don't panic when the user selects a range of empty cells.
 
 ## v1.1.5
@@ -10,25 +11,31 @@ All notable changes to this project will be documented in this file.
 - **Chore**: Update to Golang 1.19 #160
 
 ## v1.1.4
+
 - Fix: deprecated link variant button for v9
 
 ## v1.1.3
+
 - Bump grafana dependencies to 8.3.4
 
 ## v1.1.2
+
 - Change release pipeline
 
 ## v1.1.1
+
 - Targeting Grafana 8.1+
 - Documentation and link fixes
 - Add explicit explanation to the auth constraint
 
 ## v1.1.0
+
 - Targeting Grafana 7.2+
 - Adding support for annotations
 - Include arm builds
 
 ## v1.0.0
+
 - Works with Grafana 7+
 - Avoid crashing on unknown timezone (#69)
 - improved support for formula values
