@@ -11,6 +11,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
 	"google.golang.org/api/sheets/v4"
@@ -22,7 +23,7 @@ type GoogleSheets struct {
 }
 
 // Query queries a spreadsheet and returns a corresponding data frame.
-func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config *models.DatasourceSettings, timeRange backend.TimeRange) (dr backend.DataResponse) {
+func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config models.DatasourceSettings, timeRange backend.TimeRange) (dr backend.DataResponse) {
 	client, err := NewGoogleClient(ctx, config)
 	if err != nil {
 		dr.Error = fmt.Errorf("unable to create Google API client: %w", err)
@@ -64,7 +65,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 }
 
 // GetSpreadsheets gets spreadsheets from the Google API.
-func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *models.DatasourceSettings) (map[string]string, error) {
+func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config models.DatasourceSettings) (map[string]string, error) {
 	client, err := NewGoogleClient(ctx, config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Google API client: %w", err)
@@ -101,7 +102,7 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 	if result.Properties.TimeZone != "" {
 		loc, err := time.LoadLocation(result.Properties.TimeZone)
 		if err != nil {
-			backend.Logger.Warn("could not load timezone from spreadsheet: %w", err)
+			log.DefaultLogger.Warn("could not load timezone from spreadsheet: %w", err)
 		} else {
 			time.Local = loc
 		}
@@ -146,13 +147,13 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		if column.HasMixedTypes() {
 			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
 			warnings = append(warnings, warning)
-			backend.Logger.Warn(warning)
+			log.DefaultLogger.Warn(warning)
 		}
 
 		if column.HasMixedUnits() {
 			warning := fmt.Sprintf("Multiple units found in column %q. Formatted value will be used", column.Header)
 			warnings = append(warnings, warning)
-			backend.Logger.Warn(warning)
+			log.DefaultLogger.Warn(warning)
 		}
 	}
 
@@ -178,7 +179,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
 	frame.Meta = &data.FrameMeta{Custom: meta}
-	backend.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
+	log.DefaultLogger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
 	return frame, nil
 }
 
