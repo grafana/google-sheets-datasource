@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
@@ -44,7 +45,9 @@ func LoadSettings(ctx backend.PluginContext) (*DatasourceSettings, error) {
 
 		model.PrivateKey = privateKey
 	} else {
-		model.PrivateKey = settings.DecryptedSecureJSONData["privateKey"]
+		privateKey := settings.DecryptedSecureJSONData["privateKey"]
+		// React might escape newline characters like this \\n so we need to handle that
+		model.PrivateKey = strings.ReplaceAll(privateKey, "\\n", "\n")
 	}
 
 	model.APIKey = settings.DecryptedSecureJSONData["apiKey"]
