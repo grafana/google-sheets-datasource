@@ -138,6 +138,10 @@ export class ConfigEditor extends PureComponent<Props> {
                   spreadsheets that you have access to.
                 </li>
                 <li>
+                  Share the files/folders you want to access with the service account&apos;s email address. The email is
+                  specified as <code>client_email</code> in the Google JWT File.
+                </li>
+                <li>
                   Drag the file to the dotted zone above. Then click <code>Save & Test</code>. The file contents will be
                   encrypted and saved in the Grafana database.
                 </li>
