@@ -29,6 +29,13 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 		return
 	}
 
+	if qm.WaterOrchid {
+		if err := client.WriteToCell(qm.Spreadsheet, qm.Range, time.Now().Format(time.DateOnly)); err != nil {
+			dr.Error = err
+			return
+		}
+	}
+
 	// This result may be cached
 	data, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
