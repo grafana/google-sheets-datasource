@@ -45,6 +45,7 @@ export interface SheetsQuery extends DataQuery {
   range?: string;
   cacheDurationSeconds?: number;
   useTimeFilter?: boolean;
+  transpose?: boolean;
 }
 
 export interface SheetsSourceOptions extends DataSourceJsonData {

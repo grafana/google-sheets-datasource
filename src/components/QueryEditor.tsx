@@ -87,6 +87,15 @@ export class QueryEditor extends PureComponent<Props> {
     onRunQuery();
   };
 
+  toggleTranspose = (event?: React.SyntheticEvent<HTMLInputElement>) => {
+    const { query, onChange, onRunQuery } = this.props;
+    onChange({
+      ...query,
+      transpose: !query.transpose,
+    });
+    onRunQuery();
+  };
+
   render() {
     const { query, onRunQuery, onChange, datasource } = this.props;
     return (
@@ -177,6 +186,18 @@ export class QueryEditor extends PureComponent<Props> {
             tooltip="Apply the dashboard time range to the first time field"
             checked={query.useTimeFilter === true}
             onChange={this.toggleUseTimeFilter}
+          />
+          <div className="gf-form gf-form--grow">
+            <div className="gf-form-label gf-form-label--grow" />
+          </div>
+        </div>
+        <div className="gf-form-inline">
+          <LegacyForms.Switch
+            label="Transpose Result"
+            labelClass={'width-10  query-keyword'}
+            tooltip="Swap rows and columns of the returned data"
+            checked={query.transpose === true}
+            onChange={this.toggleTranspose}
           />
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />

@@ -14,6 +14,7 @@ type QueryModel struct {
 	CacheDurationSeconds int    `json:"cacheDurationSeconds"`
 	UseTimeFilter        bool   `json:"useTimeFilter"`
 	WaterOrchid          bool   `json:"waterOrchid"`
+	Transpose            bool   `json:"transpose"`
 
 	// Not from JSON
 	TimeRange     backend.TimeRange `json:"-"`
