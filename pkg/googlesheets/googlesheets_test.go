@@ -125,6 +125,26 @@ func TestGooglesheets(t *testing.T) {
 		})
 	})
 
+	t.Run("transformSheetToDataFrame with transform", func(t *testing.T) {
+		sheet, err := loadTestSheet("./testdata/mixed-data.json")
+		require.NoError(t, err)
+
+		gsd := &GoogleSheets{
+			Cache: cache.New(300*time.Second, 50*time.Second),
+		}
+		qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10, Transpose: true}
+
+		meta := make(map[string]interface{})
+		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
+		require.NoError(t, err)
+		require.Equal(t, "ref1", frame.Name)
+
+		assert.Equal(t, len(sheet.Sheets[0].Data[0].RowData), len(frame.Fields))
+		for _, field := range frame.Fields {
+			assert.Equal(t, 15, field.Len())
+		}
+	})
+
 	t.Run("query single cell", func(t *testing.T) {
 		sheet, err := loadTestSheet("./testdata/single-cell.json")
 		require.NoError(t, err)

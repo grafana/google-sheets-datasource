@@ -116,7 +116,12 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 }
 
 func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {
-	columns, start := getColumnDefinitions(sheet.RowData)
+	rowData := sheet.RowData
+	if qm.Transpose {
+		rowData = flipSheet(rowData)
+	}
+
+	columns, start := getColumnDefinitions(rowData)
 	warnings := []string{}
 
 	converters := make([]data.FieldConverter, len(columns))
@@ -128,7 +133,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		converters[i] = fc
 	}
 
-	inputConverter, err := data.NewFrameInputConverter(converters, len(sheet.RowData)-start)
+	inputConverter, err := data.NewFrameInputConverter(converters, len(rowData)-start)
 	if err != nil {
 		return nil, err
 	}
@@ -156,8 +161,8 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		}
 	}
 
-	for rowIndex := start; rowIndex < len(sheet.RowData); rowIndex++ {
-		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
+	for rowIndex := start; rowIndex < len(rowData); rowIndex++ {
+		for columnIndex, cellData := range rowData[rowIndex].Values {
 			if columnIndex >= len(columns) {
 				continue
 			}
@@ -180,6 +185,33 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	frame.Meta = &data.FrameMeta{Custom: meta}
 	backend.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
 	return frame, nil
+}
+
+func flipSheet(sheet []*sheets.RowData) []*sheets.RowData {
+	if len(sheet) == 0 {
+		return []*sheets.RowData{}
+	}
+
+	valuesLen := len(sheet[0].Values)
+	for rowIndex := 0; rowIndex < len(sheet); rowIndex++ {
+		if len(sheet[rowIndex].Values) > valuesLen {
+			valuesLen = len(sheet[rowIndex].Values)
+		}
+	}
+
+	flippedSheet := make([]*sheets.RowData, valuesLen)
+	for columnIndex := 0; columnIndex < valuesLen; columnIndex++ {
+		flippedSheet[columnIndex] = &sheets.RowData{}
+		flippedSheet[columnIndex].Values = make([]*sheets.CellData, len(sheet))
+	}
+
+	for rowIndex := 0; rowIndex < len(sheet); rowIndex++ {
+		for columnIndex, cellData := range sheet[rowIndex].Values {
+			flippedSheet[columnIndex].Values[rowIndex] = cellData
+		}
+	}
+
+	return flippedSheet
 }
 
 // timeConverter handles sheets TIME column types.

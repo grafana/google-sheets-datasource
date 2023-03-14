@@ -13,6 +13,7 @@ type QueryModel struct {
 	Range                string `json:"range"`
 	CacheDurationSeconds int    `json:"cacheDurationSeconds"`
 	UseTimeFilter        bool   `json:"useTimeFilter"`
+	Transpose            bool   `json:"transpose"`
 
 	// Not from JSON
 	TimeRange     backend.TimeRange `json:"-"`
