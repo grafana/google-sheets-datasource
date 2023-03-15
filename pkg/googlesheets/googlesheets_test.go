@@ -16,7 +16,7 @@ import (
 type fakeClient struct {
 }
 
-func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
+func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRanges []string, includeGridData bool) (*sheets.Spreadsheet, error) {
 	return loadTestSheet("./testdata/mixed-data.json")
 }
 
@@ -56,7 +56,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
+			qm := models.QueryModel{RawRange: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
 			_, meta, err := gsd.getSheetData(client, &qm)
@@ -75,7 +75,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 0}
+			qm := models.QueryModel{RawRange: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 0}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
 			_, meta, err := gsd.getSheetData(client, &qm)
@@ -93,7 +93,7 @@ func TestGooglesheets(t *testing.T) {
 		gsd := &GoogleSheets{
 			Cache: cache.New(300*time.Second, 50*time.Second),
 		}
-		qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
+		qm := models.QueryModel{RawRange: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
 		meta := make(map[string]interface{})
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
@@ -112,7 +112,7 @@ func TestGooglesheets(t *testing.T) {
 
 		t.Run("meta is populated correctly", func(t *testing.T) {
 			assert.Equal(t, qm.Spreadsheet, meta["spreadsheetId"])
-			assert.Equal(t, qm.Range, meta["range"])
+			assert.Equal(t, qm.RawRange, meta["range"])
 		})
 
 		t.Run("meta warnings field is populated correctly", func(t *testing.T) {
@@ -132,7 +132,7 @@ func TestGooglesheets(t *testing.T) {
 		gsd := &GoogleSheets{
 			Cache: cache.New(300*time.Second, 50*time.Second),
 		}
-		qm := models.QueryModel{Range: "A2", Spreadsheet: "someId", CacheDurationSeconds: 10}
+		qm := models.QueryModel{RawRange: "A2", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
 		meta := make(map[string]interface{})
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)

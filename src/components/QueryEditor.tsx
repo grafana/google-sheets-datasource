@@ -136,7 +136,7 @@ export class QueryEditor extends PureComponent<Props> {
               </p>
             }
           >
-            Range
+            Ranges
           </InlineFormLabel>
           <input
             className="gf-form-input width-14"

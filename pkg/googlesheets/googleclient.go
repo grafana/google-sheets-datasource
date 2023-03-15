@@ -3,7 +3,6 @@ package googlesheets
 import (
 	"context"
 	"fmt"
-
 	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
@@ -19,7 +18,7 @@ type GoogleClient struct {
 }
 
 type client interface {
-	GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error)
+	GetSpreadsheet(spreadSheetID string, sheetRanges []string, includeGridData bool) (*sheets.Spreadsheet, error)
 }
 
 // NewGoogleClient creates a new client and initializes a sheet service and a drive service
@@ -57,11 +56,12 @@ func (gc *GoogleClient) TestClient() error {
 }
 
 // GetSpreadsheet gets a google spreadsheet struct by id and range
-func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
+func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRanges []string, includeGridData bool) (*sheets.Spreadsheet, error) {
 	req := gc.sheetsService.Spreadsheets.Get(spreadSheetID)
-	if len(sheetRange) > 0 {
-		req = req.Ranges(sheetRange)
+	if len(sheetRanges) > 0 {
+		req = req.Ranges(sheetRanges...)
 	}
+
 	return req.IncludeGridData(true).Do()
 }
 
