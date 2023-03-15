@@ -141,7 +141,7 @@ func TestGooglesheets(t *testing.T) {
 
 		assert.Equal(t, len(sheet.Sheets[0].Data[0].RowData), len(frame.Fields))
 		for _, field := range frame.Fields {
-			assert.Equal(t, 15, field.Len())
+			assert.Equal(t, len(sheet.Sheets[0].Data[0].RowData[0].Values)-1, field.Len())
 		}
 	})
 

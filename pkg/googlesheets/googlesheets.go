@@ -175,7 +175,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 			}
 
 			// Skip any empty values
-			if cellData.FormattedValue == "" {
+			if cellData == nil || cellData.FormattedValue == "" {
 				continue
 			}
 
@@ -217,7 +217,6 @@ func flipSheet(sheet []*sheets.RowData) []*sheets.RowData {
 			flippedSheet[columnIndex].Values[rowIndex] = cellData
 		}
 	}
-
 	return flippedSheet
 }
 
@@ -303,7 +302,11 @@ func getColumnDefinitions(rows []*sheets.RowData) ([]*ColumnDefinition, int) {
 	if len(rows) > 1 {
 		start = 1
 		for columnIndex, headerCell := range headerRow {
-			name := getUniqueColumnName(strings.TrimSpace(headerCell.FormattedValue), columnIndex, columnMap)
+			name := ""
+			if headerCell != nil {
+				name = strings.TrimSpace(headerCell.FormattedValue)
+			}
+			name = getUniqueColumnName(name, columnIndex, columnMap)
 			columnMap[name] = true
 			columns = append(columns, NewColumnDefinition(name, columnIndex))
 		}
