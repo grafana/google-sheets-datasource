@@ -6,7 +6,7 @@
   "id": "grafana-googlesheets-datasource",
 
   "backend": true,
-  "executable": "gfx_sheets",
+  "executable": "gpx_sheets",
   "metrics": true,
   "annotations": true,
 
