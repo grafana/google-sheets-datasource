@@ -20,7 +20,7 @@ type GoogleClient struct {
 }
 
 type client interface {
-	GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error)
+	GetSpreadsheet(spreadSheetID string, sheetRanges []string, includeGridData bool) (*sheets.Spreadsheet, error)
 	WriteToCell(spreadsheetID, sheetRange, newValue string) error
 }
 
@@ -76,11 +76,12 @@ func (gc *GoogleClient) TestClient() error {
 }
 
 // GetSpreadsheet gets a google spreadsheet struct by id and range
-func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
+func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRanges []string, includeGridData bool) (*sheets.Spreadsheet, error) {
 	req := gc.sheetsReadOnlyService.Spreadsheets.Get(spreadSheetID)
-	if len(sheetRange) > 0 {
-		req = req.Ranges(sheetRange)
+	if len(sheetRanges) > 0 {
+		req = req.Ranges(sheetRanges...)
 	}
+
 	return req.IncludeGridData(true).Do()
 }
 
