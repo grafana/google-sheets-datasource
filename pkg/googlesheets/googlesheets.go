@@ -38,15 +38,42 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 	}
 
 	// This result may be cached
-	data, meta, err := gs.getSheetData(client, qm)
+	multipleData, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
 		dr.Error = err
 		return
 	}
 
 	var rowData []*sheets.RowData
-	for _, d := range data {
-		rowData = append(rowData, d.RowData...)
+	var indexOfDataWithLongestRow int
+	if qm.Transpose {
+		var longest int
+		for i, d := range multipleData {
+			if len(d.RowData) > longest {
+				longest = len(d.RowData)
+				indexOfDataWithLongestRow = i
+			}
+		}
+
+		resultingRowData := make([]*sheets.RowData, longest)
+		for i, r := range multipleData[indexOfDataWithLongestRow].RowData {
+			resultingRowData[i] = r
+		}
+		for i, d := range multipleData {
+			if i == indexOfDataWithLongestRow {
+				continue
+			}
+			for j, r := range d.RowData {
+				resultingRowData[j].Values = append(resultingRowData[j].Values, r.Values...)
+			}
+		}
+
+		rowData = flipSheet(resultingRowData)
+	} else {
+		for _, d := range multipleData {
+			rowData = append(rowData, d.RowData...)
+		}
+
 	}
 
 	frame, err := gs.transformSheetToDataFrame(rowData, meta, refID, qm)
@@ -129,10 +156,6 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) ([]*s
 }
 
 func (gs *GoogleSheets) transformSheetToDataFrame(rowData []*sheets.RowData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {
-	if qm.Transpose {
-		rowData = flipSheet(rowData)
-	}
-
 	columns, start := getColumnDefinitions(rowData)
 	warnings := []string{}
 
