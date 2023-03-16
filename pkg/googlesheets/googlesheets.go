@@ -31,7 +31,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 
 	if qm.WaterOrchid {
 		// note that it takes in the raw range here since we pass it in from the button panel
-		if err := client.WriteToCell(qm.Spreadsheet, qm.RawRange, time.Now().Format(time.DateOnly)); err != nil {
+		if err := client.WriteToCell(qm.Spreadsheet, qm.RawRange, time.Now().Format("2006-01-02")); err != nil { // TODO: time.DateOnly in go 1.20
 			dr.Error = err
 			return
 		}
