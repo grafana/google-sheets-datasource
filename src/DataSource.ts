@@ -1,10 +1,10 @@
-import { DataSourceInstanceSettings, SelectableValue, ScopedVars } from '@grafana/data';
+import { DataSourceInstanceSettings, SelectableValue, ScopedVars, CoreApp } from '@grafana/data';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 
 import { SheetsQuery, SheetsSourceOptions } from './types';
 
 export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceOptions> {
-  constructor(instanceSettings: DataSourceInstanceSettings<SheetsSourceOptions>) {
+  constructor(private instanceSettings: DataSourceInstanceSettings<SheetsSourceOptions>) {
     super(instanceSettings);
   }
 
@@ -27,5 +27,9 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
         ? Object.entries(spreadsheets).map(([value, label]) => ({ label, value } as SelectableValue<string>))
         : []
     );
+  }
+
+  getDefaultQuery(app: CoreApp): Partial<SheetsQuery> {
+    return { spreadsheet: this.instanceSettings.jsonData.defaultSheetID };
   }
 }
