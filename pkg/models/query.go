@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
@@ -10,10 +11,12 @@ import (
 // QueryModel represents a spreadsheet query.
 type QueryModel struct {
 	Spreadsheet          string `json:"spreadsheet"`
-	Range                string `json:"range"`
-	CacheDurationSeconds int    `json:"cacheDurationSeconds"`
-	UseTimeFilter        bool   `json:"useTimeFilter"`
-	Transpose            bool   `json:"transpose"`
+	RawRange             string `json:"range"`
+	ParsedRange          []string
+	CacheDurationSeconds int  `json:"cacheDurationSeconds"`
+	UseTimeFilter        bool `json:"useTimeFilter"`
+	WaterOrchid          bool `json:"waterOrchid"`
+	Transpose            bool `json:"transpose"`
 
 	// Not from JSON
 	TimeRange     backend.TimeRange `json:"-"`
@@ -32,5 +35,10 @@ func GetQueryModel(query backend.DataQuery) (*QueryModel, error) {
 	// Copy directly from the well typed query
 	model.TimeRange = query.TimeRange
 	model.MaxDataPoints = query.MaxDataPoints
+
+	if model.RawRange != "" {
+		model.ParsedRange = strings.Split(model.RawRange, ",") // TODO: what about sheets with a comma in the name
+	}
+
 	return model, nil
 }

@@ -3,8 +3,8 @@ package googlesheets
 import (
 	"context"
 	"fmt"
-
 	"github.com/grafana/google-sheets-datasource/pkg/models"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
@@ -13,18 +13,36 @@ import (
 
 // GoogleClient struct
 type GoogleClient struct {
-	sheetsService *sheets.Service
-	driveService  *drive.Service
-	auth          *models.DatasourceSettings
+	sheetsWriteService    *sheets.Service
+	sheetsReadOnlyService *sheets.Service
+	driveService          *drive.Service
+	auth                  *models.DatasourceSettings
 }
 
 type client interface {
-	GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error)
+	GetSpreadsheet(spreadSheetID string, sheetRanges []string, includeGridData bool) (*sheets.Spreadsheet, error)
+	WriteToCell(spreadsheetID, sheetRange, newValue string) error
+}
+
+func (gc *GoogleClient) WriteToCell(spreadsheetID, sheetRange, newValue string) error {
+	resp, err := gc.sheetsWriteService.Spreadsheets.Values.Update(spreadsheetID, sheetRange, &sheets.ValueRange{
+		Range:  sheetRange,
+		Values: [][]interface{}{{newValue}},
+	}).ValueInputOption("USER_ENTERED").Context(context.Background()).Do()
+
+	backend.Logger.Info("resp", resp.UpdatedRange)
+
+	return err
 }
 
 // NewGoogleClient creates a new client and initializes a sheet service and a drive service
 func NewGoogleClient(ctx context.Context, auth *models.DatasourceSettings) (*GoogleClient, error) {
-	sheetsService, err := createSheetsService(ctx, auth)
+	sheetsReadAndWriteService, err := createSheetsService(ctx, auth, sheets.SpreadsheetsScope)
+	if err != nil {
+		return nil, err
+	}
+
+	sheetsReadOnlyService, err := createSheetsService(ctx, auth, sheets.SpreadsheetsReadonlyScope)
 	if err != nil {
 		return nil, err
 	}
@@ -35,9 +53,10 @@ func NewGoogleClient(ctx context.Context, auth *models.DatasourceSettings) (*Goo
 	}
 
 	return &GoogleClient{
-		sheetsService: sheetsService,
-		driveService:  driveService,
-		auth:          auth,
+		sheetsWriteService:    sheetsReadAndWriteService,
+		sheetsReadOnlyService: sheetsReadOnlyService,
+		driveService:          driveService,
+		auth:                  auth,
 	}, nil
 }
 
@@ -57,11 +76,12 @@ func (gc *GoogleClient) TestClient() error {
 }
 
 // GetSpreadsheet gets a google spreadsheet struct by id and range
-func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
-	req := gc.sheetsService.Spreadsheets.Get(spreadSheetID)
-	if len(sheetRange) > 0 {
-		req = req.Ranges(sheetRange)
+func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRanges []string, includeGridData bool) (*sheets.Spreadsheet, error) {
+	req := gc.sheetsReadOnlyService.Spreadsheets.Get(spreadSheetID)
+	if len(sheetRanges) > 0 {
+		req = req.Ranges(sheetRanges...)
 	}
+
 	return req.IncludeGridData(true).Do()
 }
 
@@ -89,7 +109,7 @@ func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 	return fs, nil
 }
 
-func createSheetsService(ctx context.Context, auth *models.DatasourceSettings) (*sheets.Service, error) {
+func createSheetsService(ctx context.Context, auth *models.DatasourceSettings, scope string) (*sheets.Service, error) {
 	if len(auth.AuthType) == 0 {
 		return nil, fmt.Errorf("missing AuthType setting")
 	}
@@ -103,8 +123,7 @@ func createSheetsService(ctx context.Context, auth *models.DatasourceSettings) (
 
 	if auth.AuthType == "jwt" {
 		jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT),
-			// Only need readonly access to spreadsheets (and drive?)
-			"https://www.googleapis.com/auth/spreadsheets.readonly")
+			scope)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing JWT file: %w", err)
 		}

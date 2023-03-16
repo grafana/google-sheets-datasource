@@ -29,6 +29,14 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 		return
 	}
 
+	if qm.WaterOrchid {
+		// note that it takes in the raw range here since we pass it in from the button panel
+		if err := client.WriteToCell(qm.Spreadsheet, qm.RawRange, time.Now().Format(time.DateOnly)); err != nil {
+			dr.Error = err
+			return
+		}
+	}
+
 	// This result may be cached
 	data, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
@@ -36,7 +44,12 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 		return
 	}
 
-	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
+	var rowData []*sheets.RowData
+	for _, d := range data {
+		rowData = append(rowData, d.RowData...)
+	}
+
+	frame, err := gs.transformSheetToDataFrame(rowData, meta, refID, qm)
 	if err != nil {
 		dr.Error = err
 		return
@@ -59,6 +72,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 			})
 		}
 	}
+
 	dr.Frames = append(dr.Frames, frame)
 	return
 }
@@ -84,16 +98,16 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *models.Data
 }
 
 // getSheetData gets grid data corresponding to a spreadsheet.
-func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*sheets.GridData, map[string]interface{}, error) {
-	cacheKey := qm.Spreadsheet + qm.Range
+func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) ([]*sheets.GridData, map[string]interface{}, error) {
+	cacheKey := qm.Spreadsheet + strings.Join(qm.ParsedRange, ",")
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
-		return item.(*sheets.GridData), map[string]interface{}{
+		return item.([]*sheets.GridData), map[string]interface{}{
 			"hit":     true,
 			"expires": expires.Unix(),
 		}, nil
 	}
 
-	result, err := client.GetSpreadsheet(qm.Spreadsheet, qm.Range, true)
+	result, err := client.GetSpreadsheet(qm.Spreadsheet, qm.ParsedRange, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -107,16 +121,14 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 		}
 	}
 
-	data := result.Sheets[0].Data[0]
 	if qm.CacheDurationSeconds > 0 {
-		gs.Cache.Set(cacheKey, data, time.Duration(qm.CacheDurationSeconds)*time.Second)
+		gs.Cache.Set(cacheKey, result.Sheets[0].Data, time.Duration(qm.CacheDurationSeconds)*time.Second)
 	}
 
-	return data, map[string]interface{}{"hit": false}, nil
+	return result.Sheets[0].Data, map[string]interface{}{"hit": false}, nil
 }
 
-func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {
-	rowData := sheet.RowData
+func (gs *GoogleSheets) transformSheetToDataFrame(rowData []*sheets.RowData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {
 	if qm.Transpose {
 		rowData = flipSheet(rowData)
 	}
@@ -181,7 +193,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 
 	meta["warnings"] = warnings
 	meta["spreadsheetId"] = qm.Spreadsheet
-	meta["range"] = qm.Range
+	meta["range"] = qm.RawRange
 	frame.Meta = &data.FrameMeta{Custom: meta}
 	backend.Logger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
 	return frame, nil
