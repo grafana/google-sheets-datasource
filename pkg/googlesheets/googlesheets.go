@@ -193,7 +193,15 @@ func flipSheet(sheet []*sheets.RowData) []*sheets.RowData {
 	}
 
 	valuesLen := len(sheet[0].Values)
+	var lastRowWithValuesIndex int
 	for rowIndex := 0; rowIndex < len(sheet); rowIndex++ {
+		for _, v := range sheet[rowIndex].Values {
+			// sheets can trail with empty rows; this will truncate them so that empty columns are not formed in a "Transpose"
+			if v.FormattedValue != "" {
+				lastRowWithValuesIndex = rowIndex
+				break
+			}
+		}
 		if len(sheet[rowIndex].Values) > valuesLen {
 			valuesLen = len(sheet[rowIndex].Values)
 		}
@@ -202,10 +210,10 @@ func flipSheet(sheet []*sheets.RowData) []*sheets.RowData {
 	flippedSheet := make([]*sheets.RowData, valuesLen)
 	for columnIndex := 0; columnIndex < valuesLen; columnIndex++ {
 		flippedSheet[columnIndex] = &sheets.RowData{}
-		flippedSheet[columnIndex].Values = make([]*sheets.CellData, len(sheet))
+		flippedSheet[columnIndex].Values = make([]*sheets.CellData, lastRowWithValuesIndex+1)
 	}
 
-	for rowIndex := 0; rowIndex < len(sheet); rowIndex++ {
+	for rowIndex := 0; rowIndex < lastRowWithValuesIndex+1; rowIndex++ {
 		for columnIndex, cellData := range sheet[rowIndex].Values {
 			flippedSheet[columnIndex].Values[rowIndex] = cellData
 		}
