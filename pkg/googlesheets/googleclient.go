@@ -24,6 +24,7 @@ type client interface {
 	WriteToCell(spreadsheetID, sheetRange, newValue string) error
 }
 
+// WriteToCell updates one cell with one new value
 func (gc *GoogleClient) WriteToCell(spreadsheetID, sheetRange, newValue string) error {
 	resp, err := gc.sheetsWriteService.Spreadsheets.Values.Update(spreadsheetID, sheetRange, &sheets.ValueRange{
 		Range:  sheetRange,
