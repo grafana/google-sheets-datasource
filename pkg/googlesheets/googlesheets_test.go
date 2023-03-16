@@ -192,3 +192,11 @@ func TestGooglesheets(t *testing.T) {
 		require.Equal(t, "AJIL", getExcelColumnName(24582))
 	})
 }
+
+// TODO: finish this test
+func Test_flipSheet(t *testing.T) {
+	sheet, err := loadTestSheet("./testdata/transpose-with-empty-rows.json")
+	require.NoError(t, err)
+
+	flipSheet(sheet.Sheets[0].Data[0].RowData)
+}

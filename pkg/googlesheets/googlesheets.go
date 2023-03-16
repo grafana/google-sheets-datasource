@@ -31,7 +31,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 
 	if qm.WaterOrchid {
 		// note that it takes in the raw range here since we pass it in from the button panel
-		if err := client.WriteToCell(qm.Spreadsheet, qm.RawRange, time.Now().Format(time.DateOnly)); err != nil {
+		if err := client.WriteToCell(qm.Spreadsheet, qm.RawRange, time.Now().Format("2006-01-02")); err != nil { // TODO: time.DateOnly in go 1.20
 			dr.Error = err
 			return
 		}
@@ -205,7 +205,15 @@ func flipSheet(sheet []*sheets.RowData) []*sheets.RowData {
 	}
 
 	valuesLen := len(sheet[0].Values)
+	var lastRowWithValuesIndex int
 	for rowIndex := 0; rowIndex < len(sheet); rowIndex++ {
+		for _, v := range sheet[rowIndex].Values {
+			// sheets can trail with empty rows; this will truncate them so that empty columns are not formed in a "Transpose"
+			if v.FormattedValue != "" {
+				lastRowWithValuesIndex = rowIndex
+				break
+			}
+		}
 		if len(sheet[rowIndex].Values) > valuesLen {
 			valuesLen = len(sheet[rowIndex].Values)
 		}
@@ -214,10 +222,10 @@ func flipSheet(sheet []*sheets.RowData) []*sheets.RowData {
 	flippedSheet := make([]*sheets.RowData, valuesLen)
 	for columnIndex := 0; columnIndex < valuesLen; columnIndex++ {
 		flippedSheet[columnIndex] = &sheets.RowData{}
-		flippedSheet[columnIndex].Values = make([]*sheets.CellData, len(sheet))
+		flippedSheet[columnIndex].Values = make([]*sheets.CellData, lastRowWithValuesIndex+1)
 	}
 
-	for rowIndex := 0; rowIndex < len(sheet); rowIndex++ {
+	for rowIndex := 0; rowIndex < lastRowWithValuesIndex+1; rowIndex++ {
 		for columnIndex, cellData := range sheet[rowIndex].Values {
 			flippedSheet[columnIndex].Values[rowIndex] = cellData
 		}
