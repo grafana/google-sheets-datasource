@@ -47,7 +47,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 	var rowData []*sheets.RowData
 	if qm.Transpose {
 		resultingRowData := combineHorizontally(allData)
-		rowData = flipSheet(resultingRowData)
+		rowData = flipRowsAndColumns(resultingRowData)
 	} else {
 		// combines sets of data in a way that increases their height: imagine combining 2 rows lengthwise to create one taller row of height 2
 		for _, d := range allData {
@@ -226,7 +226,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(rowData []*sheets.RowData, met
 	return frame, nil
 }
 
-func flipSheet(sheet []*sheets.RowData) []*sheets.RowData {
+func flipRowsAndColumns(sheet []*sheets.RowData) []*sheets.RowData {
 	if len(sheet) == 0 {
 		return []*sheets.RowData{}
 	}

@@ -17,7 +17,7 @@ type fakeClient struct {
 }
 
 func (f *fakeClient) WriteToCell(spreadsheetID, sheetRange, newValue string) error {
-	//TODO implement me
+	//TODO: write test for WriteToCell
 	panic("implement me")
 }
 
@@ -130,26 +130,6 @@ func TestGooglesheets(t *testing.T) {
 		})
 	})
 
-	t.Run("transformSheetToDataFrame with transform", func(t *testing.T) {
-		sheet, err := loadTestSheet("./testdata/mixed-data.json")
-		require.NoError(t, err)
-
-		gsd := &GoogleSheets{
-			Cache: cache.New(300*time.Second, 50*time.Second),
-		}
-		qm := models.QueryModel{RawRange: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10, Transpose: true}
-
-		meta := make(map[string]interface{})
-		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0].RowData, meta, "ref1", &qm)
-		require.NoError(t, err)
-		require.Equal(t, "ref1", frame.Name)
-
-		assert.Equal(t, len(sheet.Sheets[0].Data[0].RowData), len(frame.Fields))
-		for _, field := range frame.Fields {
-			assert.Equal(t, len(sheet.Sheets[0].Data[0].RowData[0].Values)-1, field.Len())
-		}
-	})
-
 	t.Run("query single cell", func(t *testing.T) {
 		sheet, err := loadTestSheet("./testdata/single-cell.json")
 		require.NoError(t, err)
@@ -193,10 +173,53 @@ func TestGooglesheets(t *testing.T) {
 	})
 }
 
-// TODO: finish this test
-func Test_flipSheet(t *testing.T) {
+func Test_flipRowsAndColumns(t *testing.T) {
+	// Original input
+	/*
+		| Scientific name    | Descriptive name | Days until needing water |   |
+		| IKEA phalaenopsis  | tall red         |                        1 |   |
+		|                    |                  |                          |   |
+		| brown phalaenopsis | brown pot        |                        3 |   |
+		|                    |                  |                          |   |
+	*/
+
+	// Flipped result
+	/*
+		| Scientific name          | IKEA phalaenopsis |   | brown phalaenopsis |
+		| Descriptive name         | tall red          |   | brown pot          |
+		| Days until needing water |                 1 |   |                  3 |
+		|                          |                   |   |                    |
+	*/
+
 	sheet, err := loadTestSheet("./testdata/transpose-with-empty-rows.json")
 	require.NoError(t, err)
 
-	flipSheet(sheet.Sheets[0].Data[0].RowData)
+	flippedRows := flipRowsAndColumns(sheet.Sheets[0].Data[0].RowData)
+
+	assert.Len(t, flippedRows, 4)           // number of rows. flipRowsAndColumns cuts off trailing empty rows, but leaves any sandwiched empty rows untouched
+	assert.Len(t, flippedRows[0].Values, 4) // number of columns
+
+	// 1st row
+	assert.Equal(t, "Scientific name", flippedRows[0].Values[0].FormattedValue)
+	assert.Equal(t, "IKEA phalaenopsis", flippedRows[0].Values[1].FormattedValue)
+	assert.Equal(t, "", flippedRows[0].Values[2].FormattedValue)
+	assert.Equal(t, "brown phalaenopsis", flippedRows[0].Values[3].FormattedValue)
+
+	// 2nd row
+	assert.Equal(t, "Descriptive name", flippedRows[1].Values[0].FormattedValue)
+	assert.Equal(t, "tall red", flippedRows[1].Values[1].FormattedValue)
+	assert.Equal(t, "", flippedRows[1].Values[2].FormattedValue)
+	assert.Equal(t, "brown pot", flippedRows[1].Values[3].FormattedValue)
+
+	// 3rd row
+	assert.Equal(t, "Days until needing water", flippedRows[2].Values[0].FormattedValue)
+	assert.Equal(t, "1", flippedRows[2].Values[1].FormattedValue)
+	assert.Equal(t, "", flippedRows[2].Values[2].FormattedValue)
+	assert.Equal(t, "3", flippedRows[2].Values[3].FormattedValue)
+
+	// 4th row
+	assert.Equal(t, "", flippedRows[3].Values[0].FormattedValue)
+	assert.Equal(t, "", flippedRows[3].Values[1].FormattedValue)
+	assert.Equal(t, "", flippedRows[3].Values[2].FormattedValue)
+	assert.Equal(t, "", flippedRows[3].Values[3].FormattedValue)
 }
