@@ -139,7 +139,7 @@ export class QueryEditor extends PureComponent<Props> {
             className="query-keyword"
             tooltip={
               <p>
-                A string like <code>Sheet1!A1:B2</code>, that refers to a group of cells in the spreadsheet, and is
+                A string like <code>Sheet1!A1:B2,Sheet1!G2:G13</code>, that refers to a group of cells in the spreadsheet, and is
                 typically used in formulas. Named ranges are also supported. When a named range conflicts with a
                 sheet&rsquo;s name, the named range is preferred.
               </p>
