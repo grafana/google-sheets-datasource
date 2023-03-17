@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { LegacyForms, Select, InlineFormLabel } from '@grafana/ui';
+import { LegacyForms, Select, InlineFormLabel, SegmentAsync } from '@grafana/ui';
 import {
   DataSourcePluginOptionsEditorProps,
   onUpdateDatasourceSecureJsonDataOption,
@@ -7,6 +7,8 @@ import {
 } from '@grafana/data';
 import { SheetsSourceOptions, GoogleSheetsSecureJsonData, GoogleAuthType, googleAuthTypes } from '../types';
 import { JWTConfig } from './';
+import { getDataSourceSrv } from '@grafana/runtime';
+import { DataSource } from 'DataSource';
 
 export type Props = DataSourcePluginOptionsEditorProps<SheetsSourceOptions, GoogleSheetsSecureJsonData>;
 
@@ -24,6 +26,16 @@ export class ConfigEditor extends PureComponent<Props> {
         apiKey: false,
       },
     });
+  };
+
+  loadSheetIDs = async () => {
+    const { options } = this.props;
+    try {
+      const ds = (await getDataSourceSrv().get(options.uid)) as DataSource;
+      return ds.getSpreadSheets();
+    } catch {
+      return [];
+    }
   };
 
   render() {
@@ -172,6 +184,26 @@ export class ConfigEditor extends PureComponent<Props> {
               </ol>
             </>
           )}
+        </div>
+        <div className="gf-form">
+          <InlineFormLabel
+            className="width-10"
+            tooltip="The ID of a default google sheet. The datasource must be saved before this can be set."
+          >
+            Default Spreadsheet ID
+          </InlineFormLabel>
+          <SegmentAsync
+            className="width-30"
+            loadOptions={() => this.loadSheetIDs()}
+            placeholder="Select Spreadsheet ID"
+            value={jsonData.defaultSheetID}
+            allowCustomValue={true}
+            onChange={onUpdateDatasourceJsonDataOptionSelect(this.props, 'defaultSheetID')}
+            disabled={
+              (jsonData.authType === GoogleAuthType.KEY && (!secureJsonFields || !secureJsonFields.apiKey)) ||
+              (jsonData.authType === GoogleAuthType.JWT && (!secureJsonFields || !secureJsonFields.jwt))
+            }
+          />
         </div>
       </div>
     );

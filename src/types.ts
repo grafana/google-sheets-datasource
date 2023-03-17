@@ -50,6 +50,7 @@ export interface SheetsQuery extends DataQuery {
 
 export interface SheetsSourceOptions extends DataSourceJsonData {
   authType: GoogleAuthType;
+  defaultSheetID?: string;
 }
 
 export interface GoogleSheetsSecureJsonData {
