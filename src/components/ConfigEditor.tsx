@@ -184,9 +184,9 @@ export class ConfigEditor extends PureComponent<Props> {
         <div className="gf-form">
           <InlineFormLabel
             className="width-10"
-            tooltip="The id of a default google sheet. The datasource must be saved before this can be set."
+            tooltip="The ID of a default google sheet. The datasource must be saved before this can be set."
           >
-            Default SheetID
+            Default Spreadsheet ID
           </InlineFormLabel>
           <SegmentAsync
             className="width-30"
