@@ -38,15 +38,21 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 	}
 
 	// This result may be cached
-	data, meta, err := gs.getSheetData(client, qm)
+	allData, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
 		dr.Error = err
 		return
 	}
 
 	var rowData []*sheets.RowData
-	for _, d := range data {
-		rowData = append(rowData, d.RowData...)
+	if qm.Transpose {
+		resultingRowData := combineHorizontally(allData)
+		rowData = flipRowsAndColumns(resultingRowData)
+	} else {
+		// combines sets of data in a way that increases their height: imagine combining 2 rows lengthwise to create one taller row of height 2
+		for _, d := range allData {
+			rowData = append(rowData, d.RowData...)
+		}
 	}
 
 	frame, err := gs.transformSheetToDataFrame(rowData, meta, refID, qm)
@@ -75,6 +81,31 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 
 	dr.Frames = append(dr.Frames, frame)
 	return
+}
+
+// combineHorizontally combines sets of data in a way that increases their width: imagine combining 2 columns lengthwise to create one larger column of width 2
+func combineHorizontally(allData []*sheets.GridData) []*sheets.RowData {
+	var indexOfLongerData int
+	var longest int
+	for i, d := range allData {
+		if len(d.RowData) > longest {
+			longest = len(d.RowData)
+			indexOfLongerData = i
+		}
+	}
+
+	resultingRowData := make([]*sheets.RowData, longest)
+	copy(resultingRowData, allData[indexOfLongerData].RowData)
+
+	for i, d := range allData {
+		if i == indexOfLongerData {
+			continue
+		}
+		for j, r := range d.RowData {
+			resultingRowData[j].Values = append(resultingRowData[j].Values, r.Values...)
+		}
+	}
+	return resultingRowData
 }
 
 // GetSpreadsheets gets spreadsheets from the Google API.
@@ -129,10 +160,6 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) ([]*s
 }
 
 func (gs *GoogleSheets) transformSheetToDataFrame(rowData []*sheets.RowData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {
-	if qm.Transpose {
-		rowData = flipSheet(rowData)
-	}
-
 	columns, start := getColumnDefinitions(rowData)
 	warnings := []string{}
 
@@ -199,7 +226,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(rowData []*sheets.RowData, met
 	return frame, nil
 }
 
-func flipSheet(sheet []*sheets.RowData) []*sheets.RowData {
+func flipRowsAndColumns(sheet []*sheets.RowData) []*sheets.RowData {
 	if len(sheet) == 0 {
 		return []*sheets.RowData{}
 	}
