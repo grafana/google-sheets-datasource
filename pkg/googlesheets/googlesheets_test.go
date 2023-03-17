@@ -174,6 +174,8 @@ func TestGooglesheets(t *testing.T) {
 }
 
 func Test_flipRowsAndColumns(t *testing.T) {
+	/* cSpell:disable */
+
 	// Original input
 	/*
 		| Scientific name    | Descriptive name | Days until needing water |   |
@@ -222,4 +224,6 @@ func Test_flipRowsAndColumns(t *testing.T) {
 	assert.Equal(t, "", flippedRows[3].Values[1].FormattedValue)
 	assert.Equal(t, "", flippedRows[3].Values[2].FormattedValue)
 	assert.Equal(t, "", flippedRows[3].Values[3].FormattedValue)
+
+	/* cSpell:enable */
 }
