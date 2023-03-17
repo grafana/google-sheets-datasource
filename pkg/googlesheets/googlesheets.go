@@ -130,7 +130,7 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config *models.Data
 
 // getSheetData gets grid data corresponding to a spreadsheet.
 func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) ([]*sheets.GridData, map[string]interface{}, error) {
-	cacheKey := qm.Spreadsheet + strings.Join(qm.ParsedRange, ",")
+	cacheKey := qm.Spreadsheet + qm.RawRange
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		return item.([]*sheets.GridData), map[string]interface{}{
 			"hit":     true,

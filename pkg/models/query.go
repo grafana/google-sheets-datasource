@@ -37,7 +37,11 @@ func GetQueryModel(query backend.DataQuery) (*QueryModel, error) {
 	model.MaxDataPoints = query.MaxDataPoints
 
 	if model.RawRange != "" {
-		model.ParsedRange = strings.Split(model.RawRange, ",") // TODO: what about sheets with a comma in the name
+		parsedRange := strings.Split(model.RawRange, ",") // TODO: what about sheets with a comma in the name
+		for i := range parsedRange {
+			parsedRange[i] = strings.TrimSpace(parsedRange[i])
+		}
+		model.ParsedRange = parsedRange
 	}
 
 	return model, nil
