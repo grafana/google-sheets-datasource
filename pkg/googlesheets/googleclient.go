@@ -10,6 +10,7 @@ import (
 	"github.com/grafana/grafana-google-sdk-go/pkg/tokenprovider"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/pkg/errors"
+	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
@@ -124,7 +125,7 @@ func createSheetsService(ctx context.Context, settings models.DatasourceSettings
 		return nil, fmt.Errorf("missing AuthenticationType setting")
 	}
 
-	if settings.AuthenticationType == "api" {
+	if settings.AuthenticationType == "key" {
 		if len(settings.APIKey) == 0 {
 			return nil, fmt.Errorf("missing API Key")
 		}
@@ -149,7 +150,7 @@ func createDriveService(ctx context.Context, settings models.DatasourceSettings)
 		return nil, fmt.Errorf("missing AuthenticationType setting")
 	}
 
-	if settings.AuthenticationType == "api" {
+	if settings.AuthenticationType == "key" {
 		if len(settings.APIKey) == 0 {
 			return nil, fmt.Errorf("missing API Key")
 		}
@@ -183,16 +184,30 @@ func getMiddleware(settings models.DatasourceSettings, routePath string) (httpcl
 	case "gce":
 		provider = tokenprovider.NewGceAccessTokenProvider(providerConfig)
 	case "jwt":
-		err := validateDataSourceSettings(settings)
+		if settings.JWT != "" {
+			jwtConfig, err := google.JWTConfigFromJSON([]byte(settings.JWT))
 
-		if err != nil {
-			return nil, err
-		}
+			if err != nil {
+				return nil, fmt.Errorf("error parsing JWT file: %w", err)
+			}
 
-		providerConfig.JwtTokenConfig = &tokenprovider.JwtTokenConfig{
-			Email:      settings.ClientEmail,
-			URI:        settings.TokenUri,
-			PrivateKey: []byte(settings.PrivateKey),
+			providerConfig.JwtTokenConfig = &tokenprovider.JwtTokenConfig{
+				Email:      jwtConfig.Email,
+				URI:        jwtConfig.TokenURL,
+				PrivateKey: jwtConfig.PrivateKey,
+			}
+		} else {
+			err := validateDataSourceSettings(settings)
+
+			if err != nil {
+				return nil, err
+			}
+
+			providerConfig.JwtTokenConfig = &tokenprovider.JwtTokenConfig{
+				Email:      settings.ClientEmail,
+				URI:        settings.TokenUri,
+				PrivateKey: []byte(settings.PrivateKey),
+			}
 		}
 		provider = tokenprovider.NewJwtAccessTokenProvider(providerConfig)
 	}

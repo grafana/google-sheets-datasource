@@ -51,8 +51,10 @@ func LoadSettings(ctx backend.PluginContext) (*DatasourceSettings, error) {
 	}
 
 	model.APIKey = settings.DecryptedSecureJSONData["apiKey"]
+	// Leaving this here for backward compatibility
 	model.JWT = settings.DecryptedSecureJSONData["jwt"]
 	model.InstanceSettings = *settings
+	model.AuthenticationType = model.AuthType
 
 	return model, nil
 }

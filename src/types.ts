@@ -3,7 +3,7 @@ import { GoogleAuthType, GOOGLE_AUTH_TYPE_OPTIONS, DataSourceSecureJsonData } fr
 
 export const GoogleSheetsAuth = {
   ...GoogleAuthType,
-  API: 'api',
+  API: 'key',
 } as const;
 
 export const googleSheetsAuthTypes = [
