@@ -8,13 +8,11 @@ require (
 	github.com/grafana/grafana-plugin-sdk-go v0.149.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/stretchr/testify v1.8.1
+	golang.org/x/oauth2 v0.5.0
 	google.golang.org/api v0.110.0
 )
 
-require (
-	github.com/prometheus/client_golang v1.14.0 // indirect
-	golang.org/x/oauth2 v0.5.0 // indirect
-)
+require github.com/prometheus/client_golang v1.14.0 // indirect
 
 require (
 	cloud.google.com/go/compute v1.18.0 // indirect
@@ -40,7 +38,7 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.7.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
-	github.com/grafana/grafana-google-sdk-go v0.0.0-20220111153424-31abece20ee3
+	github.com/grafana/grafana-google-sdk-go v0.1.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/hashicorp/go-hclog v1.4.0 // indirect

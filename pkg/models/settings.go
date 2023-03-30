@@ -3,9 +3,8 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"os"
-	"strings"
 
+	"github.com/grafana/grafana-google-sdk-go/pkg/utils"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
@@ -35,19 +34,9 @@ func LoadSettings(ctx backend.PluginContext) (*DatasourceSettings, error) {
 		return nil, fmt.Errorf("error reading settings: %s", err.Error())
 	}
 
-	// Check if a private key path was provided. Fall back to the plugin's default method
-	// of an inline private key
-	if model.PrivateKeyPath != "" {
-		privateKey, err := readPrivateKeyFromFile(model.PrivateKeyPath)
-		if err != nil {
-			return nil, fmt.Errorf("could not write private key to DataSourceInfo json: %w", err)
-		}
-
-		model.PrivateKey = privateKey
-	} else {
-		privateKey := settings.DecryptedSecureJSONData["privateKey"]
-		// React might escape newline characters like this \\n so we need to handle that
-		model.PrivateKey = strings.ReplaceAll(privateKey, "\\n", "\n")
+	model.PrivateKey, err = utils.GetPrivateKey(settings)
+	if err != nil {
+		return model, err
 	}
 
 	model.APIKey = settings.DecryptedSecureJSONData["apiKey"]
@@ -57,17 +46,4 @@ func LoadSettings(ctx backend.PluginContext) (*DatasourceSettings, error) {
 	model.AuthenticationType = model.AuthType
 
 	return model, nil
-}
-
-func readPrivateKeyFromFile(rsaPrivateKeyLocation string) (string, error) {
-	if rsaPrivateKeyLocation == "" {
-		return "", fmt.Errorf("missing file location for private key")
-	}
-
-	privateKey, err := os.ReadFile(rsaPrivateKeyLocation)
-	if err != nil {
-		return "", fmt.Errorf("could not read private key file from file system: %w", err)
-	}
-
-	return string(privateKey), nil
 }
