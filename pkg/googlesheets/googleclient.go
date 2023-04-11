@@ -78,9 +78,9 @@ func (gc *GoogleClient) TestClient() error {
 	}
 
 	// Test spreadsheet from google
-	spreadsheetId := "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+	spreadsheetID := "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
 	readRange := "Class Data!A2:E"
-	_, err := gc.sheetsService.Spreadsheets.Values.Get(spreadsheetId, readRange).Do()
+	_, err := gc.sheetsService.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
 	if err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func getMiddleware(settings models.DatasourceSettings, routePath string) (httpcl
 
 			providerConfig.JwtTokenConfig = &tokenprovider.JwtTokenConfig{
 				Email:      settings.ClientEmail,
-				URI:        settings.TokenUri,
+				URI:        settings.TokenURI,
 				PrivateKey: []byte(settings.PrivateKey),
 			}
 		}
@@ -226,7 +226,7 @@ func newHTTPClient(settings models.DatasourceSettings, opts httpclient.Options, 
 }
 
 func validateDataSourceSettings(settings models.DatasourceSettings) error {
-	if settings.DefaultProject == "" || settings.ClientEmail == "" || settings.PrivateKey == "" || settings.TokenUri == "" {
+	if settings.DefaultProject == "" || settings.ClientEmail == "" || settings.PrivateKey == "" || settings.TokenURI == "" {
 		return fmt.Errorf("datasource is missing authentication details")
 	}
 

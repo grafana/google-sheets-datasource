@@ -16,7 +16,7 @@ type DatasourceSettings struct {
 	DefaultProject     string `json:"defaultProject"`
 	JWT                string `json:"jwt"`
 	ClientEmail        string `json:"clientEmail"`
-	TokenUri           string `json:"tokenUri"`
+	TokenURI           string `json:"tokenUri"`
 	AuthenticationType string `json:"authenticationType"`
 	PrivateKeyPath     string `json:"privateKeyPath"`
 
