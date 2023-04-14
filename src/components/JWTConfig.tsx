@@ -56,7 +56,7 @@ export function JWTConfig({ onChange, isConfigured }: Props) {
     <>
       {configKeys.map((key) => (
         <div className="gf-form" key={key}>
-          <InlineFormLabel width={10}>{startCase(key)}</InlineFormLabel>
+          <InlineFormLabel width={12}>{startCase(key)}</InlineFormLabel>
           <input disabled className="gf-form-input width-30" value="configured" />
         </div>
       ))}

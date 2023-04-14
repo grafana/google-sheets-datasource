@@ -28,7 +28,7 @@ export class ConfigEditor extends PureComponent<Props> {
     });
   };
 
-  loadSheetIDs = async () => {
+  loadspreadSheetIDs = async () => {
     const { options } = this.props;
     try {
       const ds = (await getDataSourceSrv().get(options.uid)) as DataSource;
@@ -187,14 +187,14 @@ export class ConfigEditor extends PureComponent<Props> {
         </div>
         <div className="gf-form">
           <InlineFormLabel
-            className="width-10"
-            tooltip="The id of a default google sheet. The datasource must be saved before this can be set."
+            className="width-12"
+            tooltip="The ID of a default Google spreadsheet. The datasource must be saved before this can be set."
           >
-            Default SheetID
+            Default spreadsheet ID
           </InlineFormLabel>
           <SegmentAsync
             className="width-30"
-            loadOptions={() => this.loadSheetIDs()}
+            loadOptions={() => this.loadspreadSheetIDs()}
             placeholder="Select Spreadsheet ID"
             value={jsonData.defaultSheetID}
             allowCustomValue={true}
