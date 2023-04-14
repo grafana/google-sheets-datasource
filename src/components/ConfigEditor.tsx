@@ -1,15 +1,13 @@
 import {
   DataSourcePluginOptionsEditorProps,
   onUpdateDatasourceSecureJsonDataOption,
-  onUpdateDatasourceJsonDataOptionSelect,
 } from '@grafana/data';
 import { AuthConfig, DataSourceOptions } from '@grafana/google-sdk';
-import { Field, SecretInput, Divider, InlineFormLabel, SegmentAsync } from '@grafana/ui';
+import { Field, SecretInput, Divider, SegmentAsync } from '@grafana/ui';
 import React from 'react';
-import { GoogleSheetsAuth, GoogleSheetsSecureJSONData, googleSheetsAuthTypes } from '../types';
+import { GoogleSheetsAuth, GoogleSheetsSecureJSONData, googleSheetsAuthTypes, SheetsSourceOptions } from '../types';
 import { getBackwardCompatibleOptions } from '../utils';
 import { ConfigurationHelp } from './ConfigurationHelp';
-import { DataSourceDescription } from '@grafana/plugin-ui';
 import { getDataSourceSrv } from '@grafana/runtime';
 import { DataSource } from '../DataSource';
 
@@ -44,12 +42,6 @@ export function ConfigEditor(props: Props) {
 
   return (
     <>
-      <DataSourceDescription
-        dataSourceName="Google Sheets"
-        docsLink="https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/"
-        hasRequiredFields={false}
-      />
-
       <Divider />
       <div className="grafana-info-box">
         <h5>Choosing an authentication type</h5>
@@ -78,13 +70,13 @@ export function ConfigEditor(props: Props) {
       <Divider />
 
       <Field
-        label="Default Sheet ID"
-        description="The ID of a default Google Sheet. The datasource must be saved before this can be set."
+        label="Default spreadsheet ID"
+        description="The ID of a default Google spreadsheet. The datasource must be saved before this can be set."
       >
         <SegmentAsync
           loadOptions={loadSheetIDs}
           placeholder="Select Spreadsheet ID"
-          value={options.jsonData.defaultSheetID}
+          value={(options.jsonData as SheetsSourceOptions).defaultSheetID}
           allowCustomValue={true}
           onChange={(value) => {
             props.onOptionsChange({
@@ -92,7 +84,7 @@ export function ConfigEditor(props: Props) {
               jsonData: {
                 ...options.jsonData,
                 defaultSheetID: value?.value || value,
-              },
+              } as DataSourceOptions & { defaultSheetID?: string },
             });
           }}
           disabled={
