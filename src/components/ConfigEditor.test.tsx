@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ConfigEditor } from './ConfigEditor';
 
@@ -41,8 +40,6 @@ describe('ConfigEditor', () => {
     // Check that the API key is configured
     expect(screen.getByPlaceholderText('Enter API key')).toHaveAttribute('value', 'configured');
   });
-
-  //
 
   it('should be backward compatible with JWT auth type', () => {
     render(
