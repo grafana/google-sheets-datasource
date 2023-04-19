@@ -1,5 +1,5 @@
 import React from 'react';
-import { LegacyForms, Select, InlineFormLabel, SegmentAsync } from '@grafana/ui';
+import { LegacyForms, Select, InlineFormLabel, AsyncSelect } from '@grafana/ui';
 import {
   DataSourcePluginOptionsEditorProps,
   onUpdateDatasourceSecureJsonDataOption,
@@ -188,11 +188,12 @@ export function ConfigEditor(props: Props) {
         >
           Default spreadsheet ID
         </InlineFormLabel>
-        <SegmentAsync
+        <AsyncSelect
+          defaultOptions
           className="width-30"
-          loadOptions={() => loadspreadSheetIDs()}
+          loadOptions={loadspreadSheetIDs}
           placeholder="Select Spreadsheet ID"
-          value={jsonData.defaultSheetID}
+          value={{ label: jsonData.defaultSheetID, value: jsonData.defaultSheetID }}
           allowCustomValue={true}
           onChange={onUpdateDatasourceJsonDataOptionSelect(props, 'defaultSheetID')}
           disabled={

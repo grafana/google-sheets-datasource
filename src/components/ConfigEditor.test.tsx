@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { ConfigEditor } from './ConfigEditor';
 import { DataSourcePluginOptionsEditorProps, DataSourceSettings } from '@grafana/data';
 import { SheetsSourceOptions, GoogleSheetsSecureJsonData, GoogleAuthType } from '../types';
@@ -53,7 +53,11 @@ describe('ConfigEditor', () => {
       onOptionsChange: onChange,
     } as DataSourcePluginOptionsEditorProps<SheetsSourceOptions, GoogleSheetsSecureJsonData>;
     render(<ConfigEditor {...props} onOptionsChange={onChange} />);
+    expect(screen.getByText('Default spreadsheet ID')).toBeInTheDocument();
   });
+
+  it('should save default spreadsheet ID', async () => {});
+
   // it('should save and request spreadsheets', async () => {
   //   const onChange = jest.fn();
   //   render(<ConfigEditor {...props} onOptionsChange={onChange} />);
