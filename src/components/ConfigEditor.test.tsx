@@ -55,4 +55,19 @@ describe('ConfigEditor', () => {
     // Check that the Private key input is configured
     expect(screen.getByTestId('Private Key Input')).toHaveAttribute('value', 'configured');
   });
+
+  it('should render default spreadsheet ID field', async () => {
+    const onChange = jest.fn();
+    render(
+      <ConfigEditor
+        onOptionsChange={onChange}
+        options={{ jsonData: { authenticationType: 'key' }, secureJsonFields: {} } as any}
+      />
+    );
+    expect(screen.getByText('Default spreadsheet ID')).toBeInTheDocument();
+  });
+
+  it('should save default spreadsheet ID', async () => {
+    // TODO: Implement test
+  });
 });
