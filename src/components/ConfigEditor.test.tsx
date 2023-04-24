@@ -2,6 +2,19 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ConfigEditor } from './ConfigEditor';
 
+jest.mock('@grafana/runtime', () => ({
+  getDataSourceSrv: () => ({
+    get: Promise.resolve({
+      getSpreadSheets: jest.fn().mockImplementation(() =>
+        Promise.resolve([
+          { label: 'label1', value: 'value1' },
+          { label: 'label2', value: 'value2' },
+        ])
+      ),
+    }),
+  }),
+}));
+
 describe('ConfigEditor', () => {
   it('should support old authType property', () => {
     const onOptionsChange = jest.fn();
