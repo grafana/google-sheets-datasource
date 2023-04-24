@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { ConfigEditor } from './ConfigEditor';
 import { DataSourcePluginOptionsEditorProps, DataSourceSettings } from '@grafana/data';
 import { SheetsSourceOptions, GoogleSheetsSecureJsonData, GoogleAuthType } from '../types';
@@ -37,6 +37,9 @@ const dataSourceSettings: DataSourceSettings<SheetsSourceOptions, GoogleSheetsSe
   jsonData: {
     authType: GoogleAuthType.JWT,
   },
+  secureJsonFields: {
+    jwt: true,
+  },
   id: 0,
   uid: '',
   type: '',
@@ -44,6 +47,21 @@ const dataSourceSettings: DataSourceSettings<SheetsSourceOptions, GoogleSheetsSe
   access: 'direct',
   name: 'Google Sheets Test Datasource',
 };
+
+// jsonData.authType === GoogleAuthType.JWT && (!secureJsonFields || !secureJsonFields.jwt);
+
+jest.mock('@grafana/runtime', () => ({
+  getDataSourceSrv: () => ({
+    get: Promise.resolve({
+      getSpreadSheets: jest.fn().mockImplementation(() =>
+        Promise.resolve([
+          { label: 'label1', value: 'value1' },
+          { label: 'label2', value: 'value2' },
+        ])
+      ),
+    }),
+  }),
+}));
 
 describe('ConfigEditor', () => {
   it('should render default spreadsheet ID field', async () => {
@@ -56,7 +74,33 @@ describe('ConfigEditor', () => {
     expect(screen.getByText('Default spreadsheet ID')).toBeInTheDocument();
   });
 
-  it('should save default spreadsheet ID', async () => {});
+  it('some name', async () => {
+    const onChange = jest.fn();
+    const props = {
+      options: dataSourceSettings,
+      onOptionsChange: onChange,
+    } as DataSourcePluginOptionsEditorProps<SheetsSourceOptions, GoogleSheetsSecureJsonData>;
+
+    render(<ConfigEditor {...props} onOptionsChange={onChange} />);
+
+    waitFor(() => {
+      const selectEl = screen.getByText('Default spreadsheet ID');
+      expect(selectEl).not.toBeInTheDocument();
+    });
+
+    // userEvent.click(selectEl);
+
+    //
+    //   const selectEl = screen.getByLabelText(selectors.components.ConfigEditor.workgroup.input);
+    //   expect(selectEl).toBeInTheDocument();
+    //
+    //   await select(selectEl, resourceName, { container: document.body });
+    //
+    //   expect(onChange).toHaveBeenCalledWith({
+    //     ...props.options,
+    //     jsonData: { ...props.options.jsonData, workgroup: resourceName },
+    //   });
+  });
 
   // it('should save and request spreadsheets', async () => {
   //   const onChange = jest.fn();

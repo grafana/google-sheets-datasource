@@ -1,5 +1,5 @@
 import React from 'react';
-import { LegacyForms, Select, InlineFormLabel, AsyncSelect } from '@grafana/ui';
+import { LegacyForms, Select, InlineFormLabel, SegmentAsync } from '@grafana/ui';
 import {
   DataSourcePluginOptionsEditorProps,
   onUpdateDatasourceSecureJsonDataOption,
@@ -188,8 +188,7 @@ export function ConfigEditor(props: Props) {
         >
           Default spreadsheet ID
         </InlineFormLabel>
-        <AsyncSelect
-          defaultOptions
+        <SegmentAsync
           className="width-30"
           loadOptions={loadspreadSheetIDs}
           placeholder="Select Spreadsheet ID"
