@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ConfigEditor } from './ConfigEditor';
 import { DataSourceSettings } from '@grafana/data';
 import { SheetsSourceOptions, GoogleSheetsSecureJsonData } from '../types';
@@ -33,18 +34,30 @@ const dataSourceSettings: DataSourceSettings<SheetsSourceOptions, GoogleSheetsSe
 
 jest.mock('@grafana/runtime', () => ({
   getDataSourceSrv: () => ({
-    get: Promise.resolve({
-      getSpreadSheets: jest.fn().mockImplementation(() =>
-        Promise.resolve([
-          { label: 'label1', value: 'value1' },
-          { label: 'label2', value: 'value2' },
-        ])
-      ),
-    }),
+    get: (_: string) =>
+      Promise.resolve({
+        getSpreadSheets: () =>
+          Promise.resolve([
+            { label: 'label1', value: 'value1' },
+            { label: 'label2', value: 'value2' },
+          ]),
+      }),
   }),
 }));
 
+const mockedSelect = jest.fn();
+jest.mock('@grafana/data', () => ({
+  ...jest.requireActual('@grafana/data'),
+  // onUpdateDatasourceJsonDataOptionSelect will be called anyway on mount, and twice, one for spreadsheetId and one for authType.
+  // The one we are actually testing for is the returned function (in this case mockedSelect) and checking that it is called with the value of the selected option
+  onUpdateDatasourceJsonDataOptionSelect: jest.fn(() => mockedSelect),
+}));
+
 describe('ConfigEditor', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should support old authType property', () => {
     const onOptionsChange = jest.fn();
     // Render component with old authType property
@@ -97,7 +110,6 @@ describe('ConfigEditor', () => {
     // Check that the Private key input is configured
     expect(screen.getByTestId('Private Key Input')).toHaveAttribute('value', 'configured');
   });
-
   it('should render default spreadsheet ID field', async () => {
     const onChange = jest.fn();
     render(
@@ -109,11 +121,7 @@ describe('ConfigEditor', () => {
     expect(screen.getByText('Default spreadsheet ID')).toBeInTheDocument();
   });
 
-  it('should save default spreadsheet ID', async () => {
-    // TODO: Implement test
-  });
-
-  it('should display available spreadsheets in selector', async () => {
+  it('should update default spreadsheet after selecting it', async () => {
     const onChange = jest.fn();
     const props = {
       options: dataSourceSettings,
@@ -122,9 +130,11 @@ describe('ConfigEditor', () => {
 
     render(<ConfigEditor {...props} onOptionsChange={onChange} />);
 
-    await waitFor(() => {
-      const selectEl = screen.getByText('Default spreadsheet ID');
-      expect(selectEl).toBeInTheDocument();
-    });
+    const selectEl = screen.getByText('Select Spreadsheet ID');
+    expect(selectEl).toBeInTheDocument();
+    await userEvent.click(selectEl);
+    const spreadsheetOption = await screen.findByText('label1');
+    await userEvent.click(spreadsheetOption);
+    await waitFor(() => expect(mockedSelect).toHaveBeenCalledWith({ label: 'label1', value: 'value1' }));
   });
 });
