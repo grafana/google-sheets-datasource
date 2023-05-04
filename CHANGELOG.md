@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## v1.1.8
+- **Chore**: CI pipeline updated with GO 1.20.4
+
 ## v1.1.7
 - **Chore**: Update to Golang 1.20
 
