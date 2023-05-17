@@ -9,6 +9,14 @@ All notable changes to this project will be documented in this file.
 There was a change in the plugin configuration. Please take a look at the provisioning example in the [documentation](src/docs/provisioning.md).
 The change is backward compatible so you can still use the old configuration.
 
+## v1.1.8
+
+- **Chore**: Backend binaries are now compiled with golang 1.20.4
+
+## v1.1.7
+
+- **Chore**: Update to Golang 1.20
+
 ## v1.1.6
 
 - Fix: Don't panic when the user selects a range of empty cells.
