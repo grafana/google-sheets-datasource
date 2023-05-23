@@ -7,7 +7,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/grafana/grafana-plugin-sdk-go v0.149.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.3
 	golang.org/x/oauth2 v0.5.0
 	google.golang.org/api v0.110.0
 )
