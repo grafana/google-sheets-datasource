@@ -1,26 +1,19 @@
-import { DataQuery, DataSourceJsonData } from '@grafana/data';
+import { DataQuery } from '@grafana/schema';
+import { GoogleAuthType, GOOGLE_AUTH_TYPE_OPTIONS, DataSourceSecureJsonData } from '@grafana/google-sdk';
 
-//-------------------------------------------------------------------------------
-// General google cloud auth types
-// same as stackdriver etc
-//-------------------------------------------------------------------------------
+export const GoogleSheetsAuth = {
+  ...GoogleAuthType,
+  API: 'key',
+} as const;
 
-export interface JWT {
-  private_key: any;
-  token_uri: any;
-  client_email: any;
-  project_id: any;
-}
-
-export enum GoogleAuthType {
-  JWT = 'jwt',
-  KEY = 'key',
-}
-
-export const googleAuthTypes = [
-  { label: 'API Key (public spreadsheets)', value: GoogleAuthType.KEY },
-  { label: 'Google JWT File (public and private spreadsheets)', value: GoogleAuthType.JWT },
+export const googleSheetsAuthTypes = [
+  { label: 'API Key', value: GoogleSheetsAuth.API },
+  ...GOOGLE_AUTH_TYPE_OPTIONS
 ];
+
+export interface GoogleSheetsSecureJSONData extends DataSourceSecureJsonData {
+  apiKey?: string;
+}
 
 export interface CacheInfo {
   hit: boolean;
@@ -45,13 +38,4 @@ export interface SheetsQuery extends DataQuery {
   range?: string;
   cacheDurationSeconds?: number;
   useTimeFilter?: boolean;
-}
-
-export interface SheetsSourceOptions extends DataSourceJsonData {
-  authType: GoogleAuthType;
-}
-
-export interface GoogleSheetsSecureJsonData {
-  apiKey?: string;
-  jwt?: string;
 }

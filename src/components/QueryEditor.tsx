@@ -1,10 +1,11 @@
-import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
-import { LinkButton, InlineFormLabel, Segment, SegmentAsync, LegacyForms } from '@grafana/ui';
+import { DataSourceOptions } from '@grafana/google-sdk';
+import { InlineFormLabel, LegacyForms, LinkButton, Segment, SegmentAsync } from '@grafana/ui';
+import React, { ChangeEvent, PureComponent } from 'react';
 import { DataSource } from '../DataSource';
-import { SheetsQuery, SheetsSourceOptions } from '../types';
+import { SheetsQuery } from '../types';
 
-type Props = QueryEditorProps<DataSource, SheetsQuery, SheetsSourceOptions>;
+type Props = QueryEditorProps<DataSource, SheetsQuery, DataSourceOptions>;
 
 export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery> {
   let idx = url?.indexOf('/d/');

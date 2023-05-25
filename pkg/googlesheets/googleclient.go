@@ -3,19 +3,45 @@ package googlesheets
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/http"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
+	"github.com/grafana/grafana-google-sdk-go/pkg/tokenprovider"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
+	"github.com/pkg/errors"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
 
+const (
+	sheetsRoute = "sheets"
+	driveRoute  = "drive"
+)
+
+type routeInfo struct {
+	method string
+	scopes []string
+}
+
+var routes = map[string]routeInfo{
+	sheetsRoute: {
+		method: "GET",
+		scopes: []string{sheets.SpreadsheetsReadonlyScope},
+	},
+	driveRoute: {
+		method: "GET",
+		scopes: []string{drive.DriveReadonlyScope},
+	},
+}
+
 // GoogleClient struct
 type GoogleClient struct {
 	sheetsService *sheets.Service
 	driveService  *drive.Service
-	auth          *models.DatasourceSettings
+	auth          string
 }
 
 type client interface {
@@ -23,13 +49,13 @@ type client interface {
 }
 
 // NewGoogleClient creates a new client and initializes a sheet service and a drive service
-func NewGoogleClient(ctx context.Context, auth *models.DatasourceSettings) (*GoogleClient, error) {
-	sheetsService, err := createSheetsService(ctx, auth)
+func NewGoogleClient(ctx context.Context, settings models.DatasourceSettings) (*GoogleClient, error) {
+	sheetsService, err := createSheetsService(ctx, settings)
 	if err != nil {
 		return nil, err
 	}
 
-	driveService, err := createDriveService(ctx, auth)
+	driveService, err := createDriveService(ctx, settings)
 	if err != nil {
 		return nil, err
 	}
@@ -37,22 +63,27 @@ func NewGoogleClient(ctx context.Context, auth *models.DatasourceSettings) (*Goo
 	return &GoogleClient{
 		sheetsService: sheetsService,
 		driveService:  driveService,
-		auth:          auth,
+		auth:          settings.AuthenticationType,
 	}, nil
 }
 
 // TestClient checks that the client can connect to required services
 func (gc *GoogleClient) TestClient() error {
 	// When using JWT, check the drive API
-	if gc.auth.AuthType == "jwt" {
-		q := gc.driveService.Files.List().Q("mimeType='application/vnd.google-apps.spreadsheet'")
-		_, err := q.Do()
+	if gc.auth == "jwt" {
+		_, err := gc.driveService.Files.List().PageSize(1).Do()
 		if err != nil {
 			return err
 		}
 	}
 
-	// TODO: check the sheets API
+	// Test spreadsheet from google
+	spreadsheetID := "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+	readRange := "Class Data!A2:E"
+	_, err := gc.sheetsService.Spreadsheets.Values.Get(spreadsheetID, readRange).Do()
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -89,53 +120,115 @@ func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 	return fs, nil
 }
 
-func createSheetsService(ctx context.Context, auth *models.DatasourceSettings) (*sheets.Service, error) {
-	if len(auth.AuthType) == 0 {
-		return nil, fmt.Errorf("missing AuthType setting")
+func createSheetsService(ctx context.Context, settings models.DatasourceSettings) (*sheets.Service, error) {
+	if len(settings.AuthenticationType) == 0 {
+		return nil, fmt.Errorf("missing AuthenticationType setting")
 	}
 
-	if auth.AuthType == "key" {
-		if len(auth.APIKey) == 0 {
+	if settings.AuthenticationType == "key" {
+		if len(settings.APIKey) == 0 {
 			return nil, fmt.Errorf("missing API Key")
 		}
-		return sheets.NewService(ctx, option.WithAPIKey(auth.APIKey))
+		return sheets.NewService(ctx, option.WithAPIKey(settings.APIKey))
 	}
 
-	if auth.AuthType == "jwt" {
-		jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT),
-			// Only need readonly access to spreadsheets (and drive?)
-			"https://www.googleapis.com/auth/spreadsheets.readonly")
-		if err != nil {
-			return nil, fmt.Errorf("error parsing JWT file: %w", err)
-		}
-
-		client := jwtConfig.Client(ctx)
-		return sheets.NewService(ctx, option.WithHTTPClient(client))
+	client, err := newHTTPClient(settings, httpclient.Options{}, sheetsRoute)
+	if err != nil {
+		return nil, errors.WithMessage(err, "Failed to create http client")
 	}
 
-	return nil, fmt.Errorf("invalid Auth Type: %s", auth.AuthType)
+	srv, err := sheets.NewService(ctx, option.WithHTTPClient(client))
+	if err != nil {
+		log.Fatalf("Unable to retrieve Sheets client: %v", err)
+	}
+
+	return srv, nil
 }
 
-func createDriveService(ctx context.Context, auth *models.DatasourceSettings) (*drive.Service, error) {
-	if len(auth.AuthType) == 0 {
-		return nil, fmt.Errorf("missing AuthType setting")
+func createDriveService(ctx context.Context, settings models.DatasourceSettings) (*drive.Service, error) {
+	if len(settings.AuthenticationType) == 0 {
+		return nil, fmt.Errorf("missing AuthenticationType setting")
 	}
 
-	if auth.AuthType == "key" {
-		if len(auth.APIKey) == 0 {
+	if settings.AuthenticationType == "key" {
+		if len(settings.APIKey) == 0 {
 			return nil, fmt.Errorf("missing API Key")
 		}
-		return drive.NewService(ctx, option.WithAPIKey(auth.APIKey))
+		return drive.NewService(ctx, option.WithAPIKey(settings.APIKey))
 	}
 
-	if auth.AuthType == "jwt" {
-		jwtConfig, err := google.JWTConfigFromJSON([]byte(auth.JWT), drive.DriveMetadataReadonlyScope)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing JWT file: %w", err)
+	client, err := newHTTPClient(settings, httpclient.Options{}, driveRoute)
+	if err != nil {
+		return nil, errors.WithMessage(err, "Failed to create http client")
+	}
+
+	srv, err := drive.NewService(ctx, option.WithHTTPClient(client))
+	if err != nil {
+		log.Fatalf("Unable to retrieve Drive client: %v", err)
+	}
+
+	return srv, nil
+}
+
+func getMiddleware(settings models.DatasourceSettings, routePath string) (httpclient.Middleware, error) {
+	providerConfig := tokenprovider.Config{
+		RoutePath:         routePath,
+		RouteMethod:       routes[routePath].method,
+		DataSourceID:      settings.InstanceSettings.ID,
+		DataSourceUpdated: settings.InstanceSettings.Updated,
+		Scopes:            routes[routePath].scopes,
+	}
+
+	var provider tokenprovider.TokenProvider
+	switch settings.AuthenticationType {
+	case "gce":
+		provider = tokenprovider.NewGceAccessTokenProvider(providerConfig)
+	case "jwt":
+		if settings.JWT != "" {
+			jwtConfig, err := google.JWTConfigFromJSON([]byte(settings.JWT))
+
+			if err != nil {
+				return nil, fmt.Errorf("error parsing JWT file: %w", err)
+			}
+
+			providerConfig.JwtTokenConfig = &tokenprovider.JwtTokenConfig{
+				Email:      jwtConfig.Email,
+				URI:        jwtConfig.TokenURL,
+				PrivateKey: jwtConfig.PrivateKey,
+			}
+		} else {
+			err := validateDataSourceSettings(settings)
+
+			if err != nil {
+				return nil, err
+			}
+
+			providerConfig.JwtTokenConfig = &tokenprovider.JwtTokenConfig{
+				Email:      settings.ClientEmail,
+				URI:        settings.TokenURI,
+				PrivateKey: []byte(settings.PrivateKey),
+			}
 		}
-
-		client := jwtConfig.Client(ctx)
-		return drive.NewService(ctx, option.WithHTTPClient(client))
+		provider = tokenprovider.NewJwtAccessTokenProvider(providerConfig)
 	}
-	return nil, fmt.Errorf("invalid Auth Type: %s", auth.AuthType)
+
+	return tokenprovider.AuthMiddleware(provider), nil
+}
+
+func newHTTPClient(settings models.DatasourceSettings, opts httpclient.Options, route string) (*http.Client, error) {
+	m, err := getMiddleware(settings, route)
+	if err != nil {
+		return nil, err
+	}
+
+	opts.Middlewares = append(opts.Middlewares, m)
+	return httpclient.New(opts)
+}
+
+func validateDataSourceSettings(settings models.DatasourceSettings) error {
+	if settings.DefaultProject == "" || settings.ClientEmail == "" || settings.PrivateKey == "" || settings.TokenURI == "" {
+		return fmt.Errorf("datasource is missing authentication details")
+	}
+
+	return nil
 }
