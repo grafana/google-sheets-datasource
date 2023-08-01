@@ -17,7 +17,11 @@ import (
 
 func RunServer() error {
 	http.HandleFunc("/", getRoot)
-	fmt.Printf("starting k8s server on port 3333")
+	fmt.Printf("starting k8s server on port 3333...\n")
+	err := start(context.Background())
+	if err != nil {
+		return err
+	}
 	return http.ListenAndServe(":3333", nil)
 }
 
