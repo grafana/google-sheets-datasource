@@ -3,51 +3,74 @@ package ext
 import (
 	"context"
 	"fmt"
-	"io"
+	"github.com/grafana/google-sheets-datasource/pkg/apiserver"
+	"k8s.io/apiserver/pkg/authorization/authorizer"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	"net"
 	"net/http"
 	"os"
+	"path"
 
 	"github.com/grafana/grafana-apiserver/pkg/certgenerator"
 	grafanaapiserveroptions "github.com/grafana/grafana-apiserver/pkg/cmd/server/options"
 	"k8s.io/apiserver/pkg/authentication/user"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/options"
+	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
 
-func RunServer() error {
-	http.HandleFunc("/", getRoot)
-	fmt.Printf("starting k8s server on port 3333...\n")
-	err := start(context.Background())
-	if err != nil {
-		return err
-	}
-	return http.ListenAndServe(":3333", nil)
+type FakeAuthorizer struct {
 }
 
-func getRoot(w http.ResponseWriter, r *http.Request) {
-	fmt.Printf("got / request\n")
-	io.WriteString(w, "hello!")
+func (fa *FakeAuthorizer) Authorize(ctx context.Context, a authorizer.Attributes) (authorized authorizer.Decision, reason string, err error) {
+	return authorizer.DecisionAllow, "", nil
 }
 
-func start(ctx context.Context) error {
+func Start(ctx context.Context) error {
 	// logger := logr.New(newLogAdapter())
 	// logger.V(9)
 	// klog.SetLoggerWithOptions(logger, klog.ContextualLogger(true))
 
 	o := grafanaapiserveroptions.NewGrafanaAPIServerOptions(os.Stdout, os.Stderr)
 	o.RecommendedOptions.SecureServing.BindPort = 6443
-	o.RecommendedOptions.Authentication.RemoteKubeConfigFileOptional = true
-	o.RecommendedOptions.Authorization.RemoteKubeConfigFileOptional = true
+	// o.RecommendedOptions.Authentication.DisableAnonymous = false
+	o.RecommendedOptions.Authentication.RemoteKubeConfigFile = "/Users/charandas/.kube/config"
+	o.RecommendedOptions.Authorization.RemoteKubeConfigFile = "/Users/charandas/.kube/config"
 	o.RecommendedOptions.Authorization.AlwaysAllowPaths = []string{"*"}
-	o.RecommendedOptions.Authorization.AlwaysAllowGroups = []string{user.SystemPrivilegedGroup, "grafana"}
+	o.RecommendedOptions.Authorization.AlwaysAllowGroups = []string{user.Anonymous}
+	// o.RecommendedOptions.Authorization.
 	o.RecommendedOptions.Etcd = nil
 	// TODO: setting CoreAPI to nil currently segfaults in grafana-apiserver
 	o.RecommendedOptions.CoreAPI = nil
 
 	// Get the util to get the paths to pre-generated certs
 	certUtil := certgenerator.CertUtil{
-		//K8sDataPath: s.dataPath,
+		K8sDataPath: "data",
+	}
+
+	err := certUtil.InitializeCACertPKI()
+	if err != nil {
+		fmt.Println("Err", err)
+		panic("could not provision certs")
+	}
+
+	err = certUtil.EnsureApiServerPKI("127.0.0.1")
+	if err != nil {
+		fmt.Println("Err", err)
+		panic("could not provision certs")
+	}
+
+	err = certUtil.EnsureAuthzClientPKI()
+	if err != nil {
+		fmt.Printf("error ensuring K8s Authz Client PKI", "error", err)
+		panic("could not provision certs")
+	}
+
+	err = certUtil.EnsureAuthnClientPKI()
+	if err != nil {
+		fmt.Printf("error ensuring K8s Authn Client PKI", "error", err)
+		panic("could not provision certs")
 	}
 
 	o.RecommendedOptions.SecureServing.BindAddress = net.ParseIP(certgenerator.DefaultAPIServerIp)
@@ -81,10 +104,18 @@ func start(ctx context.Context) error {
 
 	// serverConfig.GenericConfig.Authentication.Authenticator = authenticator
 
-	server, err := serverConfig.Complete().New(genericapiserver.NewEmptyDelegate())
+	delegationTarget := genericapiserver.NewEmptyDelegate()
+	delegateHandler := delegationTarget.UnprotectedHandler()
+	if delegateHandler == nil {
+		delegateHandler = http.NotFoundHandler()
+	}
+
+	server, err := serverConfig.Complete().New(delegationTarget)
 	if err != nil {
 		return err
 	}
+
+	// server.GenericAPIServer.Authorizer = &FakeAuthorizer{}
 
 	restConfig := server.GenericAPIServer.LoopbackClientConfig
 	// err = s.writeKubeConfiguration(s.restConfig)
@@ -94,6 +125,21 @@ func start(ctx context.Context) error {
 
 	prepared := server.GenericAPIServer.PrepareRun()
 	fmt.Printf("TODO: %v, %v\n", prepared, restConfig)
+
+	err = writeKubeConfiguration(server.GenericAPIServer.LoopbackClientConfig)
+	if err != nil {
+		return err
+	}
+
+	subresourceHandler := &apiserver.SubresourceHandler{
+		Storage:             nil,
+		Authorizer:          server.GenericAPIServer.Authorizer,
+		MaxRequestBodyBytes: serverConfig.GenericConfig.MaxRequestBodyBytes,
+		DelegateHandler:     delegateHandler,
+	}
+
+	server.GenericAPIServer.Handler.NonGoRestfulMux.Handle(fmt.Sprintf("/apis/%s", apiserver.PluginAPIGroup), subresourceHandler)
+	server.GenericAPIServer.Handler.NonGoRestfulMux.HandlePrefix(fmt.Sprintf("/apis/%s/", apiserver.PluginAPIGroup), subresourceHandler)
 
 	// s.handler = func(c *contextmodel.ReqContext) {
 	// 	req := c.Req
@@ -115,9 +161,44 @@ func start(ctx context.Context) error {
 	// 	prepared.GenericAPIServer.Handler.ServeHTTP(resp, req)
 	// }
 
-	// go func() {
-	// 	s.stoppedCh <- prepared.Run(s.stopCh)
-	// }()
+	fmt.Println("Potato")
+	go func() {
+		c := make(chan struct{})
+		err := prepared.Run(c)
+		if err != nil {
+			fmt.Printf("Could not run", err)
+		}
+	}()
 
 	return nil
+}
+
+func writeKubeConfiguration(restConfig *rest.Config) error {
+	clusters := make(map[string]*clientcmdapi.Cluster)
+	clusters["default-cluster"] = &clientcmdapi.Cluster{
+		Server:                restConfig.Host,
+		InsecureSkipTLSVerify: true,
+	}
+
+	contexts := make(map[string]*clientcmdapi.Context)
+	contexts["default-context"] = &clientcmdapi.Context{
+		Cluster:   "default-cluster",
+		Namespace: "default",
+		AuthInfo:  "default",
+	}
+
+	authinfos := make(map[string]*clientcmdapi.AuthInfo)
+	authinfos["default"] = &clientcmdapi.AuthInfo{
+		Token: restConfig.BearerToken,
+	}
+
+	clientConfig := clientcmdapi.Config{
+		Kind:           "Config",
+		APIVersion:     "v1",
+		Clusters:       clusters,
+		Contexts:       contexts,
+		CurrentContext: "default-context",
+		AuthInfos:      authinfos,
+	}
+	return clientcmd.WriteToFile(clientConfig, path.Join("data", "grafana.kubeconfig"))
 }
