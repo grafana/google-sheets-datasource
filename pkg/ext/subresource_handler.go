@@ -29,6 +29,7 @@ const PluginAPIVersion = "v1"
 
 var _ http.Handler = &SubresourceHandler{}
 
+// NOTE: this is not in use currently
 type SubresourceHandler struct {
 	Storage             *storage.PluginResourceStorage
 	Authorizer          authorizer.Authorizer

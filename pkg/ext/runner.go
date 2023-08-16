@@ -2,7 +2,6 @@ package ext
 
 import (
 	"fmt"
-
 	"github.com/grafana/google-sheets-datasource/pkg/apiserver/registry"
 	"github.com/grafana/grafana-apiserver/pkg/storage/filepath"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -17,6 +16,7 @@ import (
 
 	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/install"
 	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
+	"github.com/grafana/google-sheets-datasource/pkg/apiserver/apihelpers"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
@@ -25,23 +25,27 @@ import (
 var (
 	Scheme = runtime.NewScheme()
 	Codecs = serializer.NewCodecFactory(Scheme)
+
+	// if you modify this, make sure you update the crEncoder
+	unversionedVersion = schema.GroupVersion{Group: "", Version: "v1"}
+	unversionedTypes   = []runtime.Object{
+		&metav1.Status{},
+		&metav1.WatchEvent{},
+		&metav1.APIVersions{},
+		&metav1.APIGroupList{},
+		&metav1.APIGroup{},
+		&metav1.APIResourceList{},
+		&apihelpers.SubresourceStreamer{},
+	}
 )
 
 func init() {
 	fmt.Println("init: Potato")
 	install.Install(Scheme)
 
-	metav1.AddToGroupVersion(Scheme, schema.GroupVersion{Version: "v1"})
+	metav1.AddToGroupVersion(Scheme, schema.GroupVersion{Group: "", Version: "v1"})
+	Scheme.AddUnversionedTypes(unversionedVersion, unversionedTypes...)
 
-	// TODO: keep the generic API server from wanting this
-	unversioned := schema.GroupVersion{Group: "", Version: "v1"}
-	Scheme.AddUnversionedTypes(unversioned,
-		&metav1.Status{},
-		&metav1.APIVersions{},
-		&metav1.APIGroupList{},
-		&metav1.APIGroup{},
-		&metav1.APIResourceList{},
-	)
 }
 
 type PluginAggregatedServer struct {
@@ -111,17 +115,16 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 		return nil, err
 	}
 	storageMap["datasources"] = datasourceREST
-	apiGroupInfo.VersionedResourcesStorageMap["v1"] = storageMap
-
 	// storageMap["datasources/query"] = &storage.SubresourceStreamerREST{}
+	apiGroupInfo.VersionedResourcesStorageMap["v1"] = storageMap
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
 		fmt.Println("Could not install API Group", err)
 		return nil, err
 	}
 
-	// server.GenericAPIServer.Handler.NonGoRestfulMux.Handle(fmt.Sprintf("/apis/%s", PluginAPIGroup), subresourceHandler)
-	// server.GenericAPIServer.Handler.NonGoRestfulMux.HandlePrefix(fmt.Sprintf("/apis/%s/", PluginAPIGroup), subresourceHandler)
+	// s.GenericAPIServer.Handler.NonGoRestfulMux.Handle(fmt.Sprintf("/apis/%s", PluginAPIGroup), subresourceHandler)
+	// s.GenericAPIServer.Handler.NonGoRestfulMux.HandlePrefix(fmt.Sprintf("/apis/%s/", PluginAPIGroup), subresourceHandler)
 
 	return s, nil
 }
