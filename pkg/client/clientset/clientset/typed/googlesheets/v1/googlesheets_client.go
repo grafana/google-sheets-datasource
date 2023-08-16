@@ -15,7 +15,6 @@ import (
 type GooglesheetsV1Interface interface {
 	RESTClient() rest.Interface
 	DatasourcesGetter
-	DatasourceQueriesGetter
 }
 
 // GooglesheetsV1Client is used to interact with features provided by the googlesheets.ext.grafana.com group.
@@ -25,10 +24,6 @@ type GooglesheetsV1Client struct {
 
 func (c *GooglesheetsV1Client) Datasources(namespace string) DatasourceInterface {
 	return newDatasources(c, namespace)
-}
-
-func (c *GooglesheetsV1Client) DatasourceQueries(namespace string) DatasourceQueryInterface {
-	return newDatasourceQueries(c, namespace)
 }
 
 // NewForConfig creates a new GooglesheetsV1Client for the given config.

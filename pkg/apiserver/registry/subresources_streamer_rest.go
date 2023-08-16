@@ -44,7 +44,7 @@ type SubresourceStreamerREST struct {
 } */
 
 func (r *SubresourceStreamerREST) New() runtime.Object {
-	return &v1.DatasourceQuery{}
+	return &v1.Datasource{}
 }
 
 func (r *SubresourceStreamerREST) Destroy() {

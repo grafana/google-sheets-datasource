@@ -11,11 +11,3 @@ type DatasourceListerExpansion interface{}
 // DatasourceNamespaceListerExpansion allows custom methods to be added to
 // DatasourceNamespaceLister.
 type DatasourceNamespaceListerExpansion interface{}
-
-// DatasourceQueryListerExpansion allows custom methods to be added to
-// DatasourceQueryLister.
-type DatasourceQueryListerExpansion interface{}
-
-// DatasourceQueryNamespaceListerExpansion allows custom methods to be added to
-// DatasourceQueryNamespaceLister.
-type DatasourceQueryNamespaceListerExpansion interface{}

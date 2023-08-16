@@ -18,10 +18,6 @@ func (c *FakeGooglesheetsV1) Datasources(namespace string) v1.DatasourceInterfac
 	return &FakeDatasources{c, namespace}
 }
 
-func (c *FakeGooglesheetsV1) DatasourceQueries(namespace string) v1.DatasourceQueryInterface {
-	return &FakeDatasourceQueries{c, namespace}
-}
-
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeGooglesheetsV1) RESTClient() rest.Interface {
