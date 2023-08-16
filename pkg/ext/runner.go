@@ -3,7 +3,6 @@ package ext
 import (
 	"fmt"
 	"github.com/grafana/google-sheets-datasource/pkg/apiserver/registry"
-	"github.com/grafana/google-sheets-datasource/pkg/apiserver/storage"
 	"github.com/grafana/grafana-apiserver/pkg/storage/filepath"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -12,7 +11,6 @@ import (
 	"k8s.io/apimachinery/pkg/version"
 	clientRest "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
-	"net/http"
 	"path"
 
 	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/install"
@@ -21,6 +19,8 @@ import (
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
+
+const PluginAPIGroup = "googlesheets.ext.grafana.com"
 
 var (
 	Scheme = runtime.NewScheme()
@@ -93,19 +93,6 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 		return nil, err
 	}
 
-	delegationTarget := genericapiserver.NewEmptyDelegate()
-	delegateHandler := delegationTarget.UnprotectedHandler()
-	if delegateHandler == nil {
-		delegateHandler = http.NotFoundHandler()
-	}
-
-	/* subresourceHandler := &SubresourceHandler{
-		Storage:             nil,
-		Authorizer:          s.GenericAPIServer.Authorizer,
-		MaxRequestBodyBytes: c.GenericConfig.MaxRequestBodyBytes,
-		DelegateHandler:     delegateHandler,
-	} */
-
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(PluginAPIGroup, Scheme, metav1.ParameterCodec, Codecs)
 	storageMap := map[string]rest.Storage{}
 
@@ -114,16 +101,13 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 		return nil, err
 	}
 	storageMap["datasources"] = datasourceREST
-	storageMap["datasources/query"] = &storage.SubresourceStreamerREST{}
+	storageMap["datasources/query"] = &registry.SubresourceStreamerREST{}
 	apiGroupInfo.VersionedResourcesStorageMap["v1"] = storageMap
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
 		fmt.Println("Could not install API Group", err)
 		return nil, err
 	}
-
-	// s.GenericAPIServer.Handler.NonGoRestfulMux.Handle(fmt.Sprintf("/apis/%s", PluginAPIGroup), subresourceHandler)
-	// s.GenericAPIServer.Handler.NonGoRestfulMux.HandlePrefix(fmt.Sprintf("/apis/%s/", PluginAPIGroup), subresourceHandler)
 
 	return s, nil
 }

@@ -1,4 +1,4 @@
-package storage
+package registry
 
 import (
 	"bytes"
