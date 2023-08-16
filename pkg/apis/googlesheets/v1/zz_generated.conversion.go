@@ -120,6 +120,15 @@ func Convert_googlesheets_DatasourceList_To_v1_DatasourceList(in *googlesheets.D
 }
 
 func autoConvert_v1_DatasourceSpec_To_googlesheets_DatasourceSpec(in *DatasourceSpec, out *googlesheets.DatasourceSpec, s conversion.Scope) error {
+	out.AuthType = in.AuthType
+	out.APIKey = in.APIKey
+	out.DefaultProject = in.DefaultProject
+	out.JWT = in.JWT
+	out.ClientEmail = in.ClientEmail
+	out.TokenURI = in.TokenURI
+	out.AuthenticationType = in.AuthenticationType
+	out.PrivateKeyPath = in.PrivateKeyPath
+	out.PrivateKey = in.PrivateKey
 	return nil
 }
 
@@ -129,6 +138,15 @@ func Convert_v1_DatasourceSpec_To_googlesheets_DatasourceSpec(in *DatasourceSpec
 }
 
 func autoConvert_googlesheets_DatasourceSpec_To_v1_DatasourceSpec(in *googlesheets.DatasourceSpec, out *DatasourceSpec, s conversion.Scope) error {
+	out.AuthType = in.AuthType
+	out.APIKey = in.APIKey
+	out.DefaultProject = in.DefaultProject
+	out.JWT = in.JWT
+	out.ClientEmail = in.ClientEmail
+	out.TokenURI = in.TokenURI
+	out.AuthenticationType = in.AuthenticationType
+	out.PrivateKeyPath = in.PrivateKeyPath
+	out.PrivateKey = in.PrivateKey
 	return nil
 }
 

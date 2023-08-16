@@ -9,3 +9,10 @@ dist/
 provisioning
 .eslintcache
 __debug_bin
+
+# k8s PoC
+apiserver.local.config/
+data/
+datasource.json
+gpx_sheets_darwin_arm64
+standalone.txt

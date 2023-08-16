@@ -2,7 +2,10 @@ package ext
 
 import (
 	"fmt"
+	generatedopenapi "github.com/grafana/google-sheets-datasource/pkg/client/openapi"
 	"io"
+	openapinamer "k8s.io/apiserver/pkg/endpoints/openapi"
+	"k8s.io/apiserver/pkg/util/openapi"
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -17,11 +20,8 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset/scheme"
 	informers "github.com/grafana/google-sheets-datasource/pkg/client/informers/externalversions"
 
-	generatedopenapi "github.com/grafana/google-sheets-datasource/pkg/client/openapi"
-	openapinamer "k8s.io/apiserver/pkg/endpoints/openapi"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
-	"k8s.io/apiserver/pkg/util/openapi"
 	netutils "k8s.io/utils/net"
 	"net"
 )
@@ -70,6 +70,10 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 		return []admission.PluginInitializer{}, nil
 	}
 
+	o.RecommendedOptions.Admission.RecommendedPluginOrder = []string{}
+	o.RecommendedOptions.Admission.DisablePlugins = []string{}
+	o.RecommendedOptions.Admission.EnablePlugins = []string{}
+
 	o.RecommendedOptions.SecureServing.BindPort = 6443
 	// o.RecommendedOptions.Authentication.DisableAnonymous = false
 	o.RecommendedOptions.Authentication.RemoteKubeConfigFileOptional = true
@@ -77,9 +81,9 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 	// better for development / testing
 	o.RecommendedOptions.Authorization = nil
 	// o.RecommendedOptions.Authorization.RemoteKubeConfigFileOptional = true
-	// o.RecommendedOptions.Authorization.AlwaysAllowPaths = []string{"/*"}
-	// o.RecommendedOptions.Authorization.AlwaysAllowGroups = []string{user.APIServerUser}
-	o.RecommendedOptions.Etcd = nil
+	// o.RecommendedOptions.Authorization.AlwaysAllowPaths = []string{"*"}
+	// o.RecommendedOptions.Authorization.AlwaysAllowGroups = []string{user.AllUnauthenticated, user.AllAuthenticated}
+	o.RecommendedOptions.Etcd.StorageConfig.Transport.ServerList = []string{"127.0.0.1:2379"}
 	o.RecommendedOptions.CoreAPI = nil
 
 	serverConfig := genericapiserver.NewRecommendedConfig(Codecs)

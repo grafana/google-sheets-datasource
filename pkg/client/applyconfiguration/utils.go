@@ -17,6 +17,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 	// Group=googlesheets.ext.grafana.com, Version=v1
 	case v1.SchemeGroupVersion.WithKind("Datasource"):
 		return &googlesheetsv1.DatasourceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("DatasourceSpec"):
+		return &googlesheetsv1.DatasourceSpecApplyConfiguration{}
 
 	}
 	return nil

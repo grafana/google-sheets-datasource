@@ -178,6 +178,73 @@ func schema_pkg_apis_googlesheets_v1_DatasourceSpec(ref common.ReferenceCallback
 			SchemaProps: spec.SchemaProps{
 				Description: "DatasourceSpec defines the desired state of Datasource",
 				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"authType": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"apiKey": {
+						SchemaProps: spec.SchemaProps{
+							Description: "jwt | key | gce",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"defaultProject": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"jwt": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"clientEmail": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"tokenUri": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"authenticationType": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"privateKeyPath": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"privateKey": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+				},
+				Required: []string{"authType", "apiKey", "defaultProject", "jwt", "clientEmail", "tokenUri", "authenticationType", "privateKeyPath", "privateKey"},
 			},
 		},
 	}

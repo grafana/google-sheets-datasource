@@ -5,7 +5,7 @@
 package v1
 
 import (
-	googlesheetsv1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
+	apisgooglesheetsv1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
@@ -16,8 +16,8 @@ import (
 type DatasourceApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *googlesheetsv1.DatasourceSpec   `json:"spec,omitempty"`
-	Status                           *googlesheetsv1.DatasourceStatus `json:"status,omitempty"`
+	Spec                             *DatasourceSpecApplyConfiguration    `json:"spec,omitempty"`
+	Status                           *apisgooglesheetsv1.DatasourceStatus `json:"status,omitempty"`
 }
 
 // Datasource constructs an declarative configuration of the Datasource type for use with
@@ -192,15 +192,15 @@ func (b *DatasourceApplyConfiguration) ensureObjectMetaApplyConfigurationExists(
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *DatasourceApplyConfiguration) WithSpec(value googlesheetsv1.DatasourceSpec) *DatasourceApplyConfiguration {
-	b.Spec = &value
+func (b *DatasourceApplyConfiguration) WithSpec(value *DatasourceSpecApplyConfiguration) *DatasourceApplyConfiguration {
+	b.Spec = value
 	return b
 }
 
 // WithStatus sets the Status field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Status field is set to the value of the last call.
-func (b *DatasourceApplyConfiguration) WithStatus(value googlesheetsv1.DatasourceStatus) *DatasourceApplyConfiguration {
+func (b *DatasourceApplyConfiguration) WithStatus(value apisgooglesheetsv1.DatasourceStatus) *DatasourceApplyConfiguration {
 	b.Status = &value
 	return b
 }

@@ -2,22 +2,19 @@ package ext
 
 import (
 	"fmt"
+	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/install"
 	"github.com/grafana/google-sheets-datasource/pkg/apiserver/registry"
-	"github.com/grafana/grafana-apiserver/pkg/storage/filepath"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/version"
-	clientRest "k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"path"
-
-	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/install"
-	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
+	clientRest "k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
+	"path"
 )
 
 const PluginAPIGroup = "googlesheets.ext.grafana.com"
@@ -39,7 +36,6 @@ var (
 )
 
 func init() {
-	fmt.Println("init: Potato")
 	install.Install(Scheme)
 
 	metav1.AddToGroupVersion(Scheme, schema.GroupVersion{Group: "", Version: "v1"})
@@ -96,7 +92,8 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(PluginAPIGroup, Scheme, metav1.ParameterCodec, Codecs)
 	storageMap := map[string]rest.Storage{}
 
-	datasourceREST, err := registry.NewREST(Scheme, filepath.NewRESTOptionsGetter("/tmp/plugin-apiserver", Codecs.LegacyCodec(v1.SchemeGroupVersion)))
+	// filepath.NewStorage("/tmp/plugin-apiserver", Codecs.LegacyCodec(v1.SchemeGroupVersion))
+	datasourceREST, err := registry.NewREST(Scheme, c.GenericConfig.RESTOptionsGetter)
 	if err != nil {
 		return nil, err
 	}

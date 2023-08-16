@@ -32,6 +32,15 @@ type DatasourceList struct {
 
 // DatasourceSpec defines the desired state of Datasource
 type DatasourceSpec struct {
+	AuthType           string `json:"authType"` // jwt | key | gce
+	APIKey             string `json:"apiKey"`
+	DefaultProject     string `json:"defaultProject"`
+	JWT                string `json:"jwt"`
+	ClientEmail        string `json:"clientEmail"`
+	TokenURI           string `json:"tokenUri"`
+	AuthenticationType string `json:"authenticationType"`
+	PrivateKeyPath     string `json:"privateKeyPath"`
+	PrivateKey         string `json:"privateKey"` // `json:"-"`
 }
 
 // DatasourceStatus defines the observed state of Datasource
