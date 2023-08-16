@@ -12,7 +12,6 @@ import (
 	"github.com/patrickmn/go-cache"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 )
 
@@ -29,7 +28,7 @@ type googleSheetsDatasource struct {
 }
 
 // NewDatasource creates a new Google Sheets datasource instance.
-func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func NewDatasource(settings backend.DataSourceInstanceSettings) (googleSheetsDatasource, error) {
 	ds := &googleSheetsDatasource{
 		googlesheets: &GoogleSheets{Cache: cache.New(300*time.Second, 5*time.Second)},
 	}

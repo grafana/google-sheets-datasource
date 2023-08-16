@@ -98,7 +98,9 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 		return nil, err
 	}
 	storageMap["datasources"] = datasourceREST
-	storageMap["datasources/query"] = &registry.SubresourceStreamerREST{}
+	storageMap["datasources/query"] = &registry.SubresourceStreamerREST{
+		RestConfig: c.GenericConfig.LoopbackClientConfig,
+	}
 	apiGroupInfo.VersionedResourcesStorageMap["v1"] = storageMap
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
