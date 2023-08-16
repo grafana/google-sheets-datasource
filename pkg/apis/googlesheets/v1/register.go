@@ -17,13 +17,12 @@ limitations under the License.
 package v1
 
 import (
-	"github.com/grafana/google-sheets-datasource/pkg/apiserver"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // GroupName is the group name used in this package
-const GroupName = apiserver.PluginAPIGroup
+const GroupName = "googlesheets.ext.grafana.com"
 
 // SchemeGroupVersion is group version used to register these objects
 var SchemeGroupVersion = schema.GroupVersion{Group: GroupName, Version: "v1"}

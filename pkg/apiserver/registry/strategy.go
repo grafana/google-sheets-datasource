@@ -28,9 +28,9 @@ func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 	return labels.Set(apiserver.ObjectMeta.Labels), SelectableFields(apiserver), nil
 }
 
-// MatchFlunder is the filter used by the generic etcd backend to watch events
+// MatchDatasource is the filter used by the generic etcd backend to watch events
 // from etcd to clients of the apiserver only interested in specific labels/fields.
-func MatchFlunder(label labels.Selector, field fields.Selector) storage.SelectionPredicate {
+func MatchDatasource(label labels.Selector, field fields.Selector) storage.SelectionPredicate {
 	return storage.SelectionPredicate{
 		Label:    label,
 		Field:    field,

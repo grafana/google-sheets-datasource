@@ -19,7 +19,7 @@ func NewREST(scheme *runtime.Scheme, optsGetter generic.RESTOptionsGetter) (*RES
 	store := &genericregistry.Store{
 		NewFunc:                   func() runtime.Object { return &googlesheets.Datasource{} },
 		NewListFunc:               func() runtime.Object { return &googlesheets.DatasourceList{} },
-		PredicateFunc:             MatchFlunder,
+		PredicateFunc:             MatchDatasource,
 		DefaultQualifiedResource:  googlesheets.Resource("datasources"),
 		SingularQualifiedResource: googlesheets.Resource("datasource"),
 

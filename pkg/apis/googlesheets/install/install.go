@@ -6,6 +6,7 @@
 package install
 
 import (
+	"fmt"
 	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets"
 	googlesheetsV1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -14,7 +15,8 @@ import (
 
 // Install registers the API group and adds types to a scheme
 func Install(scheme *runtime.Scheme) {
+	fmt.Println("init: Tomato")
 	utilruntime.Must(googlesheets.AddToScheme(scheme))
-	utilruntime.Must(googlesheets.AddToScheme(scheme))
+	utilruntime.Must(googlesheetsV1.AddToScheme(scheme))
 	utilruntime.Must(scheme.SetVersionPriority(googlesheetsV1.SchemeGroupVersion))
 }

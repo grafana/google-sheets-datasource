@@ -1,8 +1,8 @@
 package main
 
 import (
-	"context"
 	"github.com/grafana/google-sheets-datasource/pkg/ext"
+	genericapiserver "k8s.io/apiserver/pkg/server"
 	"os"
 
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
@@ -11,8 +11,14 @@ import (
 )
 
 func main() {
-	err := ext.Start(context.TODO())
-	if err != nil {
+	stopCh := genericapiserver.SetupSignalHandler()
+	options := ext.NewPluginAggregatedServerOptions(os.Stdout, os.Stderr)
+
+	if err := options.Complete(); err != nil {
+		panic(err)
+	}
+
+	if err := options.Run(stopCh); err != nil {
 		panic(err)
 	}
 
@@ -24,7 +30,7 @@ func main() {
 
 //
 // Group:
-//   google-sheets.ext.grafana.com
+//   googlesheets.ext.grafana.com
 // Kind:
 //   datasource ??
 //

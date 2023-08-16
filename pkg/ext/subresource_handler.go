@@ -1,4 +1,4 @@
-package apiserver
+package ext
 
 import (
 	"fmt"
@@ -19,7 +19,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apiserver/pkg/endpoints/handlers/responsewriters"
 	apirequest "k8s.io/apiserver/pkg/endpoints/request"
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
@@ -29,11 +28,6 @@ const PluginAPIGroup = "googlesheets.ext.grafana.com"
 const PluginAPIVersion = "v1"
 
 var _ http.Handler = &SubresourceHandler{}
-
-var (
-	Scheme = runtime.NewScheme()
-	Codecs = serializer.NewCodecFactory(Scheme)
-)
 
 type SubresourceHandler struct {
 	Storage             *storage.PluginResourceStorage
