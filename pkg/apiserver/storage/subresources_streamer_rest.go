@@ -3,24 +3,21 @@ package storage
 import (
 	"bytes"
 	"context"
+	"github.com/grafana/google-sheets-datasource/pkg/apiserver/apihelpers"
 	"io"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apiserver/pkg/registry/generic"
-	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
 	"k8s.io/apiserver/pkg/registry/rest"
-
-	"github.com/grafana/google-sheets-datasource/pkg/apiserver/apihelpers"
 )
 
+var _ rest.Storage = (*SubresourceStreamerREST)(nil)
 var _ rest.Getter = (*SubresourceStreamerREST)(nil)
 
 type SubresourceStreamerREST struct {
-	store *genericregistry.Store
+	// store *genericregistry.Store
 }
 
-func NewSubresourceStreamerREST(resource schema.GroupResource, singularResource schema.GroupResource, strategy apihelpers.StreamerStrategy, optsGetter generic.RESTOptionsGetter, tableConvertor rest.TableConvertor) *SubresourceStreamerREST {
+/* func NewSubresourceStreamerREST(resource schema.GroupResource, singularResource schema.GroupResource, strategy apihelpers.StreamerStrategy, optsGetter generic.RESTOptionsGetter, tableConvertor rest.TableConvertor) *SubresourceStreamerREST {
 	var storage SubresourceStreamerREST
 	store := &genericregistry.Store{
 		NewFunc:     func() runtime.Object { return &apihelpers.SubresourceStreamer{} },
@@ -43,11 +40,18 @@ func NewSubresourceStreamerREST(resource schema.GroupResource, singularResource 
 	storage.store = store
 	return &storage
 
-}
+} */
 
 func (r *SubresourceStreamerREST) New() runtime.Object {
-	return r.store.New()
+	return &apihelpers.SubresourceStreamer{}
 }
+
+func (r *SubresourceStreamerREST) Destroy() {
+}
+
+/* func (r *SubresourceStreamerREST) New() runtime.Object {
+	return r.store.New()
+} */
 
 func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
 	i := func(ctx context.Context, apiVersion, acceptHeader string) (stream io.ReadCloser, flush bool, mimeType string, err error) {

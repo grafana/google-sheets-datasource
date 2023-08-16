@@ -3,28 +3,51 @@ package ext
 import (
 	"context"
 	"fmt"
+	"github.com/grafana/google-sheets-datasource/pkg/apiserver/registry"
+	"github.com/grafana/grafana-apiserver/pkg/storage/filepath"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/runtime/serializer"
+
 	"github.com/grafana/google-sheets-datasource/pkg/apiserver"
-	"k8s.io/apiserver/pkg/authorization/authorizer"
-	"k8s.io/client-go/rest"
+	clientRest "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"net"
 	"net/http"
 	"os"
 	"path"
 
+	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/install"
+	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	"github.com/grafana/grafana-apiserver/pkg/certgenerator"
 	grafanaapiserveroptions "github.com/grafana/grafana-apiserver/pkg/cmd/server/options"
 	"k8s.io/apiserver/pkg/authentication/user"
+	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	"k8s.io/apiserver/pkg/server/options"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 )
 
-type FakeAuthorizer struct {
-}
+var (
+	Scheme = runtime.NewScheme()
+	Codecs = serializer.NewCodecFactory(Scheme)
+)
 
-func (fa *FakeAuthorizer) Authorize(ctx context.Context, a authorizer.Attributes) (authorized authorizer.Decision, reason string, err error) {
-	return authorizer.DecisionAllow, "", nil
+func init() {
+	install.Install(Scheme)
+
+	metav1.AddToGroupVersion(Scheme, schema.GroupVersion{Version: "v1"})
+
+	// TODO: keep the generic API server from wanting this
+	unversioned := schema.GroupVersion{Group: "", Version: "v1"}
+	Scheme.AddUnversionedTypes(unversioned,
+		&metav1.Status{},
+		&metav1.APIVersions{},
+		&metav1.APIGroupList{},
+		&metav1.APIGroup{},
+		&metav1.APIResourceList{},
+	)
 }
 
 func Start(ctx context.Context) error {
@@ -138,6 +161,23 @@ func Start(ctx context.Context) error {
 		DelegateHandler:     delegateHandler,
 	}
 
+	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(apiserver.PluginAPIGroup, Scheme, metav1.ParameterCodec, Codecs)
+	storageMap := map[string]rest.Storage{}
+
+	datasourceREST, err := registry.NewREST(Scheme, filepath.NewRESTOptionsGetter("/tmp/plugin-apiserver", Codecs.LegacyCodec(v1.SchemeGroupVersion)))
+	if err != nil {
+		return err
+	}
+	storageMap["datasources"] = datasourceREST
+	apiGroupInfo.VersionedResourcesStorageMap[v1.SchemeGroupVersion.Version] = storageMap
+
+	// storageMap["datasources/query"] = &storage.SubresourceStreamerREST{}
+
+	if err := server.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
+		fmt.Println("Could not install API Group", err)
+		return err
+	}
+
 	server.GenericAPIServer.Handler.NonGoRestfulMux.Handle(fmt.Sprintf("/apis/%s", apiserver.PluginAPIGroup), subresourceHandler)
 	server.GenericAPIServer.Handler.NonGoRestfulMux.HandlePrefix(fmt.Sprintf("/apis/%s/", apiserver.PluginAPIGroup), subresourceHandler)
 
@@ -173,7 +213,7 @@ func Start(ctx context.Context) error {
 	return nil
 }
 
-func writeKubeConfiguration(restConfig *rest.Config) error {
+func writeKubeConfiguration(restConfig *clientRest.Config) error {
 	clusters := make(map[string]*clientcmdapi.Cluster)
 	clusters["default-cluster"] = &clientcmdapi.Cluster{
 		Server:                restConfig.Host,

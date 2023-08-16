@@ -25,7 +25,7 @@ import (
 	"sigs.k8s.io/structured-merge-diff/v4/fieldpath"
 )
 
-const PluginAPIGroup = "google-sheets.ext.grafana.com"
+const PluginAPIGroup = "googlesheets.ext.grafana.com"
 const PluginAPIVersion = "v1"
 
 var _ http.Handler = &SubresourceHandler{}
@@ -170,10 +170,11 @@ func (sh *SubresourceHandler) ServeHTTP(w http.ResponseWriter, req *http.Request
 	)
 
 	switch {
-	case subresource == "query":
-		handlers.GetResource(sh.Storage.Query, &reqScope)
 	case len(subresource) == 0:
 		w.WriteHeader(404)
+		// refs
+		// history
+		// query
 	default:
 		responsewriters.ErrorNegotiated(
 			apierrors.NewNotFound(schema.GroupResource{Group: requestInfo.APIGroup, Resource: requestInfo.Resource}, requestInfo.Name),
