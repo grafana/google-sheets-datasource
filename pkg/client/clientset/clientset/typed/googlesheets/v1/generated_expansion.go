@@ -5,3 +5,5 @@
 package v1
 
 type DatasourceExpansion interface{}
+
+type DatasourceQueryExpansion interface{}
