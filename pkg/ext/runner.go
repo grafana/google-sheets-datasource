@@ -3,6 +3,7 @@ package ext
 import (
 	"fmt"
 	"github.com/grafana/google-sheets-datasource/pkg/apiserver/registry"
+	"github.com/grafana/google-sheets-datasource/pkg/apiserver/storage"
 	"github.com/grafana/grafana-apiserver/pkg/storage/filepath"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -113,7 +114,7 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 		return nil, err
 	}
 	storageMap["datasources"] = datasourceREST
-	// storageMap["datasources/query"] = &storage.SubresourceStreamerREST{}
+	storageMap["datasources/query"] = &storage.SubresourceStreamerREST{}
 	apiGroupInfo.VersionedResourcesStorageMap["v1"] = storageMap
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {

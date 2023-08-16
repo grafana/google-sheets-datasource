@@ -18,7 +18,6 @@ import (
 	informers "github.com/grafana/google-sheets-datasource/pkg/client/informers/externalversions"
 
 	generatedopenapi "github.com/grafana/google-sheets-datasource/pkg/client/openapi"
-	"k8s.io/apiserver/pkg/authentication/user"
 	openapinamer "k8s.io/apiserver/pkg/endpoints/openapi"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	genericoptions "k8s.io/apiserver/pkg/server/options"
@@ -73,10 +72,13 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 
 	o.RecommendedOptions.SecureServing.BindPort = 6443
 	// o.RecommendedOptions.Authentication.DisableAnonymous = false
-	o.RecommendedOptions.Authentication.RemoteKubeConfigFile = "/Users/charandas/.kube/config"
-	o.RecommendedOptions.Authorization.RemoteKubeConfigFile = "/Users/charandas/.kube/config"
-	o.RecommendedOptions.Authorization.AlwaysAllowPaths = []string{"*"}
-	o.RecommendedOptions.Authorization.AlwaysAllowGroups = []string{user.Anonymous}
+	o.RecommendedOptions.Authentication.RemoteKubeConfigFileOptional = true
+	// Setting authorization to nil sets authorization to always allow more effectively than below options
+	// better for development / testing
+	o.RecommendedOptions.Authorization = nil
+	// o.RecommendedOptions.Authorization.RemoteKubeConfigFileOptional = true
+	// o.RecommendedOptions.Authorization.AlwaysAllowPaths = []string{"/*"}
+	// o.RecommendedOptions.Authorization.AlwaysAllowGroups = []string{user.APIServerUser}
 	o.RecommendedOptions.Etcd = nil
 	o.RecommendedOptions.CoreAPI = nil
 

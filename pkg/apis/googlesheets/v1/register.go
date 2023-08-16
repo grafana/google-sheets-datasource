@@ -59,6 +59,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&Datasource{},
 		&DatasourceList{},
+		&DatasourceQuery{},
 	)
 	return nil
 }

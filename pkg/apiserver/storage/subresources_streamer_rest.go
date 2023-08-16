@@ -3,6 +3,7 @@ package storage
 import (
 	"bytes"
 	"context"
+	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	"github.com/grafana/google-sheets-datasource/pkg/apiserver/apihelpers"
 	"io"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -43,7 +44,7 @@ type SubresourceStreamerREST struct {
 } */
 
 func (r *SubresourceStreamerREST) New() runtime.Object {
-	return &apihelpers.SubresourceStreamer{}
+	return &v1.DatasourceQuery{}
 }
 
 func (r *SubresourceStreamerREST) Destroy() {

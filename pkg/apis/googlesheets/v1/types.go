@@ -9,6 +9,8 @@ import (
 // Datasource
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +resource:path=datasources,strategy=DatasourceStrategy
+// +subresource:request=DatasourceQuery,path=query,kind=DatasourceQuery,rest=DatasourceQueryREST
 type Datasource struct {
 	metav1.TypeMeta `json:",inline"`
 	// +optional
