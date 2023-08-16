@@ -16,7 +16,6 @@ import (
 
 	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/install"
 	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
-	"github.com/grafana/google-sheets-datasource/pkg/apiserver/apihelpers"
 	"k8s.io/apiserver/pkg/registry/rest"
 	genericapiserver "k8s.io/apiserver/pkg/server"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
@@ -35,7 +34,6 @@ var (
 		&metav1.APIGroupList{},
 		&metav1.APIGroup{},
 		&metav1.APIResourceList{},
-		&apihelpers.SubresourceStreamer{},
 	}
 )
 
