@@ -23,34 +23,8 @@ var _ rest.Storage = (*SubresourceStreamerREST)(nil)
 var _ rest.Getter = (*SubresourceStreamerREST)(nil)
 
 type SubresourceStreamerREST struct {
-	// store *genericregistry.Store
 	RestConfig *restclient.Config
 }
-
-/* func NewSubresourceStreamerREST(resource schema.GroupResource, singularResource schema.GroupResource, strategy apihelpers.StreamerStrategy, optsGetter generic.RESTOptionsGetter, tableConvertor rest.TableConvertor) *SubresourceStreamerREST {
-	var storage SubresourceStreamerREST
-	store := &genericregistry.Store{
-		NewFunc:     func() runtime.Object { return &apihelpers.SubresourceStreamer{} },
-		NewListFunc: func() runtime.Object { return &apihelpers.SubresourceStreamer{} },
-
-		DefaultQualifiedResource:  resource,
-		SingularQualifiedResource: singularResource,
-
-		CreateStrategy:      strategy,
-		UpdateStrategy:      strategy,
-		DeleteStrategy:      strategy,
-		ResetFieldsStrategy: strategy,
-
-		TableConvertor: tableConvertor,
-	}
-	options := &generic.StoreOptions{RESTOptions: optsGetter}
-	if err := store.CompleteWithOptions(options); err != nil {
-		panic(err) // TODO: Propagate error up
-	}
-	storage.store = store
-	return &storage
-
-} */
 
 func (r *SubresourceStreamerREST) New() runtime.Object {
 	return &v1.Datasource{}
@@ -58,10 +32,6 @@ func (r *SubresourceStreamerREST) New() runtime.Object {
 
 func (r *SubresourceStreamerREST) Destroy() {
 }
-
-/* func (r *SubresourceStreamerREST) New() runtime.Object {
-	return r.store.New()
-} */
 
 func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
 	cs, err := clientset.NewForConfig(r.RestConfig)
@@ -76,10 +46,10 @@ func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, options 
 
 	settings := backend.DataSourceInstanceSettings{}
 	settings.JSONData, err = json.Marshal(ds.Spec)
-	// settings.DecryptedSecureJSONData = map[string]string{}
 
-	// settings.DecryptedSecureJSONData["apiKey"] = ds.Spec.APIKey
-	// settings.DecryptedSecureJSONData["jwt"] = ds.Spec.JWT
+	settings.DecryptedSecureJSONData = map[string]string{}
+	settings.DecryptedSecureJSONData["apiKey"] = ds.Spec.APIKey
+	settings.DecryptedSecureJSONData["jwt"] = ds.Spec.JWT
 
 	settings.Type = "grafana-googlesheets-datasource"
 
@@ -133,7 +103,7 @@ func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, options 
 			//  Headers: // from context
 		})
 		if err != nil {
-			klog.Info("QueryResponse: +%v", queryResponse)
+			klog.Info("QueryResponse: %v", queryResponse)
 		}
 
 		jsonRsp, err := json.Marshal(queryResponse)
