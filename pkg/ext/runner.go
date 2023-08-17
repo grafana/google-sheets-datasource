@@ -99,7 +99,7 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 		return nil, err
 	}
 	storageMap["datasources"] = datasourceREST
-	storageMap["datasources/query"] = &registry.SubresourceStreamerREST{
+	storageMap["datasources/query"] = &SubresourceStreamerREST{
 		RestConfig: c.GenericConfig.LoopbackClientConfig,
 	}
 	apiGroupInfo.VersionedResourcesStorageMap["v1"] = storageMap
