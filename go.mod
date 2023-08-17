@@ -6,7 +6,6 @@ require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-logr/logr v1.2.4
-	github.com/grafana/grafana-apiserver v0.0.0-20230713001719-88a9ed41992d
 	github.com/grafana/grafana-google-sdk-go v0.2.1
 	github.com/grafana/grafana-plugin-sdk-go v0.149.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
@@ -17,6 +16,7 @@ require (
 	k8s.io/apimachinery v0.27.4
 	k8s.io/apiserver v0.27.4
 	k8s.io/client-go v0.27.4
+	k8s.io/klog v1.0.0
 	k8s.io/kube-openapi v0.0.0-20230501164219-8b0f38b5fd1f
 	k8s.io/utils v0.0.0-20230406110748-d93618cff8a2
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3
@@ -32,7 +32,6 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
-	github.com/bwmarrin/snowflake v0.3.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cheekybits/genny v1.0.0 // indirect

@@ -13,6 +13,8 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 )
 
+const GroupName = "googlesheets.ext.grafana.com"
+
 var Scheme = runtime.NewScheme()
 var Codecs = serializer.NewCodecFactory(Scheme)
 var ParameterCodec = runtime.NewParameterCodec(Scheme)
@@ -39,4 +41,13 @@ var AddToScheme = localSchemeBuilder.AddToScheme
 func init() {
 	v1.AddToGroupVersion(Scheme, schema.GroupVersion{Version: "v1"})
 	utilruntime.Must(AddToScheme(Scheme))
+	// NOTE: Had to manually add the below fragment - it wasn't part of the codegen and was prohibiting the use of GetOptions
+	// when needing to use the clientset
+	Scheme.AddUnversionedTypes(
+		schema.GroupVersion{Group: GroupName, Version: "v1"},
+		&v1.ListOptions{},
+		&v1.GetOptions{},
+		&v1.DeleteOptions{},
+	)
 }
+

@@ -7,6 +7,7 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"k8s.io/apiserver/pkg/endpoints/request"
+	"k8s.io/klog"
 
 	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	"github.com/grafana/google-sheets-datasource/pkg/apiserver/apihelpers"
@@ -75,35 +76,67 @@ func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, options 
 
 	settings := backend.DataSourceInstanceSettings{}
 	settings.JSONData, err = json.Marshal(ds.Spec)
-	settings.DecryptedSecureJSONData = map[string]string{}
+	// settings.DecryptedSecureJSONData = map[string]string{}
 
-	settings.DecryptedSecureJSONData["apiKey"] = ds.Spec.APIKey
-	settings.DecryptedSecureJSONData["jwt"] = ds.Spec.JWT
+	// settings.DecryptedSecureJSONData["apiKey"] = ds.Spec.APIKey
+	// settings.DecryptedSecureJSONData["jwt"] = ds.Spec.JWT
 
 	settings.Type = "grafana-googlesheets-datasource"
 
 	pluginCtx := &backend.PluginContext{
-		OrgID:                      0,
+		OrgID:                      1,
 		PluginID:                   settings.Type,
 		User:                       &backend.User{},
-		AppInstanceSettings:        &backend.AppInstanceSettings{},,
-		DataSourceInstanceSettings: settings,
+		AppInstanceSettings:        &backend.AppInstanceSettings{},
+		DataSourceInstanceSettings: &settings,
 	}
 
 	instance, err := googlesheets.NewDatasource(settings)
+	if err != nil {
+		return nil, err
+	}
+
+	googleSheetDatasource, ok := instance.(*googlesheets.GoogleSheetsDatasource)
+	if !ok {
+		return nil, err
+	}
+
+	customProperties, err := json.Marshal(map[string]interface{}{
+		"cacheDurationSeconds": 300,
+		"spreadsheet":          "19sbxbIdRUNOeYECMlq2D3nFwD5oVJf1m8YRHcB1UXOY",
+		"range":                "To do!C6",
+		"datasourceId":         4, // ds.Spec.Id
+		"datasource": map[string]string{
+			"uid":  "b1808c48-9fc9-4045-82d7-081781f8a553",
+			"type": "grafana-googlesheets-datasource",
+		},
+	})
 
 	if err != nil {
 		return nil, err
 	}
 
 	i := func(ctx context.Context, apiVersion, acceptHeader string) (stream io.ReadCloser, flush bool, mimeType string, err error) {
-		instance.QueryData(ctx, &backend.QueryDataRequest{
-			PluginContext: pluginCtx,
-			Queries: []backend.DataQuery{},
+
+		queryResponse, err := googleSheetDatasource.QueryData(ctx, &backend.QueryDataRequest{
+			PluginContext: *pluginCtx,
+			Queries: []backend.DataQuery{
+				{
+					RefID: "A",
+					// QueryType:     "", // not defined in the original request as sniffed from a browser session
+					MaxDataPoints: 1541,
+					Interval:      15000,
+					TimeRange:     backend.TimeRange{},
+					JSON:          customProperties,
+				},
+			},
 			//  Headers: // from context
 		})
+		if err != nil {
+			klog.Info("QueryResponse: +%v", queryResponse)
+		}
 
-		jsonRsp := []byte("{\"test\": \"true\"}")
+		jsonRsp, err := json.Marshal(queryResponse)
 		if err != nil {
 			return nil, false, "", err
 		}

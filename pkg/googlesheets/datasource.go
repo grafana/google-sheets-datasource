@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"net/http"
 	"time"
 
@@ -16,20 +17,20 @@ import (
 )
 
 var (
-	_ backend.QueryDataHandler    = (*googleSheetsDatasource)(nil)
-	_ backend.CheckHealthHandler  = (*googleSheetsDatasource)(nil)
-	_ backend.CallResourceHandler = (*googleSheetsDatasource)(nil)
+	_ backend.QueryDataHandler    = (*GoogleSheetsDatasource)(nil)
+	_ backend.CheckHealthHandler  = (*GoogleSheetsDatasource)(nil)
+	_ backend.CallResourceHandler = (*GoogleSheetsDatasource)(nil)
 )
 
-type googleSheetsDatasource struct {
+type GoogleSheetsDatasource struct {
 	googlesheets *GoogleSheets
 
 	backend.CallResourceHandler
 }
 
 // NewDatasource creates a new Google Sheets datasource instance.
-func NewDatasource(settings backend.DataSourceInstanceSettings) (googleSheetsDatasource, error) {
-	ds := &googleSheetsDatasource{
+func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+	ds := &GoogleSheetsDatasource{
 		googlesheets: &GoogleSheets{Cache: cache.New(300*time.Second, 5*time.Second)},
 	}
 
@@ -41,7 +42,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (googleSheetsDat
 }
 
 // CheckHealth checks if the datasource is working.
-func (d *googleSheetsDatasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
+func (d *GoogleSheetsDatasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	res := &backend.CheckHealthResult{}
 	log.DefaultLogger.Debug("CheckHealth called")
 	config, err := models.LoadSettings(req.PluginContext)
@@ -75,7 +76,7 @@ func (d *googleSheetsDatasource) CheckHealth(ctx context.Context, req *backend.C
 }
 
 // QueryData handles queries to the datasource.
-func (d *googleSheetsDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+func (d *GoogleSheetsDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	// create response struct
 	response := backend.NewQueryDataResponse()
 
@@ -127,7 +128,7 @@ func writeResult(rw http.ResponseWriter, path string, val interface{}, err error
 	rw.WriteHeader(code)
 }
 
-func (d *googleSheetsDatasource) handleResourceSpreadsheets(rw http.ResponseWriter, req *http.Request) {
+func (d *GoogleSheetsDatasource) handleResourceSpreadsheets(rw http.ResponseWriter, req *http.Request) {
 	log.DefaultLogger.Debug("Received resource call", "url", req.URL.String())
 	if req.Method != http.MethodGet {
 		return
