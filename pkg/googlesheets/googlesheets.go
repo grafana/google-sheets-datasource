@@ -1,18 +1,18 @@
 package googlesheets
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
 
-	"context"
+	"github.com/grafana/google-sheets-datasource/pkg/models"
 
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
-	"github.com/grafana/grafana-plugin-sdk-go/data"
+	sdkData "github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
 	"google.golang.org/api/sheets/v4"
 )
@@ -116,11 +116,11 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 	return data, map[string]interface{}{"hit": false}, nil
 }
 
-func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {
+func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*sdkData.Frame, error) {
 	columns, start := getColumnDefinitions(sheet.RowData)
 	warnings := []string{}
 
-	converters := make([]data.FieldConverter, len(columns))
+	converters := make([]sdkData.FieldConverter, len(columns))
 	for i, column := range columns {
 		fc, ok := converterMap[column.GetType()]
 		if !ok {
@@ -129,7 +129,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		converters[i] = fc
 	}
 
-	inputConverter, err := data.NewFrameInputConverter(converters, len(sheet.RowData)-start)
+	inputConverter, err := sdkData.NewFrameInputConverter(converters, len(sheet.RowData)-start)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	for i, column := range columns {
 		field := frame.Fields[i]
 		field.Name = column.Header
-		field.Config = &data.FieldConfig{
+		field.Config = &sdkData.FieldConfig{
 			DisplayName: column.Header,
 			Unit:        column.GetUnit(),
 		}
@@ -178,14 +178,14 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	meta["warnings"] = warnings
 	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
-	frame.Meta = &data.FrameMeta{Custom: meta}
+	frame.Meta = &sdkData.FrameMeta{Custom: meta}
 	log.DefaultLogger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
 	return frame, nil
 }
 
 // timeConverter handles sheets TIME column types.
-var timeConverter = data.FieldConverter{
-	OutputFieldType: data.FieldTypeNullableTime,
+var timeConverter = sdkData.FieldConverter{
+	OutputFieldType: sdkData.FieldTypeNullableTime,
 	Converter: func(i interface{}) (interface{}, error) {
 		var t *time.Time
 		cellData, ok := i.(*sheets.CellData)
@@ -201,8 +201,8 @@ var timeConverter = data.FieldConverter{
 }
 
 // stringConverter handles sheets STRING column types.
-var stringConverter = data.FieldConverter{
-	OutputFieldType: data.FieldTypeNullableString,
+var stringConverter = sdkData.FieldConverter{
+	OutputFieldType: sdkData.FieldTypeNullableString,
 	Converter: func(i interface{}) (interface{}, error) {
 		var s *string
 		cellData, ok := i.(*sheets.CellData)
@@ -214,8 +214,8 @@ var stringConverter = data.FieldConverter{
 }
 
 // numberConverter handles sheets STRING column types.
-var numberConverter = data.FieldConverter{
-	OutputFieldType: data.FieldTypeNullableFloat64,
+var numberConverter = sdkData.FieldConverter{
+	OutputFieldType: sdkData.FieldTypeNullableFloat64,
 	Converter: func(i interface{}) (interface{}, error) {
 		cellData, ok := i.(*sheets.CellData)
 		if !ok {
@@ -227,7 +227,7 @@ var numberConverter = data.FieldConverter{
 
 // converterMap is a map sheets.ColumnType to fieldConverter and
 // is used to create a data.FrameInputConverter for a returned sheet.
-var converterMap = map[ColumnType]data.FieldConverter{
+var converterMap = map[ColumnType]sdkData.FieldConverter{
 	"TIME":   timeConverter,
 	"STRING": stringConverter,
 	"NUMBER": numberConverter,

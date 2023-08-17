@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/grafana/google-sheets-datasource/pkg/ext"
-	genericapiserver "k8s.io/apiserver/pkg/server"
 	"os"
 
+	"github.com/grafana/google-sheets-datasource/pkg/ext"
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
+
 	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
+	genericapiserver "k8s.io/apiserver/pkg/server"
 )
 
 func main() {
@@ -27,10 +28,3 @@ func main() {
 		os.Exit(1)
 	}
 }
-
-//
-// Group:
-//   googlesheets.ext.grafana.com
-// Kind:
-//   datasource ??
-//

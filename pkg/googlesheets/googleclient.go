@@ -3,10 +3,10 @@ package googlesheets
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
+
 	"github.com/grafana/grafana-google-sdk-go/pkg/tokenprovider"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/pkg/errors"
@@ -88,7 +88,7 @@ func (gc *GoogleClient) TestClient() error {
 }
 
 // GetSpreadsheet gets a google spreadsheet struct by id and range
-func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
+func (gc *GoogleClient) GetSpreadsheet(spreadSheetID string, sheetRange string, _ bool) (*sheets.Spreadsheet, error) {
 	req := gc.sheetsService.Spreadsheets.Get(spreadSheetID)
 	if len(sheetRange) > 0 {
 		req = req.Ranges(sheetRange)
@@ -139,7 +139,7 @@ func createSheetsService(ctx context.Context, settings models.DatasourceSettings
 
 	srv, err := sheets.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
-		log.Fatalf("Unable to retrieve Sheets client: %v", err)
+		return nil, fmt.Errorf("Unable to retrieve Sheets client: %v", err)
 	}
 
 	return srv, nil
@@ -164,7 +164,7 @@ func createDriveService(ctx context.Context, settings models.DatasourceSettings)
 
 	srv, err := drive.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
-		log.Fatalf("Unable to retrieve Drive client: %v", err)
+		return nil, fmt.Errorf("Unable to retrieve Drive client: %v", err)
 	}
 
 	return srv, nil

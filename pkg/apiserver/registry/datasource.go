@@ -2,6 +2,7 @@ package registry
 
 import (
 	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"

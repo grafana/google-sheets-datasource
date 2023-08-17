@@ -3,12 +3,13 @@ package registry
 import (
 	"context"
 	"fmt"
+
 	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets"
 
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/validation/field"
+	apifield "k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/apiserver/pkg/registry/generic"
 	"k8s.io/apiserver/pkg/storage"
 	"k8s.io/apiserver/pkg/storage/names"
@@ -19,11 +20,11 @@ func NewStrategy(typer runtime.ObjectTyper) datasourceStrategy {
 	return datasourceStrategy{typer, names.SimpleNameGenerator}
 }
 
-// GetAttrs returns labels.Set, fields.Set, and error in case the given runtime.Object is not a Flunder
+// GetAttrs returns labels.Set, fields.Set, and error in case the given runtime.Object is not a Datasource
 func GetAttrs(obj runtime.Object) (labels.Set, fields.Set, error) {
 	apiserver, ok := obj.(*googlesheets.Datasource)
 	if !ok {
-		return nil, nil, fmt.Errorf("given object is not a Flunder")
+		return nil, nil, fmt.Errorf("given object is not a Datasource")
 	}
 	return labels.Set(apiserver.ObjectMeta.Labels), SelectableFields(apiserver), nil
 }
@@ -52,18 +53,18 @@ func (datasourceStrategy) NamespaceScoped() bool {
 	return true
 }
 
-func (datasourceStrategy) PrepareForCreate(ctx context.Context, obj runtime.Object) {
+func (datasourceStrategy) PrepareForCreate(_ context.Context, _ runtime.Object) {
 }
 
-func (datasourceStrategy) PrepareForUpdate(ctx context.Context, obj, old runtime.Object) {
+func (datasourceStrategy) PrepareForUpdate(_ context.Context, _, _ runtime.Object) {
 }
 
-func (datasourceStrategy) Validate(ctx context.Context, obj runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+func (datasourceStrategy) Validate(_ context.Context, _ runtime.Object) apifield.ErrorList {
+	return apifield.ErrorList{}
 }
 
 // WarningsOnCreate returns warnings for the creation of the given object.
-func (datasourceStrategy) WarningsOnCreate(ctx context.Context, obj runtime.Object) []string {
+func (datasourceStrategy) WarningsOnCreate(_ context.Context, _ runtime.Object) []string {
 	return nil
 }
 
@@ -75,14 +76,14 @@ func (datasourceStrategy) AllowUnconditionalUpdate() bool {
 	return false
 }
 
-func (datasourceStrategy) Canonicalize(obj runtime.Object) {
+func (datasourceStrategy) Canonicalize(_ runtime.Object) {
 }
 
-func (datasourceStrategy) ValidateUpdate(ctx context.Context, obj, old runtime.Object) field.ErrorList {
-	return field.ErrorList{}
+func (datasourceStrategy) ValidateUpdate(_ context.Context, _, _ runtime.Object) apifield.ErrorList {
+	return apifield.ErrorList{}
 }
 
 // WarningsOnUpdate returns warnings for the given update.
-func (datasourceStrategy) WarningsOnUpdate(ctx context.Context, obj, old runtime.Object) []string {
+func (datasourceStrategy) WarningsOnUpdate(_ context.Context, _, _ runtime.Object) []string {
 	return nil
 }

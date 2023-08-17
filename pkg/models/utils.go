@@ -10,12 +10,12 @@ import (
 
 // Fork to temporarily use private key insensitively for POC from SDK util
 
-type JSONData struct {
+type jsonData struct {
 	PrivateKey string `json:"privateKey"`
 }
 
 func getPrivateKey(settings *backend.DataSourceInstanceSettings) (string, error) {
-	jsonData := JSONData{}
+	jsonData := jsonData{}
 
 	if err := json.Unmarshal(settings.JSONData, &jsonData); err != nil {
 		return "", fmt.Errorf("could not unmarshal DataSourceInfo json: %w", err)

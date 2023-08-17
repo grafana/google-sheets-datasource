@@ -4,17 +4,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"k8s.io/apiserver/pkg/endpoints/request"
-	"k8s.io/klog"
+	"io"
 
 	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	"github.com/grafana/google-sheets-datasource/pkg/apiserver/apihelpers"
 	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset"
-	"io"
+	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
+
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apiserver/pkg/endpoints/request"
 	"k8s.io/apiserver/pkg/registry/rest"
 	restclient "k8s.io/client-go/rest"
 )
@@ -33,7 +33,7 @@ func (r *SubresourceStreamerREST) New() runtime.Object {
 func (r *SubresourceStreamerREST) Destroy() {
 }
 
-func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, _ *metav1.GetOptions) (runtime.Object, error) {
 	cs, err := clientset.NewForConfig(r.RestConfig)
 	if err != nil {
 		return nil, err
@@ -46,6 +46,10 @@ func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, options 
 
 	settings := backend.DataSourceInstanceSettings{}
 	settings.JSONData, err = json.Marshal(ds.Spec)
+
+	if err != nil {
+		return nil, err
+	}
 
 	settings.DecryptedSecureJSONData = map[string]string{}
 	settings.DecryptedSecureJSONData["apiKey"] = ds.Spec.APIKey
@@ -66,7 +70,7 @@ func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, options 
 		return nil, err
 	}
 
-	googleSheetDatasource, ok := instance.(*googlesheets.GoogleSheetsDatasource)
+	googleSheetDatasource, ok := instance.(*googlesheets.Datasource)
 	if !ok {
 		return nil, err
 	}
@@ -87,7 +91,6 @@ func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, options 
 	}
 
 	i := func(ctx context.Context, apiVersion, acceptHeader string) (stream io.ReadCloser, flush bool, mimeType string, err error) {
-
 		queryResponse, err := googleSheetDatasource.QueryData(ctx, &backend.QueryDataRequest{
 			PluginContext: *pluginCtx,
 			Queries: []backend.DataQuery{
@@ -103,7 +106,7 @@ func (r *SubresourceStreamerREST) Get(ctx context.Context, name string, options 
 			//  Headers: // from context
 		})
 		if err != nil {
-			klog.Info("QueryResponse: %v", queryResponse)
+			return nil, false, "", err
 		}
 
 		jsonRsp, err := json.Marshal(queryResponse)

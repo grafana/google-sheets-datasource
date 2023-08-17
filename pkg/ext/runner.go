@@ -1,9 +1,11 @@
 package ext
 
 import (
-	"fmt"
+	"path"
+
 	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/install"
 	"github.com/grafana/google-sheets-datasource/pkg/apiserver/registry"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -14,7 +16,7 @@ import (
 	clientRest "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
-	"path"
+	"k8s.io/klog/v2"
 )
 
 const PluginAPIGroup = "googlesheets.ext.grafana.com"
@@ -40,7 +42,6 @@ func init() {
 
 	metav1.AddToGroupVersion(Scheme, schema.GroupVersion{Group: "", Version: "v1"})
 	Scheme.AddUnversionedTypes(unversionedVersion, unversionedTypes...)
-
 }
 
 type PluginAggregatedServer struct {
@@ -104,7 +105,7 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 	apiGroupInfo.VersionedResourcesStorageMap["v1"] = storageMap
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
-		fmt.Println("Could not install API Group", err)
+		klog.Info("Could not install API Group", err)
 		return nil, err
 	}
 

@@ -2,28 +2,27 @@ package ext
 
 import (
 	"fmt"
-	generatedopenapi "github.com/grafana/google-sheets-datasource/pkg/client/openapi"
 	"io"
-	openapinamer "k8s.io/apiserver/pkg/endpoints/openapi"
-	"k8s.io/apiserver/pkg/util/openapi"
+	"net"
 	"time"
+
+	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
+	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset"
+	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset/scheme"
+	informers "github.com/grafana/google-sheets-datasource/pkg/client/informers/externalversions"
+	generatedopenapi "github.com/grafana/google-sheets-datasource/pkg/client/openapi"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/admission"
+	openapinamer "k8s.io/apiserver/pkg/endpoints/openapi"
+	genericapiserver "k8s.io/apiserver/pkg/server"
+	genericoptions "k8s.io/apiserver/pkg/server/options"
+	"k8s.io/apiserver/pkg/util/openapi"
 	clientGoInformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/rest"
-
-	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
-	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset"
-	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset/scheme"
-	informers "github.com/grafana/google-sheets-datasource/pkg/client/informers/externalversions"
-
-	genericapiserver "k8s.io/apiserver/pkg/server"
-	genericoptions "k8s.io/apiserver/pkg/server/options"
 	netutils "k8s.io/utils/net"
-	"net"
 )
 
 type PluginAggregatedServerOptions struct {
