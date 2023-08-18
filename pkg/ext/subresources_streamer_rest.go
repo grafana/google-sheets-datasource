@@ -16,9 +16,20 @@ import (
 
 var _ rest.Storage = (*SubresourceStreamerREST)(nil)
 var _ rest.Getter = (*SubresourceStreamerREST)(nil)
+var _ rest.CreaterUpdater = (*SubresourceStreamerREST)(nil)
 
 type SubresourceStreamerREST struct {
 	RestConfig *restclient.Config
+}
+
+func (r *SubresourceStreamerREST) Create(ctx context.Context, obj runtime.Object, createValidation rest.ValidateObjectFunc, options *metav1.CreateOptions) (runtime.Object, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *SubresourceStreamerREST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (r *SubresourceStreamerREST) New() runtime.Object {

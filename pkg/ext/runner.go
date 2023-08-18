@@ -1,11 +1,11 @@
 package ext
 
 import (
+	"net/http"
 	"path"
 
 	"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/install"
 	"github.com/grafana/google-sheets-datasource/pkg/apiserver/registry"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -46,6 +46,7 @@ func init() {
 
 type PluginAggregatedServer struct {
 	GenericAPIServer *genericapiserver.GenericAPIServer
+	RequestHandler   *RequestHandler
 }
 
 type Config struct {
@@ -76,7 +77,24 @@ func (cfg *Config) Complete() CompletedConfig {
 
 // New returns a new instance of PluginAggregatedServer from the given config.
 func (c completedConfig) New() (*PluginAggregatedServer, error) {
-	genericServer, err := c.GenericConfig.New("sample-apiserver", genericapiserver.NewEmptyDelegate())
+	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(PluginAPIGroup, Scheme, metav1.ParameterCodec, Codecs)
+	storageMap := map[string]rest.Storage{}
+
+	// filepath.NewStorage("/tmp/plugin-apiserver", Codecs.LegacyCodec(v1.SchemeGroupVersion))
+	datasourceREST, err := registry.NewREST(Scheme, c.GenericConfig.RESTOptionsGetter)
+	if err != nil {
+		return nil, err
+	}
+	storageMap["datasources"] = datasourceREST
+	/* storageMap["datasources/health"] = &SubresourceStreamerREST{
+		RestConfig: c.GenericConfig.LoopbackClientConfig,
+	}
+	storageMap["datasources/query"] = &SubresourceStreamerREST{
+		RestConfig: c.GenericConfig.LoopbackClientConfig,
+	} */
+
+	delegationTarget := genericapiserver.NewEmptyDelegate()
+	genericServer, err := c.GenericConfig.New("sample-apiserver", delegationTarget)
 	if err != nil {
 		return nil, err
 	}
@@ -90,22 +108,20 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 		return nil, err
 	}
 
-	apiGroupInfo := genericapiserver.NewDefaultAPIGroupInfo(PluginAPIGroup, Scheme, metav1.ParameterCodec, Codecs)
-	storageMap := map[string]rest.Storage{}
-
-	// filepath.NewStorage("/tmp/plugin-apiserver", Codecs.LegacyCodec(v1.SchemeGroupVersion))
-	datasourceREST, err := registry.NewREST(Scheme, c.GenericConfig.RESTOptionsGetter)
-	if err != nil {
-		return nil, err
-	}
-	storageMap["datasources"] = datasourceREST
-	storageMap["datasources/health"] = &SubresourceStreamerREST{
-		RestConfig: c.GenericConfig.LoopbackClientConfig,
-	}
-	storageMap["datasources/query"] = &SubresourceStreamerREST{
-		RestConfig: c.GenericConfig.LoopbackClientConfig,
-	}
 	apiGroupInfo.VersionedResourcesStorageMap["v1"] = storageMap
+
+	delegateHandler := delegationTarget.UnprotectedHandler()
+	if delegateHandler == nil {
+		delegateHandler = http.NotFoundHandler()
+	}
+
+	s.RequestHandler = &RequestHandler{
+		delegate: delegateHandler,
+	}
+
+	// s.GenericAPIServer.Handler.NonGoRestfulMux.Handle("/apis", s.RequestHandler)
+	// s.GenericAPIServer.Handler.NonGoRestfulMux.HandlePrefix("/apis/", s.RequestHandler)
+	// s.GenericAPIServer.RegisterDestroyFunc(s.RequestHandler.destroy)
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {
 		klog.Info("Could not install API Group", err)
