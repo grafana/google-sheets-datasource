@@ -93,7 +93,7 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 	serverConfig.SharedInformerFactory = clientGoInformers.NewSharedInformerFactory(fake.NewSimpleClientset(), 10*time.Minute)
 	serverConfig.ClientConfig = &rest.Config{}
 	serverConfig.BuildHandlerChainFunc = func(apiHandler http.Handler, c *genericapiserver.Config) http.Handler {
-		return &RequestHandler{delegate: genericapiserver.DefaultBuildHandlerChain(apiHandler, c)}
+		return NewRequestHandler(apiHandler, c)
 	}
 
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {

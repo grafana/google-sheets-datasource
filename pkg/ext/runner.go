@@ -46,7 +46,6 @@ func init() {
 
 type PluginAggregatedServer struct {
 	GenericAPIServer *genericapiserver.GenericAPIServer
-	RequestHandler   *RequestHandler
 }
 
 type Config struct {
@@ -115,12 +114,6 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 		delegateHandler = http.NotFoundHandler()
 	}
 
-	s.RequestHandler = &RequestHandler{
-		delegate: delegateHandler,
-	}
-
-	// s.GenericAPIServer.Handler.NonGoRestfulMux.Handle("/apis", s.RequestHandler)
-	// s.GenericAPIServer.Handler.NonGoRestfulMux.HandlePrefix("/apis/", s.RequestHandler)
 	// s.GenericAPIServer.RegisterDestroyFunc(s.RequestHandler.destroy)
 
 	if err := s.GenericAPIServer.InstallAPIGroup(&apiGroupInfo); err != nil {

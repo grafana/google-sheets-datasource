@@ -3,6 +3,7 @@ package ext
 import (
 	"context"
 	"io"
+	"net/http"
 
 	"github.com/grafana/kindsys"
 )
@@ -45,7 +46,7 @@ type RawAPIHandler struct {
 	Level   RawAPILevel // resource | namespace | group
 
 	// The GET request + response (see the standard /history and /refs)
-	Handler func(ctx context.Context, id kindsys.StaticMetadata) StreamingResponse
+	Handler func(ctx context.Context, id kindsys.StaticMetadata) (http.HandlerFunc, error)
 }
 
 type RawAPILevel int8

@@ -1,10 +1,10 @@
 package ext
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
-	"io"
+	"fmt"
+	"net/http"
 
 	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset"
@@ -75,6 +75,10 @@ func (shi *ServiceHookImpl) GetterFn() ResourceGetter {
 	}
 }
 
+func (shi *ServiceHookImpl) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+}
+
 func (shi *ServiceHookImpl) setupGetRawAPIHandlers() {
 	shi.GetRawAPIHandlers = func(getter ResourceGetter) []RawAPIHandler {
 		// TODO: until we have a real resource getter, doing that inside the hook
@@ -83,22 +87,22 @@ func (shi *ServiceHookImpl) setupGetRawAPIHandlers() {
 				Path:    "/{subresource}/query",
 				OpenAPI: "",
 				Level:   RawAPILevel(RawAPILevelResource),
-				Handler: func(ctx context.Context, id kindsys.StaticMetadata) StreamingResponse {
+				Handler: func(ctx context.Context, id kindsys.StaticMetadata) (http.HandlerFunc, error) {
 					r, err := getter(ctx, id)
-					if err != nil || r == nil {
-						return nil
+					if err != nil {
+						return nil, err
 					}
 
 					ds, ok := r.(*v1.ResourceV0)
 					if !ok {
-						return nil
+						return nil, fmt.Errorf("type assertion failed to kindsys ResourceV0")
 					}
 
 					settings := backend.DataSourceInstanceSettings{}
 					settings.JSONData, err = json.Marshal(ds.Spec)
 
 					if err != nil {
-						return nil
+						return nil, err
 					}
 
 					settings.DecryptedSecureJSONData = map[string]string{}
@@ -117,12 +121,12 @@ func (shi *ServiceHookImpl) setupGetRawAPIHandlers() {
 
 					instance, err := googlesheets.NewDatasource(settings)
 					if err != nil {
-						return nil
+						return nil, err
 					}
 
 					googleSheetDatasource, ok := instance.(*googlesheets.Datasource)
 					if !ok {
-						return nil
+						return nil, err
 					}
 
 					customProperties, err := json.Marshal(map[string]interface{}{
@@ -137,10 +141,10 @@ func (shi *ServiceHookImpl) setupGetRawAPIHandlers() {
 					})
 
 					if err != nil {
-						return nil
+						return nil, err
 					}
 
-					return func(ctx context.Context, apiVersion, acceptHeader string) (stream io.ReadCloser, flush bool, mimeType string, err error) {
+					return func(w http.ResponseWriter, req *http.Request) {
 						queryResponse, err := googleSheetDatasource.QueryData(ctx, &backend.QueryDataRequest{
 							PluginContext: *pluginCtx,
 							Queries: []backend.DataQuery{
@@ -156,15 +160,16 @@ func (shi *ServiceHookImpl) setupGetRawAPIHandlers() {
 							//  Headers: // from context
 						})
 						if err != nil {
-							return nil, false, "", err
+							return
 						}
 
 						jsonRsp, err := json.Marshal(queryResponse)
 						if err != nil {
-							return nil, false, "", err
+							return
 						}
-						return io.NopCloser(bytes.NewReader(jsonRsp)), false, "application/json", nil
-					}
+						w.WriteHeader(200)
+						w.Write(jsonRsp)
+					}, nil
 				},
 			},
 		}
