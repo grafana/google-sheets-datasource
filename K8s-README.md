@@ -37,8 +37,29 @@ be absorbed into the main README at root.
       }
     }
     ```
-6. Once applied, you should be able to:
+6. Once applied, you should be able to do query and resource requests of following formats:
+    ```json
+    {
+      "queries": [{
+        "refId": "A",
+        "datasource": {
+          "type": "grafana-googlesheets-datasource",
+          "uid": "b1808c48-9fc9-4045-82d7-081781f8a553"
+        },
+        "cacheDurationSeconds": 300,
+        "spreadsheet": "spreadsheetID",
+        "range": "",
+        "datasourceId": 4,
+        "intervalMs": 30000,
+        "maxDataPoints": 794
+      }],
+      "from": "1692624667389",
+      "to": "1692646267389"
+    }
+
+    ```
+
     ```shell
-    curl -ik 'https://localhost:6443/apis/googlesheets.ext.grafana.com/v1/namespaces/default/datasources/12345/resource/spreadsheets
-    []
+    curl -ik 'https://localhost:6443/apis/googlesheets.ext.grafana.com/v1/namespaces/default/datasources/12345/resource/spreadsheets'    
+    curl -X POST -ik 'https://localhost:6443/apis/googlesheets.ext.grafana.com/v1/namespaces/default/datasources/12345/query' -d @./request.json
     ```
