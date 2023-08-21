@@ -59,14 +59,12 @@ func (handler *requestHandler) subresourceHandler(writer http.ResponseWriter, re
 
 	switch info.Subresource {
 	case "query":
-		fallthrough
-	case "health":
 		serviceHookImpl := NewServiceHookImpl(handler.restConfig)
 
 		handlers := serviceHookImpl.GetRawAPIHandlers(serviceHookImpl.GetterFn())
 		handlerWithSetupCompleted, err := handlers[0].Handler(ctx, kindsys.StaticMetadata{
 			Name: info.Name,
-			// curious: but request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is
+			// curious: request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is
 			Namespace: info.Namespace,
 		})
 

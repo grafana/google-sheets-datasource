@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
@@ -12,6 +13,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	restclient "k8s.io/client-go/rest"
+	"k8s.io/klog/v2"
 )
 
 import "github.com/grafana/kindsys"
@@ -129,34 +131,24 @@ func (shi *ServiceHookImpl) setupGetRawAPIHandlers() {
 						return nil, err
 					}
 
-					customProperties, err := json.Marshal(map[string]interface{}{
-						"cacheDurationSeconds": 300,
-						"spreadsheet":          "19sbxbIdRUNOeYECMlq2D3nFwD5oVJf1m8YRHcB1UXOY",
-						"range":                "To do!C6",
-						"datasourceId":         4, // ds.Spec.Id
-						"datasource": map[string]string{
-							"uid":  "b1808c48-9fc9-4045-82d7-081781f8a553",
-							"type": "grafana-googlesheets-datasource",
-						},
-					})
-
-					if err != nil {
-						return nil, err
-					}
-
 					return func(w http.ResponseWriter, req *http.Request) {
+						body, err := io.ReadAll(req.Body)
+						if err != nil {
+							klog.Errorf("QueryDataRequest was malformed: %s", err)
+							w.WriteHeader(400)
+							w.Write([]byte("QueryDataRequest was malformed"))
+							return
+						}
+						queries, err := readQueries(body)
+						if err != nil {
+							klog.Errorf("Could not parse QueryDataRequest: %s", err)
+							w.WriteHeader(400)
+							w.Write([]byte("Could not parse QueryDataRequst"))
+							return
+						}
 						queryResponse, err := googleSheetDatasource.QueryData(ctx, &backend.QueryDataRequest{
 							PluginContext: *pluginCtx,
-							Queries: []backend.DataQuery{
-								{
-									RefID: "A",
-									// QueryType:     "", // not defined in the original request as sniffed from a browser session
-									MaxDataPoints: 1541,
-									Interval:      15000,
-									TimeRange:     backend.TimeRange{},
-									JSON:          customProperties,
-								},
-							},
+							Queries:       queries,
 							//  Headers: // from context
 						})
 						if err != nil {
