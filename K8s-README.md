@@ -7,9 +7,9 @@ be absorbed into the main README at root.
 ## Background
 
 1. Until entity-storage is exposed to the plugin in form of an API, `etcd` and standard K8s codegen are prerequisites for the POC.
-2. `mage` target has been redefined in `.bra.toml` to provide better debugging capability using appropriate gcflags and ldflags. For now, the current platform binary is generated at root of the repo (not in `dist/`).
-3. For now, we have found the ability to run in standalone mode as useful: this means, no Grafana is used and plugin binary is launched directly.
-4. Authz is disabled for now. You can `kubectl` or `curl` against the API without worrying about tokens.
+2. `mage` target has been redefined in `.bra.toml` to provide better debugging capability using appropriate gcflags and ldflags. The current platform binary is generated at root of the repo (not in `dist/`).
+3. We have found the ability to run in standalone mode as useful: this means, no Grafana is used and plugin binary is launched directly.
+4. Authz is disabled. You can `kubectl` or `curl` against the API without worrying about tokens.
 
 ## Setup
 
