@@ -16,7 +16,8 @@ be absorbed into the main README at root.
 1. `brew install etcd` and start `etcd` on standard port `2379`.
 2. `mage watch` in one terminal tab.
 3. `./gpx_sheets_darwin_arm64` launches the aggregated API server. 
-4. Apply a datasource (google sheet connection) manually. `defaultProject`, `clientEmail` and `privateKey` must be filled from your google service account credentials. Private key should contain `\n` for newlines.
+4. `export KUBECONFG=./data/grafana.kubeconfig`
+5. Apply a datasource (google sheet connection) manually. `defaultProject`, `clientEmail` and `privateKey` must be filled from your google service account credentials. Private key should contain `\n` for newlines.
     ```json
     {
       "apiVersion": "googlesheets.ext.grafana.com/v1",
@@ -36,7 +37,7 @@ be absorbed into the main README at root.
       }
     }
     ```
-5. Once applied, you should be able to:
+6. Once applied, you should be able to:
     ```shell
     curl -ik 'https://localhost:6443/apis/googlesheets.ext.grafana.com/v1/namespaces/default/datasources/12345/resource/spreadsheets
     []
