@@ -146,6 +146,7 @@ func (shi *ServiceHookImpl) setupGetRawAPIHandlers() {
 							w.Write([]byte("Could not parse QueryDataRequst"))
 							return
 						}
+
 						queryResponse, err := googleSheetDatasource.QueryData(ctx, &backend.QueryDataRequest{
 							PluginContext: *pluginCtx,
 							Queries:       queries,

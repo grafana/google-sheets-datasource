@@ -29,9 +29,18 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *
 		restConfig: restConfig,
 	}
 
-	router.
-		HandleFunc("/apis/googlesheets.ext.grafana.com/v1/namespaces/{ns}/datasources/{datasourceName}/{subresource}", requestHandler.subresourceHandler).
+	dsSubrouter := router.
+		PathPrefix("/apis/googlesheets.ext.grafana.com/v1/namespaces/{ns}/datasources/{datasourceName}").
+		Subrouter()
+
+	dsSubrouter.
+		HandleFunc("/{subresource}", requestHandler.subresourceHandler).
 		Methods("POST")
+
+	dsSubrouter.
+		HandleFunc("/resource/{resourcePath:.*}", requestHandler.callResourceHandler).
+		Methods("ANY")
+
 	// Per Gorilla Mux issue here: https://github.com/gorilla/mux/issues/616#issuecomment-798807509
 	// default handler must come last
 	router.PathPrefix("/").Handler(apiHandler)
@@ -46,6 +55,36 @@ func (handler *requestHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 func (handler *requestHandler) destroy() {
 	// TODO: register any on destroy code here and get the callback registered with API Server
 }
+
+func (handler *requestHandler) callResourceHandler(writer http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	_, ok := request.RequestInfoFrom(ctx)
+	if !ok {
+		responsewriters.ErrorNegotiated(
+			apierrors.NewInternalError(fmt.Errorf("no RequestInfo found in the context")),
+			Codecs, schema.GroupVersion{}, writer, req,
+		)
+		return
+	}
+
+	vars := mux.Vars(req)
+	resourcePath, ok := vars["resourcePath"]
+	if !ok {
+		writer.WriteHeader(404)
+		writer.Write([]byte(fmt.Sprintf("Unknown empty resource path specified for CallResource")))
+		return
+	}
+
+	switch resourcePath {
+	case "spreadsheets":
+		writer.Write([]byte("[]"))
+		return
+	default:
+		writer.WriteHeader(404)
+		writer.Write([]byte(fmt.Sprintf("Unknown resource path specified for CallResource: %s", resourcePath)))
+	}
+}
+
 func (handler *requestHandler) subresourceHandler(writer http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	info, ok := request.RequestInfoFrom(ctx)
