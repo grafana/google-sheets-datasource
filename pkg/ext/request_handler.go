@@ -13,31 +13,28 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/endpoints/handlers/responsewriters"
 	"k8s.io/apiserver/pkg/endpoints/request"
-	genericapiserver "k8s.io/apiserver/pkg/server"
 )
 
 type requestHandler struct {
-	router             *mux.Router
-	config             *genericapiserver.Config
-	subresourceHandler *subresourceHandler
+	router     *mux.Router
+	restConfig *restclient.Config
 }
 
-func NewRequestHandler(apiHandler http.Handler, c *genericapiserver.Config) *requestHandler {
+// restclient.Config is only used by subresource handler, so we don't save it on the resource handler
+func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *requestHandler {
 	router := mux.NewRouter()
 
 	requestHandler := &requestHandler{
-		router:             router,
-		config:             c,
-		subresourceHandler: newSubresourceHandler(c.LoopbackClientConfig),
+		router:     router,
+		restConfig: restConfig,
 	}
 
-	// Not calling DefaultBuildHandlerChain on any of the handlers written by us prevents being able to get requestInfo
-	// One could argue that Gorilla Mux does provide vars based matching on route params
-	// But I went with using requestInfo just to make the code looking like K8s
-	router.Handle("/apis/googlesheets.ext.grafana.com/v1/namespaces/{ns}/datasources/{datasourceName}/{subresource}", genericapiserver.DefaultBuildHandlerChain(requestHandler.subresourceHandler, c))
+	router.
+		HandleFunc("/apis/googlesheets.ext.grafana.com/v1/namespaces/{ns}/datasources/{datasourceName}/{subresource}", requestHandler.subresourceHandler).
+		Methods("POST")
 	// Per Gorilla Mux issue here: https://github.com/gorilla/mux/issues/616#issuecomment-798807509
 	// default handler must come last
-	router.PathPrefix("/").Handler(genericapiserver.DefaultBuildHandlerChain(apiHandler, c))
+	router.PathPrefix("/").Handler(apiHandler)
 
 	return requestHandler
 }
@@ -49,15 +46,7 @@ func (handler *requestHandler) ServeHTTP(w http.ResponseWriter, req *http.Reques
 func (handler *requestHandler) destroy() {
 	// TODO: register any on destroy code here and get the callback registered with API Server
 }
-
-// Needed to make another struct for subresourceHandler so as to satisfy http.Handler interface
-// and to be able to call genericapiserver.DefaultBuildHandlerChain on it - an anonymous function sadly
-// can't be wrapped like that
-type subresourceHandler struct {
-	restConfig *restclient.Config
-}
-
-func (subhandler *subresourceHandler) ServeHTTP(writer http.ResponseWriter, req *http.Request) {
+func (handler *requestHandler) subresourceHandler(writer http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	info, ok := request.RequestInfoFrom(ctx)
 	if !ok {
@@ -72,7 +61,7 @@ func (subhandler *subresourceHandler) ServeHTTP(writer http.ResponseWriter, req 
 	case "query":
 		fallthrough
 	case "health":
-		serviceHookImpl := NewServiceHookImpl(subhandler.restConfig)
+		serviceHookImpl := NewServiceHookImpl(handler.restConfig)
 
 		handlers := serviceHookImpl.GetRawAPIHandlers(serviceHookImpl.GetterFn())
 		handlerWithSetupCompleted, err := handlers[0].Handler(ctx, kindsys.StaticMetadata{
@@ -93,11 +82,5 @@ func (subhandler *subresourceHandler) ServeHTTP(writer http.ResponseWriter, req 
 		// This should never happen in theory - only configured subresource APIs will trigger
 		writer.WriteHeader(404)
 		writer.Write([]byte(fmt.Sprintf("Unknown subresource: %s", info.Subresource)))
-	}
-}
-
-func newSubresourceHandler(restConfig *restclient.Config) *subresourceHandler {
-	return &subresourceHandler{
-		restConfig: restConfig,
 	}
 }

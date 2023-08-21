@@ -93,7 +93,10 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 	serverConfig.SharedInformerFactory = clientGoInformers.NewSharedInformerFactory(fake.NewSimpleClientset(), 10*time.Minute)
 	serverConfig.ClientConfig = &rest.Config{}
 	serverConfig.BuildHandlerChainFunc = func(apiHandler http.Handler, c *genericapiserver.Config) http.Handler {
-		return NewRequestHandler(apiHandler, c)
+		// Not calling DefaultBuildHandlerChain on any of the handlers written by us prevents being able to get requestInfo
+		// One could argue that Gorilla Mux does provide vars based matching on route params
+		// But I went with using requestInfo just to make the code looking like K8s
+		return genericapiserver.DefaultBuildHandlerChain(NewRequestHandler(apiHandler, c.LoopbackClientConfig), c)
 	}
 
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {

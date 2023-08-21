@@ -85,12 +85,6 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 		return nil, err
 	}
 	storageMap["datasources"] = datasourceREST
-	/* storageMap["datasources/health"] = &SubresourceStreamerREST{
-		RestConfig: c.GenericConfig.LoopbackClientConfig,
-	}
-	storageMap["datasources/query"] = &SubresourceStreamerREST{
-		RestConfig: c.GenericConfig.LoopbackClientConfig,
-	} */
 
 	delegationTarget := genericapiserver.NewEmptyDelegate()
 	genericServer, err := c.GenericConfig.New("sample-apiserver", delegationTarget)
