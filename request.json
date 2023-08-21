@@ -1,0 +1,19 @@
+{
+  "queries": [
+    {
+      "refId": "A",
+      "datasource": {
+        "type": "grafana-googlesheets-datasource",
+        "uid": "b1808c48-9fc9-4045-82d7-081781f8a553"
+      },
+      "cacheDurationSeconds": 300,
+      "spreadsheet": "19sbxbIdRUNOeYECMlq2D3nFwD5oVJf1m8YRHcB1UXOY",
+      "range": "",
+      "datasourceId": 4,
+      "intervalMs": 30000,
+      "maxDataPoints": 794
+    }
+  ],
+  "from": "1692624667389",
+  "to": "1692646267389"
+}

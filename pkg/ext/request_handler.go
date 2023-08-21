@@ -39,7 +39,7 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *
 
 	dsSubrouter.
 		HandleFunc("/resource/{resourcePath:.*}", requestHandler.callResourceHandler).
-		Methods("ANY")
+		Methods("GET")
 
 	// Per Gorilla Mux issue here: https://github.com/gorilla/mux/issues/616#issuecomment-798807509
 	// default handler must come last
