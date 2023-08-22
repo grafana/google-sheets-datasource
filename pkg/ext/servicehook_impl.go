@@ -11,12 +11,11 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset"
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/kindsys"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 )
-
-import "github.com/grafana/kindsys"
 
 type InternalHandler = func(ctx context.Context, pluginCtx *backend.PluginContext, datasource *googlesheets.Datasource, path ...string) func(w http.ResponseWriter, req *http.Request)
 
@@ -124,7 +123,9 @@ func setupPluginContextAndReturnHandler(getter ResourceGetter, internalHandler I
 
 		settings.DecryptedSecureJSONData = map[string]string{}
 		settings.DecryptedSecureJSONData["apiKey"] = ds.Spec.APIKey
-		settings.DecryptedSecureJSONData["jwt"] = ds.Spec.JWT
+
+		// k8s HACK! move from spec to decrypted
+		settings.DecryptedSecureJSONData["privateKey"] = ds.Spec.PrivateKey
 
 		settings.Type = "grafana-googlesheets-datasource"
 

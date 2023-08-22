@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/grafana/grafana-google-sdk-go/pkg/utils"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
@@ -33,8 +34,7 @@ func LoadSettings(ctx backend.PluginContext) (*DatasourceSettings, error) {
 		return nil, fmt.Errorf("error reading settings: %s", err.Error())
 	}
 
-	// NOTE: was utils.getPrivateKey(settings) from utils in plugin-sdk except it skips the privateKey, only looking for privateKeyPath
-	model.PrivateKey, err = getPrivateKey(settings)
+	model.PrivateKey, err = utils.GetPrivateKey(settings)
 	if err != nil {
 		return model, err
 	}
