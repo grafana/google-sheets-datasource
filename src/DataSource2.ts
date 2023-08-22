@@ -34,11 +34,12 @@ export class DataSource2 extends DataSourceApi<SheetsQuery, DataSourceOptions> {
     }
 
     const headers: Record<string, string> = {};
+    const params: Record<string, string> = {}; // CORS is not happy with the additional parameters
     if (request.dashboardUID) {
-      headers[PluginRequestHeaders.DashboardUID] = request.dashboardUID;
+        params[PluginRequestHeaders.DashboardUID] = request.dashboardUID;
     }
     if (request.panelId) {
-      headers[PluginRequestHeaders.PanelID] = `${request.panelId}`;
+        params[PluginRequestHeaders.PanelID] = `${request.panelId}`;
     }
     // if (request.queryGroupId) {
     //   headers[PluginRequestHeaders.QueryGroupID] = `${request.queryGroupId}`;
@@ -51,6 +52,7 @@ export class DataSource2 extends DataSourceApi<SheetsQuery, DataSourceOptions> {
         requestId,
         hideFromInspector,
         headers,
+        params,
       })
       .pipe(
         map((raw) => {

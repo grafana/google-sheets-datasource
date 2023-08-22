@@ -126,6 +126,7 @@ func writeResult(rw http.ResponseWriter, path string, val interface{}, err error
 	if err != nil {
 		code = http.StatusInternalServerError
 	}
+	rw.Header().Set("Content-Type", "application/json")
 	rw.WriteHeader(code)
 }
 
