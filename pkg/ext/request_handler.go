@@ -16,8 +16,9 @@ import (
 )
 
 type requestHandler struct {
-	router     *mux.Router
-	restConfig *restclient.Config
+	router          *mux.Router
+	restConfig      *restclient.Config
+	serviceHookImpl *ServiceHookImpl
 }
 
 // restclient.Config is only used by subresource handler, so we don't save it on the resource handler
@@ -25,8 +26,9 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *
 	router := mux.NewRouter()
 
 	requestHandler := &requestHandler{
-		router:     router,
-		restConfig: restConfig,
+		router:          router,
+		restConfig:      restConfig,
+		serviceHookImpl: NewServiceHookImpl(restConfig),
 	}
 
 	dsSubrouter := router.
@@ -38,8 +40,7 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *
 		Methods("POST")
 
 	dsSubrouter.
-		HandleFunc("/resource/{resourcePath:.*}", requestHandler.callResourceHandler).
-		Methods("GET")
+		HandleFunc("/resource/{resourcePath:.*}", requestHandler.callResourceHandler)
 
 	// Per Gorilla Mux issue here: https://github.com/gorilla/mux/issues/616#issuecomment-798807509
 	// default handler must come last
@@ -58,7 +59,7 @@ func (handler *requestHandler) destroy() {
 
 func (handler *requestHandler) callResourceHandler(writer http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
-	_, ok := request.RequestInfoFrom(ctx)
+	info, ok := request.RequestInfoFrom(ctx)
 	if !ok {
 		responsewriters.ErrorNegotiated(
 			apierrors.NewInternalError(fmt.Errorf("no RequestInfo found in the context")),
@@ -77,7 +78,21 @@ func (handler *requestHandler) callResourceHandler(writer http.ResponseWriter, r
 
 	switch resourcePath {
 	case "spreadsheets":
-		writer.Write([]byte("[]"))
+		handlers := handler.serviceHookImpl.GetRawAPIHandlers(handler.serviceHookImpl.GetterFn())
+		handlerWithSetupCompleted, err := handlers[1].Handler(ctx, kindsys.StaticMetadata{
+			Name: info.Name,
+			// curious: request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is
+			Namespace: info.Namespace,
+		})
+
+		if err != nil {
+			klog.Errorf("Error when getting the handler that closes on StaticMetadata: %s", err)
+			writer.WriteHeader(404)
+			writer.Write([]byte(""))
+			return
+		}
+
+		handlerWithSetupCompleted(writer, req)
 		return
 	default:
 		writer.WriteHeader(404)
@@ -98,9 +113,7 @@ func (handler *requestHandler) subresourceHandler(writer http.ResponseWriter, re
 
 	switch info.Subresource {
 	case "query":
-		serviceHookImpl := NewServiceHookImpl(handler.restConfig)
-
-		handlers := serviceHookImpl.GetRawAPIHandlers(serviceHookImpl.GetterFn())
+		handlers := handler.serviceHookImpl.GetRawAPIHandlers(handler.serviceHookImpl.GetterFn())
 		handlerWithSetupCompleted, err := handlers[0].Handler(ctx, kindsys.StaticMetadata{
 			Name: info.Name,
 			// curious: request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is

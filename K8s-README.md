@@ -60,6 +60,7 @@ be absorbed into the main README at root.
     ```
 
     ```shell
-    curl -ik 'https://localhost:6443/apis/googlesheets.ext.grafana.com/v1/namespaces/default/datasources/12345/resource/spreadsheets'    
+    curl -ik 'https://localhost:6443/apis/googlesheets.ext.grafana.com/v1/namespaces/default/datasources/12345/resource/spreadsheets'
+   {"spreadsheets":{}}%    
     curl -X POST -ik 'https://localhost:6443/apis/googlesheets.ext.grafana.com/v1/namespaces/default/datasources/12345/query' -d @./request.json
     ```

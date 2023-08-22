@@ -34,6 +34,7 @@ type APIServiceHooks struct {
 
 // This allows access to resources for API handlers
 type ResourceGetter = func(ctx context.Context, id kindsys.StaticMetadata) (kindsys.Resource, error)
+type ClosedOnFetchedK8sResourceHandler = func(ctx context.Context, id kindsys.StaticMetadata) (http.HandlerFunc, error)
 
 // This is used to answer raw API requests like /logs
 type StreamingResponse = func(ctx context.Context, apiVersion, acceptHeader string) (
@@ -46,7 +47,7 @@ type RawAPIHandler struct {
 	Level   RawAPILevel // resource | namespace | group
 
 	// The GET request + response (see the standard /history and /refs)
-	Handler func(ctx context.Context, id kindsys.StaticMetadata) (http.HandlerFunc, error)
+	Handler ClosedOnFetchedK8sResourceHandler
 }
 
 type RawAPILevel int8
