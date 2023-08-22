@@ -171,12 +171,19 @@ func getCallResourceHandler(ctx context.Context, pluginCtx *backend.PluginContex
 			return nil
 		})
 
-		_ = datasource.CallResource(ctx, &backend.CallResourceRequest{
+		err = datasource.CallResource(ctx, &backend.CallResourceRequest{
 			PluginContext: *pluginCtx,
 			Path:          path[0],
 			Method:        req.Method,
 			Body:          body,
 		}, wrappedSender)
+
+		if err != nil {
+			// our wrappedSender func will likely never be invoked for errors
+			// respond with a 400
+			w.WriteHeader(400)
+			w.Write([]byte("encountered error invoking CallResponseHandler for request"))
+		}
 	}
 }
 
