@@ -15,7 +15,7 @@ be absorbed into the main README at root.
 
 1. `brew install etcd` and start `etcd` on standard port `2379`.
 2. `mage watch` in one terminal tab.
-3. `./gpx_sheets_darwin_arm64` launches the aggregated API server. 
+3. `./gpx_sheets_darwin_arm64 k8s` launches the aggregated API server. NOTE the additional command line argument 
 4. `export KUBECONFIG=./data/grafana.kubeconfig`
 5. Apply a datasource (google sheet connection) manually. `defaultProject`, `clientEmail` and `privateKey` must be filled from your google service account credentials. Private key should contain `\n` for newlines.
     ```json

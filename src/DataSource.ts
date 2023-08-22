@@ -2,12 +2,17 @@ import { DataSourceInstanceSettings, ScopedVars, SelectableValue } from '@grafan
 import { DataSourceOptions } from '@grafana/google-sdk';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { SheetsQuery } from './types';
+import { DataSource2 } from 'DataSource2';
 
 export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOptions> {
   authType: string;
   constructor(instanceSettings: DataSourceInstanceSettings<DataSourceOptions>) {
     super(instanceSettings);
     this.authType = instanceSettings.jsonData.authenticationType;
+
+    if(true) {
+      return new DataSource2(instanceSettings) as any; // eeep!!!
+    }
   }
 
   // Enables default annotation support for 7.2+

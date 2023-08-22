@@ -2,7 +2,7 @@ module github.com/grafana/google-sheets-datasource
 
 go 1.20
 
-replace github.com/grafana/kindsys => /Users/charandas/go/src/github.com/grafana/kindsys
+replace github.com/grafana/kindsys => ../../kindsys
 
 require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
