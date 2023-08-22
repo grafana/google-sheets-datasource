@@ -89,7 +89,7 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 	// o.RecommendedOptions.SecureServing.
 
 	serverConfig := genericapiserver.NewRecommendedConfig(Codecs)
-	serverConfig.CorsAllowedOriginList = []string{"*"}
+	serverConfig.CorsAllowedOriginList = []string{".*"}
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
 	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
 	serverConfig.SkipOpenAPIInstallation = false
