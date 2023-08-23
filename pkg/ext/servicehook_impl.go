@@ -87,13 +87,27 @@ func (shi *ServiceHookImpl) setupGetRawAPIHandlers() {
 		// TODO: until we have a real resource getter, doing that inside the hook
 		return []RawAPIHandler{
 			{
-				Path:    "/query",
+				Path:    "not-found-handler",
+				OpenAPI: "",
+				Level:   RawAPILevel(RawAPILevelResource),
+				Handler: func(_ context.Context, _ kindsys.StaticMetadata) (http.HandlerFunc, error) {
+					return http.NotFound, nil
+				},
+			},
+			{
+				Path:    "query",
 				OpenAPI: "",
 				Level:   RawAPILevel(RawAPILevelResource),
 				Handler: setupPluginContextAndReturnHandler(getter, getQueryHandler),
 			},
 			{
-				Path:    "/resource/spreadsheets",
+				Path:    "health",
+				OpenAPI: "",
+				Level:   RawAPILevel(RawAPILevelResource),
+				Handler: setupPluginContextAndReturnHandler(getter, getHealthHandler),
+			},
+			{
+				Path:    "resource/spreadsheets",
 				OpenAPI: "",
 				Level:   RawAPILevel(RawAPILevelResource),
 				Handler: setupPluginContextAndReturnHandler(getter, getCallResourceHandler, "/spreadsheets"),
@@ -188,6 +202,29 @@ func getCallResourceHandler(ctx context.Context, pluginCtx *backend.PluginContex
 	}
 }
 
+func getHealthHandler(ctx context.Context, pluginCtx *backend.PluginContext, datasource *googlesheets.Datasource, _ ...string) func(w http.ResponseWriter, req *http.Request) {
+	return func(w http.ResponseWriter, req *http.Request) {
+		healthResponse, err := datasource.CheckHealth(ctx, &backend.CheckHealthRequest{
+			PluginContext: *pluginCtx,
+		})
+
+		if err != nil {
+			// our wrappedSender func will likely never be invoked for errors
+			// respond with a 400
+			w.WriteHeader(400)
+			klog.Errorf("encountered error invoking CheckHealth: %s", err)
+			w.Write([]byte("encountered error invoking CheckHealth"))
+		}
+
+		jsonRsp, err := json.Marshal(healthResponse)
+		if err != nil {
+			return
+		}
+		w.WriteHeader(200)
+		w.Write(jsonRsp)
+	}
+}
+
 func getQueryHandler(ctx context.Context, pluginCtx *backend.PluginContext, datasource *googlesheets.Datasource, _ ...string) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		body, err := io.ReadAll(req.Body)
@@ -201,7 +238,7 @@ func getQueryHandler(ctx context.Context, pluginCtx *backend.PluginContext, data
 		if err != nil {
 			klog.Errorf("Could not parse QueryDataRequest: %s", err)
 			w.WriteHeader(400)
-			w.Write([]byte("Could not parse QueryDataRequst"))
+			w.Write([]byte("Could not parse QueryDataRequest"))
 			return
 		}
 

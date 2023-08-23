@@ -21,6 +21,18 @@ type requestHandler struct {
 	serviceHookImpl *ServiceHookImpl
 }
 
+// TODO: the map below is redundant as we could iterate through []RawAPIHandler and check for a match against Path
+// for a given subresource
+var (
+	subresourceToRawHandlerIndexMap = map[string]int{
+		// 0 is left unpopulated here and 0th index in the RawAPIHandlers is setup
+		// with a notFound handler just in case we inadvertently get 0 back from this map for mismatched subresources
+		"query":                 1,
+		"health":                2,
+		"resource/spreadsheets": 3,
+	}
+)
+
 // restclient.Config is only used by subresource handler, so we don't save it on the resource handler
 func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *requestHandler {
 	router := mux.NewRouter()
@@ -36,8 +48,12 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *
 		Subrouter()
 
 	dsSubrouter.
-		HandleFunc("/{subresource}", requestHandler.subresourceHandler).
+		HandleFunc("/query", requestHandler.subresourceHandler).
 		Methods("POST")
+
+	dsSubrouter.
+		HandleFunc("/health", requestHandler.subresourceHandler).
+		Methods("GET")
 
 	dsSubrouter.
 		HandleFunc("/resource/{resourcePath:.*}", requestHandler.callResourceHandler)
@@ -70,6 +86,7 @@ func (handler *requestHandler) callResourceHandler(writer http.ResponseWriter, r
 
 	vars := mux.Vars(req)
 	resourcePath, ok := vars["resourcePath"]
+	subresource := fmt.Sprintf("resource/%s", resourcePath)
 	if !ok {
 		writer.WriteHeader(404)
 		writer.Write([]byte(fmt.Sprintf("Unknown empty resource path specified for CallResource")))
@@ -79,7 +96,7 @@ func (handler *requestHandler) callResourceHandler(writer http.ResponseWriter, r
 	switch resourcePath {
 	case "spreadsheets":
 		handlers := handler.serviceHookImpl.GetRawAPIHandlers(handler.serviceHookImpl.GetterFn())
-		handlerWithSetupCompleted, err := handlers[1].Handler(ctx, kindsys.StaticMetadata{
+		handlerWithSetupCompleted, err := handlers[subresourceToRawHandlerIndexMap[subresource]].Handler(ctx, kindsys.StaticMetadata{
 			Name: info.Name,
 			// curious: request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is
 			Namespace: info.Namespace,
@@ -113,8 +130,10 @@ func (handler *requestHandler) subresourceHandler(writer http.ResponseWriter, re
 
 	switch info.Subresource {
 	case "query":
+		fallthrough
+	case "health":
 		handlers := handler.serviceHookImpl.GetRawAPIHandlers(handler.serviceHookImpl.GetterFn())
-		handlerWithSetupCompleted, err := handlers[0].Handler(ctx, kindsys.StaticMetadata{
+		handlerWithSetupCompleted, err := handlers[subresourceToRawHandlerIndexMap[info.Subresource]].Handler(ctx, kindsys.StaticMetadata{
 			Name: info.Name,
 			// curious: request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is
 			Namespace: info.Namespace,
