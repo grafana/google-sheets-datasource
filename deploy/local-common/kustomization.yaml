@@ -1,0 +1,18 @@
+resources:
+- ../base
+
+patches:
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: google-sheets
+      namespace: google-sheets
+    $patch: delete
+- patch: |-
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: ext-api
+      namespace: google-sheets
+    $patch: delete

@@ -1,0 +1,5 @@
+namespace: google-sheets
+
+resources:
+  - ../local-common
+  - service.yaml

@@ -1,0 +1,12 @@
+namespace: google-sheets
+
+resources:
+  - apiservice.yaml
+  - auth-delegator.yaml
+  - auth-reader.yaml
+  - deployment.yaml
+  - ns.yaml
+  - rbac-bind.yaml
+  - rbac.yaml
+  - sa.yaml
+  - service.yaml

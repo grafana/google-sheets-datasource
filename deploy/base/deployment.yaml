@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: google-sheets
+  namespace: google-sheets
+  labels:
+    apiserver: "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      apiserver: "true"
+  template:
+    metadata:
+      labels:
+        apiserver: "true"
+    spec:
+      serviceAccountName: google-sheets
+      containers:
+        - name: google-sheets
+          image: localhost:5000/google-sheets:latest
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          volumeMounts:
+            - mountPath: "/tmp/google-sheets"
+              name: resource-storage
+      volumes:
+        - name: resource-storage
+          emptyDir:
+            sizeLimit: 500Mi

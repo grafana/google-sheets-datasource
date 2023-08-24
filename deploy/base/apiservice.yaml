@@ -1,0 +1,14 @@
+apiVersion: apiregistration.k8s.io/v1
+kind: APIService
+metadata:
+  name: v1.googlesheets.ext.grafana.com
+spec:
+  insecureSkipTLSVerify: true
+  group: googlesheets.ext.grafana.com
+  groupPriorityMinimum: 1000
+  versionPriority: 15
+  service:
+    name: ext-api
+    namespace: google-sheets
+    port: 6443
+  version: v1
