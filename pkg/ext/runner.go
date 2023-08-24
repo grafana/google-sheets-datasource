@@ -1,7 +1,6 @@
 package ext
 
 import (
-	"fmt"
 	"net/http"
 	"path"
 
@@ -137,9 +136,7 @@ func (o PluginAggregatedServerOptions) Run(stopCh <-chan struct{}) error {
 		return nil
 	})
 
-	v := server.GenericAPIServer.PrepareRun()
-	fmt.Printf("RUN: %v\n", v)
-	return v.Run(stopCh)
+	return server.GenericAPIServer.PrepareRun().Run(stopCh)
 }
 
 func writeKubeConfiguration(restConfig *clientRest.Config) error {

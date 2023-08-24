@@ -1,6 +1,11 @@
 {
-  "ignorePaths": ["node_modules/**", "pkg/googlesheets/testdata", "dist/**"],
+  "ignorePaths": [
+    "node_modules/**",
+    "pkg/googlesheets/testdata",
+    "dist/**"
+  ],
   "words": [
+    "APIV",
     "araddon",
     "dataproxy",
     "datasource",
@@ -11,9 +16,9 @@
     "httpadapter",
     "httpclient",
     "instancemgmt",
+    "Middlewares",
     "patrickmn",
     "Sdump",
-    "Middlewares",
     "stackdriver",
     "stretchr",
     "testdata",
