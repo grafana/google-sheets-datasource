@@ -5,13 +5,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	restclient "k8s.io/client-go/rest"
-	"k8s.io/klog/v2"
-
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/endpoints/handlers/responsewriters"
 	"k8s.io/apiserver/pkg/endpoints/request"
+	restclient "k8s.io/client-go/rest"
 )
 
 type requestHandler struct {
@@ -73,19 +71,9 @@ func (handler *requestHandler) destroy() {
 }
 
 func (handler *requestHandler) callResourceHandler(writer http.ResponseWriter, req *http.Request) {
-	ctx := req.Context()
-	info, ok := request.RequestInfoFrom(ctx)
-	if !ok {
-		responsewriters.ErrorNegotiated(
-			apierrors.NewInternalError(fmt.Errorf("no RequestInfo found in the context")),
-			Codecs, schema.GroupVersion{}, writer, req,
-		)
-		return
-	}
-
 	vars := mux.Vars(req)
 	resourcePath, ok := vars["resourcePath"]
-	subresource := fmt.Sprintf("resource/%s", resourcePath)
+	_ = fmt.Sprintf("resource/%s", resourcePath)
 	if !ok {
 		writer.WriteHeader(404)
 		writer.Write([]byte(fmt.Sprintf("Unknown empty resource path specified for CallResource")))
@@ -94,20 +82,8 @@ func (handler *requestHandler) callResourceHandler(writer http.ResponseWriter, r
 
 	switch resourcePath {
 	case "spreadsheets":
-		handlers := handler.serviceHookImpl.GetRawAPIHandlers(handler.serviceHookImpl.GetterFn())
-		handlerWithSetupCompleted, err := handlers[subresourceToRawHandlerIndexMap[subresource]].Handler(
-			ctx, info.Name, info.Namespace,
-			// curious: request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is
-		)
-
-		if err != nil {
-			klog.Errorf("Error when getting the handler that closes on StaticMetadata: %s", err)
-			writer.WriteHeader(404)
-			writer.Write([]byte(""))
-			return
-		}
-
-		handlerWithSetupCompleted(writer, req)
+		handler := SubresourceHandlerWrapper(handler.serviceHookImpl.PluginRouteHandlers[4].Handler, handler.serviceHookImpl.GetterFn())
+		handler(writer, req)
 		return
 	default:
 		writer.WriteHeader(404)
@@ -128,22 +104,11 @@ func (handler *requestHandler) subresourceHandler(writer http.ResponseWriter, re
 
 	switch info.Subresource {
 	case "query":
-		fallthrough
+		handler := SubresourceHandlerWrapper(handler.serviceHookImpl.PluginRouteHandlers[2].Handler, handler.serviceHookImpl.GetterFn())
+		handler(writer, req)
 	case "health":
-		handlers := handler.serviceHookImpl.GetRawAPIHandlers(handler.serviceHookImpl.GetterFn())
-		handlerWithSetupCompleted, err := handlers[subresourceToRawHandlerIndexMap[info.Subresource]].Handler(
-			ctx, info.Name, info.Namespace,
-			// // curious: request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is
-		)
-
-		if err != nil {
-			klog.Errorf("Error when getting the handler that closes on StaticMetadata: %s", err)
-			writer.WriteHeader(404)
-			writer.Write([]byte(""))
-			return
-		}
-
-		handlerWithSetupCompleted(writer, req)
+		handler := SubresourceHandlerWrapper(handler.serviceHookImpl.PluginRouteHandlers[3].Handler, handler.serviceHookImpl.GetterFn())
+		handler(writer, req)
 	default:
 		// This should never happen in theory - only configured subresource APIs will trigger
 		writer.WriteHeader(404)

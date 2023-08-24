@@ -30,12 +30,10 @@ type APIServiceHooks struct {
 
 	// This is called when initialized -- the endpoints will be added to the api server
 	// the OpenAPI specs will be exposed in the public API
-	GetRawAPIHandlers func(getter ResourceGetter) []RawAPIHandler
-
-	//
 	PluginRouteHandlers []PluginRouteHandler
 }
 
+// This is used to implement dynamic sub-resources like pods/x/logs
 type PluginRouteHandler struct {
 	Level   RawAPILevel      // group+version | namespace | resource
 	Slug    string           // added to the appropriate level
@@ -45,21 +43,10 @@ type PluginRouteHandler struct {
 
 // This allows access to resources for API handlers
 type ResourceGetter = func(ctx context.Context, ns string, name string) (kindsys.Resource, error)
-type ClosedOnFetchedK8sResourceHandler = func(ctx context.Context, ns string, name string) (http.HandlerFunc, error)
 
 // This is used to answer raw API requests like /logs
 type StreamingResponse = func(ctx context.Context, apiVersion, acceptHeader string) (
 	stream io.ReadCloser, flush bool, mimeType string, err error)
-
-// This is used to implement dynamic sub-resources like pods/x/logs
-type RawAPIHandler struct {
-	Path    string
-	OpenAPI string
-	Level   RawAPILevel // resource | namespace | group
-
-	// The GET request + response (see the standard /history and /refs)
-	Handler ClosedOnFetchedK8sResourceHandler
-}
 
 type RawAPILevel int8
 
