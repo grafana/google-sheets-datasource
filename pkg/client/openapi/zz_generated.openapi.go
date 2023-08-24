@@ -17,6 +17,7 @@ import (
 
 func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenAPIDefinition {
 	return map[string]common.OpenAPIDefinition{
+		"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1.DatasourceXXX":       schema_pkg_apis_googlesheets_v1_Datasource(ref),
 		"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1.Datasource":       schema_pkg_apis_googlesheets_v1_Datasource(ref),
 		"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1.DatasourceList":   schema_pkg_apis_googlesheets_v1_DatasourceList(ref),
 		"github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1.DatasourceSpec":   schema_pkg_apis_googlesheets_v1_DatasourceSpec(ref),

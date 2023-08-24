@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"time"
 
+	"k8s.io/kube-openapi/pkg/validation/spec"
+
 	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset"
 	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset/scheme"
@@ -91,7 +93,96 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 	serverConfig := genericapiserver.NewRecommendedConfig(Codecs)
 	serverConfig.CorsAllowedOriginList = []string{".*"}
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
-	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
+	serverConfig.OpenAPIConfig.PostProcessSpec = func(s *spec.Swagger) (*spec.Swagger, error) {
+		s.Info.Title = "POST PROCESSED!!!"
+		s.Info.VendorExtensible = spec.VendorExtensible{
+			Extensions: map[string]any{"hello": "world"},
+		}
+		s.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/aaaa-custom-root-api"] = spec.PathItem{
+			PathItemProps: spec.PathItemProps{
+				Get: &spec.Operation{
+					OperationProps: spec.OperationProps{
+						Description: "hello just a custom route",
+						Produces: []string{
+							"application/json",
+						},
+						Responses: &spec.Responses{
+							ResponsesProps: spec.ResponsesProps{
+								StatusCodeResponses: map[int]spec.Response{
+									200: {},
+									500: {},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		s.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/namespaces/{namespace}/aaaa-custom-tenant-level-api"] = spec.PathItem{
+			PathItemProps: spec.PathItemProps{
+				Get: &spec.Operation{
+					OperationProps: spec.OperationProps{
+						Description: "note! the route can not match a resource name (datasource)",
+						Produces: []string{
+							"application/json",
+						},
+						Responses: &spec.Responses{
+							ResponsesProps: spec.ResponsesProps{
+								StatusCodeResponses: map[int]spec.Response{
+									200: {},
+									500: {},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		s.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/namespaces/{namespace}/datasources/{name}/query"] = spec.PathItem{
+			PathItemProps: spec.PathItemProps{
+				Post: &spec.Operation{
+					OperationProps: spec.OperationProps{
+						Description: "The query method (currently sent to /ds/query)",
+						Produces: []string{
+							"application/json",
+						},
+						Responses: &spec.Responses{
+							ResponsesProps: spec.ResponsesProps{
+								StatusCodeResponses: map[int]spec.Response{
+									200: {},
+									500: {},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		s.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/namespaces/{namespace}/datasources/{name}/health"] = spec.PathItem{
+			PathItemProps: spec.PathItemProps{
+				Get: &spec.Operation{
+					OperationProps: spec.OperationProps{
+						Description: "Checks if the datasource config is OK",
+						Produces: []string{
+							"application/json",
+						},
+						Responses: &spec.Responses{
+							ResponsesProps: spec.ResponsesProps{
+								StatusCodeResponses: map[int]spec.Response{
+									200: {},
+									500: {},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		return s, nil
+	}
+	// cry face!!! the hook is not called here!!!
+	// serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
+	// serverConfig.OpenAPIV3Config.PostProcessSpec = serverConfig.OpenAPIConfig.PostProcessSpec
 	serverConfig.SkipOpenAPIInstallation = false
 	serverConfig.SharedInformerFactory = clientGoInformers.NewSharedInformerFactory(fake.NewSimpleClientset(), 10*time.Minute)
 	serverConfig.ClientConfig = &rest.Config{}
