@@ -36,7 +36,7 @@ func ResourceFromContext(ctx context.Context) (kindsys.Resource, error) {
 	return nil, fmt.Errorf("a Resource was not found in the context")
 }
 
-// SubresourceFromContext gets the resource from context
+// SubresourceFromContext gets the subresource from context
 func SubresourceFromContext(ctx context.Context) (*string, error) {
 	s, ok := ctx.Value(ctxSubresourceKey{}).(string)
 	if ok {
