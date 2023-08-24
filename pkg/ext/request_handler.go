@@ -18,18 +18,6 @@ type requestHandler struct {
 	serviceHookImpl *ServiceHookImpl
 }
 
-// TODO: the map below is redundant as we could iterate through []RawAPIHandler and check for a match against Path
-// for a given subresource
-var (
-	subresourceToRawHandlerIndexMap = map[string]int{
-		// 0 is left unpopulated here and 0th index in the RawAPIHandlers is setup
-		// with a notFound handler just in case we inadvertently get 0 back from this map for mismatched subresources
-		"query":                 1,
-		"health":                2,
-		"resource/spreadsheets": 3,
-	}
-)
-
 // restclient.Config is only used by subresource handler, so we don't save it on the resource handler
 func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *requestHandler {
 	router := mux.NewRouter()
@@ -62,36 +50,20 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *
 	return requestHandler
 }
 
-func (handler *requestHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	handler.router.ServeHTTP(w, req)
+func (h *requestHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	h.router.ServeHTTP(w, req)
 }
 
-func (handler *requestHandler) destroy() {
+func (h *requestHandler) destroy() {
 	// TODO: register any on destroy code here and get the callback registered with API Server
 }
 
-func (handler *requestHandler) callResourceHandler(writer http.ResponseWriter, req *http.Request) {
-	vars := mux.Vars(req)
-	resourcePath, ok := vars["resourcePath"]
-	_ = fmt.Sprintf("resource/%s", resourcePath)
-	if !ok {
-		writer.WriteHeader(404)
-		writer.Write([]byte(fmt.Sprintf("Unknown empty resource path specified for CallResource")))
-		return
-	}
+func (h *requestHandler) callResourceHandler(writer http.ResponseWriter, req *http.Request) {
+	SubresourceHandlerWrapper(h.serviceHookImpl.PluginRouteHandlers[4].Handler, h.serviceHookImpl.GetterFn())(writer, req)
 
-	switch resourcePath {
-	case "spreadsheets":
-		handler := SubresourceHandlerWrapper(handler.serviceHookImpl.PluginRouteHandlers[4].Handler, handler.serviceHookImpl.GetterFn())
-		handler(writer, req)
-		return
-	default:
-		writer.WriteHeader(404)
-		writer.Write([]byte(fmt.Sprintf("Unknown resource path specified for CallResource: %s", resourcePath)))
-	}
 }
 
-func (handler *requestHandler) subresourceHandler(writer http.ResponseWriter, req *http.Request) {
+func (h *requestHandler) subresourceHandler(writer http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	info, ok := request.RequestInfoFrom(ctx)
 	if !ok {
@@ -104,10 +76,10 @@ func (handler *requestHandler) subresourceHandler(writer http.ResponseWriter, re
 
 	switch info.Subresource {
 	case "query":
-		handler := SubresourceHandlerWrapper(handler.serviceHookImpl.PluginRouteHandlers[2].Handler, handler.serviceHookImpl.GetterFn())
+		handler := SubresourceHandlerWrapper(h.serviceHookImpl.PluginRouteHandlers[2].Handler, h.serviceHookImpl.GetterFn())
 		handler(writer, req)
 	case "health":
-		handler := SubresourceHandlerWrapper(handler.serviceHookImpl.PluginRouteHandlers[3].Handler, handler.serviceHookImpl.GetterFn())
+		handler := SubresourceHandlerWrapper(h.serviceHookImpl.PluginRouteHandlers[3].Handler, h.serviceHookImpl.GetterFn())
 		handler(writer, req)
 	default:
 		// This should never happen in theory - only configured subresource APIs will trigger
