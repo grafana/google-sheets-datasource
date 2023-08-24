@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"k8s.io/kube-openapi/pkg/spec3"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 
 	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
@@ -180,9 +181,84 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 		}
 		return s, nil
 	}
-	// cry face!!! the hook is not called here!!!
-	// serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
-	// serverConfig.OpenAPIV3Config.PostProcessSpec = serverConfig.OpenAPIConfig.PostProcessSpec
+
+	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
+	serverConfig.OpenAPIV3Config.PostProcessSpec3 = func(s *spec3.OpenAPI) (*spec3.OpenAPI, error) {
+		if s.Paths != nil && s.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/"] != nil {
+			copy := *s // will copy the rest of the properties
+			copy.Info.Title = "Google sheets plugin"
+
+			ttt := []string{"builtin k8s"}
+			for _, p := range s.Paths.Paths {
+				if p.Get != nil {
+					p.Get.Tags = ttt
+				}
+				if p.Post != nil {
+					p.Post.Tags = ttt
+				}
+				if p.Patch != nil {
+					p.Patch.Tags = ttt
+				}
+				if p.Put != nil {
+					p.Put.Tags = ttt
+				}
+				if p.Delete != nil {
+					p.Delete.Tags = ttt
+				}
+			}
+
+			copy.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/anything"] = &spec3.Path{
+				PathProps: spec3.PathProps{
+					Summary: "the query method",
+					Get: &spec3.Operation{
+						OperationProps: spec3.OperationProps{
+							Description: "method at the rood plugin level",
+							Tags:        []string{"plugin level (no config)"},
+						},
+					},
+				},
+			}
+
+			copy.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/namespaces/{namespace}/anything"] = &spec3.Path{
+				PathProps: spec3.PathProps{
+					Summary: "the query method",
+					Get: &spec3.Operation{
+						OperationProps: spec3.OperationProps{
+							Description: "method at the org/tenant level",
+							Tags:        []string{"tenant level"},
+						},
+					},
+				},
+			}
+
+			copy.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/namespaces/{namespace}/datasources/{name}/query"] = &spec3.Path{
+				PathProps: spec3.PathProps{
+					Summary: "the query method",
+					Post: &spec3.Operation{
+						OperationProps: spec3.OperationProps{
+							Description: "the query method",
+							Tags:        []string{"datasource level"},
+						},
+					},
+				},
+			}
+
+			copy.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/namespaces/{namespace}/datasources/{name}/health"] = &spec3.Path{
+				PathProps: spec3.PathProps{
+					Summary: "healthcheck",
+					Get: &spec3.Operation{
+						OperationProps: spec3.OperationProps{
+							Description: "do healthcheck",
+							Tags:        []string{"datasource level"},
+						},
+					},
+				},
+			}
+
+			return &copy, nil
+		}
+		return s, nil
+	}
 	serverConfig.SkipOpenAPIInstallation = false
 	serverConfig.SharedInformerFactory = clientGoInformers.NewSharedInformerFactory(fake.NewSimpleClientset(), 10*time.Minute)
 	serverConfig.ClientConfig = &rest.Config{}
