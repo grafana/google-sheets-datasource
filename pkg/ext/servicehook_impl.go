@@ -31,6 +31,43 @@ func NewServiceHookImpl(restConfig *restclient.Config) *ServiceHookImpl {
 			BeforeAdd:         nil,
 			BeforeUpdate:      nil,
 			GetRawAPIHandlers: nil,
+
+			PluginRouteHandlers: []PluginRouteHandler{
+				{
+					Level: RawAPILevelGroupVersion,
+					Slug:  "xxx", // URL will be
+					Handler: func(w http.ResponseWriter, r *http.Request) {
+						w.Write([]byte("Root level handler (xxx)"))
+					},
+				},
+				{
+					Level: RawAPILevelNamespace,
+					Slug:  "yyy", // URL will be
+					Handler: func(w http.ResponseWriter, r *http.Request) {
+						w.Write([]byte("namespace level handler (yyy)"))
+					},
+				},
+				{
+					Level: RawAPILevelResource,
+					Slug:  "zzz", // URL will be
+					Handler: func(w http.ResponseWriter, r *http.Request) {
+						ctx := r.Context()
+						res, err := ResourceFromContext(ctx)
+						if err != nil {
+							w.Write([]byte("ERROR!"))
+							return
+						}
+
+						ds, ok := res.(*v1.ResourceV0)
+						if !ok {
+							w.Write([]byte("expected datasource"))
+							return
+						}
+
+						w.Write([]byte("resource level handler (zzz) " + ds.Spec.AuthType))
+					},
+				},
+			},
 		},
 		RestConfig: restConfig,
 	}
@@ -39,7 +76,7 @@ func NewServiceHookImpl(restConfig *restclient.Config) *ServiceHookImpl {
 }
 
 func (shi *ServiceHookImpl) GetterFn() ResourceGetter {
-	return func(ctx context.Context, id kindsys.StaticMetadata) (kindsys.Resource, error) {
+	return func(ctx context.Context, ns string, name string) (kindsys.Resource, error) {
 		// TODO: until we have a real resource getter, doing that inside the hook
 		cs, err := clientset.NewForConfig(shi.RestConfig)
 		if err != nil {
@@ -47,7 +84,7 @@ func (shi *ServiceHookImpl) GetterFn() ResourceGetter {
 			return nil, err
 		}
 
-		ds, err := cs.GooglesheetsV1().Datasources(id.Namespace).Get(ctx, id.Name, metav1.GetOptions{})
+		ds, err := cs.GooglesheetsV1().Datasources(ns).Get(ctx, name, metav1.GetOptions{})
 		if err != nil {
 			return nil, err
 		}
@@ -87,29 +124,21 @@ func (shi *ServiceHookImpl) setupGetRawAPIHandlers() {
 		// TODO: until we have a real resource getter, doing that inside the hook
 		return []RawAPIHandler{
 			{
-				Path:    "not-found-handler",
-				OpenAPI: "",
-				Level:   RawAPILevel(RawAPILevelResource),
-				Handler: func(_ context.Context, _ kindsys.StaticMetadata) (http.HandlerFunc, error) {
-					return http.NotFound, nil
-				},
-			},
-			{
 				Path:    "query",
 				OpenAPI: "",
-				Level:   RawAPILevel(RawAPILevelResource),
+				Level:   RawAPILevelResource,
 				Handler: setupPluginContextAndReturnHandler(getter, getQueryHandler),
 			},
 			{
 				Path:    "health",
 				OpenAPI: "",
-				Level:   RawAPILevel(RawAPILevelResource),
+				Level:   RawAPILevelResource,
 				Handler: setupPluginContextAndReturnHandler(getter, getHealthHandler),
 			},
 			{
 				Path:    "resource/spreadsheets",
 				OpenAPI: "",
-				Level:   RawAPILevel(RawAPILevelResource),
+				Level:   RawAPILevelResource,
 				Handler: setupPluginContextAndReturnHandler(getter, getCallResourceHandler, "/spreadsheets"),
 			},
 		}
@@ -117,8 +146,8 @@ func (shi *ServiceHookImpl) setupGetRawAPIHandlers() {
 }
 
 func setupPluginContextAndReturnHandler(getter ResourceGetter, internalHandler InternalHandler, path ...string) ClosedOnFetchedK8sResourceHandler {
-	return func(ctx context.Context, id kindsys.StaticMetadata) (http.HandlerFunc, error) {
-		r, err := getter(ctx, id)
+	return func(ctx context.Context, ns string, name string) (http.HandlerFunc, error) {
+		r, err := getter(ctx, ns, name)
 		if err != nil {
 			return nil, err
 		}

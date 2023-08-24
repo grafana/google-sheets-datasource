@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/grafana/kindsys"
+	"k8s.io/kube-openapi/pkg/spec3"
 )
 
 // Alternative "Grafana Resource Definition" hook
@@ -30,11 +31,21 @@ type APIServiceHooks struct {
 	// This is called when initialized -- the endpoints will be added to the api server
 	// the OpenAPI specs will be exposed in the public API
 	GetRawAPIHandlers func(getter ResourceGetter) []RawAPIHandler
+
+	//
+	PluginRouteHandlers []PluginRouteHandler
+}
+
+type PluginRouteHandler struct {
+	Level   RawAPILevel      // group+version | namespace | resource
+	Slug    string           // added to the appropriate level
+	Spec    spec3.PathProps  // Exposed in the open api service discovery
+	Handler http.HandlerFunc // when Level = resource, the resource will be available in context
 }
 
 // This allows access to resources for API handlers
-type ResourceGetter = func(ctx context.Context, id kindsys.StaticMetadata) (kindsys.Resource, error)
-type ClosedOnFetchedK8sResourceHandler = func(ctx context.Context, id kindsys.StaticMetadata) (http.HandlerFunc, error)
+type ResourceGetter = func(ctx context.Context, ns string, name string) (kindsys.Resource, error)
+type ClosedOnFetchedK8sResourceHandler = func(ctx context.Context, ns string, name string) (http.HandlerFunc, error)
 
 // This is used to answer raw API requests like /logs
 type StreamingResponse = func(ctx context.Context, apiVersion, acceptHeader string) (
@@ -53,7 +64,7 @@ type RawAPIHandler struct {
 type RawAPILevel int8
 
 const (
-	RawAPILevelResource int8 = iota
+	RawAPILevelResource RawAPILevel = iota
 	RawAPILevelNamespace
-	RawAPILevelGroup
+	RawAPILevelGroupVersion
 )

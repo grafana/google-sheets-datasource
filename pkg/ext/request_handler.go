@@ -8,7 +8,6 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
 
-	"github.com/grafana/kindsys"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apiserver/pkg/endpoints/handlers/responsewriters"
@@ -96,11 +95,10 @@ func (handler *requestHandler) callResourceHandler(writer http.ResponseWriter, r
 	switch resourcePath {
 	case "spreadsheets":
 		handlers := handler.serviceHookImpl.GetRawAPIHandlers(handler.serviceHookImpl.GetterFn())
-		handlerWithSetupCompleted, err := handlers[subresourceToRawHandlerIndexMap[subresource]].Handler(ctx, kindsys.StaticMetadata{
-			Name: info.Name,
+		handlerWithSetupCompleted, err := handlers[subresourceToRawHandlerIndexMap[subresource]].Handler(
+			ctx, info.Name, info.Namespace,
 			// curious: request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is
-			Namespace: info.Namespace,
-		})
+		)
 
 		if err != nil {
 			klog.Errorf("Error when getting the handler that closes on StaticMetadata: %s", err)
@@ -133,11 +131,10 @@ func (handler *requestHandler) subresourceHandler(writer http.ResponseWriter, re
 		fallthrough
 	case "health":
 		handlers := handler.serviceHookImpl.GetRawAPIHandlers(handler.serviceHookImpl.GetterFn())
-		handlerWithSetupCompleted, err := handlers[subresourceToRawHandlerIndexMap[info.Subresource]].Handler(ctx, kindsys.StaticMetadata{
-			Name: info.Name,
-			// curious: request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is
-			Namespace: info.Namespace,
-		})
+		handlerWithSetupCompleted, err := handlers[subresourceToRawHandlerIndexMap[info.Subresource]].Handler(
+			ctx, info.Name, info.Namespace,
+			// // curious: request.NamespaceValue(ctx) doesn't seem to be set but info.Namespace is
+		)
 
 		if err != nil {
 			klog.Errorf("Error when getting the handler that closes on StaticMetadata: %s", err)
