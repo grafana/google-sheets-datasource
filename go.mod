@@ -7,12 +7,14 @@ replace github.com/grafana/kindsys => ../../kindsys
 require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/davecgh/go-spew v1.1.1
+	github.com/gorilla/mux v1.8.0
 	github.com/grafana/grafana-google-sdk-go v0.2.1
 	github.com/grafana/grafana-plugin-sdk-go v0.149.1
 	github.com/grafana/kindsys v0.0.0-20230802133549-74f2bc812610
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.3
+	github.com/vectordotdev/go-datemath v0.1.1-0.20220323213446-f3954d0b18ae
 	golang.org/x/oauth2 v0.7.0
 	google.golang.org/api v0.110.0
 	k8s.io/apimachinery v0.27.4
@@ -24,9 +26,7 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3
 )
 
-require github.com/vectordotdev/go-datemath v0.1.1-0.20220323213446-f3954d0b18ae
-
-require github.com/gorilla/mux v1.8.0
+replace k8s.io/kube-openapi v0.0.0-20230501164219-8b0f38b5fd1f => github.com/ryantxu/kube-openapi v0.0.0-20230824043724-ccc3f70d4321
 
 require (
 	cloud.google.com/go/compute v1.18.0 // indirect
@@ -63,6 +63,7 @@ require (
 	github.com/google/cel-go v0.12.6 // indirect
 	github.com/google/flatbuffers v2.0.0+incompatible // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
+	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
@@ -88,7 +89,6 @@ require (
 	github.com/mattn/go-runewidth v0.0.10 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mitchellh/go-testing-interface v1.0.0 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect

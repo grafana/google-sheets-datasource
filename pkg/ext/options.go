@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"k8s.io/kube-openapi/pkg/spec3"
 	"k8s.io/kube-openapi/pkg/validation/spec"
 
 	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
@@ -180,9 +181,14 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 		}
 		return s, nil
 	}
-	// cry face!!! the hook is not called here!!!
-	// serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
-	// serverConfig.OpenAPIV3Config.PostProcessSpec = serverConfig.OpenAPIConfig.PostProcessSpec
+	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
+	serverConfig.OpenAPIV3Config.PostProcessSpec3 = func(s *spec3.OpenAPI) (*spec3.OpenAPI, error) {
+		s.Info.Title = "POST PROCESSED V3!!!"
+		s.Info.VendorExtensible = spec.VendorExtensible{
+			Extensions: map[string]any{"hello": "world(3)"},
+		}
+		return s, nil
+	}
 	serverConfig.SkipOpenAPIInstallation = false
 	serverConfig.SharedInformerFactory = clientGoInformers.NewSharedInformerFactory(fake.NewSimpleClientset(), 10*time.Minute)
 	serverConfig.ClientConfig = &rest.Config{}
