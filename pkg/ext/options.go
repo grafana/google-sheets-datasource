@@ -11,7 +11,7 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset"
 	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset/scheme"
 	informers "github.com/grafana/google-sheets-datasource/pkg/client/informers/externalversions"
-	generatedopenapi "github.com/grafana/google-sheets-datasource/pkg/client/openapi"
+	extopenapi "github.com/grafana/google-sheets-datasource/pkg/ext/openapi"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -86,12 +86,11 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 	o.RecommendedOptions.Etcd.StorageConfig.Transport.ServerList = []string{"127.0.0.1:2379"}
 	o.RecommendedOptions.CoreAPI = nil
 
-	// o.RecommendedOptions.SecureServing.
-
 	serverConfig := genericapiserver.NewRecommendedConfig(Codecs)
 	serverConfig.CorsAllowedOriginList = []string{".*"}
-	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
-	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
+	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(extopenapi.AttachExtDefinitionsToGenerated), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
+	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(extopenapi.AttachExtDefinitionsToGenerated), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
+	time.Sleep(10 * time.Second)
 	serverConfig.SkipOpenAPIInstallation = false
 	serverConfig.SharedInformerFactory = clientGoInformers.NewSharedInformerFactory(fake.NewSimpleClientset(), 10*time.Minute)
 	serverConfig.ClientConfig = &rest.Config{}

@@ -85,6 +85,8 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 		return nil, err
 	}
 	storageMap["datasources"] = datasourceREST
+	// NOTE: this below is just for testing whether we can populate the openapi spec with routes for subresources
+	// storageMap["datasources/query"] = datasourceREST
 
 	delegationTarget := genericapiserver.NewEmptyDelegate()
 	genericServer, err := c.GenericConfig.New("sample-apiserver", delegationTarget)

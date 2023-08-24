@@ -43,6 +43,13 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *
 		serviceHookImpl: NewServiceHookImpl(restConfig),
 	}
 
+	// NOTE: test this with aggregation
+	router.
+		Path("/apis/googlesheets.ext.grafana.com/v1/myhandler").
+		HandlerFunc(func(writer http.ResponseWriter, h *http.Request) {
+			writer.Write([]byte("OK"))
+		})
+
 	dsSubrouter := router.
 		PathPrefix("/apis/googlesheets.ext.grafana.com/v1/namespaces/{ns}/datasources/{datasourceName}").
 		Subrouter()
