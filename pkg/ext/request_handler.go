@@ -57,7 +57,7 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config, h
 				sub.MethodNotAllowedHandler = &methodNotAllowedHandler{}
 			}
 			methods := methodsFromSpec(v.Spec)
-			sub.HandleFunc(v.Slug, methodNotAllowedHandlerWrapper(SubresourceHandlerWrapper(v.Handler, getter))).Methods(methods...)
+			sub.HandleFunc(v.Slug, SubresourceHandlerWrapper(v.Handler, getter)).Methods(methods...)
 		}
 	}
 
@@ -112,25 +112,6 @@ func methodsFromSpec(props spec3.PathProps) []string {
 		methods = append(methods, "DELETE")
 	}
 	return methods
-}
-
-func methodNotAllowedHandlerWrapper(upstream http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var found bool
-		methods, _ := mux.CurrentRoute(r).GetMethods()
-		for _, m := range methods {
-			if m == r.Method {
-				found = true
-			}
-		}
-
-		if !found {
-			w.WriteHeader(405)
-			return
-		}
-
-		upstream(w, r)
-	}
 }
 
 type methodNotAllowedHandler struct {
