@@ -91,6 +91,9 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 
 	// o.RecommendedOptions.SecureServing.
 
+	// The custom hooks!
+	hooks := NewServiceHooks()
+
 	serverConfig := genericapiserver.NewRecommendedConfig(Codecs)
 	serverConfig.CorsAllowedOriginList = []string{".*"}
 	serverConfig.OpenAPIConfig = genericapiserver.DefaultOpenAPIConfig(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
@@ -184,77 +187,21 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 
 	serverConfig.OpenAPIV3Config = genericapiserver.DefaultOpenAPIV3Config(openapi.GetOpenAPIDefinitionsWithoutDisabledFeatures(generatedopenapi.GetOpenAPIDefinitions), openapinamer.NewDefinitionNamer(Scheme, scheme.Scheme))
 	serverConfig.OpenAPIV3Config.PostProcessSpec3 = func(s *spec3.OpenAPI) (*spec3.OpenAPI, error) {
-		if s.Paths != nil && s.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/"] != nil {
+		prefix := "/apis/googlesheets.ext.grafana.com/v1"
+		if s.Paths != nil && s.Paths.Paths[prefix+"/"] != nil {
 			copy := *s // will copy the rest of the properties
-			copy.Info.Title = "Google sheets plugin"
-
-			ttt := []string{"builtin k8s"}
-			for _, p := range s.Paths.Paths {
-				if p.Get != nil {
-					p.Get.Tags = ttt
+			copy.Info.Title = "Google sheets plugin!"
+			for _, v := range hooks.PluginRouteHandlers {
+				path := prefix
+				switch v.Level {
+				case RawAPILevelResource:
+					path += "/namespaces/{ns}/datasources/{name}"
+				case RawAPILevelNamespace:
+					path += "/namespaces/{ns}"
 				}
-				if p.Post != nil {
-					p.Post.Tags = ttt
-				}
-				if p.Patch != nil {
-					p.Patch.Tags = ttt
-				}
-				if p.Put != nil {
-					p.Put.Tags = ttt
-				}
-				if p.Delete != nil {
-					p.Delete.Tags = ttt
-				}
+				path += v.Slug
+				copy.Paths.Paths[path] = &spec3.Path{PathProps: v.Spec}
 			}
-
-			copy.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/anything"] = &spec3.Path{
-				PathProps: spec3.PathProps{
-					Summary: "the query method",
-					Get: &spec3.Operation{
-						OperationProps: spec3.OperationProps{
-							Description: "method at the rood plugin level",
-							Tags:        []string{"plugin level (no config)"},
-						},
-					},
-				},
-			}
-
-			copy.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/namespaces/{namespace}/anything"] = &spec3.Path{
-				PathProps: spec3.PathProps{
-					Summary: "the query method",
-					Get: &spec3.Operation{
-						OperationProps: spec3.OperationProps{
-							Description: "method at the org/tenant level",
-							Tags:        []string{"tenant level"},
-						},
-					},
-				},
-			}
-
-			copy.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/namespaces/{namespace}/datasources/{name}/query"] = &spec3.Path{
-				PathProps: spec3.PathProps{
-					Summary: "the query method",
-					Post: &spec3.Operation{
-						OperationProps: spec3.OperationProps{
-							Description: "the query method",
-							Tags:        []string{"datasource level"},
-						},
-					},
-				},
-			}
-
-			copy.Paths.Paths["/apis/googlesheets.ext.grafana.com/v1/namespaces/{namespace}/datasources/{name}/health"] = &spec3.Path{
-				PathProps: spec3.PathProps{
-					Summary: "healthcheck",
-					Get: &spec3.Operation{
-						OperationProps: spec3.OperationProps{
-							Description: "do healthcheck",
-							Tags:        []string{"datasource level"},
-						},
-					},
-				},
-			}
-
 			return &copy, nil
 		}
 		return s, nil
@@ -266,7 +213,11 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 		// Not calling DefaultBuildHandlerChain on any of the handlers written by us prevents being able to get requestInfo
 		// One could argue that Gorilla Mux does provide vars based matching on route params
 		// But I went with using requestInfo just to make the code looking like K8s
-		return genericapiserver.DefaultBuildHandlerChain(NewRequestHandler(apiHandler, c.LoopbackClientConfig), c)
+		return genericapiserver.DefaultBuildHandlerChain(
+			NewRequestHandler(
+				apiHandler,
+				c.LoopbackClientConfig,
+				hooks), c)
 	}
 
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {

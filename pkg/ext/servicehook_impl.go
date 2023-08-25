@@ -16,6 +16,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/klog/v2"
+	"k8s.io/kube-openapi/pkg/spec3"
 )
 
 func NewServiceHooks() *APIServiceHooks {
@@ -74,14 +75,40 @@ func NewServiceHooks() *APIServiceHooks {
 		PluginRouteHandlers: []PluginRouteHandler{
 			{
 				Level: RawAPILevelGroupVersion,
-				Slug:  "xxx", // URL will be
+				Slug:  "/xxx", // URL will be
+				Spec: spec3.PathProps{
+					Summary:     "an example at the root level",
+					Description: "longer description here?",
+					Get: &spec3.Operation{
+						OperationProps: spec3.OperationProps{
+							Parameters: []*spec3.Parameter{
+								{ParameterProps: spec3.ParameterProps{
+									Name: "xxx",
+								}},
+							},
+						},
+					},
+				},
 				Handler: func(w http.ResponseWriter, r *http.Request) {
 					w.Write([]byte("Root level handler (xxx)"))
 				},
 			},
 			{
 				Level: RawAPILevelNamespace,
-				Slug:  "yyy", // URL will be
+				Slug:  "/yyy", // URL will be
+				Spec: spec3.PathProps{
+					Summary:     "an example at the namespace level",
+					Description: "longer description here?",
+					Get: &spec3.Operation{
+						OperationProps: spec3.OperationProps{
+							Parameters: []*spec3.Parameter{
+								{ParameterProps: spec3.ParameterProps{
+									Name: "yyy",
+								}},
+							},
+						},
+					},
+				},
 				Handler: func(w http.ResponseWriter, r *http.Request) {
 					w.Write([]byte("namespace level handler (yyy)"))
 				},
@@ -89,6 +116,19 @@ func NewServiceHooks() *APIServiceHooks {
 			{
 				Level: RawAPILevelResource,
 				Slug:  "/query", // URL will be
+				Spec: spec3.PathProps{
+					Summary:     "an example at the root level",
+					Description: "longer description here?",
+					Post: &spec3.Operation{
+						OperationProps: spec3.OperationProps{
+							RequestBody: &spec3.RequestBody{
+								RequestBodyProps: spec3.RequestBodyProps{
+									Required: true,
+								},
+							},
+						},
+					},
+				},
 				Handler: func(w http.ResponseWriter, r *http.Request) {
 					ctx := r.Context()
 					ds, pluginCtx, err := dsgetter(ctx)
@@ -105,6 +145,11 @@ func NewServiceHooks() *APIServiceHooks {
 			{
 				Level: RawAPILevelResource,
 				Slug:  "/health", // URL will be
+				Spec: spec3.PathProps{
+					Summary:     "check if the service is OK",
+					Description: "longer description here?",
+					Get:         &spec3.Operation{},
+				},
 				Handler: func(w http.ResponseWriter, r *http.Request) {
 					ctx := r.Context()
 					ds, pluginCtx, err := dsgetter(ctx)

@@ -11,36 +11,75 @@ type requestHandler struct {
 	router *mux.Router
 }
 
-// restclient.Config is only used by subresource handler, so we don't save it on the resource handler
-func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config) *requestHandler {
+func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config, hooks *APIServiceHooks) *requestHandler {
 	router := mux.NewRouter()
 
 	getter := makeGetter(restConfig)
-	hooks := NewServiceHooks()
 	requestHandler := &requestHandler{
 		router: router,
 	}
 
-	dsSubrouter := router.
-		PathPrefix("/apis/googlesheets.ext.grafana.com/v1/namespaces/{ns}/datasources/{name}").
-		Subrouter()
+	// LEVEL = Group+Verison
+	var sub *mux.Router
+	prefix := "/apis/googlesheets.ext.grafana.com/v1"
+	for _, v := range hooks.PluginRouteHandlers {
+		if v.Level == RawAPILevelGroupVersion {
+			if sub == nil {
+				sub = router.PathPrefix(prefix).Subrouter()
+			}
+			sub.HandleFunc(v.Slug, v.Handler)
+			// TODO... methods from spec!
+		}
+	}
 
-	dsSubrouter.
-		HandleFunc("/query", SubresourceHandlerWrapper(
-			hooks.PluginRouteHandlers[2].Handler, getter)).
-		Methods("POST")
+	// LEVEL = Namespace/Tenent
+	sub = nil
+	prefix += "/namespaces/{ns}"
+	for _, v := range hooks.PluginRouteHandlers {
+		if v.Level == RawAPILevelNamespace {
+			if sub == nil {
+				sub = router.PathPrefix(prefix).Subrouter()
+			}
+			sub.HandleFunc(v.Slug, v.Handler)
+			// TODO... methods from spec!
+		}
+	}
 
-	dsSubrouter.
-		HandleFunc("/health", SubresourceHandlerWrapper(
-			hooks.PluginRouteHandlers[3].Handler, getter)).
-		Methods("GET")
+	// LEVEL = Resource
+	sub = nil
+	prefix += "/datasources/{name}"
+	for _, v := range hooks.PluginRouteHandlers {
+		if v.Level == RawAPILevelResource {
+			if sub == nil {
+				sub = router.PathPrefix(prefix).Subrouter()
+				// ??? does not do anything!!!
+				sub.MethodNotAllowedHandler = &methodNotAllowedHandler{}
+			}
+			sub.HandleFunc(v.Slug, SubresourceHandlerWrapper(v.Handler, getter))
+			// TODO... methods from spec!
+		}
+	}
 
-	dsSubrouter.
-		HandleFunc("/resource/{path:.*}", SubresourceHandlerWrapper(
-			hooks.PluginRouteHandlers[4].Handler, getter))
+	// dsSubrouter := router.
+	// 	PathPrefix("/apis/googlesheets.ext.grafana.com/v1/namespaces/{ns}/datasources/{name}").
+	// 	Subrouter()
+
+	// dsSubrouter.
+	// 	HandleFunc("/query", SubresourceHandlerWrapper(
+	// 		hooks.PluginRouteHandlers[2].Handler, getter)).
+	// 	Methods("POST")
+
+	// dsSubrouter.
+	// 	HandleFunc("/health", SubresourceHandlerWrapper(
+	// 		hooks.PluginRouteHandlers[3].Handler, getter)).
+	// 	Methods("GET")
+
+	// dsSubrouter.
+	// 	HandleFunc("/resource/{path:.*}", SubresourceHandlerWrapper(
+	// 		hooks.PluginRouteHandlers[4].Handler, getter))
 
 	// ?????? does not seem to do anything :(
-	dsSubrouter.MethodNotAllowedHandler = &methodNotAllowedHandler{}
+	//dsSubrouter.MethodNotAllowedHandler = &methodNotAllowedHandler{}
 
 	// Per Gorilla Mux issue here: https://github.com/gorilla/mux/issues/616#issuecomment-798807509
 	// default handler must come last
