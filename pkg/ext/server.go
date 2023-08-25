@@ -37,7 +37,7 @@ type APIServiceHooks struct {
 type PluginRouteHandler struct {
 	Level   RawAPILevel      // group+version | namespace | resource
 	Slug    string           // added to the appropriate level
-	Spec    spec3.PathProps  // Exposed in the open api service discovery
+	Spec    *spec3.PathProps // Exposed in the open api service discovery
 	Handler http.HandlerFunc // when Level = resource, the resource will be available in context
 }
 

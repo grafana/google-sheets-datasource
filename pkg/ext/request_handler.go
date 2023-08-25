@@ -1,6 +1,7 @@
 package ext
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -12,7 +13,7 @@ type requestHandler struct {
 	router *mux.Router
 }
 
-func NewRequestHandler(delegateHandler http.Handler, restConfig *restclient.Config, hooks *APIServiceHooks) *requestHandler {
+func NewRequestHandler(delegateHandler http.Handler, restConfig *restclient.Config, hooks *APIServiceHooks) (*requestHandler, error) {
 	router := mux.NewRouter()
 	getter := makeGetter(restConfig)
 
@@ -23,9 +24,15 @@ func NewRequestHandler(delegateHandler http.Handler, restConfig *restclient.Conf
 		if v.Level == RawAPILevelGroupVersion {
 			if sub == nil {
 				sub = router.PathPrefix(prefix).Subrouter()
+				sub.MethodNotAllowedHandler = &methodNotAllowedHandler{}
+			}
+
+			methods, err := methodsFromSpec(v.Slug, v.Spec)
+			if err != nil {
+				return nil, err
 			}
 			sub.HandleFunc(v.Slug, v.Handler).
-				Methods(methodsFromSpec(v.Spec)...)
+				Methods(methods...)
 		}
 	}
 
@@ -36,9 +43,15 @@ func NewRequestHandler(delegateHandler http.Handler, restConfig *restclient.Conf
 		if v.Level == RawAPILevelNamespace {
 			if sub == nil {
 				sub = router.PathPrefix(prefix).Subrouter()
+				sub.MethodNotAllowedHandler = &methodNotAllowedHandler{}
+			}
+
+			methods, err := methodsFromSpec(v.Slug, v.Spec)
+			if err != nil {
+				return nil, err
 			}
 			sub.HandleFunc(v.Slug, v.Handler).
-				Methods(methodsFromSpec(v.Spec)...)
+				Methods(methods...)
 
 		}
 	}
@@ -50,9 +63,15 @@ func NewRequestHandler(delegateHandler http.Handler, restConfig *restclient.Conf
 		if v.Level == RawAPILevelResource {
 			if sub == nil {
 				sub = router.PathPrefix(prefix).Subrouter()
+				sub.MethodNotAllowedHandler = &methodNotAllowedHandler{}
+			}
+
+			methods, err := methodsFromSpec(v.Slug, v.Spec)
+			if err != nil {
+				return nil, err
 			}
 			sub.HandleFunc(v.Slug, SubresourceHandlerWrapper(v.Handler, getter)).
-				Methods(methodsFromSpec(v.Spec)...)
+				Methods(methods...)
 		}
 	}
 
@@ -62,14 +81,18 @@ func NewRequestHandler(delegateHandler http.Handler, restConfig *restclient.Conf
 
 	return &requestHandler{
 		router: router,
-	}
+	}, nil
 }
 
 func (h *requestHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	h.router.ServeHTTP(w, req)
 }
 
-func methodsFromSpec(props spec3.PathProps) []string {
+func methodsFromSpec(slug string, props *spec3.PathProps) ([]string, error) {
+	if props == nil {
+		return []string{"GET", "POST", "PUT", "PATCH", "DELETE"}, nil
+	}
+
 	methods := make([]string, 0)
 	if props.Get != nil {
 		methods = append(methods, "GET")
@@ -86,5 +109,18 @@ func methodsFromSpec(props spec3.PathProps) []string {
 	if props.Delete != nil {
 		methods = append(methods, "DELETE")
 	}
-	return methods
+
+	if len(methods) == 0 {
+		return nil, fmt.Errorf("Invalid OpenAPI Spec for slug=%s without any methods in PathProps", slug)
+	}
+
+	return methods, nil
+}
+
+type methodNotAllowedHandler struct {
+}
+
+func (h *methodNotAllowedHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	w.WriteHeader(405) // method not allowed
+	// w.Write([]byte(fmt.Sprintf("bad method: %s", req.Method)))
 }

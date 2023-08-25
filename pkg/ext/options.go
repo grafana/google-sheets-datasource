@@ -200,7 +200,9 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 					path += "/namespaces/{ns}"
 				}
 				path += v.Slug
-				copy.Paths.Paths[path] = &spec3.Path{PathProps: v.Spec}
+				if v.Spec != nil {
+					copy.Paths.Paths[path] = &spec3.Path{PathProps: *v.Spec}
+				}
 			}
 			return &copy, nil
 		}
@@ -213,11 +215,14 @@ func (o *PluginAggregatedServerOptions) Config() (*Config, error) {
 		// Call DefaultBuildHandlerChain on the main entrypoint http.Handler
 		// See https://github.com/kubernetes/apiserver/blob/v0.28.0/pkg/server/config.go#L906
 		// DefaultBuildHandlerChain provides many things, notably CORS, HSTS, cache-control, authz and latency tracking
-		return genericapiserver.DefaultBuildHandlerChain(
-			NewRequestHandler(
-				delegateHandler,
-				c.LoopbackClientConfig,
-				hooks), c)
+		requestHandler, err := NewRequestHandler(
+			delegateHandler,
+			c.LoopbackClientConfig,
+			hooks)
+		if err != nil {
+			panic(fmt.Sprintf("could not build handler chain func: %s", err.Error()))
+		}
+		return genericapiserver.DefaultBuildHandlerChain(requestHandler, c)
 	}
 
 	if err := o.RecommendedOptions.ApplyTo(serverConfig); err != nil {
