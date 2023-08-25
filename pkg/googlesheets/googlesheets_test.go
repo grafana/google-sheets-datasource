@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
+
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -16,7 +17,7 @@ import (
 type fakeClient struct {
 }
 
-func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
+func (f *fakeClient) GetSpreadsheet(_ string, _ string, _ bool) (*sheets.Spreadsheet, error) {
 	return loadTestSheet("./testdata/mixed-data.json")
 }
 
@@ -95,7 +96,7 @@ func TestGooglesheets(t *testing.T) {
 		}
 		qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
-		meta := make(map[string]interface{})
+		meta := make(map[string]any)
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
 		require.NoError(t, err)
 		require.Equal(t, "ref1", frame.Name)
@@ -121,7 +122,7 @@ func TestGooglesheets(t *testing.T) {
 			assert.Equal(t, "Multiple data types found in column \"MixedDataTypes\". Using string data type", warnings[0])
 			assert.Equal(t, "Multiple units found in column \"MixedUnits\". Formatted value will be used", warnings[1])
 			assert.Equal(t, "Multiple units found in column \"Mixed currencies\". Formatted value will be used", warnings[2])
-			//assert.Equal(t, "Multiple data types found in column \"MixedUnits\". Using string data type", warnings[2])
+			// assert.Equal(t, "Multiple data types found in column \"MixedUnits\". Using string data type", warnings[2])
 		})
 	})
 
@@ -134,7 +135,7 @@ func TestGooglesheets(t *testing.T) {
 		}
 		qm := models.QueryModel{Range: "A2", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
-		meta := make(map[string]interface{})
+		meta := make(map[string]any)
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
 		require.NoError(t, err)
 		require.Equal(t, "ref1", frame.Name)

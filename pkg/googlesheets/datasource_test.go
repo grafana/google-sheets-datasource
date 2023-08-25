@@ -11,7 +11,7 @@ import (
 )
 
 func TestGoogleSheetsDatasource_CheckHealth(t *testing.T) {
-	ds := &googleSheetsDatasource{
+	ds := &Datasource{
 		googlesheets: &GoogleSheets{},
 	}
 
@@ -70,7 +70,7 @@ func TestGoogleSheetsDatasource_CheckHealth(t *testing.T) {
 }
 
 func TestGoogleSheetsDatasource_QueryData(t *testing.T) {
-	ds := &googleSheetsDatasource{
+	ds := &Datasource{
 		googlesheets: &GoogleSheets{},
 	}
 
