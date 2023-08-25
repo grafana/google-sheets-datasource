@@ -1,15 +1,15 @@
 package googlesheets
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
 
-	"context"
+	"github.com/grafana/google-sheets-datasource/pkg/models"
 
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
@@ -31,13 +31,13 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 	}
 
 	// This result may be cached
-	data, meta, err := gs.getSheetData(client, qm)
+	sheetData, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
 		dr.Error = err
 		return
 	}
 
-	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
+	frame, err := gs.transformSheetToDataFrame(sheetData, meta, refID, qm)
 	if err != nil {
 		dr.Error = err
 		return
@@ -108,12 +108,12 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 		}
 	}
 
-	data := result.Sheets[0].Data[0]
+	sheetData := result.Sheets[0].Data[0]
 	if qm.CacheDurationSeconds > 0 {
-		gs.Cache.Set(cacheKey, data, time.Duration(qm.CacheDurationSeconds)*time.Second)
+		gs.Cache.Set(cacheKey, sheetData, time.Duration(qm.CacheDurationSeconds)*time.Second)
 	}
 
-	return data, map[string]interface{}{"hit": false}, nil
+	return sheetData, map[string]interface{}{"hit": false}, nil
 }
 
 func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {

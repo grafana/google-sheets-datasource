@@ -50,7 +50,7 @@ func (cd *ColumnDefinition) GetType() ColumnType {
 		}
 	}
 
-	//The column has mixed or no data types - fallback to string
+	// The column has mixed or no data types - fallback to string
 	return ColumTypeString
 }
 
