@@ -96,7 +96,7 @@ func TestGooglesheets(t *testing.T) {
 		}
 		qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
-		meta := make(map[string]interface{})
+		meta := make(map[string]any)
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
 		require.NoError(t, err)
 		require.Equal(t, "ref1", frame.Name)
@@ -135,7 +135,7 @@ func TestGooglesheets(t *testing.T) {
 		}
 		qm := models.QueryModel{Range: "A2", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
-		meta := make(map[string]interface{})
+		meta := make(map[string]any)
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
 		require.NoError(t, err)
 		require.Equal(t, "ref1", frame.Name)

@@ -106,8 +106,8 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 	return response, nil
 }
 
-func writeResult(rw http.ResponseWriter, path string, val interface{}, err error) {
-	response := make(map[string]interface{})
+func writeResult(rw http.ResponseWriter, path string, val any, err error) {
+	response := make(map[string]any)
 	code := http.StatusOK
 	if err != nil {
 		response["error"] = err.Error()
