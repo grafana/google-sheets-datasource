@@ -95,7 +95,7 @@ func (h *requestHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func methodsFromSpec(props spec3.PathProps) []string {
-	methods := []string{}
+	methods := make([]string, 0)
 	if props.Get != nil {
 		methods = append(methods, "GET")
 	}
