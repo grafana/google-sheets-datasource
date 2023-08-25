@@ -5,6 +5,7 @@ import (
 
 	"github.com/gorilla/mux"
 	restclient "k8s.io/client-go/rest"
+	"k8s.io/kube-openapi/pkg/spec3"
 )
 
 type requestHandler struct {
@@ -55,8 +56,8 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config, h
 				// ??? does not do anything!!!
 				sub.MethodNotAllowedHandler = &methodNotAllowedHandler{}
 			}
-			sub.HandleFunc(v.Slug, SubresourceHandlerWrapper(v.Handler, getter))
-			// TODO... methods from spec!
+			methods := methodsFromSpec(v.Spec)
+			sub.HandleFunc(v.Slug, methodNotAllowedHandlerWrapper(SubresourceHandlerWrapper(v.Handler, getter))).Methods(methods...)
 		}
 	}
 
@@ -83,6 +84,7 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config, h
 
 	// Per Gorilla Mux issue here: https://github.com/gorilla/mux/issues/616#issuecomment-798807509
 	// default handler must come last
+
 	router.PathPrefix("/").Handler(apiHandler)
 
 	return requestHandler
@@ -90,6 +92,45 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config, h
 
 func (h *requestHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	h.router.ServeHTTP(w, req)
+}
+
+func methodsFromSpec(props spec3.PathProps) []string {
+	methods := []string{}
+	if props.Get != nil {
+		methods = append(methods, "GET")
+	}
+	if props.Post != nil {
+		methods = append(methods, "POST")
+	}
+	if props.Put != nil {
+		methods = append(methods, "PUT")
+	}
+	if props.Patch != nil {
+		methods = append(methods, "PATCH")
+	}
+	if props.Delete != nil {
+		methods = append(methods, "DELETE")
+	}
+	return methods
+}
+
+func methodNotAllowedHandlerWrapper(upstream http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var found bool
+		methods, _ := mux.CurrentRoute(r).GetMethods()
+		for _, m := range methods {
+			if m == r.Method {
+				found = true
+			}
+		}
+
+		if !found {
+			w.WriteHeader(405)
+			return
+		}
+
+		upstream(w, r)
+	}
 }
 
 type methodNotAllowedHandler struct {
