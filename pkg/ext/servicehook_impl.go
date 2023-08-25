@@ -271,15 +271,17 @@ func executeCallResourceHandler(ctx context.Context, w http.ResponseWriter, req 
 		return nil
 	})
 
-	subresource, err := SubresourceFromContext(ctx)
-	if err != nil {
-		w.WriteHeader(500)
-		w.Write([]byte("Subresource not found for CallResourceHandler request"))
+	idx := strings.LastIndex(req.URL.Path, "/resource")
+	if idx < 0 {
+		w.WriteHeader(400)
+		w.Write([]byte("expected resource path"))
+		return
 	}
+	path := req.URL.Path[idx+len("/resource"):]
 
 	err = datasource.CallResource(ctx, &backend.CallResourceRequest{
 		PluginContext: *pluginCtx,
-		Path:          strings.Replace(*subresource, "resource", "", 1),
+		Path:          path,
 		Method:        req.Method,
 		Body:          body,
 	}, wrappedSender)
