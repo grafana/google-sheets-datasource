@@ -28,8 +28,8 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config, h
 			if sub == nil {
 				sub = router.PathPrefix(prefix).Subrouter()
 			}
-			sub.HandleFunc(v.Slug, v.Handler)
-			// TODO... methods from spec!
+			sub.HandleFunc(v.Slug, v.Handler).
+				Methods(methodsFromSpec(v.Spec)...)
 		}
 	}
 
@@ -41,8 +41,9 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config, h
 			if sub == nil {
 				sub = router.PathPrefix(prefix).Subrouter()
 			}
-			sub.HandleFunc(v.Slug, v.Handler)
-			// TODO... methods from spec!
+			sub.HandleFunc(v.Slug, v.Handler).
+				Methods(methodsFromSpec(v.Spec)...)
+
 		}
 	}
 
@@ -53,34 +54,11 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config, h
 		if v.Level == RawAPILevelResource {
 			if sub == nil {
 				sub = router.PathPrefix(prefix).Subrouter()
-				// ??? does not do anything!!!
-				sub.MethodNotAllowedHandler = &methodNotAllowedHandler{}
 			}
-			methods := methodsFromSpec(v.Spec)
-			sub.HandleFunc(v.Slug, SubresourceHandlerWrapper(v.Handler, getter)).Methods(methods...)
+			sub.HandleFunc(v.Slug, SubresourceHandlerWrapper(v.Handler, getter)).
+				Methods(methodsFromSpec(v.Spec)...)
 		}
 	}
-
-	// dsSubrouter := router.
-	// 	PathPrefix("/apis/googlesheets.ext.grafana.com/v1/namespaces/{ns}/datasources/{name}").
-	// 	Subrouter()
-
-	// dsSubrouter.
-	// 	HandleFunc("/query", SubresourceHandlerWrapper(
-	// 		hooks.PluginRouteHandlers[2].Handler, getter)).
-	// 	Methods("POST")
-
-	// dsSubrouter.
-	// 	HandleFunc("/health", SubresourceHandlerWrapper(
-	// 		hooks.PluginRouteHandlers[3].Handler, getter)).
-	// 	Methods("GET")
-
-	// dsSubrouter.
-	// 	HandleFunc("/resource/{path:.*}", SubresourceHandlerWrapper(
-	// 		hooks.PluginRouteHandlers[4].Handler, getter))
-
-	// ?????? does not seem to do anything :(
-	//dsSubrouter.MethodNotAllowedHandler = &methodNotAllowedHandler{}
 
 	// Per Gorilla Mux issue here: https://github.com/gorilla/mux/issues/616#issuecomment-798807509
 	// default handler must come last
@@ -112,12 +90,4 @@ func methodsFromSpec(props spec3.PathProps) []string {
 		methods = append(methods, "DELETE")
 	}
 	return methods
-}
-
-type methodNotAllowedHandler struct {
-}
-
-func (h *methodNotAllowedHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	w.WriteHeader(405) // method not allowed
-	// w.Write([]byte(fmt.Sprintf("bad method: %s", req.Method)))
 }
