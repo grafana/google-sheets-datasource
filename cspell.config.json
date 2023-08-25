@@ -16,6 +16,7 @@
     "httpadapter",
     "httpclient",
     "instancemgmt",
+    "klog",
     "Middlewares",
     "patrickmn",
     "Sdump",

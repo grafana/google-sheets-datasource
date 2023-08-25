@@ -3,6 +3,7 @@ package ext
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -17,204 +18,128 @@ import (
 	"k8s.io/klog/v2"
 )
 
-type InternalHandler = func(ctx context.Context, pluginCtx *backend.PluginContext, datasource *googlesheets.Datasource, path ...string) func(w http.ResponseWriter, req *http.Request)
+func NewServiceHooks() *APIServiceHooks {
+	// right now this makes a new datasource for each request!
+	// ideally can use instancemanager with a key on resource version!
+	dsgetter := func(ctx context.Context) (*googlesheets.Datasource, *backend.PluginContext, error) {
+		res, err := ResourceFromContext(ctx)
+		if err != nil {
+			return nil, nil, fmt.Errorf("no resource in context: %w", err)
+		}
 
-type ServiceHookImpl struct {
-	*APIServiceHooks
-	RestConfig *restclient.Config
-}
+		ds, ok := res.(*v1.ResourceV0)
+		if !ok {
+			return nil, nil, fmt.Errorf("expected datasource resource config [%t]", res)
+		}
 
-func NewServiceHookImpl(restConfig *restclient.Config) *ServiceHookImpl {
-	return &ServiceHookImpl{
-		APIServiceHooks: &APIServiceHooks{
-			Kind:         nil,
-			BeforeAdd:    nil,
-			BeforeUpdate: nil,
+		settings := backend.DataSourceInstanceSettings{}
+		settings.JSONData, err = json.Marshal(ds.Spec)
+		if err != nil {
+			return nil, nil, err
+		}
 
-			PluginRouteHandlers: []PluginRouteHandler{
-				{
-					Level: RawAPILevelGroupVersion,
-					Slug:  "xxx", // URL will be
-					Handler: func(w http.ResponseWriter, r *http.Request) {
-						w.Write([]byte("Root level handler (xxx)"))
-					},
+		settings.DecryptedSecureJSONData = map[string]string{}
+		settings.DecryptedSecureJSONData["apiKey"] = ds.Spec.APIKey
+
+		// k8s HACK! move from spec to decrypted
+		settings.DecryptedSecureJSONData["privateKey"] = ds.Spec.PrivateKey
+
+		settings.Type = "grafana-googlesheets-datasource"
+
+		pluginCtx := &backend.PluginContext{
+			OrgID:                      1,
+			PluginID:                   settings.Type,
+			User:                       &backend.User{},
+			AppInstanceSettings:        &backend.AppInstanceSettings{},
+			DataSourceInstanceSettings: &settings,
+		}
+
+		instance, err := googlesheets.NewDatasource(settings)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		googleSheetDatasource, ok := instance.(*googlesheets.Datasource)
+		if !ok {
+			return nil, nil, fmt.Errorf("expected googlesheets.Datasource [%t]", instance)
+		}
+		return googleSheetDatasource, pluginCtx, nil
+	}
+
+	return &APIServiceHooks{
+		Kind:         nil,
+		BeforeAdd:    nil,
+		BeforeUpdate: nil,
+
+		PluginRouteHandlers: []PluginRouteHandler{
+			{
+				Level: RawAPILevelGroupVersion,
+				Slug:  "xxx", // URL will be
+				Handler: func(w http.ResponseWriter, r *http.Request) {
+					w.Write([]byte("Root level handler (xxx)"))
 				},
-				{
-					Level: RawAPILevelNamespace,
-					Slug:  "yyy", // URL will be
-					Handler: func(w http.ResponseWriter, r *http.Request) {
-						w.Write([]byte("namespace level handler (yyy)"))
-					},
+			},
+			{
+				Level: RawAPILevelNamespace,
+				Slug:  "yyy", // URL will be
+				Handler: func(w http.ResponseWriter, r *http.Request) {
+					w.Write([]byte("namespace level handler (yyy)"))
 				},
-				{
-					Level: RawAPILevelResource,
-					Slug:  "/query", // URL will be
-					Handler: func(w http.ResponseWriter, r *http.Request) {
-						ctx := r.Context()
-						res, err := ResourceFromContext(ctx)
-						if err != nil {
-							w.Write([]byte("ERROR!"))
-							return
-						}
+			},
+			{
+				Level: RawAPILevelResource,
+				Slug:  "/query", // URL will be
+				Handler: func(w http.ResponseWriter, r *http.Request) {
+					ctx := r.Context()
+					ds, pluginCtx, err := dsgetter(ctx)
+					if err != nil {
+						klog.Errorf("CallResourceRequest body was malformed: %s", err)
+						w.Write([]byte("error"))
+						w.WriteHeader(500)
+						return
+					}
 
-						ds, ok := res.(*v1.ResourceV0)
-						if !ok {
-							w.Write([]byte("expected datasource"))
-							return
-						}
-
-						settings := backend.DataSourceInstanceSettings{}
-						settings.JSONData, err = json.Marshal(ds.Spec)
-
-						if err != nil {
-							http.NotFound(w, r)
-						}
-
-						settings.DecryptedSecureJSONData = map[string]string{}
-						settings.DecryptedSecureJSONData["apiKey"] = ds.Spec.APIKey
-
-						// k8s HACK! move from spec to decrypted
-						settings.DecryptedSecureJSONData["privateKey"] = ds.Spec.PrivateKey
-
-						settings.Type = "grafana-googlesheets-datasource"
-
-						pluginCtx := &backend.PluginContext{
-							OrgID:                      1,
-							PluginID:                   settings.Type,
-							User:                       &backend.User{},
-							AppInstanceSettings:        &backend.AppInstanceSettings{},
-							DataSourceInstanceSettings: &settings,
-						}
-
-						instance, err := googlesheets.NewDatasource(settings)
-						if err != nil {
-							http.NotFound(w, r)
-						}
-
-						googleSheetDatasource, ok := instance.(*googlesheets.Datasource)
-						if !ok {
-							http.NotFound(w, r)
-						}
-
-						executeQueryHandler(ctx, w, r, pluginCtx, googleSheetDatasource)
-					},
+					executeQueryHandler(ctx, w, r, pluginCtx, ds)
 				},
-				{
-					Level: RawAPILevelResource,
-					Slug:  "/health", // URL will be
-					Handler: func(w http.ResponseWriter, r *http.Request) {
-						ctx := r.Context()
-						res, err := ResourceFromContext(ctx)
-						if err != nil {
-							w.Write([]byte("ERROR!"))
-							return
-						}
-
-						ds, ok := res.(*v1.ResourceV0)
-						if !ok {
-							w.Write([]byte("expected datasource"))
-							return
-						}
-
-						settings := backend.DataSourceInstanceSettings{}
-						settings.JSONData, err = json.Marshal(ds.Spec)
-
-						if err != nil {
-							http.NotFound(w, r)
-						}
-
-						settings.DecryptedSecureJSONData = map[string]string{}
-						settings.DecryptedSecureJSONData["apiKey"] = ds.Spec.APIKey
-
-						// k8s HACK! move from spec to decrypted
-						settings.DecryptedSecureJSONData["privateKey"] = ds.Spec.PrivateKey
-
-						settings.Type = "grafana-googlesheets-datasource"
-
-						pluginCtx := &backend.PluginContext{
-							OrgID:                      1,
-							PluginID:                   settings.Type,
-							User:                       &backend.User{},
-							AppInstanceSettings:        &backend.AppInstanceSettings{},
-							DataSourceInstanceSettings: &settings,
-						}
-
-						instance, err := googlesheets.NewDatasource(settings)
-						if err != nil {
-							http.NotFound(w, r)
-						}
-
-						googleSheetDatasource, ok := instance.(*googlesheets.Datasource)
-						if !ok {
-							http.NotFound(w, r)
-						}
-
-						executeHealthHandler(ctx, w, r, pluginCtx, googleSheetDatasource)
-					},
+			},
+			{
+				Level: RawAPILevelResource,
+				Slug:  "/health", // URL will be
+				Handler: func(w http.ResponseWriter, r *http.Request) {
+					ctx := r.Context()
+					ds, pluginCtx, err := dsgetter(ctx)
+					if err != nil {
+						klog.Errorf("CallResourceRequest body was malformed: %s", err)
+						w.Write([]byte("error"))
+						w.WriteHeader(500)
+						return
+					}
+					executeHealthHandler(ctx, w, r, pluginCtx, ds)
 				},
-				{
-					Level: RawAPILevelResource,
-					Slug:  "/resource/.*", // URL will be
-					Handler: func(w http.ResponseWriter, r *http.Request) {
-						ctx := r.Context()
-						res, err := ResourceFromContext(ctx)
-						if err != nil {
-							w.Write([]byte("ERROR!"))
-							return
-						}
-
-						ds, ok := res.(*v1.ResourceV0)
-						if !ok {
-							w.Write([]byte("expected datasource"))
-							return
-						}
-
-						settings := backend.DataSourceInstanceSettings{}
-						settings.JSONData, err = json.Marshal(ds.Spec)
-
-						if err != nil {
-							http.NotFound(w, r)
-						}
-
-						settings.DecryptedSecureJSONData = map[string]string{}
-						settings.DecryptedSecureJSONData["apiKey"] = ds.Spec.APIKey
-
-						// k8s HACK! move from spec to decrypted
-						settings.DecryptedSecureJSONData["privateKey"] = ds.Spec.PrivateKey
-
-						settings.Type = "grafana-googlesheets-datasource"
-
-						pluginCtx := &backend.PluginContext{
-							OrgID:                      1,
-							PluginID:                   settings.Type,
-							User:                       &backend.User{},
-							AppInstanceSettings:        &backend.AppInstanceSettings{},
-							DataSourceInstanceSettings: &settings,
-						}
-
-						instance, err := googlesheets.NewDatasource(settings)
-						if err != nil {
-							http.NotFound(w, r)
-						}
-
-						googleSheetDatasource, ok := instance.(*googlesheets.Datasource)
-						if !ok {
-							http.NotFound(w, r)
-						}
-
-						executeCallResourceHandler(ctx, w, r, pluginCtx, googleSheetDatasource)
-					},
+			},
+			{
+				Level: RawAPILevelResource,
+				Slug:  "/resource/.*", // URL will be
+				Handler: func(w http.ResponseWriter, r *http.Request) {
+					ctx := r.Context()
+					ds, pluginCtx, err := dsgetter(ctx)
+					if err != nil {
+						klog.Errorf("CallResourceRequest body was malformed: %s", err)
+						w.Write([]byte("error"))
+						w.WriteHeader(500)
+						return
+					}
+					executeCallResourceHandler(ctx, w, r, pluginCtx, ds)
 				},
 			},
 		},
-		RestConfig: restConfig,
 	}
 }
 
-func (shi *ServiceHookImpl) GetterFn() ResourceGetter {
+func makeGetter(restConfig *restclient.Config) ResourceGetter {
 	return func(ctx context.Context, ns string, name string) (kindsys.Resource, error) {
 		// TODO: until we have a real resource getter, doing that inside the hook
-		cs, err := clientset.NewForConfig(shi.RestConfig)
+		cs, err := clientset.NewForConfig(restConfig)
 		if err != nil {
 			// log error
 			return nil, err
