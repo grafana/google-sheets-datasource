@@ -14,11 +14,7 @@ type requestHandler struct {
 
 func NewRequestHandler(delegateHandler http.Handler, restConfig *restclient.Config, hooks *APIServiceHooks) *requestHandler {
 	router := mux.NewRouter()
-
 	getter := makeGetter(restConfig)
-	requestHandler := &requestHandler{
-		router: router,
-	}
 
 	// LEVEL = Group+Verison
 	var sub *mux.Router
@@ -64,7 +60,9 @@ func NewRequestHandler(delegateHandler http.Handler, restConfig *restclient.Conf
 	// default handler must come last
 	router.PathPrefix("/").Handler(delegateHandler)
 
-	return requestHandler
+	return &requestHandler{
+		router: router,
+	}
 }
 
 func (h *requestHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
