@@ -12,7 +12,7 @@ type requestHandler struct {
 	router *mux.Router
 }
 
-func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config, hooks *APIServiceHooks) *requestHandler {
+func NewRequestHandler(delegateHandler http.Handler, restConfig *restclient.Config, hooks *APIServiceHooks) *requestHandler {
 	router := mux.NewRouter()
 
 	getter := makeGetter(restConfig)
@@ -62,8 +62,7 @@ func NewRequestHandler(apiHandler http.Handler, restConfig *restclient.Config, h
 
 	// Per Gorilla Mux issue here: https://github.com/gorilla/mux/issues/616#issuecomment-798807509
 	// default handler must come last
-
-	router.PathPrefix("/").Handler(apiHandler)
+	router.PathPrefix("/").Handler(delegateHandler)
 
 	return requestHandler
 }
