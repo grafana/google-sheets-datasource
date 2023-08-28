@@ -9,12 +9,11 @@ import (
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
 
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
 	"github.com/patrickmn/go-cache"
-
-	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 )
 
 var (
@@ -107,8 +106,8 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 	return response, nil
 }
 
-func writeResult(rw http.ResponseWriter, path string, val interface{}, err error) {
-	response := make(map[string]interface{})
+func writeResult(rw http.ResponseWriter, path string, val any, err error) {
+	response := make(map[string]any)
 	code := http.StatusOK
 	if err != nil {
 		response["error"] = err.Error()
