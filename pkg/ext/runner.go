@@ -118,27 +118,6 @@ func (c completedConfig) New() (*PluginAggregatedServer, error) {
 	return s, nil
 }
 
-// Run starts a new WardleServer given PluginAggregatedServerOptions
-func (o PluginAggregatedServerOptions) Run(stopCh <-chan struct{}) error {
-	config, err := o.Config()
-	if err != nil {
-		return err
-	}
-
-	server, err := config.Complete().New()
-	if err != nil {
-		return err
-	}
-
-	server.GenericAPIServer.AddPostStartHookOrDie("start-sample-server-informers", func(context genericapiserver.PostStartHookContext) error {
-		config.GenericConfig.SharedInformerFactory.Start(context.StopCh)
-		o.SharedInformerFactory.Start(context.StopCh)
-		return nil
-	})
-
-	return server.GenericAPIServer.PrepareRun().Run(stopCh)
-}
-
 func writeKubeConfiguration(restConfig *clientRest.Config) error {
 	clusters := make(map[string]*clientcmdapi.Cluster)
 	clusters["default-cluster"] = &clientcmdapi.Cluster{
