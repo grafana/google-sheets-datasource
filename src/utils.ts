@@ -2,7 +2,11 @@ import { GoogleSheetsAuth } from './types';
 import { Props } from './components/ConfigEditor';
 
 export function getBackwardCompatibleOptions(options: Props['options']): Props['options'] {
-  const changedOptions = { ...options };
+  const changedOptions = {
+    ...options,
+    jsonData: { ...options.jsonData },
+    secureJsonFields: { ...options.secureJsonFields },
+  };
   // Make sure we support the old authType property
   changedOptions.jsonData.authenticationType = options.jsonData.authenticationType || options.jsonData.authType!;
 
