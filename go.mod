@@ -12,7 +12,10 @@ require (
 	google.golang.org/api v0.110.0
 )
 
-require github.com/prometheus/client_golang v1.14.0 // indirect
+require (
+	github.com/prometheus/client_golang v1.14.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
+)
 
 require (
 	cloud.google.com/go/compute v1.18.0 // indirect

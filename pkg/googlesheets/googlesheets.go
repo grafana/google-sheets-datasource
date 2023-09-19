@@ -2,6 +2,7 @@ package googlesheets
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
+	"google.golang.org/api/googleapi"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -96,7 +98,18 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 
 	result, err := client.GetSpreadsheet(qm.Spreadsheet, qm.Range, true)
 	if err != nil {
-		return nil, nil, err
+		if apiErr, ok := err.(*googleapi.Error); ok {
+			// Handle API-specific errors
+			if apiErr.Code == 404 {
+				return nil, nil, errors.New("spreadsheet not found")
+			}
+			if apiErr.Message != "" {
+				log.DefaultLogger.Error("Google API Error: " + apiErr.Message)
+				return nil, nil, fmt.Errorf("Google API Error %d", apiErr.Code)
+			}
+			log.DefaultLogger.Error(apiErr.Error())
+			return nil, nil, errors.New("unknown API error")
+		}
 	}
 
 	if result.Properties.TimeZone != "" {
