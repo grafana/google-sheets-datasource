@@ -1,0 +1,116 @@
+run:
+  deadline: 10m
+  build-tags: ["mage"]
+
+linters-settings:
+  funlen:
+    lines: 150
+    statements: 50
+  goimports:
+    local-prefixes: github.com/grafana/google-sheets-datasource
+  revive:
+    ignore-generated-header: true
+    enable-all-rules: true
+    confidence: 0.8
+    rules:
+      # TODO: consider enabling these and figuring out the values and enabling these
+      # instead of using a bunch of other linters (e.g. gocognit, funlen, etc.)
+      - name: cognitive-complexity
+        disabled: true
+      - name: argument-limit
+        disabled: true
+      - name: function-length
+        disabled: true
+      - name: function-result-limit
+        disabled: true
+      - name: banned-characters
+        disabled: true
+      - name: file-header
+        disabled: true
+      - name: cyclomatic
+        disabled: true
+      - name: line-length-limit
+        disabled: true
+      - name: max-public-structs
+        disabled: true
+      # TODO: this should be enabled, but we'll have to add package comments first.
+      # We should take care of that before 1.0.
+      - name: package-comments
+        disabled: true
+      # TODO: this is disabled because it complains about `inline` in JSON tags (albeit for a valid reason).
+      # See https://github.com/mgechev/revive/issues/520 for details.
+      - name: struct-tag
+        disabled: true
+      # TODO: this triggers a lot of false-positives, but might be useful in theory.
+      # Consider spending time on figuring the args.
+      - name: add-constant
+        disabled: true
+      # These linters are disabled "for good".
+      - name: confusing-naming
+        disabled: true
+      - name:  nested-structs
+        disabled: true
+      - name: unused-receiver
+        disabled: true
+      - name: bare-return
+        disabled: true
+      - name:  unexported-return
+        disabled: true
+  gocognit:
+    min-complexity: 50
+  gomnd:
+    settings:
+      mnd:
+        # the list of enabled checks, see https://github.com/tommy-muehle/go-mnd/#checks for description.
+        checks:
+          - argument
+          - case
+          - condition
+          - operation
+          - return
+        ignored-numbers: 0,1
+  misspell:
+    locale: US
+
+linters:
+  disable-all: true
+  enable:
+    - bodyclose
+    - dogsled
+    - dupl
+    - errcheck
+    - exportloopref
+    - funlen
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - goimports
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - prealloc
+    - revive
+    - staticcheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - whitespace
+
+issues:
+  # Excluding configuration per-path, per-linter, per-text and per-source
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gomnd
+        - gocognit
+        - funlen
+    - path: Magefile.go
+      linters:
+        - "deadcode"
+        - "unused"

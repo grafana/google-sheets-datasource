@@ -7,17 +7,22 @@ import (
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
+
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/api/googleapi"
 	"google.golang.org/api/sheets/v4"
 )
 
 type fakeClient struct {
+	mock.Mock
 }
 
 func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
-	return loadTestSheet("./testdata/mixed-data.json")
+	args := f.Called(spreadSheetID, sheetRange, includeGridData)
+	return args.Get(0).(*sheets.Spreadsheet), args.Error(1)
 }
 
 func loadTestSheet(path string) (*sheets.Spreadsheet, error) {
@@ -50,14 +55,15 @@ func TestGooglesheets(t *testing.T) {
 	})
 
 	t.Run("getSheetData", func(t *testing.T) {
-		client := &fakeClient{}
-
 		t.Run("spreadsheets get cached", func(t *testing.T) {
+			client := &fakeClient{}
+			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
+
+			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
 
 			_, meta, err := gsd.getSheetData(client, &qm)
 			require.NoError(t, err)
@@ -69,20 +75,93 @@ func TestGooglesheets(t *testing.T) {
 			require.NoError(t, err)
 			assert.True(t, meta["hit"].(bool))
 			assert.Equal(t, 1, gsd.Cache.ItemCount())
+			client.AssertExpectations(t)
 		})
 
 		t.Run("spreadsheets don't get cached if CacheDurationSeconds is 0", func(t *testing.T) {
+			client := &fakeClient{}
+			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 0}
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 0}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
+
+			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
 
 			_, meta, err := gsd.getSheetData(client, &qm)
 			require.NoError(t, err)
 
 			assert.False(t, meta["hit"].(bool))
 			assert.Equal(t, 0, gsd.Cache.ItemCount())
+			client.AssertExpectations(t)
+		})
+
+		t.Run("api error 404", func(t *testing.T) {
+			client := &fakeClient{}
+			qm := &models.QueryModel{
+				Spreadsheet:          "spreadsheet-id",
+				Range:                "Sheet1!A1:B2",
+				CacheDurationSeconds: 60,
+			}
+			gsd := &GoogleSheets{
+				Cache: cache.New(300*time.Second, 50*time.Second),
+			}
+			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
+				Code:    404,
+				Message: "Not found",
+			})
+
+			_, _, err := gsd.getSheetData(client, qm)
+
+			assert.Error(t, err)
+			assert.Equal(t, "spreadsheet not found", err.Error())
+			client.AssertExpectations(t)
+		})
+
+		t.Run("error other than 404", func(t *testing.T) {
+			client := &fakeClient{}
+			qm := &models.QueryModel{
+				Spreadsheet:          "spreadsheet-id",
+				Range:                "Sheet1!A1:B2",
+				CacheDurationSeconds: 60,
+			}
+			gsd := &GoogleSheets{
+				Cache: cache.New(300*time.Second, 50*time.Second),
+			}
+			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
+				Code:    403,
+				Message: "Forbidden",
+			})
+
+			_, _, err := gsd.getSheetData(client, qm)
+
+			assert.Error(t, err)
+			assert.Equal(t, "Google API Error 403", err.Error())
+
+			client.AssertExpectations(t)
+		})
+
+		t.Run("error that doesn't have message property", func(t *testing.T) {
+			client := &fakeClient{}
+			qm := &models.QueryModel{
+				Spreadsheet:          "spreadsheet-id",
+				Range:                "Sheet1!A1:B2",
+				CacheDurationSeconds: 60,
+			}
+			gsd := &GoogleSheets{
+				Cache: cache.New(300*time.Second, 50*time.Second),
+			}
+
+			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
+				Message: "",
+			})
+
+			_, _, err := gsd.getSheetData(client, qm)
+
+			assert.Error(t, err)
+			assert.Equal(t, "unknown API error", err.Error())
+
+			client.AssertExpectations(t)
 		})
 	})
 
@@ -95,7 +174,7 @@ func TestGooglesheets(t *testing.T) {
 		}
 		qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
-		meta := make(map[string]interface{})
+		meta := make(map[string]any)
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
 		require.NoError(t, err)
 		require.Equal(t, "ref1", frame.Name)
@@ -121,7 +200,7 @@ func TestGooglesheets(t *testing.T) {
 			assert.Equal(t, "Multiple data types found in column \"MixedDataTypes\". Using string data type", warnings[0])
 			assert.Equal(t, "Multiple units found in column \"MixedUnits\". Formatted value will be used", warnings[1])
 			assert.Equal(t, "Multiple units found in column \"Mixed currencies\". Formatted value will be used", warnings[2])
-			//assert.Equal(t, "Multiple data types found in column \"MixedUnits\". Using string data type", warnings[2])
+			// assert.Equal(t, "Multiple data types found in column \"MixedUnits\". Using string data type", warnings[2])
 		})
 	})
 
@@ -134,7 +213,7 @@ func TestGooglesheets(t *testing.T) {
 		}
 		qm := models.QueryModel{Range: "A2", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
-		meta := make(map[string]interface{})
+		meta := make(map[string]any)
 		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
 		require.NoError(t, err)
 		require.Equal(t, "ref1", frame.Name)

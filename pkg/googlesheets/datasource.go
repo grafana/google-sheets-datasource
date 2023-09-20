@@ -8,29 +8,29 @@ import (
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
-	"github.com/patrickmn/go-cache"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/resource/httpadapter"
+	"github.com/patrickmn/go-cache"
 )
 
 var (
-	_ backend.QueryDataHandler    = (*googleSheetsDatasource)(nil)
-	_ backend.CheckHealthHandler  = (*googleSheetsDatasource)(nil)
-	_ backend.CallResourceHandler = (*googleSheetsDatasource)(nil)
+	_ backend.QueryDataHandler    = (*Datasource)(nil)
+	_ backend.CheckHealthHandler  = (*Datasource)(nil)
+	_ backend.CallResourceHandler = (*Datasource)(nil)
 )
 
-type googleSheetsDatasource struct {
+type Datasource struct {
 	googlesheets *GoogleSheets
 
 	backend.CallResourceHandler
 }
 
 // NewDatasource creates a new Google Sheets datasource instance.
-func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
-	ds := &googleSheetsDatasource{
+func NewDatasource(_ backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+	ds := &Datasource{
 		googlesheets: &GoogleSheets{Cache: cache.New(300*time.Second, 5*time.Second)},
 	}
 
@@ -42,7 +42,7 @@ func NewDatasource(settings backend.DataSourceInstanceSettings) (instancemgmt.In
 }
 
 // CheckHealth checks if the datasource is working.
-func (d *googleSheetsDatasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
+func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
 	res := &backend.CheckHealthResult{}
 	log.DefaultLogger.Debug("CheckHealth called")
 	config, err := models.LoadSettings(req.PluginContext)
@@ -76,7 +76,7 @@ func (d *googleSheetsDatasource) CheckHealth(ctx context.Context, req *backend.C
 }
 
 // QueryData handles queries to the datasource.
-func (d *googleSheetsDatasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	// create response struct
 	response := backend.NewQueryDataResponse()
 
@@ -106,8 +106,8 @@ func (d *googleSheetsDatasource) QueryData(ctx context.Context, req *backend.Que
 	return response, nil
 }
 
-func writeResult(rw http.ResponseWriter, path string, val interface{}, err error) {
-	response := make(map[string]interface{})
+func writeResult(rw http.ResponseWriter, path string, val any, err error) {
+	response := make(map[string]any)
 	code := http.StatusOK
 	if err != nil {
 		response["error"] = err.Error()
@@ -128,7 +128,7 @@ func writeResult(rw http.ResponseWriter, path string, val interface{}, err error
 	rw.WriteHeader(code)
 }
 
-func (d *googleSheetsDatasource) handleResourceSpreadsheets(rw http.ResponseWriter, req *http.Request) {
+func (d *Datasource) handleResourceSpreadsheets(rw http.ResponseWriter, req *http.Request) {
 	log.DefaultLogger.Debug("Received resource call", "url", req.URL.String())
 	if req.Method != http.MethodGet {
 		return
