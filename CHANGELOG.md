@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.2
+
+- Handle error messages more gracefully
+
 ## v1.2.0
 
 - Refactored authentication to use grafana google sdks. With this change you can now use GCE authentication with google sheets.

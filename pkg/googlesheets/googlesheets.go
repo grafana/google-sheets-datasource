@@ -1,19 +1,21 @@
 package googlesheets
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	"context"
+	"github.com/grafana/google-sheets-datasource/pkg/models"
 
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
+	"google.golang.org/api/googleapi"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -31,13 +33,13 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 	}
 
 	// This result may be cached
-	data, meta, err := gs.getSheetData(client, qm)
+	sheetData, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
 		dr.Error = err
 		return
 	}
 
-	frame, err := gs.transformSheetToDataFrame(data, meta, refID, qm)
+	frame, err := gs.transformSheetToDataFrame(sheetData, meta, refID, qm)
 	if err != nil {
 		dr.Error = err
 		return
@@ -48,7 +50,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 	if qm.UseTimeFilter {
 		timeIndex := findTimeField(frame)
 		if timeIndex >= 0 {
-			frame, dr.Error = frame.FilterRowsByField(timeIndex, func(i interface{}) (bool, error) {
+			frame, dr.Error = frame.FilterRowsByField(timeIndex, func(i any) (bool, error) {
 				val, ok := i.(*time.Time)
 				if !ok {
 					return false, fmt.Errorf("invalid time column: %s", spew.Sdump(i))
@@ -85,10 +87,10 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config models.Datas
 }
 
 // getSheetData gets grid data corresponding to a spreadsheet.
-func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*sheets.GridData, map[string]interface{}, error) {
+func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*sheets.GridData, map[string]any, error) {
 	cacheKey := qm.Spreadsheet + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
-		return item.(*sheets.GridData), map[string]interface{}{
+		return item.(*sheets.GridData), map[string]any{
 			"hit":     true,
 			"expires": expires.Unix(),
 		}, nil
@@ -96,7 +98,18 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 
 	result, err := client.GetSpreadsheet(qm.Spreadsheet, qm.Range, true)
 	if err != nil {
-		return nil, nil, err
+		if apiErr, ok := err.(*googleapi.Error); ok {
+			// Handle API-specific errors
+			if apiErr.Code == 404 {
+				return nil, nil, errors.New("spreadsheet not found")
+			}
+			if apiErr.Message != "" {
+				log.DefaultLogger.Error("Google API Error: " + apiErr.Message)
+				return nil, nil, fmt.Errorf("Google API Error %d", apiErr.Code)
+			}
+			log.DefaultLogger.Error(apiErr.Error())
+			return nil, nil, errors.New("unknown API error")
+		}
 	}
 
 	if result.Properties.TimeZone != "" {
@@ -108,15 +121,15 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 		}
 	}
 
-	data := result.Sheets[0].Data[0]
+	sheetData := result.Sheets[0].Data[0]
 	if qm.CacheDurationSeconds > 0 {
-		gs.Cache.Set(cacheKey, data, time.Duration(qm.CacheDurationSeconds)*time.Second)
+		gs.Cache.Set(cacheKey, sheetData, time.Duration(qm.CacheDurationSeconds)*time.Second)
 	}
 
-	return data, map[string]interface{}{"hit": false}, nil
+	return sheetData, map[string]any{"hit": false}, nil
 }
 
-func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]interface{}, refID string, qm *models.QueryModel) (*data.Frame, error) {
+func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]any, refID string, qm *models.QueryModel) (*data.Frame, error) {
 	columns, start := getColumnDefinitions(sheet.RowData)
 	warnings := []string{}
 
@@ -186,7 +199,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 // timeConverter handles sheets TIME column types.
 var timeConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableTime,
-	Converter: func(i interface{}) (interface{}, error) {
+	Converter: func(i any) (any, error) {
 		var t *time.Time
 		cellData, ok := i.(*sheets.CellData)
 		if !ok {
@@ -203,7 +216,7 @@ var timeConverter = data.FieldConverter{
 // stringConverter handles sheets STRING column types.
 var stringConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableString,
-	Converter: func(i interface{}) (interface{}, error) {
+	Converter: func(i any) (any, error) {
 		var s *string
 		cellData, ok := i.(*sheets.CellData)
 		if !ok {
@@ -216,7 +229,7 @@ var stringConverter = data.FieldConverter{
 // numberConverter handles sheets STRING column types.
 var numberConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableFloat64,
-	Converter: func(i interface{}) (interface{}, error) {
+	Converter: func(i any) (any, error) {
 		cellData, ok := i.(*sheets.CellData)
 		if !ok {
 			return nil, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
