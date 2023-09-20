@@ -1,9 +1,10 @@
-package v1
+package kindsysdefs
 
 import (
 	"context"
 	"io"
 
+	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	"github.com/grafana/kindsys"
 )
 
@@ -54,7 +55,7 @@ func (k *rawSheetsKind) GetJSONSchema(version string) (string, error) {
 	panic("implement")
 }
 
-type ResourceV0 = kindsys.GenericResource[DatasourceSpec, kindsys.SimpleCustomMetadata, DatasourceStatus]
+type ResourceV0 = kindsys.GenericResource[v1.DatasourceSpec, kindsys.SimpleCustomMetadata, v1.DatasourceStatus]
 
 func (k *rawSheetsKind) Read(reader io.Reader, strict bool) (kindsys.Resource, error) {
 	panic("implement")

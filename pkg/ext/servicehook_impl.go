@@ -8,9 +8,10 @@ import (
 	"net/http"
 	"strings"
 
-	v1 "github.com/grafana/google-sheets-datasource/pkg/apis/googlesheets/v1"
 	"github.com/grafana/google-sheets-datasource/pkg/client/clientset/clientset"
 	"github.com/grafana/google-sheets-datasource/pkg/googlesheets"
+	v1 "github.com/grafana/google-sheets-datasource/pkg/kindsysdefs"
+	
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/kindsys"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
