@@ -4,6 +4,7 @@ import { InlineFormLabel, LegacyForms, LinkButton, Segment, SegmentAsync } from 
 import React, { ChangeEvent, PureComponent } from 'react';
 import { DataSource } from '../DataSource';
 import { SheetsQuery } from '../types';
+import { reportInteraction } from '@grafana/runtime';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, DataSourceOptions>;
 
@@ -81,6 +82,11 @@ export class QueryEditor extends PureComponent<Props> {
 
   toggleUseTimeFilter = (event?: React.SyntheticEvent<HTMLInputElement>) => {
     const { query, onChange, onRunQuery } = this.props;
+
+    reportInteraction('grafana_google_sheets_time_filter_toggled', {
+      checked: !query.useTimeFilter,
+    });
+
     onChange({
       ...query,
       useTimeFilter: !query.useTimeFilter,
@@ -119,6 +125,7 @@ export class QueryEditor extends PureComponent<Props> {
               icon="link"
               href={toGoogleURL(query)}
               target="_blank"
+              onClick={() => reportInteraction('grafana_google_sheets_document_opened', {})}
             ></LinkButton>
           )}
           <div className="gf-form gf-form--grow">
@@ -165,7 +172,13 @@ export class QueryEditor extends PureComponent<Props> {
               value,
               description: value ? '' : 'Response is not cached at all',
             }))}
-            onChange={({ value }) => onChange({ ...query, cacheDurationSeconds: value! })}
+            onChange={({ value }) => {
+              reportInteraction('grafana_google_sheets_cache_updated', {
+                secondsValue: value,
+              });
+
+              onChange({ ...query, cacheDurationSeconds: value! });
+            }}
           />
           <div className="gf-form gf-form--grow">
             <div className="gf-form-label gf-form-label--grow" />
