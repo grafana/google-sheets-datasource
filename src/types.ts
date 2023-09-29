@@ -6,10 +6,7 @@ export const GoogleSheetsAuth = {
   API: 'key',
 } as const;
 
-export const googleSheetsAuthTypes = [
-  { label: 'API Key', value: GoogleSheetsAuth.API },
-  ...GOOGLE_AUTH_TYPE_OPTIONS
-];
+export const googleSheetsAuthTypes = [{ label: 'API Key', value: GoogleSheetsAuth.API }, ...GOOGLE_AUTH_TYPE_OPTIONS];
 
 export interface GoogleSheetsSecureJSONData extends DataSourceSecureJsonData {
   apiKey?: string;
