@@ -31,7 +31,7 @@ export function ConfigEditor(props: Props) {
     <>
       <DataSourceDescription
         dataSourceName="Google Sheets"
-        docsLink="https://github.com/grafana/google-sheets-datasource/blob/main/src/README.md"
+        docsLink="https://grafana.com/grafana/plugins/grafana-googlesheets-datasource/"
         hasRequiredFields={false}
       />
 
