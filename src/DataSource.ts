@@ -1,4 +1,5 @@
 import {
+  CoreApp,
   DataQueryRequest,
   DataQueryResponse,
   DataSourceInstanceSettings,
@@ -19,6 +20,10 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOpt
 
   query(request: DataQueryRequest<SheetsQuery>): Observable<DataQueryResponse> {
     request.targets.forEach((target) => {
+      if (request.app === CoreApp.Dashboard || request.app === CoreApp.PanelViewer) {
+        return;
+      }
+
       reportInteraction('grafana_google_sheets_query_executed', {
         app: request.app,
         useTimeFilter: target.useTimeFilter ?? false,
