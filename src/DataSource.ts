@@ -1,5 +1,4 @@
 import {
-  CoreApp,
   DataQueryRequest,
   DataQueryResponse,
   DataSourceInstanceSettings,
@@ -7,9 +6,10 @@ import {
   SelectableValue,
 } from '@grafana/data';
 import { DataSourceOptions } from '@grafana/google-sdk';
-import { DataSourceWithBackend, getTemplateSrv, reportInteraction } from '@grafana/runtime';
+import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { SheetsQuery } from './types';
 import { Observable } from 'rxjs';
+import { trackRequest } from 'tracking';
 
 export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOptions> {
   authType: string;
@@ -19,18 +19,7 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOpt
   }
 
   query(request: DataQueryRequest<SheetsQuery>): Observable<DataQueryResponse> {
-    request.targets.forEach((target) => {
-      if (request.app === CoreApp.Dashboard || request.app === CoreApp.PanelViewer) {
-        return;
-      }
-
-      reportInteraction('grafana_google_sheets_query_executed', {
-        app: request.app,
-        useTimeFilter: target.useTimeFilter ?? false,
-        cacheDurationSeconds: target.cacheDurationSeconds ?? 0,
-      });
-    });
-
+    trackRequest(request);
     return super.query(request);
   }
 
