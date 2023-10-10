@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.4
+
+- Added feature tracking
+- Upgrade dependencies
+
 ## 1.2.3
 
 - Make sure we don't mutate the options object in the config page. This prevents crashes that occurred intermittently.
