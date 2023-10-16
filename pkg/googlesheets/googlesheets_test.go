@@ -65,16 +65,24 @@ func TestGooglesheets(t *testing.T) {
 
 			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
 
-			_, meta, err := gsd.getSheetData(client, &qm)
+			_, meta, err := gsd.getSheetData(client, &qm, "1")
 			require.NoError(t, err)
 
 			assert.False(t, meta["hit"].(bool))
 			assert.Equal(t, 1, gsd.Cache.ItemCount())
 
-			_, meta, err = gsd.getSheetData(client, &qm)
+			t.Run("passing different tenantID does not hits cache", func(t *testing.T) {
+				_, meta, err = gsd.getSheetData(client, &qm, "2")
+				require.NoError(t, err)
+				assert.False(t, meta["hit"].(bool))
+				assert.Equal(t, 2, gsd.Cache.ItemCount())
+				client.AssertExpectations(t)
+			})
+
+			_, meta, err = gsd.getSheetData(client, &qm, "1")
 			require.NoError(t, err)
 			assert.True(t, meta["hit"].(bool))
-			assert.Equal(t, 1, gsd.Cache.ItemCount())
+			assert.Equal(t, 2, gsd.Cache.ItemCount())
 			client.AssertExpectations(t)
 		})
 
@@ -88,7 +96,7 @@ func TestGooglesheets(t *testing.T) {
 
 			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
 
-			_, meta, err := gsd.getSheetData(client, &qm)
+			_, meta, err := gsd.getSheetData(client, &qm, "")
 			require.NoError(t, err)
 
 			assert.False(t, meta["hit"].(bool))
@@ -111,7 +119,7 @@ func TestGooglesheets(t *testing.T) {
 				Message: "Not found",
 			})
 
-			_, _, err := gsd.getSheetData(client, qm)
+			_, _, err := gsd.getSheetData(client, qm, "")
 
 			assert.Error(t, err)
 			assert.Equal(t, "spreadsheet not found", err.Error())
@@ -133,7 +141,7 @@ func TestGooglesheets(t *testing.T) {
 				Message: "Forbidden",
 			})
 
-			_, _, err := gsd.getSheetData(client, qm)
+			_, _, err := gsd.getSheetData(client, qm, "")
 
 			assert.Error(t, err)
 			assert.Equal(t, "Google API Error 403", err.Error())
@@ -156,7 +164,7 @@ func TestGooglesheets(t *testing.T) {
 				Message: "",
 			})
 
-			_, _, err := gsd.getSheetData(client, qm)
+			_, _, err := gsd.getSheetData(client, qm, "")
 
 			assert.Error(t, err)
 			assert.Equal(t, "unknown API error", err.Error())
