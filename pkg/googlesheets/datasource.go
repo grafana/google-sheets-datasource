@@ -29,7 +29,7 @@ type Datasource struct {
 }
 
 // NewDatasource creates a new Google Sheets datasource instance.
-func NewDatasource(_ backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func NewDatasource(_ context.Context, _ backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	ds := &Datasource{
 		googlesheets: &GoogleSheets{Cache: cache.New(300*time.Second, 5*time.Second)},
 	}
