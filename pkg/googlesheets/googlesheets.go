@@ -17,10 +17,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/sheets/v4"
-	"google.golang.org/grpc/metadata"
 )
-
-const grafanaTenantID = "tenantID"
 
 // GoogleSheets provides an interface to the Google Sheets API.
 type GoogleSheets struct {
@@ -34,10 +31,9 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 		dr.Error = fmt.Errorf("unable to create Google API client: %w", err)
 		return
 	}
-	tid := returnGrafanaMultiTenantID(ctx)
 
 	// This result may be cached
-	sheetData, meta, err := gs.getSheetData(client, qm, tid)
+	sheetData, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
 		dr.Error = err
 		return
@@ -91,8 +87,8 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config models.Datas
 }
 
 // getSheetData gets grid data corresponding to a spreadsheet.
-func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel, tenantID string) (*sheets.GridData, map[string]any, error) {
-	cacheKey := qm.Spreadsheet + qm.Range + tenantID
+func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*sheets.GridData, map[string]any, error) {
+	cacheKey := qm.Spreadsheet + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		return item.(*sheets.GridData), map[string]any{
 			"hit":     true,
@@ -304,18 +300,4 @@ func getColumnDefinitions(rows []*sheets.RowData) ([]*ColumnDefinition, int) {
 	}
 
 	return columns, start
-}
-
-func returnGrafanaMultiTenantID(ctx context.Context) (grafanaMultiTenantID string) {
-	md, exists := metadata.FromIncomingContext(ctx)
-
-	if exists {
-		tid := md.Get(grafanaTenantID)
-		backend.Logger.Info("tid", tid)
-		if len(tid) > 0 && tid[0] != "" {
-			grafanaMultiTenantID = tid[0]
-		}
-	}
-
-	return grafanaMultiTenantID
 }
