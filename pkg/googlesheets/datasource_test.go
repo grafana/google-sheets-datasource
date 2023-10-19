@@ -137,7 +137,9 @@ func TestGoogleSheetsMultiTenancy(t *testing.T) {
 	require.NoError(t, err)
 	defer func() {
 		err = tp.Shutdown()
-		t.Log("plugin shutdown error", err)
+		if err != nil {
+			t.Log("plugin shutdown error", err)
+		}
 	}()
 
 	pCtx := backend.PluginContext{DataSourceInstanceSettings: &backend.DataSourceInstanceSettings{
