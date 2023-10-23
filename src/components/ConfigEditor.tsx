@@ -1,11 +1,12 @@
 import { DataSourcePluginOptionsEditorProps, onUpdateDatasourceSecureJsonDataOption } from '@grafana/data';
 import { AuthConfig, DataSourceOptions } from '@grafana/google-sdk';
-import { Field, SecretInput, Divider } from '@grafana/ui';
+import { Field, SecretInput } from '@grafana/ui';
 import React from 'react';
 import { GoogleSheetsAuth, GoogleSheetsSecureJSONData, googleSheetsAuthTypes } from '../types';
 import { getBackwardCompatibleOptions } from '../utils';
 import { ConfigurationHelp } from './ConfigurationHelp';
 import { DataSourceDescription } from '@grafana/experimental';
+import { Divider } from './Divider';
 
 export type Props = DataSourcePluginOptionsEditorProps<DataSourceOptions, GoogleSheetsSecureJSONData>;
 
