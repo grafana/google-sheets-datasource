@@ -1,10 +1,11 @@
 import { QueryEditorProps } from '@grafana/data';
 import { DataSourceOptions } from '@grafana/google-sdk';
-import { InlineFormLabel, LegacyForms, LinkButton, Segment, SegmentAsync } from '@grafana/ui';
+import { InlineFieldRow, InlineFormLabel, InlineSwitch, Input, LinkButton, Segment, SegmentAsync } from '@grafana/ui';
 import React, { ChangeEvent, PureComponent } from 'react';
 import { DataSource } from '../DataSource';
 import { SheetsQuery } from '../types';
 import { reportInteraction } from '@grafana/runtime';
+import { css } from '@emotion/css';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, DataSourceOptions>;
 
@@ -96,9 +97,11 @@ export class QueryEditor extends PureComponent<Props> {
 
   render() {
     const { query, onRunQuery, onChange, datasource } = this.props;
+    const styles = getStyles();
+
     return (
       <>
-        <div className="gf-form-inline">
+        <InlineFieldRow className={styles.rowSpacing}>
           <InlineFormLabel
             width={10}
             className="query-keyword"
@@ -117,7 +120,7 @@ export class QueryEditor extends PureComponent<Props> {
             value={query.spreadsheet}
             allowCustomValue={true}
             onChange={this.onSpreadsheetIDChange}
-          ></SegmentAsync>
+          />
           {query.spreadsheet && (
             <LinkButton
               style={{ marginTop: 1 }}
@@ -126,13 +129,12 @@ export class QueryEditor extends PureComponent<Props> {
               href={toGoogleURL(query)}
               target="_blank"
               onClick={() => reportInteraction('grafana_google_sheets_document_opened', {})}
-            ></LinkButton>
+            />
           )}
-          <div className="gf-form gf-form--grow">
-            <div className="gf-form-label gf-form-label--grow" />
-          </div>
-        </div>
-        <div className="gf-form-inline">
+          <QueryRowTerminator />
+        </InlineFieldRow>
+
+        <InlineFieldRow className={styles.rowSpacing}>
           <InlineFormLabel
             width={10}
             className="query-keyword"
@@ -146,18 +148,19 @@ export class QueryEditor extends PureComponent<Props> {
           >
             Range
           </InlineFormLabel>
-          <input
-            className="gf-form-input width-14"
+          <Input
+            width={30}
             value={query.range || ''}
-            placeholder="ie: Class Data!A2:E"
             onChange={this.onRangeChange}
             onBlur={onRunQuery}
-          ></input>
-          <div className="gf-form gf-form--grow">
-            <div className="gf-form-label gf-form-label--grow" />
-          </div>
-        </div>
-        <div className="gf-form-inline">
+            placeholder="Class Data!A2:E"
+            className={styles.marginRight}
+          />
+
+          <QueryRowTerminator />
+        </InlineFieldRow>
+
+        <InlineFieldRow className={styles.rowSpacing}>
           <InlineFormLabel
             width={10}
             className="query-keyword"
@@ -180,23 +183,49 @@ export class QueryEditor extends PureComponent<Props> {
               onChange({ ...query, cacheDurationSeconds: value! });
             }}
           />
-          <div className="gf-form gf-form--grow">
-            <div className="gf-form-label gf-form-label--grow" />
-          </div>
-        </div>
-        <div className="gf-form-inline">
-          <LegacyForms.Switch
-            label="Use Time Filter"
-            labelClass={'width-10  query-keyword'}
-            tooltip="Apply the dashboard time range to the first time field"
-            checked={query.useTimeFilter === true}
+          <QueryRowTerminator />
+        </InlineFieldRow>
+
+        <InlineFieldRow className={styles.rowSpacing}>
+          <InlineFormLabel
+            width={10}
+            className="query-keyword"
+            tooltip="Apply the dashboard time range to the first time fieldAPI"
+          >
+            Use Time Filter
+          </InlineFormLabel>
+          <InlineSwitch
+            className={styles.marginRight}
+            value={query.useTimeFilter === true}
             onChange={this.toggleUseTimeFilter}
           />
-          <div className="gf-form gf-form--grow">
-            <div className="gf-form-label gf-form-label--grow" />
-          </div>
-        </div>
+          <QueryRowTerminator />
+        </InlineFieldRow>
       </>
     );
   }
 }
+
+const QueryRowTerminator = () => {
+  const styles = getStyles();
+
+  return (
+    <InlineFormLabel className={styles.rowTerminator}>
+      <></>
+    </InlineFormLabel>
+  );
+};
+
+const getStyles = () => {
+  return {
+    rowSpacing: css({
+      marginBottom: '4px',
+    }),
+    rowTerminator: css({
+      flexGrow: 1,
+    }),
+    marginRight: css({
+      marginRight: '4px',
+    }),
+  };
+};
