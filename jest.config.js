@@ -5,5 +5,7 @@ module.exports = {
   // Jest configuration provided by @grafana/create-plugin
   ...require('./.config/jest.config'),
   // Inform jest to only transform specific node_module packages.
-  transformIgnorePatterns: [[nodeModulesToTransform([...grafanaESModules, 'rxjs'])]],
+  transformIgnorePatterns: [
+    nodeModulesToTransform([...grafanaESModules, 'rxjs', '@grafana/ui', '@grafana/experimental']),
+  ],
 };
