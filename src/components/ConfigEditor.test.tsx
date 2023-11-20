@@ -15,7 +15,7 @@ describe('ConfigEditor', () => {
     );
 
     // Check that the correct auth type is selected
-    expect(screen.getByLabelText('API Key')).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'API Key' })).toBeChecked();
 
     // Make sure that the user can still change the auth type
     screen.getByLabelText('Google JWT File').click();
@@ -36,11 +36,13 @@ describe('ConfigEditor', () => {
     );
 
     // Check that the correct auth type is selected
-    expect(screen.getByLabelText('API Key')).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'API Key' })).toBeChecked();
 
     // Check that the API key is configured
-    expect(screen.getByLabelText('API key')).toHaveAttribute('value', 'configured');
+    expect(screen.getByPlaceholderText('Enter API key')).toHaveAttribute('value', 'configured');
   });
+
+  //
 
   it('should be backward compatible with JWT auth type', () => {
     render(

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Alert, useTheme2 } from '@grafana/ui';
+import React, { useState } from 'react';
+import { Collapse, useTheme2 } from '@grafana/ui';
 import { GoogleSheetsAuth } from '../types';
 
 interface Props {
@@ -7,7 +7,9 @@ interface Props {
 }
 
 export const ConfigurationHelp = ({ authenticationType }: Props) => {
+  const [isOpen, setIsOpen] = useState(false);
   const theme = useTheme2();
+
   const renderHelpBody = () => {
     switch (authenticationType) {
       case GoogleSheetsAuth.API:
@@ -163,8 +165,13 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
     }
   };
   return (
-    <Alert title="How to configure Google Sheets datasource?" severity="info" bottomSpacing={4}>
+    <Collapse
+      collapsible
+      label="Configure Google Sheets Authentication"
+      isOpen={isOpen}
+      onToggle={() => setIsOpen((x) => !x)}
+    >
       {renderHelpBody()}
-    </Alert>
+    </Collapse>
   );
 };

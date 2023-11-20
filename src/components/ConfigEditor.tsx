@@ -5,11 +5,14 @@ import React from 'react';
 import { GoogleSheetsAuth, GoogleSheetsSecureJSONData, googleSheetsAuthTypes } from '../types';
 import { getBackwardCompatibleOptions } from '../utils';
 import { ConfigurationHelp } from './ConfigurationHelp';
+import { DataSourceDescription } from '@grafana/experimental';
+import { Divider } from './Divider';
 
 export type Props = DataSourcePluginOptionsEditorProps<DataSourceOptions, GoogleSheetsSecureJSONData>;
 
 export function ConfigEditor(props: Props) {
   const options = getBackwardCompatibleOptions(props.options);
+
   const apiKeyProps = {
     isConfigured: Boolean(options.secureJsonFields.apiKey),
     value: options.secureJsonData?.apiKey || '',
@@ -27,13 +30,23 @@ export function ConfigEditor(props: Props) {
 
   return (
     <>
+      <DataSourceDescription
+        dataSourceName="Google Sheets"
+        docsLink="https://grafana.com/grafana/plugins/grafana-googlesheets-datasource/"
+        hasRequiredFields={false}
+      />
+
+      <Divider />
+
       <ConfigurationHelp authenticationType={options.jsonData.authenticationType} />
+
+      <Divider />
 
       <AuthConfig authOptions={googleSheetsAuthTypes} onOptionsChange={props.onOptionsChange} options={options} />
 
       {options.jsonData.authenticationType === GoogleSheetsAuth.API && (
-        <Field label="API key">
-          <SecretInput {...apiKeyProps} width={60} />
+        <Field label="API Key">
+          <SecretInput {...apiKeyProps} label="API key" width={40} />
         </Field>
       )}
     </>
