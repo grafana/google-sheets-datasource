@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.5
+
+- Upgrade grafana-plugin-sdk-go to latest
+- Added lint github workflow
+- Remove legacy form styles
+
 ## 1.2.4
 
 - Added feature tracking
