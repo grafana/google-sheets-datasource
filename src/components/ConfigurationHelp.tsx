@@ -33,16 +33,15 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 Click <strong>Create Credentials</strong> and then click <strong>API key</strong>.
               </li>
               <li>
-                Make sure to enable the{' '}
+                Before using Google APIs, you need to turn them on in a Google Cloud project.{' '}
                 <a
                   href="https://console.cloud.google.com/apis/library/sheets.googleapis.com"
                   target="_blank"
                   rel="noreferrer noopener"
                   style={{ color: theme.colors.text.link }}
                 >
-                  Google Sheets API
-                </a>{' '}
-                in your Google API Console to enable access with your token.
+                  Enable the API
+                </a>
               </li>
               <li>
                 Copy the key and paste it in the API Key field above. The file contents are encrypted and saved in the
