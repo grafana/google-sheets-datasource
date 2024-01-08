@@ -33,7 +33,7 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 Click <strong>Create Credentials</strong> and then click <strong>API key</strong>.
               </li>
               <li>
-                Make sure to enable the{' '}           
+                Make sure to enable the{' '}
                 <a
                   href="https://console.cloud.google.com/apis/library/sheets.googleapis.com"
                   target="_blank"
