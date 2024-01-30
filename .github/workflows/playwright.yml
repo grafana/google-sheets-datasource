@@ -1,0 +1,105 @@
+name: E2E tests - Playwright
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  setup-matrix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      matrix: ${{ steps.resolve-versions.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Resolve Grafana E2E versions
+        id: resolve-versions
+        uses: grafana/plugin-actions/e2e-version@main
+        with:
+          version-resolver-type: plugin-grafana-dependency
+
+  playwright-tests:
+    needs: setup-matrix
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        GRAFANA_VERSION: ${{fromJson(needs.setup-matrix.outputs.matrix)}}
+    name: E2E Tests - Grafana@${{ matrix.GRAFANA_VERSION }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install Mage
+        uses: magefile/mage-action@v3
+        with:
+          install-only: true
+
+      - name: Install yarn dependencies
+        run: yarn install --ignore-engines
+
+      - name: Build binaries
+        run: mage -v build:linux
+
+      - name: Build frontend
+        run: yarn build
+
+      - name: Install Playwright Browsers
+        run: yarn playwright install --with-deps chromium
+
+      - name: Start Grafana
+        run: |
+          docker-compose pull
+          GRAFANA_VERSION=${{ matrix.GRAFANA_VERSION }} docker-compose up -d
+
+      - name: Wait for Grafana to start
+        uses: nev7n/wait_for_response@v1
+        with:
+          url: 'http://localhost:3000/'
+          responseCode: 200
+          timeout: 20000
+          interval: 500
+
+      - name: Run Playwright tests
+        run: yarn playwright test
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: playwright-report-Grafana-v${{ matrix.GRAFANA_VERSION }}-${{github.run_id}}
+          path: packages/plugin-e2e/playwright-report/
+          retention-days: 30
+
+      - id: get-secrets
+        if: ${{ always() && github.event.organization.login == 'grafana' }}
+        uses: grafana/shared-workflows/actions/get-vault-secrets@main
+        with:
+          common_secrets: |
+            GCP_UPLOAD_ARTIFACTS_KEY=grafana/artifacts-uploader-service-account:'credentials.json'
+
+      - name: 'Authenticate to Google Cloud'
+        if: ${{ always() && github.event.organization.login == 'grafana' }}
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ env.GCP_UPLOAD_ARTIFACTS_KEY }}'
+
+      - name: 'Set up Cloud SDK'
+        if: ${{ always() && github.event.organization.login == 'grafana' }}
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: Publish report to Cloud Storage
+        if: ${{ always() && github.event.organization.login == 'grafana' }}
+        run: |
+          echo "Publish release to Google Cloud Storage:"
+          gsutil cp -r ./playwright-report/. gs://releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ matrix.GRAFANA_VERSION }}
+
+      - name: Write report link to summary
+        if: ${{ always() && github.event.organization.login == 'grafana' }}
+        run: echo '<a href="https://storage.googleapis.com/releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ matrix.GRAFANA_VERSION }}/index.html">Link to Playwright report</a>' >> $GITHUB_STEP_SUMMARY

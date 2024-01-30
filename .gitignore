@@ -6,6 +6,9 @@ cypress/report.json
 cypress/screenshots/actual
 cypress/videos/
 dist/
-provisioning
 .eslintcache
 __debug_bin
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
