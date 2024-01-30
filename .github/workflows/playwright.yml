@@ -71,6 +71,7 @@ jobs:
         run: yarn playwright test
 
       - uses: actions/upload-artifact@v4
+        # success() || steps.test.conclusion == 'failure'
         if: ${{ always() }}
         with:
           name: playwright-report-Grafana-v${{ matrix.GRAFANA_VERSION }}-${{github.run_id}}

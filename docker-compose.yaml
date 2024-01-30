@@ -9,6 +9,8 @@ services:
         grafana_version: ${GRAFANA_VERSION:-9.2.5}
     ports:
       - 3000:3000/tcp
+    environment:
+      - GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
     volumes:
       - ./dist:/var/lib/grafana/plugins/grafana-googlesheets-datasource
       - ./provisioning:/etc/grafana/provisioning
