@@ -70,10 +70,12 @@ jobs:
       - name: Run Playwright tests
         run: yarn playwright test
 
-      - name: Resolve Grafana E2E versions
+      - name: Publish report to GCS
         id: publish-report
         # uses: grafana/plugin-actions/publish-report@publish-report
         uses: ./.github/actions/publish-report
+        with:
+          directory: playwright-report/
 
       # - uses: actions/upload-artifact@v4
       #   # success() || steps.test.conclusion == 'failure'
