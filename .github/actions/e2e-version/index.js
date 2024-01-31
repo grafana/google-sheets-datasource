@@ -6,7 +6,7 @@ const npmToDockerImage = require('./npm-to-docker-image');
 
 const VersionResolverTypeInput = 'version-resolver-type';
 const MatrixOutput = 'matrix';
-const VERSIONS_LIMIT = 6;
+const VERSIONS_LIMIT = 5;
 
 const VersionResolverTypes = {
   PluginGrafanaDependency: 'plugin-grafana-dependency',
