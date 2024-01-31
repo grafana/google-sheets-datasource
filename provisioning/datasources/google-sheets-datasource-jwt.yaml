@@ -1,0 +1,17 @@
+# config file version
+apiVersion: 1
+
+deleteDatasources:
+  - name: Google Sheets Service Account
+    orgId: 1
+
+datasources:
+  - editable: true
+    enabled: true
+    jsonData:
+      authType: jwt
+    name: Google Sheets Service Account
+    secureJsonData:
+      jwt: ${GOOGLE_JWT_FILE}
+    type: grafana-googlesheets-datasource
+    version: 1
