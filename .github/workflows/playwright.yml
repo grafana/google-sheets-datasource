@@ -17,7 +17,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Resolve Grafana E2E versions
         id: resolve-versions
-        uses: grafana/plugin-actions/e2e-version@main
+        # uses: grafana/plugin-actions/e2e-version@main
+        uses: ./.github/actions/e2e-version
         with:
           version-resolver-type: plugin-grafana-dependency
 
