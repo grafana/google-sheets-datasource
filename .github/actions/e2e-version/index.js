@@ -55,11 +55,13 @@ async function run() {
       versions = evenlyPickVersions(versions, VERSIONS_LIMIT);
     }
 
+    // official grafana images
     const images = versions.map((version) => ({
       name: 'grafana',
       version,
     }));
 
+    // get the most recent grafana-dev image
     const tag = await npmToDockerImage({ core });
     if (tag) {
       images.push({ name: 'grafana-dev', version: tag });
