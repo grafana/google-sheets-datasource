@@ -5,29 +5,9 @@ inputs:
   directory:
     required: true
     description: "The directory to publish"
-  # module:
-  #   required: true
-  #   description: "Path to your plugin module.ts file. Usually ./src/module.ts"
-  # comment-pr:
-  #   description: "If running the action inside a pull_request write a comment with the check output. yes or no"
-  #   default: "yes"
-  #   required: false
-  # skip-comment-if-compatible:
-  #   description: "If comment-pr is enabled, skip the message if the result is favorable. yes or no"
-  #   default: "no"
-  #   required: false
-  # fail-if-incompatible:
-  #   description: "Fail the job if levitate finds incompatibilities. yes or no"
-  #   default: "no"
-  #   required: false
-  # targets:
-  #   description: "List of packages to test compatibility against"
-  #   default: "@grafana/data,@grafana/ui,@grafana/runtime,@grafana/schema,@grafana/e2e-selectors,@grafana/experimental"
-  #   required: false
 
 runs:
-  if: ${{ github.event.organization.login == 'grafana' }}
-  runs-on: ubuntu-latest
+  using: "composite"
   steps:
     - id: get-secrets
       uses: grafana/shared-workflows/actions/get-vault-secrets@main
