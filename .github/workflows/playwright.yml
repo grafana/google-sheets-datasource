@@ -24,7 +24,9 @@ jobs:
   playwright-tests:
     needs: setup-matrix
     timeout-minutes: 60
+    continue-on-error: ${{ needs.setup-matrix }}
     strategy:
+      fail-fast: false
       matrix:
         GRAFANA_VERSION: ${{fromJson(needs.setup-matrix.outputs.matrix)}}
     name: E2E Tests - Grafana@${{ matrix.GRAFANA_VERSION }}
