@@ -6,7 +6,7 @@ inputs:
     required: true
     description: "Grafana version used in the test session that generated the report"
   path:
-    default: "playwright-report"
+    default: "playwright-report/"
     required: false
     description: "Path to the folder to publish. Defaults to 'playwright-report'"
 
@@ -32,7 +32,11 @@ runs:
       shell: bash
       run: |
         echo "Publish release to Google Cloud Storage:"
-        gsutil cp -r ${{ inputs.path }}. gs://releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ inputs.grafanaVersion }}
+        path={${inputs.path}}
+        length=${#path}
+        last_char=${path:length-1:1}
+        [[ $last_char != "/" ]] && path="$path/"; :
+        gsutil cp -r ${{ path }}. gs://releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ inputs.grafanaVersion }}
 
     - name: Write report link to summary
       shell: bash
