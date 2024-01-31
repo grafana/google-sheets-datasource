@@ -7,7 +7,7 @@ permissions:
   id-token: write
 
 jobs:
-  setup-matrix:
+  resolve-grafana-versions:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     outputs:
@@ -22,12 +22,12 @@ jobs:
           version-resolver-type: plugin-grafana-dependency
 
   playwright-tests:
-    needs: setup-matrix
+    needs: resolve-grafana-versions
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
-        GRAFANA_VERSION: ${{fromJson(needs.setup-matrix.outputs.matrix)}}
+        GRAFANA_VERSION: ${{fromJson(needs.resolve-grafana-versions.outputs.matrix)}}
     name: E2E Tests - Grafana@${{ matrix.GRAFANA_VERSION }}
     runs-on: ubuntu-latest
     steps:
@@ -88,5 +88,3 @@ jobs:
         if: ${{ (always() && steps.run-tests.outcome == 'success') || (failure() && steps.run-tests.outcome == 'failure') && github.event.organization.login == 'grafana' }}
         # uses: grafana/plugin-actions/publish-report@publish-report
         uses: ./.github/actions/publish-report
-        with:
-          directory: playwright-report/

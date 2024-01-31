@@ -1,10 +1,12 @@
-name: "Publish artifact to GCS"
-description: "Publish an artifact to GCS"
+name: "Publish Playwright report"
+description: "Publish a Playwright report to GCS"
 
 inputs:
-  directory:
-    required: true
-    description: "The directory to publish"
+  path:
+    default: "playwright-report"
+    required: false
+    description: "Path to the folder to publish. Defaults to 'playwright-report'"
+
 
 runs:
   using: "composite"
