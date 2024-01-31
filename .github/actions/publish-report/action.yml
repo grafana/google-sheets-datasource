@@ -35,8 +35,8 @@ runs:
         path=${{inputs.path}}
         last_char=${path: -1}
         [[ $last_char != "/" ]] && path="$path/";
-        gsutil cp -r "$path". gs://releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ inputs.grafanaVersion }}
+        gsutil cp -r "$path". gs://releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ inputs.grafana-version }}
 
     - name: Write report link to summary
       shell: bash
-      run: echo '<a href="https://storage.googleapis.com/releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ inputs.grafanaVersion }}/index.html">Browse the Playwright report</a>' >> $GITHUB_STEP_SUMMARY
+      run: echo '<a href="https://storage.googleapis.com/releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ inputs.grafana-version }}/index.html">Browse the Playwright report</a>' >> $GITHUB_STEP_SUMMARY
