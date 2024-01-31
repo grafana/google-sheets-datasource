@@ -8,7 +8,7 @@ inputs:
   path:
     default: "playwright-report/"
     required: false
-    description: "Path to the folder to publish. Defaults to 'playwright-report'"
+    description: "Path to the folder to publish. Defaults to 'playwright-report/'"
 
 
 runs:

@@ -88,4 +88,3 @@ jobs:
         uses: ./.github/actions/publish-report
         with:
           grafana-version: ${{ matrix.GRAFANA_IMAGE.VERSION }}
-          # path: playwright-report
