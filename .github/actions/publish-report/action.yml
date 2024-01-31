@@ -29,8 +29,8 @@ runs:
       shell: bash
       run: |
         echo "Publish release to Google Cloud Storage:"
-        gsutil cp -r ${{ inputs.directory }}. gs://releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ matrix.GRAFANA_VERSION }}
+        gsutil cp -r ${{ inputs.directory }}. gs://releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/${{ matrix.GRAFANA_IMAGE.NAME }}-v${{ matrix.GRAFANA_IMAGE.VERSION }}
 
     - name: Write report link to summary
       shell: bash
-      run: echo '<a href="https://storage.googleapis.com/releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ matrix.GRAFANA_VERSION }}/index.html">Browse the Playwright report</a>' >> $GITHUB_STEP_SUMMARY
+      run: echo '<a href="https://storage.googleapis.com/releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/${{ matrix.GRAFANA_IMAGE.NAME }}-v${{ matrix.GRAFANA_IMAGE.VERSION }}/index.html">Browse the Playwright report</a>' >> $GITHUB_STEP_SUMMARY
