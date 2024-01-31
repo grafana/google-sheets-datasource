@@ -24,7 +24,6 @@ jobs:
   playwright-tests:
     needs: setup-matrix
     timeout-minutes: 60
-    continue-on-error: ${{ needs.setup-matrix }}
     strategy:
       fail-fast: false
       matrix:
