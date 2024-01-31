@@ -90,3 +90,5 @@ jobs:
         if: ${{ (always() && steps.run-tests.outcome == 'success') || (failure() && steps.run-tests.outcome == 'failure') && github.event.organization.login == 'grafana' }}
         # uses: grafana/plugin-actions/publish-report@publish-report
         uses: ./.github/actions/publish-report
+        with:
+          grafana-version: ${{ matrix.GRAFANA_IMAGE.VERSION }}
