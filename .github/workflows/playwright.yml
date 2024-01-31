@@ -68,46 +68,21 @@ jobs:
           interval: 500
 
       - name: Run Playwright tests
+        id: run-tests
         run: yarn playwright test
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: ${{ steps.run-tests.conclusion == 'success' || steps.run-tests.conclusion == 'failure' && github.event.organization.login != 'grafana' }}
+        with:
+          name: playwright-report-Grafana-v${{ matrix.GRAFANA_VERSION }}-${{github.run_id}}
+          path: packages/plugin-e2e/playwright-report/
+          retention-days: 30
 
       - name: Publish report to GCS
         id: publish-report
+        if: ${{ steps.run-tests.conclusion == 'success' || steps.run-tests.conclusion == 'failure' && github.event.organization.login == 'grafana' }}
         # uses: grafana/plugin-actions/publish-report@publish-report
         uses: ./.github/actions/publish-report
         with:
           directory: playwright-report/
-
-      # - uses: actions/upload-artifact@v4
-      #   # success() || steps.test.conclusion == 'failure'
-      #   if: ${{ always() }}
-      #   with:
-      #     name: playwright-report-Grafana-v${{ matrix.GRAFANA_VERSION }}-${{github.run_id}}
-      #     path: packages/plugin-e2e/playwright-report/
-      #     retention-days: 30
-
-      # - id: get-secrets
-      #   if: ${{ always() && github.event.organization.login == 'grafana' }}
-      #   uses: grafana/shared-workflows/actions/get-vault-secrets@main
-      #   with:
-      #     common_secrets: |
-      #       GCP_UPLOAD_ARTIFACTS_KEY=grafana/artifacts-uploader-service-account:'credentials.json'
-
-      # - name: 'Authenticate to Google Cloud'
-      #   if: ${{ always() && github.event.organization.login == 'grafana' }}
-      #   uses: 'google-github-actions/auth@v2'
-      #   with:
-      #     credentials_json: '${{ env.GCP_UPLOAD_ARTIFACTS_KEY }}'
-
-      # - name: 'Set up Cloud SDK'
-      #   if: ${{ always() && github.event.organization.login == 'grafana' }}
-      #   uses: 'google-github-actions/setup-gcloud@v2'
-
-      # - name: Publish report to Cloud Storage
-      #   if: ${{ always() && github.event.organization.login == 'grafana' }}
-      #   run: |
-      #     echo "Publish release to Google Cloud Storage:"
-      #     gsutil cp -r ./playwright-report/. gs://releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ matrix.GRAFANA_VERSION }}
-
-      # - name: Write report link to summary
-      #   if: ${{ always() && github.event.organization.login == 'grafana' }}
-      #   run: echo '<a href="https://storage.googleapis.com/releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ matrix.GRAFANA_VERSION }}/index.html">Link to Playwright report</a>' >> $GITHUB_STEP_SUMMARY
