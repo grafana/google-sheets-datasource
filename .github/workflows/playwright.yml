@@ -74,7 +74,7 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
-        if: ${{ steps.run-tests.conclusion == 'success' || steps.run-tests.conclusion == 'failure' && github.event.organization.login != 'grafana' }}
+        if: ${{ steps.run-tests.outcome == 'success' || steps.run-tests.outcome == 'failure' && github.event.organization.login != 'grafana' }}
         with:
           name: playwright-report-Grafana-v${{ matrix.GRAFANA_VERSION }}-${{github.run_id}}
           path: packages/plugin-e2e/playwright-report/
@@ -82,7 +82,7 @@ jobs:
 
       - name: Publish report to GCS
         id: publish-report
-        if: ${{ steps.run-tests.conclusion == 'success' || steps.run-tests.conclusion == 'failure' && github.event.organization.login == 'grafana' }}
+        if: ${{ (steps.run-tests.conclusion == 'success' || steps.run-tests.conclusion == 'failure') && github.event.organization.login == 'grafana' }}
         # uses: grafana/plugin-actions/publish-report@publish-report
         uses: ./.github/actions/publish-report
         with:
