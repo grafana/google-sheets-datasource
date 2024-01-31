@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   resolve-versions:
-    name: Resolve Grafana versions
+    name: Resolve Grafana images
     runs-on: ubuntu-latest
     timeout-minutes: 3
     outputs:
@@ -30,7 +30,7 @@ jobs:
       fail-fast: false
       matrix:
         GRAFANA_IMAGE: ${{fromJson(needs.resolve-versions.outputs.matrix)}}
-    name: E2E Tests - ${{ matrix.GRAFANA_IMAGE.name }}@${{ matrix.GRAFANA_IMAGE.VERSION }}
+    name: e2e${{ matrix.GRAFANA_IMAGE.name }}@${{ matrix.GRAFANA_IMAGE.VERSION }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
