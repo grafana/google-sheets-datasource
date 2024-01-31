@@ -56,13 +56,13 @@ async function run() {
     }
 
     const images = versions.map((version) => ({
-      name: 'grafana/grafana',
+      name: 'grafana',
       version,
     }));
 
     const tag = await npmToDockerImage({ core });
     if (tag) {
-      images.push({ name: 'grafana/grafana-dev', version: tag });
+      images.push({ name: 'grafana-dev', version: tag });
     }
 
     console.log('Resolved images: ', images);
