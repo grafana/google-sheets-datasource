@@ -24,6 +24,7 @@ runs:
       uses: 'google-github-actions/setup-gcloud@v2'
 
     - name: Publish report to Cloud Storage
+      shell: bash
       run: |
         echo "Publish release to Google Cloud Storage:"
         gsutil cp -r ${{ inputs.directory }}. gs://releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ matrix.GRAFANA_VERSION }}
