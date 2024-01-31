@@ -32,6 +32,9 @@ runs:
       shell: bash
       run: |
         echo "Publish release to Google Cloud Storage:"
+        path=${{inputs.path}}
+        last_char=${path: -1}
+        [[ $last_char != "/" ]] && path="$path/";
         gsutil cp -r ${{ path }}. gs://releng-pipeline-artifacts-dev/${{ github.event.repository.name }}/${{ github.event.number }}/Grafana-v${{ inputs.grafanaVersion }}
 
     - name: Write report link to summary
