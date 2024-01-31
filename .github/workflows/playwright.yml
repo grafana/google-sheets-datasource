@@ -27,8 +27,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        GRAFANA_VERSION: ${{fromJson(needs.resolve-grafana-versions.outputs.matrix)}}
-    name: E2E Tests - Grafana@${{ matrix.GRAFANA_VERSION }}
+        GRAFANA_IMAGE: ${{fromJson(needs.resolve-grafana-versions.outputs.matrix)}}
+    name: E2E Tests - Grafana@${{ matrix.GRAFANA_IMAGE.VERSION }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +58,7 @@ jobs:
       - name: Start Grafana
         run: |
           docker-compose pull
-          GRAFANA_VERSION=${{ matrix.GRAFANA_VERSION }} docker-compose up -d
+          GRAFANA_VERSION=${{ matrix.GRAFANA_IMAGE.VERSION }} GRAFANA_IMAGE=${{ matrix.GRAFANA_IMAGE.NAME }} docker-compose up -d
 
       - name: Wait for Grafana to start
         uses: nev7n/wait_for_response@v1
@@ -80,7 +80,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ (always() && steps.run-tests.outcome == 'success') || (failure() && steps.run-tests.outcome == 'failure') && github.event.organization.login != 'grafana' }}
         with:
-          name: playwright-report-Grafana-v${{ matrix.GRAFANA_VERSION }}-${{github.run_id}}
+          name: playwright-report-${{ matrix.GRAFANA_IMAGE.NAME }}-v${{ matrix.GRAFANA_IMAGE.VERSION }}-${{github.run_id}}
           path: packages/plugin-e2e/playwright-report/
           retention-days: 30
 

@@ -1,0 +1,23 @@
+name: 'Grafana E2E version resolver'
+description: 'Resolve Grafana versions for use in E2E tests'
+
+inputs:
+  version-resolver-type:
+    required: true 
+    type: choice
+    default: plugin-grafana-dependency
+    description: >
+     Choose between different version resolver types.
+      plugin-grafana-dependency: Resolve versions based on the Grafana version specified in the plugin.json file.
+      version-support-policy: Resolve versions according to Grafana's plugin compatibility policy. I.e. the latest major version and the last minor of the previous major version.
+    options: 
+      - plugin-grafana-dependency
+      - version-support-policy
+
+output:
+  matrix:
+    description: 'Versions to test against'
+
+runs:
+  using: node20
+  main: ./dist/index.js
