@@ -7,7 +7,8 @@ permissions:
   id-token: write
 
 jobs:
-  resolve-grafana-versions:
+  resolve-versions:
+    name: Resolve Grafana versions
     runs-on: ubuntu-latest
     timeout-minutes: 3
     outputs:
@@ -23,13 +24,13 @@ jobs:
           version-resolver-type: plugin-grafana-dependency
 
   playwright-tests:
-    needs: resolve-grafana-versions
+    needs: resolve-versions
     timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
         GRAFANA_IMAGE: ${{fromJson(needs.resolve-grafana-versions.outputs.matrix)}}
-    name: E2E Tests - Grafana@${{ matrix.GRAFANA_IMAGE.VERSION }}
+    name: E2E Tests - ${{ matrix.GRAFANA_IMAGE.name }}@${{ matrix.GRAFANA_IMAGE.VERSION }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
