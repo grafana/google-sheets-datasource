@@ -64,7 +64,7 @@ async function run() {
       version,
     }));
 
-    if (skipGrafanaDevImage !== true) {
+    if (skipGrafanaDevImage != true) {
       // get the most recent grafana-dev image
       const tag = await npmToDockerImage({ core });
       if (tag) {
