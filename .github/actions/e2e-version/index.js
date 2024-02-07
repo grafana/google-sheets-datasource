@@ -4,6 +4,7 @@ const semver = require('semver');
 const path = require('path');
 const npmToDockerImage = require('./npm-to-docker-image');
 
+const SkipGrafanaDevImageInput = 'skip-grafana-dev-image';
 const VersionResolverTypeInput = 'version-resolver-type';
 const MatrixOutput = 'matrix';
 const VERSIONS_LIMIT = 5;
@@ -15,6 +16,7 @@ const VersionResolverTypes = {
 
 async function run() {
   try {
+    const skipGrafanaDevImage = core.getInput(SkipGrafanaDevImageInput);
     const versionResolverType = core.getInput(VersionResolverTypeInput) || VersionResolverTypes.PluginGrafanaDependency;
     const availableGrafanaVersions = await getGrafanaStableMinorVersions();
     if (availableGrafanaVersions.length === 0) {
@@ -51,7 +53,7 @@ async function run() {
     }
 
     if (versionResolverType === VersionResolverTypes.PluginGrafanaDependency) {
-      // limit the number of versions to 6
+      // limit the number of versions to avoid starting too many jobs
       versions = evenlyPickVersions(versions, VERSIONS_LIMIT);
     }
 
@@ -61,10 +63,12 @@ async function run() {
       version,
     }));
 
-    // get the most recent grafana-dev image
-    const tag = await npmToDockerImage({ core });
-    if (tag) {
-      images.push({ name: 'grafana-dev', version: tag });
+    if (skipGrafanaDevImage !== 'true') {
+      // get the most recent grafana-dev image
+      const tag = await npmToDockerImage({ core });
+      if (tag) {
+        images.unshift({ name: 'grafana-dev', version: tag });
+      }
     }
 
     console.log('Resolved images: ', images);

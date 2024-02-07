@@ -67,7 +67,7 @@ jobs:
         with:
           url: 'http://localhost:3000/'
           responseCode: 200
-          timeout: 120000
+          timeout: 60000
           interval: 500
 
       - name: Run Playwright tests
@@ -88,3 +88,4 @@ jobs:
         uses: ./.github/actions/publish-report
         with:
           grafana-version: ${{ matrix.GRAFANA_IMAGE.VERSION }}
+          path: playwright-report
