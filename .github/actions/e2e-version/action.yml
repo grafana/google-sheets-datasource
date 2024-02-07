@@ -2,6 +2,11 @@ name: 'Grafana E2E version resolver'
 description: 'Resolve Grafana versions for use in E2E tests'
 
 inputs:
+  skip-grafana-dev-image:
+    default: false
+    required: false
+    description: 'Optionally, you can skip the Grafana dev image'
+    type: boolean
   version-resolver-type:
     required: true 
     type: choice
@@ -20,4 +25,4 @@ output:
 
 runs:
   using: node20
-  main: ./com/index.js
+  main: ./dist/index.js

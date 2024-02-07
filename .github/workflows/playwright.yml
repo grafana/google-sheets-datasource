@@ -21,6 +21,7 @@ jobs:
         # uses: grafana/plugin-actions/e2e-version@main
         uses: ./.github/actions/e2e-version
         with:
+          skip-grafana-dev-image: true
           version-resolver-type: plugin-grafana-dependency
 
   playwright-tests:
