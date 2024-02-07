@@ -17,6 +17,7 @@ const VersionResolverTypes = {
 async function run() {
   try {
     const skipGrafanaDevImage = core.getInput(SkipGrafanaDevImageInput);
+    console.log('skipGrafanaDevImage', skipGrafanaDevImage);
     const versionResolverType = core.getInput(VersionResolverTypeInput) || VersionResolverTypes.PluginGrafanaDependency;
     const availableGrafanaVersions = await getGrafanaStableMinorVersions();
     if (availableGrafanaVersions.length === 0) {
