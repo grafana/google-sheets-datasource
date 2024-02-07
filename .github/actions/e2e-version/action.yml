@@ -25,4 +25,4 @@ output:
 
 runs:
   using: node20
-  main: ./dist/index.js
+  main: ./com/index.js
