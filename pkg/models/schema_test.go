@@ -33,5 +33,5 @@ func TestSchemaDefinitions(t *testing.T) {
 	require.NoError(t, err)
 
 	// Update the query schemas resource
-	builder.UpdateQueryDefinition(t, "../../src/static/schema/query.schema.json")
+	builder.UpdateQueryDefinition(t, "../../src/static/schema/query.types.json")
 }
