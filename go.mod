@@ -7,7 +7,7 @@ toolchain go1.21.3
 require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/davecgh/go-spew v1.1.1
-	github.com/grafana/grafana-plugin-sdk-go v0.212.1-0.20240221213513-1202776612ce
+	github.com/grafana/grafana-plugin-sdk-go v0.212.1-0.20240225155948-2c8c4ada2764
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/oauth2 v0.16.0
@@ -16,13 +16,16 @@ require (
 
 require (
 	github.com/apache/arrow/go/v15 v15.0.0 // indirect
+	github.com/asaskevich/govalidator v0.0.0-20190424111038-f61b66f89f4a // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-openapi/jsonreference v0.20.1 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0 // indirect
 	github.com/invopop/jsonschema v0.12.0 // indirect
@@ -52,6 +55,8 @@ require (
 	google.golang.org/genproto v0.0.0-20231002182017-d307bd883b97 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20231012201019-e917dd12ba7a // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231012201019-e917dd12ba7a // indirect
+	k8s.io/kube-openapi v0.0.0-20240220201932-37d671a357a5 // indirect
+	k8s.io/utils v0.0.0-20230726121419-3b25d923346b // indirect
 )
 
 require (

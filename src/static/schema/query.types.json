@@ -8,7 +8,7 @@
     {
       "metadata": {
         "name": "default",
-        "resourceVersion": "1708122817819",
+        "resourceVersion": "1708887563476",
         "creationTimestamp": "2024-02-16T22:33:37Z"
       },
       "spec": {
@@ -42,7 +42,7 @@
         "examples": [
           {
             "name": "public query",
-            "queryPayload": {
+            "saveModel": {
               "spreadsheet": "YourSheetID",
               "range": "A1:D6"
             }
