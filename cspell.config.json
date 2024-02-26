@@ -22,7 +22,8 @@
     "testdata",
     "testid",
     "tokenprovider",
-    "typecheck"
+    "typecheck",
+    "dataplane"
   ],
   "language": "en-US"
 }
