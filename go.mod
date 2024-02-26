@@ -7,7 +7,7 @@ toolchain go1.21.3
 require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/davecgh/go-spew v1.1.1
-	github.com/grafana/grafana-plugin-sdk-go v0.212.1-0.20240225155948-2c8c4ada2764
+	github.com/grafana/grafana-plugin-sdk-go v0.212.1-0.20240225232048-ee12be24cbd1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/oauth2 v0.16.0

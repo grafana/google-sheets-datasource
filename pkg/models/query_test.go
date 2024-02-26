@@ -4,22 +4,24 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/grafana/grafana-plugin-sdk-go/experimental/spec"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/resource"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/resource/schemabuilder"
 	"github.com/stretchr/testify/require"
 )
 
 func TestSchemaDefinitions(t *testing.T) {
-	builder, err := spec.NewSchemaBuilder(
-		spec.BuilderOptions{
+	builder, err := schemabuilder.NewSchemaBuilder(
+		schemabuilder.BuilderOptions{
+			PluginID:    []string{"grafana-googlesheets-datasource"},
 			BasePackage: "github.com/grafana/google-sheets-datasource/pkg/models",
 			CodePath:    "./",
 		},
 	)
 	require.NoError(t, err)
-	err = builder.AddQueries(spec.QueryTypeInfo{
+	err = builder.AddQueries(schemabuilder.QueryTypeInfo{
 		Name:   "default",
 		GoType: reflect.TypeOf(&QueryModel{}),
-		Examples: []spec.QueryExample{
+		Examples: []resource.QueryExample{
 			{
 				Name: "public query",
 				SaveModel: QueryModel{
