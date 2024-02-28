@@ -7,3 +7,7 @@ cypress/screenshots/actual
 cypress/videos/
 dist/
 provisioning
+.eslintcache
+__debug_bin
+.idea
+.DS_Store
