@@ -13,3 +13,4 @@ __debug_bin
 /playwright/.cache/
 /playwright/.auth/
 .idea
+.DS_Store
