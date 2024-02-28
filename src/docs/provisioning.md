@@ -11,7 +11,7 @@ datasources:
     type: google-sheets-datasource
     enabled: true
     jsonData:
-      authType: 'key'
+      authenticationType: 'key'
     secureJsonData:
       apiKey: 'your-api-key'
     version: 1
@@ -27,9 +27,27 @@ datasources:
     type: google-sheets-datasource
     enabled: true
     jsonData:
-      authType: 'jwt'
+      authenticationType: 'jwt'
+      defaultProject: 'your-project-id'
+      clientEmail: 'your-client-email'
+      tokenUri: 'https://oauth2.googleapis.com/token'
     secureJsonData:
-      jwt: '{"type":"service_account","project_id":"proj-id","private_key_id":"c4ac...","private_key":"-----BEGIN PRIVATE KEY-----\nnn-----END PRIVATE KEY-----\n","client_email":"nnn@proj.iam.gserviceaccount.com","client_id":"client-id","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"cert-url"}'
+      privateKey: '-----BEGIN PRIVATE KEY-----\nnn-----END PRIVATE KEY-----\n'
+    version: 1
+    editable: true
+```
+
+Here is a provisioning example using a GCE authentication type.
+
+```yaml
+apiVersion: 1
+datasources:
+  - name: GoogleSheetsDatasourceJWT
+    type: google-sheets-datasource
+    enabled: true
+    jsonData:
+      authenticationType: 'gce'
+      defaultProject: 'your-project-id'
     version: 1
     editable: true
 ```

@@ -1,11 +1,26 @@
-import { DataSourceInstanceSettings, SelectableValue, ScopedVars, CoreApp } from '@grafana/data';
+import {
+  DataQueryRequest,
+  DataQueryResponse,
+  DataSourceInstanceSettings,
+  ScopedVars,
+  SelectableValue,
+} from '@grafana/data';
+import { DataSourceOptions } from '@grafana/google-sdk';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
+import { SheetsQuery } from './types';
+import { Observable } from 'rxjs';
+import { trackRequest } from 'tracking';
 
-import { SheetsQuery, SheetsSourceOptions } from './types';
-
-export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceOptions> {
-  constructor(private instanceSettings: DataSourceInstanceSettings<SheetsSourceOptions>) {
+export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOptions> {
+  authType: string;
+  constructor(instanceSettings: DataSourceInstanceSettings<DataSourceOptions>) {
     super(instanceSettings);
+    this.authType = instanceSettings.jsonData.authenticationType;
+  }
+
+  query(request: DataQueryRequest<SheetsQuery>): Observable<DataQueryResponse> {
+    trackRequest(request);
+    return super.query(request);
   }
 
   // Enables default annotation support for 7.2+
@@ -24,12 +39,8 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, SheetsSourceO
   async getSpreadSheets(): Promise<Array<SelectableValue<string>>> {
     return this.getResource('spreadsheets').then(({ spreadsheets }) =>
       spreadsheets
-        ? Object.entries(spreadsheets).map(([value, label]) => ({ label, value } as SelectableValue<string>))
+        ? Object.entries(spreadsheets).map(([value, label]) => ({ label, value }) as SelectableValue<string>)
         : []
     );
-  }
-
-  getDefaultQuery(app: CoreApp): Partial<SheetsQuery> {
-    return { spreadsheet: this.instanceSettings.jsonData.defaultSheetID };
   }
 }

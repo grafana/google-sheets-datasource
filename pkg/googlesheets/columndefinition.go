@@ -50,7 +50,7 @@ func (cd *ColumnDefinition) GetType() ColumnType {
 		}
 	}
 
-	//The column has mixed or no data types - fallback to string
+	// The column has mixed or no data types - fallback to string
 	return ColumTypeString
 }
 
@@ -92,7 +92,7 @@ func (cd *ColumnDefinition) checkType(cell *sheets.CellData) {
 		}
 	}
 
-	if hasNumberFormat || hasNumberValue || "0" == cell.FormattedValue {
+	if hasNumberFormat || hasNumberValue || cell.FormattedValue == "0" {
 		cd.types["NUMBER"] = true
 	} else {
 		cd.types["STRING"] = true

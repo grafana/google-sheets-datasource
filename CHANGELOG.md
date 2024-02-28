@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.5
+
+- Upgrade grafana-plugin-sdk-go to latest
+- Added lint github workflow
+- Remove legacy form styles
+
+## 1.2.4
+
+- Added feature tracking
+- Upgrade dependencies
+
+## 1.2.3
+
+- Make sure we don't mutate the options object in the config page. This prevents crashes that occurred intermittently.
+
+## 1.2.2
+
+- Handle error messages more gracefully
+
+## v1.2.0
+
+- Refactored authentication to use grafana google sdks. With this change you can now use GCE authentication with google sheets.
+
+There was a change in the plugin configuration. Please take a look at the provisioning example in the [documentation](src/docs/provisioning.md).
+The change is backward compatible so you can still use the old configuration.
+
+## v1.1.8
+
+- **Chore**: Backend binaries are now compiled with golang 1.20.4
+
+## v1.1.7
+
+- **Chore**: Update to Golang 1.20
+
 ## v1.1.6
 
 - Fix: Don't panic when the user selects a range of empty cells.
