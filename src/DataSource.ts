@@ -13,6 +13,7 @@ import { trackRequest } from 'tracking';
 
 export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOptions> {
   authType: string;
+  defaultSheetID?: string;
   constructor(instanceSettings: DataSourceInstanceSettings<DataSourceOptions>) {
     super(instanceSettings);
     this.authType = instanceSettings.jsonData.authenticationType;
@@ -42,5 +43,9 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOpt
         ? Object.entries(spreadsheets).map(([value, label]) => ({ label, value }) as SelectableValue<string>)
         : []
     );
+  }
+
+  getDefaultQuery(app: CoreApp): Partial<SheetsQuery> {
+    return { spreadsheet: this.defaultSheetID };
   }
 }

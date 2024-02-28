@@ -28,6 +28,16 @@ export function ConfigEditor(props: Props) {
     onChange: onUpdateDatasourceSecureJsonDataOption(props, 'apiKey'),
   };
 
+  const loadSheetIDs = async () => {
+    const { options } = props;
+    try {
+      const ds = (await getDataSourceSrv().get(options.uid)) as DataSource;
+      return ds.getSpreadSheets();
+    } catch {
+      return [];
+    }
+  };
+
   return (
     <>
       <DataSourceDescription
@@ -35,6 +45,27 @@ export function ConfigEditor(props: Props) {
         docsLink="https://grafana.com/grafana/plugins/grafana-googlesheets-datasource/"
         hasRequiredFields={false}
       />
+
+      <div className="gf-form">
+        <InlineFormLabel
+          className="width-10"
+          tooltip="The id of a default google sheet. The datasource must be saved before this can be set."
+        >
+          Default SheetID
+        </InlineFormLabel>
+        <SegmentAsync
+          className="width-30"
+          loadOptions={() => loadSheetIDs()}
+          placeholder="Select Spreadsheet ID"
+          value={options.jsonData.defaultSheetID}
+          allowCustomValue={true}
+          onChange={onUpdateDatasourceJsonDataOptionSelect(props, 'defaultSheetID')}
+          disabled={
+            (props.options.jsonData.authType === googleSheetsAuthTypes && (!secureJsonFields || !secureJsonFields.apiKey)) ||
+            (jsonData.authType === googleSheetsAuthTypes.JWT && (!secureJsonFields || !secureJsonFields.jwt))
+          }
+        />
+      </div>
 
       <Divider />
 

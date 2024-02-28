@@ -1,3 +1,4 @@
+import { DataSourceJsonData } from '@grafana/data';
 import { DataQuery } from '@grafana/schema';
 import { GoogleAuthType, GOOGLE_AUTH_TYPE_OPTIONS, DataSourceSecureJsonData } from '@grafana/google-sdk';
 
@@ -35,4 +36,8 @@ export interface SheetsQuery extends DataQuery {
   range?: string;
   cacheDurationSeconds?: number;
   useTimeFilter?: boolean;
+}
+
+export interface SheetsSourceOptions extends DataSourceJsonData {
+  defaultSheetID?: string;
 }
