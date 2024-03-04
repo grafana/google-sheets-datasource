@@ -8,43 +8,43 @@
     {
       "metadata": {
         "name": "default",
-        "resourceVersion": "1708887563476",
+        "resourceVersion": "1709529948112",
         "creationTimestamp": "2024-02-16T22:33:37Z"
       },
       "spec": {
-        "querySchema": {
+        "schema": {
           "$schema": "https://json-schema.org/draft-04/schema",
+          "additionalProperties": false,
+          "description": "QueryModel represents a spreadsheet query.",
           "properties": {
-            "spreadsheet": {
-              "type": "string",
-              "description": "The google sheets spreadsheet ID"
+            "cacheDurationSeconds": {
+              "description": "Cache duration in seconds",
+              "type": "integer"
             },
             "range": {
-              "type": "string",
-              "description": "A1 notation"
+              "description": "A1 notation",
+              "type": "string"
             },
-            "cacheDurationSeconds": {
-              "type": "integer",
-              "description": "Cache duration in seconds"
+            "spreadsheet": {
+              "description": "The google sheets spreadsheet ID",
+              "type": "string"
             },
             "useTimeFilter": {
-              "type": "boolean",
-              "description": "Use the query time range to filer values from the table"
+              "description": "Use the query time range to filer values from the table",
+              "type": "boolean"
             }
           },
-          "additionalProperties": false,
-          "type": "object",
           "required": [
             "spreadsheet"
           ],
-          "description": "QueryModel represents a spreadsheet query."
+          "type": "object"
         },
         "examples": [
           {
             "name": "public query",
             "saveModel": {
-              "spreadsheet": "YourSheetID",
-              "range": "A1:D6"
+              "range": "A1:D6",
+              "spreadsheet": "YourSheetID"
             }
           }
         ]
