@@ -23,7 +23,8 @@
     "testid",
     "tokenprovider",
     "typecheck",
-    "dataplane"
+    "dataplane",
+    "timeseries"
   ],
   "language": "en-US"
 }
