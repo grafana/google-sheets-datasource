@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	data "github.com/grafana/grafana-plugin-sdk-go/experimental/apis/data/v0alpha1"
 	"github.com/grafana/grafana-plugin-sdk-go/experimental/schemabuilder"
-	sdkapi "github.com/grafana/grafana-plugin-sdk-go/v0alpha1"
 	"github.com/stretchr/testify/require"
 )
 
@@ -23,10 +23,10 @@ func TestSchemaDefinitions(t *testing.T) {
 	err = builder.AddQueries(schemabuilder.QueryTypeInfo{
 		Name:   "default",
 		GoType: reflect.TypeOf(&QueryModel{}),
-		Examples: []sdkapi.QueryExample{
+		Examples: []data.QueryExample{
 			{
 				Name: "public query",
-				SaveModel: sdkapi.AsUnstructured(QueryModel{
+				SaveModel: data.AsUnstructured(QueryModel{
 					Spreadsheet: "YourSheetID",
 					Range:       "A1:D6",
 				}),
