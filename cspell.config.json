@@ -24,7 +24,8 @@
     "tokenprovider",
     "typecheck",
     "dataplane",
-    "timeseries"
+    "timeseries",
+    "schemabuilder"
   ],
   "language": "en-US"
 }
