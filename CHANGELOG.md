@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.6
+
+- Build with go 1.22
+- Configuration help: Add additional instruction to enable Google Sheets API
+
 ## 1.2.5
 
 - Upgrade grafana-plugin-sdk-go to latest
