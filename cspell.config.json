@@ -22,7 +22,10 @@
     "testdata",
     "testid",
     "tokenprovider",
-    "typecheck"
+    "typecheck",
+    "dataplane",
+    "timeseries",
+    "schemabuilder"
   ],
   "language": "en-US"
 }

@@ -9,10 +9,17 @@ import (
 
 // QueryModel represents a spreadsheet query.
 type QueryModel struct {
-	Spreadsheet          string `json:"spreadsheet"`
-	Range                string `json:"range"`
-	CacheDurationSeconds int    `json:"cacheDurationSeconds"`
-	UseTimeFilter        bool   `json:"useTimeFilter"`
+	// The google sheets spreadsheet ID
+	Spreadsheet string `json:"spreadsheet"`
+
+	// A1 notation
+	Range string `json:"range,omitempty"`
+
+	// Cache duration in seconds
+	CacheDurationSeconds int `json:"cacheDurationSeconds,omitempty"`
+
+	// Use the query time range to filer values from the table
+	UseTimeFilter bool `json:"useTimeFilter,omitempty"`
 
 	// Not from JSON
 	TimeRange     backend.TimeRange `json:"-"`

@@ -1,0 +1,13 @@
+{
+  "from": "now-1h",
+  "to": "now",
+  "queries": [
+    {
+      "refId": "A",
+      "maxDataPoints": 1000,
+      "intervalMs": 5,
+      "range": "A1:D6",
+      "spreadsheet": "YourSheetID"
+    }
+  ]
+}

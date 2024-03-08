@@ -1,0 +1,14 @@
+{
+  "type": "table",
+  "targets": [
+    {
+      "refId": "A",
+      "datasource": {
+        "type": "grafana-googlesheets-datasource",
+        "uid": "TheUID"
+      },
+      "range": "A1:D6",
+      "spreadsheet": "YourSheetID"
+    }
+  ]
+}
