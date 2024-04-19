@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.8
+
+- Upgrade dependencies
+
 ## 1.2.7
 
 - Upgrade dependencies
