@@ -7,7 +7,7 @@
     "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
     "e2e": "yarn exec cypress install && yarn exec grafana-e2e run",
     "e2e:update": "yarn exec cypress install && yarn exec grafana-e2e run --update-screenshots",
-    "lint": "eslint --cache --ignore-path ./.gitignore --ext .ts,.tsx .",
+    "lint": "eslint --cache --ignore-path ./.gitignore --ext .js,.jsx,.ts,.tsx .",
     "lint:fix": "yarn run lint --fix",
     "server": "docker-compose up --build",
     "server:debug": "docker compose -f ./docker-compose.debug.yaml up",
@@ -71,14 +71,15 @@
     "webpack": "^5.86.0"
   },
   "dependencies": {
-    "@emotion/css": "^11.1.3",
+    "@emotion/css": "11.10.6",
     "@grafana/data": "10.4.2",
     "@grafana/experimental": "^1.7.3",
     "@grafana/google-sdk": "^0.1.1",
     "@grafana/runtime": "10.4.2",
     "@grafana/schema": "10.4.2",
     "@grafana/ui": "10.4.2",
-    "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "tslib": "2.5.3"
   }
 }
