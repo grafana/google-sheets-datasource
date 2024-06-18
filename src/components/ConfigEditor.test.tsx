@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ConfigEditor } from './ConfigEditor';
 
 describe('ConfigEditor', () => {
@@ -18,7 +18,7 @@ describe('ConfigEditor', () => {
     expect(screen.getByRole('radio', { name: 'API Key' })).toBeChecked();
 
     // Make sure that the user can still change the auth type
-    screen.getByLabelText('Google JWT File').click();
+    fireEvent.click(screen.getByLabelText('Google JWT File'));
 
     // Check onOptionsChange is called with the correct value
     expect(onOptionsChange).toHaveBeenCalledWith({
