@@ -133,7 +133,7 @@ func (cd *ColumnDefinition) checkUnit(cellData *sheets.CellData) {
 			}
 		}
 	case "PERCENT":
-		cd.units["percent"] = true
+		cd.units["percentunit"] = true
 	case "CURRENCY":
 		for unit, unitID := range unitMappings {
 			if strings.Contains(cellData.FormattedValue, unit) {
