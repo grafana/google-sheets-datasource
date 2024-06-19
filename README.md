@@ -10,7 +10,11 @@ Visualize your Google Spreadsheets with Grafana
 
 Check the [docs](https://github.com/grafana/google-sheets-datasource/blob/main/src/README.md) for information on how to use the data source.
 
-## Development
+## Development guide
+
+This is a basic guide on how to set up your local environment, make the desired changes and see the result with a fresh Grafana installation.
+
+## Requirements
 
 You need to install the following first:
 
@@ -18,33 +22,33 @@ You need to install the following first:
 - [Yarn](https://yarnpkg.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 
-### Building the Plug-In
+## Running the development version
 
-In order to build the plug-in, both front-end and back-end parts, do the following:
+### Compiling the Backend
 
+If you have made any changes to any `go` files, you can use [mage](https://github.com/magefile/mage) to recompile the plugin.
+
+```sh
+mage build:linux && mage reloadPlugin
 ```
-yarn install
-yarn build
+
+### Compiling the Frontend
+
+After you made the desired changes, you can build and test the new version of the plugin using `yarn`:
+
+```sh
+yarn run dev # builds and puts the output at ./dist
 ```
 
-The built plug-in will be in the dist/ directory.
+The built plug-in will be in the `dist/` directory.
 
-### Testing the Plug-In w/ Docker Compose
+### Docker Compose
 
 To test the plug-in running inside Grafana, we recommend using our Docker Compose setup:
 
-```BASH
-mage buildAll
-```
-
-In another terminal
-
-```BASH
+```sh
 docker-compose up
 ```
-
-To restart the plug-in after backend changes:
-`./scripts/restart-plugin.sh`
 
 ### Test spreadsheet
 
