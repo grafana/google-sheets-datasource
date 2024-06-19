@@ -29,7 +29,7 @@ You need to install the following first:
 If you have made any changes to any `go` files, you can use [mage](https://github.com/magefile/mage) to recompile the plugin.
 
 ```sh
-mage build:linux && mage reloadPlugin
+mage buildAll
 ```
 
 ### Compiling the Frontend
