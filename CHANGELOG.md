@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.9
+
+- Fix showing of correct percentages values
+- Upgrade dependencies
+
 ## 1.2.8
 
 - Upgrade dependencies
