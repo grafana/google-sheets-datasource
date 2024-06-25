@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
-
 	"github.com/grafana/grafana-google-sdk-go/pkg/tokenprovider"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
+	esHttpClient "github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource/httpclient"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
@@ -222,7 +222,7 @@ func newHTTPClient(settings models.DatasourceSettings, opts httpclient.Options, 
 	}
 
 	opts.Middlewares = append(opts.Middlewares, m)
-	return httpclient.New(opts)
+	return esHttpClient.New(opts)
 }
 
 func validateDataSourceSettings(settings models.DatasourceSettings) error {
