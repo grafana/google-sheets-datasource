@@ -110,6 +110,8 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 			log.DefaultLogger.Error(apiErr.Error())
 			return nil, nil, errors.New("unknown API error")
 		}
+		log.DefaultLogger.Error("unknown error", "err", err)
+		return nil, nil, errors.New("unknown error")
 	}
 
 	if result.Properties.TimeZone != "" {
