@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/grafana/google-sheets-datasource/pkg/models"
 	"github.com/grafana/grafana-google-sdk-go/pkg/tokenprovider"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	esHttpClient "github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource/httpclient"
@@ -14,6 +13,8 @@ import (
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
+
+	"github.com/grafana/google-sheets-datasource/pkg/models"
 )
 
 const (
