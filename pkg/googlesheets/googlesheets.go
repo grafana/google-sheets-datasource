@@ -105,23 +105,23 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 			// We use ErrorSourceFromHTTPStatus to determine error source based on HTTP status code
 			// but if the error has already a source, we use that.
 			if apiErr.Code == 404 {
-				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), errors.New("spreadsheet not found"), false) 
+				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), errors.New("spreadsheet not found"), false)
 				return nil, nil, errWithSource
 			}
 			if apiErr.Message != "" {
 				log.DefaultLogger.Error("Google API Error: " + apiErr.Message)
-				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), fmt.Errorf("google API Error %d", apiErr.Code), false) 
+				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), fmt.Errorf("google API Error %d", apiErr.Code), false)
 				return nil, nil, errWithSource
 			}
-			errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), errors.New("unknown API error"), false) 
+			errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), errors.New("unknown API error"), false)
 			log.DefaultLogger.Error(apiErr.Error())
 			return nil, nil, errWithSource
 		}
-		
+
 		log.DefaultLogger.Error("unknown error", "err", err)
-		// This is an unknown error from the client - if it has error source from error source middleware, 
+		// This is an unknown error from the client - if it has error source from error source middleware,
 		// we use that. Otherwise we default to a downstream error.
-		errWithSource := errorsource.DownstreamError(errors.New("unknown error"), false) 
+		errWithSource := errorsource.DownstreamError(errors.New("unknown error"), false)
 		return nil, nil, errWithSource
 	}
 
