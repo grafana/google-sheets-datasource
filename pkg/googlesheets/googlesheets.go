@@ -119,10 +119,9 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 		}
 
 		log.DefaultLogger.Error("unknown error", "err", err)
-		// This is an unknown error from the client - if it has error source from error source middleware,
-		// we use that. Otherwise we default to a downstream error.
-		errWithSource := errorsource.DownstreamError(errors.New("unknown error"), false)
-		return nil, nil, errWithSource
+		// This is an unknown error from the client - it might have error source middleware.
+		// If not, it will be handled by the default error source - plugin error.
+		return nil, nil, err
 	}
 
 	if result.Properties.TimeZone != "" {
