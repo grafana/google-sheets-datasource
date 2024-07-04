@@ -105,7 +105,7 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 			// We use ErrorSourceFromHTTPStatus to determine error source based on HTTP status code
 			// but if the error has already a source, we use that.
 			if apiErr.Code == 404 {
-				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), errors.New("spreadsheet not found"), false)
+				errWithSource := errorsource.DownstreamError(errors.New("spreadsheet not found"), false)
 				return nil, nil, errWithSource
 			}
 			if apiErr.Message != "" {
