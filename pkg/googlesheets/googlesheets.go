@@ -14,6 +14,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	"github.com/patrickmn/go-cache"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/sheets/v4"
@@ -28,6 +29,7 @@ type GoogleSheets struct {
 func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config models.DatasourceSettings, timeRange backend.TimeRange) (dr backend.DataResponse) {
 	client, err := NewGoogleClient(ctx, config)
 	if err != nil {
+		dr = errorsource.Response(err)
 		dr.Error = fmt.Errorf("unable to create Google API client: %w", err)
 		return
 	}
@@ -35,7 +37,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 	// This result may be cached
 	sheetData, meta, err := gs.getSheetData(client, qm)
 	if err != nil {
-		dr.Error = err
+		dr = errorsource.Response(err)
 		return
 	}
 
@@ -100,18 +102,25 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 	if err != nil {
 		if apiErr, ok := err.(*googleapi.Error); ok {
 			// Handle API-specific errors
+			// We use ErrorSourceFromHTTPStatus to determine error source based on HTTP status code
 			if apiErr.Code == 404 {
-				return nil, nil, errors.New("spreadsheet not found")
+				errWithSource := errorsource.DownstreamError(errors.New("spreadsheet not found"), false)
+				return nil, nil, errWithSource
 			}
 			if apiErr.Message != "" {
 				log.DefaultLogger.Error("Google API Error: " + apiErr.Message)
-				return nil, nil, fmt.Errorf("Google API Error %d", apiErr.Code)
+				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), fmt.Errorf("google API Error %d", apiErr.Code), false)
+				return nil, nil, errWithSource
 			}
+			errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), errors.New("unknown API error"), false)
 			log.DefaultLogger.Error(apiErr.Error())
-			return nil, nil, errors.New("unknown API error")
+			return nil, nil, errWithSource
 		}
+
 		log.DefaultLogger.Error("unknown error", "err", err)
-		return nil, nil, errors.New("unknown error")
+		// This is an unknown error from the client - it might have error source middleware.
+		// If not, it will be handled by the default error source - plugin error.
+		return nil, nil, err
 	}
 
 	if result.Properties.TimeZone != "" {

@@ -136,7 +136,7 @@ func TestGooglesheets(t *testing.T) {
 			_, _, err := gsd.getSheetData(client, qm)
 
 			assert.Error(t, err)
-			assert.Equal(t, "Google API Error 403", err.Error())
+			assert.Equal(t, "google API Error 403", err.Error())
 
 			client.AssertExpectations(t)
 		})

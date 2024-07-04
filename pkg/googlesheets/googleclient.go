@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/grafana/google-sheets-datasource/pkg/models"
-
 	"github.com/grafana/grafana-google-sdk-go/pkg/tokenprovider"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
+	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/drive/v3"
 	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
+
+	"github.com/grafana/google-sheets-datasource/pkg/models"
 )
 
 const (
@@ -122,12 +123,14 @@ func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 
 func createSheetsService(ctx context.Context, settings models.DatasourceSettings) (*sheets.Service, error) {
 	if len(settings.AuthenticationType) == 0 {
-		return nil, fmt.Errorf("missing AuthenticationType setting")
+		// If the user didn't set up auth, return a downstream error as this is a user error.
+		return nil, errorsource.DownstreamError(fmt.Errorf("missing AuthenticationType setting"), false)
 	}
 
 	if settings.AuthenticationType == "key" {
 		if len(settings.APIKey) == 0 {
-			return nil, fmt.Errorf("missing API Key")
+			// If the API key is not set, return a downstream error as this is a user error.
+			return nil, errorsource.DownstreamError(fmt.Errorf("missing API Key"), false)
 		}
 		return sheets.NewService(ctx, option.WithAPIKey(settings.APIKey))
 	}
@@ -139,7 +142,7 @@ func createSheetsService(ctx context.Context, settings models.DatasourceSettings
 
 	srv, err := sheets.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
-		return nil, fmt.Errorf("Unable to retrieve Sheets client: %v", err)
+		return nil, fmt.Errorf("unable to retrieve Sheets client: %v", err)
 	}
 
 	return srv, nil
@@ -152,7 +155,8 @@ func createDriveService(ctx context.Context, settings models.DatasourceSettings)
 
 	if settings.AuthenticationType == "key" {
 		if len(settings.APIKey) == 0 {
-			return nil, fmt.Errorf("missing API Key")
+			// If the API key is not set, return a downstream error as this is a user error.
+			return nil, errorsource.DownstreamError(fmt.Errorf("missing API Key"), false)
 		}
 		return drive.NewService(ctx, option.WithAPIKey(settings.APIKey))
 	}
@@ -164,7 +168,7 @@ func createDriveService(ctx context.Context, settings models.DatasourceSettings)
 
 	srv, err := drive.NewService(ctx, option.WithHTTPClient(client))
 	if err != nil {
-		return nil, fmt.Errorf("Unable to retrieve Drive client: %v", err)
+		return nil, fmt.Errorf("unable to retrieve Drive client: %v", err)
 	}
 
 	return srv, nil
@@ -221,7 +225,7 @@ func newHTTPClient(settings models.DatasourceSettings, opts httpclient.Options, 
 		return nil, err
 	}
 
-	opts.Middlewares = append(opts.Middlewares, m)
+	opts.Middlewares = append(opts.Middlewares, m, errorsource.Middleware("grafana-googlesheets-datasource"))
 	return httpclient.New(opts)
 }
 

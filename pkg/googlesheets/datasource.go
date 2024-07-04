@@ -98,7 +98,7 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 		}
 		dr := d.googlesheets.Query(ctx, q.RefID, queryModel, *config, q.TimeRange)
 		if dr.Error != nil {
-			log.DefaultLogger.Error("Query failed", "refId", q.RefID, "error", dr.Error)
+			log.DefaultLogger.Error("Query failed", "refId", q.RefID, "error", dr.Error, "errorsource", dr.ErrorSource)
 		}
 		response.Responses[q.RefID] = dr
 	}
