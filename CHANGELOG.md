@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.10
+
+- Improve handling of unknown non-api errors
+- Add error source to error responses
+
 ## 1.2.9
 
 - Fix showing of correct percentages values
