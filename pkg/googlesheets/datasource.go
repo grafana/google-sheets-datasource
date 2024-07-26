@@ -135,7 +135,7 @@ func (d *Datasource) handleResourceSpreadsheets(rw http.ResponseWriter, req *htt
 	}
 
 	ctx := req.Context()
-	config, err := models.LoadSettings(httpadapter.PluginConfigFromContext(ctx))
+	config, err := models.LoadSettings(backend.PluginConfigFromContext(ctx))
 	if err != nil {
 		writeResult(rw, "?", nil, err)
 		return
