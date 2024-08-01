@@ -1,12 +1,14 @@
 package googlesheets
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
+	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
@@ -137,6 +139,27 @@ func TestGooglesheets(t *testing.T) {
 
 			assert.Error(t, err)
 			assert.Equal(t, "google API Error 403", err.Error())
+
+			client.AssertExpectations(t)
+		})
+
+		t.Run("context canceled", func(t *testing.T) {
+			client := &fakeClient{}
+			qm := &models.QueryModel{
+				Spreadsheet:          "spreadsheet-id",
+				Range:                "Sheet1!A1:B2",
+				CacheDurationSeconds: 60,
+			}
+			gsd := &GoogleSheets{
+				Cache: cache.New(300*time.Second, 50*time.Second),
+			}
+			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, context.Canceled)
+
+			_, _, err := gsd.getSheetData(client, qm)
+
+			assert.Error(t, err)
+			assert.Equal(t, context.Canceled.Error(), err.Error())
+			assert.True(t, backend.IsDownstreamError(err))
 
 			client.AssertExpectations(t)
 		})
