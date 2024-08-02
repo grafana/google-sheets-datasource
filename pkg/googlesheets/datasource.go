@@ -98,7 +98,12 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 		}
 		dr := d.googlesheets.Query(ctx, q.RefID, queryModel, *config, q.TimeRange)
 		if dr.Error != nil {
-			log.DefaultLogger.Error("Query failed", "refId", q.RefID, "error", dr.Error, "errorsource", dr.ErrorSource)
+			if dr.ErrorSource == backend.ErrorSourceDownstream {
+				// For downstream errors, we log them as warnings as they are not caused by the plugin itself
+				log.DefaultLogger.Warn("Query failed", "refId", q.RefID, "error", dr.Error, "errorsource", dr.ErrorSource)
+			} else {
+				log.DefaultLogger.Error("Query failed", "refId", q.RefID, "error", dr.Error, "errorsource", dr.ErrorSource)
+			}
 		}
 		response.Responses[q.RefID] = dr
 	}

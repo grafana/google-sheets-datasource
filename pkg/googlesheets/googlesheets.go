@@ -108,16 +108,22 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 				return nil, nil, errWithSource
 			}
 			if apiErr.Message != "" {
-				log.DefaultLogger.Error("Google API Error: " + apiErr.Message)
+				log.DefaultLogger.Warn("Google API Error: " + apiErr.Message)
 				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), fmt.Errorf("google API Error %d", apiErr.Code), false)
 				return nil, nil, errWithSource
 			}
 			errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), errors.New("unknown API error"), false)
-			log.DefaultLogger.Error(apiErr.Error())
+			log.DefaultLogger.Warn(apiErr.Error())
 			return nil, nil, errWithSource
 		}
 
-		log.DefaultLogger.Error("unknown error", "err", err)
+		if err == context.DeadlineExceeded || err == context.Canceled {
+			log.DefaultLogger.Warn("context canceled", "err", err)
+			errWithSource := errorsource.DownstreamError(err, false)
+			return nil, nil, errWithSource
+		}
+
+		log.DefaultLogger.Warn("unknown error", "err", err)
 		// This is an unknown error from the client - it might have error source middleware.
 		// If not, it will be handled by the default error source - plugin error.
 		return nil, nil, err
