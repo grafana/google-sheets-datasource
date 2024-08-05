@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.11
+
+- Update `github.com/grafana/grafana-plugin-sdk-go` to `v0.241.0`
+- Fix context canceled errors to be marked as downstream
+
 ## 1.2.10
 
 - Improve handling of unknown non-api errors
