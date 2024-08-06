@@ -3,6 +3,7 @@ package googlesheets
 import (
 	"context"
 	"encoding/json"
+	"net"
 	"os"
 	"testing"
 	"time"
@@ -160,6 +161,27 @@ func TestGooglesheets(t *testing.T) {
 
 			assert.Error(t, err)
 			assert.Equal(t, context.Canceled.Error(), err.Error())
+			assert.True(t, backend.IsDownstreamError(err))
+
+			client.AssertExpectations(t)
+		})
+
+		t.Run("timeout", func(t *testing.T) {
+			client := &fakeClient{}
+			qm := &models.QueryModel{
+				Spreadsheet:          "spreadsheet-id",
+				Range:                "Sheet1!A1:B2",
+				CacheDurationSeconds: 60,
+			}
+			gsd := &GoogleSheets{
+				Cache: cache.New(300*time.Second, 50*time.Second),
+			}
+
+			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &net.OpError{Err: context.DeadlineExceeded})
+
+			_, _, err := gsd.getSheetData(client, qm)
+
+			assert.Error(t, err)
 			assert.True(t, backend.IsDownstreamError(err))
 
 			client.AssertExpectations(t)
