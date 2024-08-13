@@ -180,13 +180,11 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		if column.HasMixedTypes() {
 			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
 			warnings = append(warnings, warning)
-			log.DefaultLogger.Debug(warning)
 		}
 
 		if column.HasMixedUnits() {
 			warning := fmt.Sprintf("Multiple units found in column %q. Formatted value will be used", column.Header)
 			warnings = append(warnings, warning)
-			log.DefaultLogger.Debug(warning)
 		}
 	}
 
