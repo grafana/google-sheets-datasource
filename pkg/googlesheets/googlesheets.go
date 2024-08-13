@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 	"time"
 
@@ -117,7 +118,9 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 			return nil, nil, errWithSource
 		}
 
-		if err == context.DeadlineExceeded || err == context.Canceled {
+		// Check for all type of timeouts or context canceled that should be treated as downstream errors
+		netErr, neErrOk := err.(net.Error)
+		if neErrOk && netErr.Timeout() || errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
 			log.DefaultLogger.Warn("context canceled", "err", err)
 			errWithSource := errorsource.DownstreamError(err, false)
 			return nil, nil, errWithSource
