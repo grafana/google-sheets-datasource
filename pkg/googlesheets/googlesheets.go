@@ -81,7 +81,7 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config models.Datas
 		return nil, err
 	}
 
-	fileNames := map[string]string{}
+	fileNames := make(map[string]string, len(files))
 	for _, i := range files {
 		fileNames[i.Id] = i.Name
 	}
@@ -180,16 +180,16 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		if column.HasMixedTypes() {
 			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
 			warnings = append(warnings, warning)
-			log.DefaultLogger.Warn(warning)
 		}
 
 		if column.HasMixedUnits() {
 			warning := fmt.Sprintf("Multiple units found in column %q. Formatted value will be used", column.Header)
 			warnings = append(warnings, warning)
-			log.DefaultLogger.Warn(warning)
 		}
 	}
 
+	// We want to show the warnings only once per column
+	warningsIncludeConverterErrorForColumns := make(map[int]bool, len(columns))
 	for rowIndex := start; rowIndex < len(sheet.RowData); rowIndex++ {
 		for columnIndex, cellData := range sheet.RowData[rowIndex].Values {
 			if columnIndex >= len(columns) {
@@ -202,8 +202,10 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 			}
 
 			err := inputConverter.Set(columnIndex, rowIndex-start, cellData)
-			if err != nil {
+			if err != nil && !warningsIncludeConverterErrorForColumns[columnIndex] {
+				log.DefaultLogger.Debug("unsuccessful converting of cell data", "err", err)
 				warnings = append(warnings, err.Error())
+				warningsIncludeConverterErrorForColumns[columnIndex] = true
 			}
 		}
 	}
@@ -212,7 +214,6 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 	meta["spreadsheetId"] = qm.Spreadsheet
 	meta["range"] = qm.Range
 	frame.Meta = &data.FrameMeta{Custom: meta}
-	log.DefaultLogger.Debug("frame.Meta: %s", spew.Sdump(frame.Meta))
 	return frame, nil
 }
 
@@ -287,13 +288,13 @@ func getUniqueColumnName(formattedName string, columnIndex int, columns map[stri
 }
 
 func getColumnDefinitions(rows []*sheets.RowData) ([]*ColumnDefinition, int) {
-	columns := []*ColumnDefinition{}
-	columnMap := map[string]bool{}
 	if len(rows) < 1 {
-		return columns, 0
+		return  []*ColumnDefinition{}, 0
 	}
 	headerRow := rows[0].Values
 
+	columns := make([]*ColumnDefinition, 0, len(headerRow))
+	columnMap := make(map[string]bool, len(headerRow))
 	start := 0
 	if len(rows) > 1 {
 		start = 1
