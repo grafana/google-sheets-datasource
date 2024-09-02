@@ -21,54 +21,15 @@ weight: 10
 
 # Google Sheets data source plugin for Grafana
 
-The GitHub data source plugin for Grafana lets you to query the GitHub API in Grafana so you can visualize your GitHub repositories and projects.
+The Google Sheets data source plugin for Grafana lets you to visualize your Google Spreadsheets in Grafana. It uses the Google Sheets API to read the data and allow you to define the query inside the editor to view in a Dashboard panel.
 
-{{< docs/play title="GitHub data source plugin demo" url="https://play.grafana.org/d/cdgx261sa1ypsa/3-single-repo-with-override-examples" >}}
-
-## Query types
-
-The plugin supports the following query types:
-
-- Commits
-- Issues
-- Contributors
-- Tags
-- Releases
-- Pull requests
-- Labels
-- Repositories
-- Milestones
-- Packages
-- Vulnerabilities
-- Projects
-- Stargazers
-- Workflows
-- Workflow usage
-
-## Supported features
-
-With the plugin you can:
-
-- Visualize queries
-- Use template variables
-- Configure Annotations
-- Cache queries
-
-## Caching
-
-Caching on this plugin is always enabled.
-
-{{< admonition type="note" >}}
-To work around [GitHub's rate limiting](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28), the plugin caches requests aggressively.
-
-This can mean that it takes up to five minutes for a new pull request, commit, or issue to show up in a query.
-{{< /admonition >}}
+{{< docs/play title="GitHub data source plugin demo" url="https://play.grafana.org/d/ddkar8yanj56oa/visualizing-google-sheets-data" >}}
 
 ## Requirements
 
 To use the GitHub data source plugin, you will need:
 
-- A free [GitHub](https://github.com/) or a [GitHub Enterprise](https://github.com/enterprise) account.
+- A [Google account](https://support.google.com/accounts/answer/27441?hl=en) to create the API key for Google Sheets.
 - Any of the following Grafana editions:
   - Grafana OSS server.
   - A [Grafana Cloud](https://grafana.com/pricing/) stack.
