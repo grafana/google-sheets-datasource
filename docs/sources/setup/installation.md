@@ -36,29 +36,29 @@ Find more information about the [plugin catalog](https://grafana.com/docs/grafan
 
 ## Install from grafana.com
 
-Install the plugin from the [grafana.com plugins page](https://grafana.com/grafana/plugins/grafana-github-datasource/?tab=installation) using the instructions provided there. With this installation, you will get the latest published version of the plugin.
+Install the plugin from the [grafana.com plugins page](https://grafana.com/grafana/plugins/grafana-googlesheets-datasource/?tab=installation) using the instructions provided there. With this installation, you will get the latest published version of the plugin.
 
 ## Install from GitHub
 
-1. Go to [Releases](https://github.com/grafana/github-datasource/releases/) on the GitHub project page.
+1. Go to [Releases](https://github.com/grafana/google-sheets-datasource/releases) on the GitHub project page.
 
 1. Find the release you want to install.
 
-1. Download the release by clicking the release asset called `grafana-github-datasource-<VERSION>.zip`. You may need to un-collapse the **Assets** section to see it.
+1. Download the release by clicking the release asset called `grafana-googlesheets-datasource-<VERSION>.zip`. You may need to un-collapse the **Assets** section to see it.
 
 1. Unarchive the plugin into the Grafana plugins directory:
 
    On Linux or macOS, run the following commands to extract the plugin:
 
    ```bash
-   unzip grafana-github-datasource-<VERSION>.zip
-   mv grafana-github-datasource /var/lib/grafana/plugins
+   unzip grafana-googlesheets-datasource-<VERSION>.zip
+   mv grafana-googlesheets-datasource /var/lib/grafana/plugins
    ```
 
    On Windows, run the following command to extract the plugin:
 
    ```powershell
-   Expand-Archive -Path grafana-github-datasource-<VERSION>.zip -DestinationPath C:\grafana\data\plugins
+   Expand-Archive -Path grafana-googlesheets-datasource-<VERSION>.zip -DestinationPath C:\grafana\data\plugins
    ```
 
 1. Restart Grafana.
@@ -72,13 +72,13 @@ If you are using `grafana-cli`, execute the following command to install the lat
 1. On Linux or macOS, open your terminal and run the following command:
 
    ```bash
-   grafana-cli plugins install grafana-github-datasource
+   grafana-cli plugins install grafana-googlesheets-datasource
    ```
 
    On Windows, run the following command:
 
    ```shell
-   grafana-cli.exe plugins install grafana-github-datasource
+   grafana-cli.exe plugins install grafana-googlesheets-datasource
    ```
 
 1. Then restart Grafana.
@@ -88,17 +88,17 @@ If you are using `grafana-cli`, execute the following command to install the lat
 If you need custom version of the plugin from GitHub, you can install it by running the following command:
 
 ```bash
-grafana-cli --pluginUrl <ZIP_FILE_URL> plugins install grafana-github-datasource
+grafana-cli --pluginUrl <ZIP_FILE_URL> plugins install grafana-googlesheets-datasource
 ```
 
-For example, to install version 1.6.0 of the plugin on Linux or macOS:
+For example, to install version 1.2.10 of the plugin on Linux or macOS:
 
 ```bash
-grafana-cli --pluginUrl https://github.com/grafana/github-datasource/releases/download/v1.6.0/grafana-github-datasource-1.6.0.zip plugins install grafana-github-datasource
+grafana-cli --pluginUrl https://github.com/grafana/google-sheets-datasource/releases/download/v1.2.10/grafana-googlesheets-datasource-1.2.10.zip plugins install grafana-googlesheets-datasource
 ```
 
-Or to install version 1.6.0 of the plugin on Windows:
+Or to install version 1.2.10 of the plugin on Windows:
 
 ```powershell
-grafana-cli.exe --pluginUrl https://github.com/grafana/github-datasource/releases/download/v1.6.0/grafana-github-datasource-1.6.0.zip plugins install grafana-github-datasource
+grafana-cli.exe --pluginUrl https://github.com/grafana/google-sheets-datasource/releases/download/v1.2.10/grafana-googlesheets-datasource-1.2.10.zip plugins install grafana-googlesheets-datasource
 ```
