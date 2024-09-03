@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.12
+
+- Update `github.com/grafana/grafana-plugin-sdk-go` to `v0.245.0`
+- Bump micromatch from 4.0.7 to 4.0.8
+- Bump webpack from 5.92.0 to 5.94.0
+- Improve efficiency when processing response
+- Fix timeout error source
+- Add the make docs procedure
+
 ## 1.2.11
 
 - Update `github.com/grafana/grafana-plugin-sdk-go` to `v0.241.0`
