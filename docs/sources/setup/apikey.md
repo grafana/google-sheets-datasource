@@ -21,38 +21,23 @@ weight: 102
 
 # Create a Google Sheets API Key
 
-You will need a _personal access token_ to use the plugin. GitHub currently supports two types of personal access tokens:
+The Google Sheets data source plugin uses the Google Sheet API to access the spreadsheets. It supports the following three ways of authentication:
 
-1. fine-grained personal access tokens
-1. personal access tokens (classic)
+- API Key
+- Google JWT File
+- GCE Default Service Account
 
-Read more about [personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
+## API Key
 
-The Grafana GitHub data source plugin works with both. Below is a table that indicates what minimum requirements must be matched before the plugin can be used.
+If a spreadsheet is shared publicly on the Internet, it can be accessed in the Google Sheets data source using **API Key** auth. When accessing public spreadsheets using the Google Sheets API, the request doesn't need to be authorized, but does need to be accompanied by an identifier, such as an API key.
 
-Options:
+To generate an API Key, follow the steps:
 
-| Setting               | Required | Description                                           |
-| --------------------- | -------- | ----------------------------------------------------- |
-| Access token          | true     | This is required to allow plugin to connect to GitHub |
-| GitHub Enterprise URL | false    | Only if you are using GitHub Enterprise account       |
+1. Open the [Credentials page](https://console.developers.google.com/apis/credentials) in the Google API Console.
+1. Click Create Credentials and then click API key.
+1. Before using Google APIs, you need to turn them on in a Google Cloud project. [Enable the API](https://console.cloud.google.com/apis/library/sheets.googleapis.com)
+1. Copy the key and paste it in the API Key field above. The file contents are encrypted and saved in the Grafana database.
 
-## Creating a personal access token (classic)
-
-This is an example when you want to use the personal access token (classic).
-
-1. Login to your GitHub account.
-1. Navigate to [Personal access tokens](https://github.com/settings/tokens) and click **Generate new token**.
-1. Select the **personal access token (classic)**.
-1. Define the permissions which you want to allow.
-1. Click **Generate Token**.
-
-### Permissions
-
-You will need to define the access permissions for your token in order to allow it to access the data.
-
-The following lists include the required permissions for the access token:
-
-For all repositories:
-
-https://console.cloud.google.com/flows/enableapi?apiid=sheets.googleapis.com
+{{< admonition type="note" >}}
+If you want to know how to share a file or folder, read about that in the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
+{{< /admonition >}}
