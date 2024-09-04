@@ -41,3 +41,24 @@ To generate an API Key, follow the steps:
 {{< admonition type="note" >}}
 If you want to know how to share a file or folder, read about that in the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
 {{< /admonition >}}
+
+## Google JWT File
+
+Whenever access to private spreadsheets is necessary, service account auth using a Google JWT File should be used. A Google service account is an account that belongs to a project within an account or organization instead of to an individual end user. Your application calls Google APIs on behalf of the service account, so users aren't directly involved.
+
+The project that the service account is associated with needs to be granted access to the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) and the [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive).
+
+The Google Sheets data source uses the scope `https://www.googleapis.com/auth/spreadsheets.readonly` to get read-only access to spreadsheets. It also uses the scope `https://www.googleapis.com/auth/drive.metadata.readonly` to list all spreadsheets that the service account has access to in Google Drive.
+
+To create a service account, generate a Google JWT file and enable the APIs, follow the steps:
+
+1. Open the [Credentials](https://console.developers.google.com/apis/credentials) page in the Google API Console.
+1. Click **Create Credentials** then click Service account.
+1. On the Create service account page, enter the Service account details.
+1. On the `Create service account` page, fill in the `Service account details` and then click `Create`.
+1. On the `Service account permissions` page, don’t add a role to the service account. Just click `Continue`.
+1. In the next step, click `Create Key`. Choose key type `JSON` and click `Create`. A JSON key file will be created and downloaded to your computer
+1. Open the [Google Sheets](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) in API Library and enable access for your account
+1. Open the [Google Drive](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive) in API Library and enable access for your account. Access to the Google Drive API is used to list all spreadsheets that you have access to.
+1. Share any private files/folders you want to access with the service account's email address. The email is specified as `client_email` in the Google JWT File.
+1. Drag the file to the dotted zone above. Then click `Save & Test`. The file contents will be encrypted and saved in the Grafana database.
