@@ -62,3 +62,12 @@ To create a service account, generate a Google JWT file and enable the APIs, fol
 1. Open the [Google Drive](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive) in API Library and enable access for your account. Access to the Google Drive API is used to list all spreadsheets that you have access to.
 1. Share any private files/folders you want to access with the service account's email address. The email is specified as `client_email` in the Google JWT File.
 1. Drag the file to the dotted zone above. Then click `Save & Test`. The file contents will be encrypted and saved in the Grafana database.
+
+### Sharing
+
+By default, the service account doesn't have access to any spreadsheets within the account/organization that it is associated with. To grant the service account access to files and/or folders in Google Drive, you need to share the file/folder with the service account's email address. The email is specified in the Google JWT File. If you want to know how to share a file or folder, please refer to the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
+
+{{< admonition type="caution" >}}
+Beware that once a file/folder is shared with the service account, all users in Grafana will be able to see the spreadsheet/spreadsheets.
+{{< /admonition >}}
+
