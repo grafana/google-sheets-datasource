@@ -16,7 +16,7 @@ labels:
     - oss
     - enterprise
     - cloud
-weight: 104
+weight: 103
 ---
 
 # Provisioning the Google Sheets data source in Grafana
