@@ -31,7 +31,7 @@ To use the GitHub data source plugin, you will need:
 
 - A [Google account](https://support.google.com/accounts/answer/27441?hl=en) to be able to use Google Sheets.
 - Any of the following Grafana editions:
-  - Grafana OSS server.
+  - [Grafana OSS](https://grafana.com/oss/grafana/) server.
   - A [Grafana Cloud](https://grafana.com/pricing/) stack.
   - An on-premise Grafana Enterprise server with an [activated license](https://grafana.com/docs/grafana/latest/enterprise/license/activate-license/).
 

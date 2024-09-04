@@ -25,9 +25,9 @@ You can define and configure the Google Sheets data source in YAML files with Gr
 
 You can use any of the 3 types of provisioning:
 
-- API key authentication type
-- Google JWT file (service account) authentication type
-- GCE authentication type
+- API Key
+- Google JWT File
+- GCE Default Service Account
 
 ## Using the API key authentication type
 
