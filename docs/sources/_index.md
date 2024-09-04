@@ -29,7 +29,7 @@ The Google Sheets data source plugin for Grafana lets you to visualize your Goog
 
 To use the GitHub data source plugin, you will need:
 
-- A [Google account](https://support.google.com/accounts/answer/27441?hl=en) to create the API key for Google Sheets.
+- A [Google account](https://support.google.com/accounts/answer/27441?hl=en) to be able to use Google Sheets.
 - Any of the following Grafana editions:
   - Grafana OSS server.
   - A [Grafana Cloud](https://grafana.com/pricing/) stack.
@@ -47,6 +47,10 @@ To use the GitHub data source plugin, you will need:
 - Add [Annotations](https://grafana.com/docs/grafana/latest/dashboards/annotations/)
 - Configure and use [Templates and variables](https://grafana.com/docs/grafana/latest/variables/)
 - Add [Transformations](https://grafana.com/docs/grafana/latest/panels/transformations/)
+
+## Quota
+
+Please refer to the [official docs](https://developers.google.com/sheets/api/limits).
 
 ## Report issues
 
