@@ -32,7 +32,7 @@ Once the **Spreadsheet ID** field is clicked, you have the following options:
 
 - Enter a spreadsheet ID
 - Enter a spreadsheet URL. The query editor will then extract the spreadsheet ID from the URL.
-- Select a spreadsheet from the dropdown. The dropdown will only be populated if [Google JWT File](./setup/configure.md) auth is used and as long as spreadsheets are shared with the service account. Read about configuring JWT Auth [here](./setup/configure.md).
+- Select a spreadsheet from the dropdown. The dropdown will only be populated if [Google JWT File](./setup/configure.md/) auth is used and as long as spreadsheets are shared with the service account. Read about configuring JWT Auth [here](./setup/configure.md).
   ![Available spreadsheets listed in a dropdown](/media/docs/plugins/google-sheets-query-editor-2.png)
 - Enter a link to a certain range. The query editor will then extract both spreadsheet ID and range from the URL. To copy a range, open the Spreadsheet and select the cells that you want to include. Then right click and select `Get link to this range`. The link will be stored in the clipboard.  
   ![Available spreadsheets listed in a dropdown](/media/docs/plugins/google-sheets-query-editor-3.png)
