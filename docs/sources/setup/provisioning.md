@@ -45,9 +45,9 @@ datasources:
     type: google-sheets-datasource
     enabled: true
     jsonData:
-      authenticationType: 'key'
+      authenticationType: ’<KEY>’
     secureJsonData:
-      apiKey: 'your-api-key'
+      apiKey: ’<YOUR-API-KEY>’
     version: 1
     editable: true
 ```
@@ -68,8 +68,8 @@ datasources:
     enabled: true
     jsonData:
       authenticationType: 'jwt'
-      defaultProject: 'your-project-id'
-      clientEmail: 'your-client-email'
+      defaultProject: ’<YOUR_PROJECT_ID>’
+      clientEmail: ’<YOUR_CLIENT_EMAIL>’
       tokenUri: 'https://oauth2.googleapis.com/token'
     secureJsonData:
       privateKey: '-----BEGIN PRIVATE KEY-----\nnn-----END PRIVATE KEY-----\n'
@@ -93,7 +93,7 @@ datasources:
     enabled: true
     jsonData:
       authenticationType: 'gce'
-      defaultProject: 'your-project-id'
+      defaultProject: ’<YOUR_PROJECT_ID>’
     version: 1
     editable: true
 ```
