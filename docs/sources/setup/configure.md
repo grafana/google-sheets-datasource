@@ -45,8 +45,6 @@ To generate an API Key, refer to the following steps:
 1. Copy the key and paste it in the API Key field above. The file contents are encrypted and saved in the Grafana database.
 1. Click **Save & Test** button and you should see a confirmation dialog box that says “Data source is working”.
 
-
-
 {{< admonition type="note" >}}
 If you want to know how to share a file or folder, read about that in the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
 {{< /admonition >}}
