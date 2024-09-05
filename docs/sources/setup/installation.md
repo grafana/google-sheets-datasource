@@ -92,13 +92,13 @@ If you need custom version of the plugin from GitHub, you can install it by runn
 grafana-cli --pluginUrl <ZIP_FILE_URL> plugins install grafana-googlesheets-datasource
 ```
 
-For example, to install version 1.2.10 of the plugin on Linux or macOS:
+For example, to install version `1.2.10` of the plugin on Linux or macOS:
 
 ```bash
 grafana-cli --pluginUrl https://github.com/grafana/google-sheets-datasource/releases/download/v1.2.10/grafana-googlesheets-datasource-1.2.10.zip plugins install grafana-googlesheets-datasource
 ```
 
-Or to install version 1.2.10 of the plugin on Windows:
+Or to install version `1.2.10` of the plugin on Windows:
 
 ```powershell
 grafana-cli.exe --pluginUrl https://github.com/grafana/google-sheets-datasource/releases/download/v1.2.10/grafana-googlesheets-datasource-1.2.10.zip plugins install grafana-googlesheets-datasource
