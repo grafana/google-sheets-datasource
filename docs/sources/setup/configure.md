@@ -103,6 +103,6 @@ For creating and enabling service accounts for GCE instances, refer to the follo
 1. Copy and Paste the project name in the Default project field.
 1. Click **Save & Test** button and you should see a confirmation dialog box that says “Data source is working”.
 
-{{< admonition type="info" >}}
+{{< admonition type="note" >}}
 For more information about creating and enabling service accounts for GCE instances, refer to enabling service accounts for instances in Google documentation.
 {{< /admonition >}}
