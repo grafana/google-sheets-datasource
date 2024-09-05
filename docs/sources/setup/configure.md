@@ -11,6 +11,7 @@ keywords:
   - excel sheets
   - excel data
   - csv data
+  - visualize spreadsheets
 labels:
   products:
     - oss
@@ -76,7 +77,6 @@ To create a service account, generate a Google JWT file and enable the APIs, ref
 1. Share any private files/folders you want to access with the service account's email address. The email is specified as `client_email` in the Google JWT File.
 1. Drag n Drop the file into the JWT Key Details section. The file contents will be encrypted and saved in the Grafana database.
 1. Click **Save & Test** button and you should see a confirmation dialog box that says “Data source is working”.
-
 
 ### Sharing
 

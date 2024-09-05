@@ -11,6 +11,7 @@ keywords:
   - excel sheets
   - excel data
   - csv data
+  - visualize spreadsheets
 labels:
   products:
     - oss
