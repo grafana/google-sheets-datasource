@@ -49,4 +49,4 @@ The Google Sheets data source has a caching feature that makes it possible to ca
 
 ## Time filter
 
-In case the Google Sheets data source was able to parse all cells in a column to the [Golang Time](https://golang.org/pkg/time/) data type, you'll be able to filter out all the rows in the Spreadsheet that are outside the bounds of the time range that is specified in the dashboard in Grafana. To do that you need to enable the **Use Time Filter** option in the query editor. This feature might be useful when you want to visualize spreadsheet data using a Graph panel.
+In case the Google Sheets data source was able to parse all cells in a column to the [Golang Time](https://golang.org/pkg/time/) data type, you'll be able to filter out all the rows in the Spreadsheet that are outside the bounds of the time range that is specified in the dashboard in Grafana. To do that you need to enable the **Use Time Filter** option in the query editor. This feature might be useful when you want to visualize spreadsheet data using a Time series panel.

@@ -45,7 +45,7 @@ datasources:
     type: google-sheets-datasource
     enabled: true
     jsonData:
-      authenticationType: ’<KEY>’
+      authenticationType: 'key'
     secureJsonData:
       apiKey: ’<YOUR-API-KEY>’
     version: 1

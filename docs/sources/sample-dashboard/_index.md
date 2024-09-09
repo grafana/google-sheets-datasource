@@ -26,7 +26,7 @@ We are going to create a sample Dashboard by using this publicly available [demo
 
 ## Example
 
-1. Copy the sheet-ID from the demo spreadsheet which should look similiar to `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8` in your web browser.
+1. Copy the spreadsheet ID from the demo spreadsheet which should look similar to `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8` in your web browser.
 
 1. Paste in the Query editor
    ![Paste the Spreadsheet ID in the query editor](/media/docs/plugins/google-sheets-example-1.png)
@@ -34,7 +34,7 @@ We are going to create a sample Dashboard by using this publicly available [demo
 1. After that you should be able to see a similar Time series visualization as Grafana automatically detect this data as Time series and uses the Time Series panel visualziation to display it.
    ![View Spreadsheet data in Time Series panel visualization](/media/docs/plugins/google-sheets-example-2.png)
 
-1. You can also use other visualization panel options for e.g. Bar Gauge:
+1. You can also use other visualization panel options for e.g. Bar gauge:
    ![View Spreadsheet data in Bar Gauge panel visualization ](/media/docs/plugins/google-sheets-example-3.png)
 
 ## Play demo
