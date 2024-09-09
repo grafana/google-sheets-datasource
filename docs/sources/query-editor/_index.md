@@ -47,7 +47,6 @@ Right next to the Spreadsheet ID input field there's button. If you click on tha
 We recommend using a specific range to select relevant data, as retrieving the entire sheet, especially if it contains a large amount of data, may result in slow query performance.
 {{< /admonition >}}
 
-
 ## Cache time
 
 The Google Sheets data source has a caching feature that makes it possible to cache the Spreadsheet API response. The cache key is a combination of spreadsheet ID and range. The default cache time is set to five minutes, but that can be changed by selecting another option from the **Cache Time** field. By setting cache time to `0s`, the cache will be bypassed.
