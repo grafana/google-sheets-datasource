@@ -41,7 +41,12 @@ Right next to the Spreadsheet ID input field there's button. If you click on tha
 
 ## Range
 
-[A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation) is used to specify the range. If the range field is left blank, the Google Sheet API will return the whole first sheet in the spreadsheet. We recommend using a specific range to select relevant data, as retrieving the entire sheet, especially if it contains a large amount of data, may result in slow query performance.
+[A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation) is used to specify the range. If the range field is left blank, the Google Sheet API will return the whole first sheet in the spreadsheet.
+
+{{< admonition type="note" >}}
+We recommend using a specific range to select relevant data, as retrieving the entire sheet, especially if it contains a large amount of data, may result in slow query performance.
+{{< /admonition >}}
+
 
 ## Cache time
 
