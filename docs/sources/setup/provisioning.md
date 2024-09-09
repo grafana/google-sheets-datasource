@@ -42,7 +42,7 @@ The following YAML snippet can be used to provision the Google Sheets data sourc
 apiVersion: 1
 datasources:
   - name: GoogleSheetsDatasourceApiKey
-    type: google-sheets-datasource
+    type: grafana-googlesheets-datasource
     enabled: true
     jsonData:
       authenticationType: 'key'
@@ -64,7 +64,7 @@ The following YAML snippet can be used to provision the Google Sheets data sourc
 apiVersion: 1
 datasources:
   - name: GoogleSheetsDatasourceJWT
-    type: google-sheets-datasource
+    type: grafana-googlesheets-datasource
     enabled: true
     jsonData:
       authenticationType: 'jwt'
@@ -89,7 +89,7 @@ The following YAML snippet can be used to provision the Google Sheets data sourc
 apiVersion: 1
 datasources:
   - name: GoogleSheetsDatasourceJWT
-    type: google-sheets-datasource
+    type: grafana-googlesheets-datasource
     enabled: true
     jsonData:
       authenticationType: 'gce'
