@@ -54,7 +54,7 @@ datasources:
 
 ## Using the Google JWT service accounts authentication type
 
-You can use the Google JSON Web Tokens (JWT) service accounts authentication type that will allow you to authenticate for server-side applications or backend services that need to access Google APIs on behalf of a user or service account. For more information about the Google Sheets API Key, refer to [Using JWT to authenticate users](https://cloud.google.com/api-gateway/docs/authenticating-users-jwt).
+You can use the Google JSON Web Tokens (JWT) service accounts authentication type that will allow you to authenticate for server-side applications or backend services that need to access Google APIs on behalf of a user or service account. For more information about the Google JWT authentication, refer to [Using JWT to authenticate users](https://cloud.google.com/api-gateway/docs/authenticating-users-jwt).
 
 **Example**
 
@@ -79,7 +79,7 @@ datasources:
 
 ## Using the GCE authentication type
 
-You can also use the Google Compute Engine (GCE) authentication type if you running applications or services on Google Compute Engine virtual machines as it provides a default service account that is associated with each virtual machin which can also be be used to authenticate and authorize access to Google services and APIs from within the virtual machine. For more information about the Google Sheets API Key, refer to [Authenticate to Compute Engine](https://cloud.google.com/compute/docs/authentication).
+You can also use the Google Compute Engine (GCE) authentication type if you running applications or services on Google Compute Engine virtual machines as it provides a default service account that is associated with each virtual machin which can also be be used to authenticate and authorize access to Google services and APIs from within the virtual machine. For more information about the GCE authentication, refer to [Authenticate to Compute Engine](https://cloud.google.com/compute/docs/authentication).
 
 **Example**
 
