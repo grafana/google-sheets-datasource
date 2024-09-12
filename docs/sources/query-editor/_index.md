@@ -1,7 +1,6 @@
 ---
-title: Creating queries for the Google Sheets data source plugin for Grafana
-menuTitle: Using the query editor
-description: Learn how to use the query editor for the Google Sheets data source plugin to visualize Google Spreadsheets data in Grafana dashboards.
+title: Query editor
+description: Learn about the query editor for the Google Sheets data source plugin to visualize Google Spreadsheets data in Grafana.
 keywords:
   - data source
   - google sheets
@@ -20,11 +19,12 @@ labels:
 weight: 200
 ---
 
-# Using the Query Editor
+# Query editor
 
-![Visualize temperature date in Grafana Google Spreadsheets data source](/media/docs/plugins/google-sheets-query-editor-1.png)
+The Google Sheets data source query editor configures the Google Sheets API query.
+Refer to the following sections to understand how to set each configuration option.
 
-Please refer to the Google Sheets API [common terms](https://developers.google.com/sheets/api/guides/concepts#spreadsheet_id) to get detailed information on what **spreadsheet ID** and **range** is.
+![The Google Sheets data source query editor configured to query a Google Sheet](/media/docs/plugins/google-sheets-query-editor-1.png)
 
 ## Spreadsheet ID
 
@@ -41,16 +41,22 @@ Right next to the Spreadsheet ID input field there's button. If you click on tha
 
 ## Range
 
-[A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation) is used to specify the range. If the range field is left blank, the Google Sheet API will return the whole first sheet in the spreadsheet.
+The **Range** field controls the range to query.
+You use [A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation) to specify the range. If you leave the range field empty, the Google Sheets API returns the whole first sheet in the spreadsheet.
 
-{{< admonition type="note" >}}
-We recommend using a specific range to select relevant data, as retrieving the entire sheet, especially if it contains a large amount of data, may result in slow query performance.
+{{< admonition type="tip" >}}
+Use a specific range to select relevant data for faster queries and to use less of your Google Sheets API quota.
 {{< /admonition >}}
 
-## Cache time
+## Cache Time
 
-The Google Sheets data source has a caching feature that makes it possible to cache the Spreadsheet API response. The cache key is a combination of spreadsheet ID and range. The default cache time is set to five minutes, but that can be changed by selecting another option from the **Cache Time** field. By setting cache time to `0s`, the cache will be bypassed.
+The **Cache Time** field controls how long to cache the Google Sheets API response.
+The cache key is a combination of spreadsheet ID and range.
+Changing the spreadsheet ID or range results in a different cache key.
 
-## Time filter
+The default cache time is five minutes.
+To bypass the cache completely, set **Cache Time** to `0s`.
 
-In case the Google Sheets data source was able to parse all cells in a column to the [Golang Time](https://golang.org/pkg/time/) data type, you'll be able to filter out all the rows in the Spreadsheet that are outside the bounds of the time range that is specified in the dashboard in Grafana. To do that you need to enable the **Use Time Filter** option in the query editor. This feature might be useful when you want to visualize spreadsheet data using a Time series panel.
+## Time Filter
+
+The **Time Filter** toggle controls whether to filter rows containing cells with time fields using the dashboard timepicker time.
