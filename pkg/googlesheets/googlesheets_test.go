@@ -217,7 +217,6 @@ func TestGooglesheets(t *testing.T) {
 				Err: retrieveErr,
 			}
 
-
 			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, urlErr)
 
 			_, _, err := gsd.getSheetData(client, qm)
