@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
-	"golang.org/x/oauth2"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
@@ -19,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/sheets/v4"
 )

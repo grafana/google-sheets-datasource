@@ -1,6 +1,6 @@
 run:
   deadline: 10m
-  build-tags: ["mage"]
+  build-tags: ['mage']
 
 linters-settings:
   funlen:
@@ -48,13 +48,15 @@ linters-settings:
       # These linters are disabled "for good".
       - name: confusing-naming
         disabled: true
-      - name:  nested-structs
+      - name: nested-structs
         disabled: true
       - name: unused-receiver
         disabled: true
       - name: bare-return
         disabled: true
-      - name:  unexported-return
+      - name: unexported-return
+        disabled: true
+      - name: redundant-import-alias
         disabled: true
   gocognit:
     min-complexity: 50
@@ -79,7 +81,7 @@ linters:
     - dogsled
     - dupl
     - errcheck
-    - exportloopref
+    - copyloopvar
     - funlen
     - gocognit
     - goconst
@@ -112,5 +114,5 @@ issues:
         - funlen
     - path: Magefile.go
       linters:
-        - "deadcode"
-        - "unused"
+        - 'deadcode'
+        - 'unused'

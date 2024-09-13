@@ -99,7 +99,7 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 				"hit":     true,
 				"expires": expires.Unix(),
 			}, nil
-		} 
+		}
 		return nil, nil, errors.New("invalid cache item not type of *sheets.GridData")
 	}
 
