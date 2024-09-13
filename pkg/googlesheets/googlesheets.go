@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
+	"golang.org/x/oauth2"
 
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
@@ -118,12 +119,13 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 			return nil, nil, errWithSource
 		}
 
-		// Check for all type of timeouts or context canceled that should be treated as downstream errors
 		netErr, neErrOk := err.(net.Error)
-		if neErrOk && netErr.Timeout() || errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-			log.DefaultLogger.Warn("context canceled", "err", err)
-			errWithSource := errorsource.DownstreamError(err, false)
-			return nil, nil, errWithSource
+		if neErrOk {
+			var retrieveErr *oauth2.RetrieveError
+			if errors.As(netErr, &retrieveErr) {
+				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(retrieveErr.Response.StatusCode), err, false)
+				return nil, nil, errWithSource
+			}
 		}
 
 		log.DefaultLogger.Warn("unknown error", "err", err)

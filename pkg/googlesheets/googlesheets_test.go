@@ -4,11 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"net"
+	"net/http"
+	"net/url"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
+	"golang.org/x/oauth2"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 
@@ -178,6 +181,44 @@ func TestGooglesheets(t *testing.T) {
 			}
 
 			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &net.OpError{Err: context.DeadlineExceeded})
+
+			_, _, err := gsd.getSheetData(client, qm)
+
+			assert.Error(t, err)
+			assert.True(t, backend.IsDownstreamError(err))
+
+			client.AssertExpectations(t)
+		})
+
+		t.Run("oauth invalid grant", func(t *testing.T) {
+			client := &fakeClient{}
+			qm := &models.QueryModel{
+				Spreadsheet:          "spreadsheet-id",
+				Range:                "Sheet1!A1:B2",
+				CacheDurationSeconds: 60,
+			}
+			gsd := &GoogleSheets{
+				Cache: cache.New(300*time.Second, 50*time.Second),
+			}
+
+			// Simulated oauth2.RetrieveError
+			retrieveErr := &oauth2.RetrieveError{
+				Response: &http.Response{
+					Status:     "400 Bad Request",
+					StatusCode: 400,
+				},
+				Body: []byte(`{"error":"invalid_grant","error_description":"Invalid grant: account not found"}`),
+			}
+
+			// Simulated *url.Error wrapping the retrieveErr
+			urlErr := &url.Error{
+				Op:  "Get",
+				URL: "https://sheets.googleapis.com/v4/spreadsheets/...",
+				Err: retrieveErr,
+			}
+
+
+			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, urlErr)
 
 			_, _, err := gsd.getSheetData(client, qm)
 
