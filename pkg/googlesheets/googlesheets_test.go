@@ -29,7 +29,10 @@ type fakeClient struct {
 
 func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
 	args := f.Called(spreadSheetID, sheetRange, includeGridData)
-	return args.Get(0).(*sheets.Spreadsheet), args.Error(1)
+	if spreadsheet, ok := args.Get(0).(*sheets.Spreadsheet); ok {
+		return spreadsheet, args.Error(1)
+	}
+	return nil, args.Error(1)
 }
 
 func loadTestSheet(path string) (*sheets.Spreadsheet, error) {
@@ -281,7 +284,8 @@ func TestGooglesheets(t *testing.T) {
 		})
 
 		t.Run("meta warnings field is populated correctly", func(t *testing.T) {
-			warnings := meta["warnings"].([]string)
+			warnings, ok := meta["warnings"].([]string)
+			require.True(t, ok)
 			assert.Equal(t, 3, len(warnings))
 			assert.Equal(t, "Multiple data types found in column \"MixedDataTypes\". Using string data type", warnings[0])
 			assert.Equal(t, "Multiple units found in column \"MixedUnits\". Formatted value will be used", warnings[1])
