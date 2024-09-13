@@ -1,7 +1,7 @@
 ---
-title: Creating a sample Dashboard using the Google Sheets data source plugin for Grafana
-menuTitle: Creating a sample Dashboard
-description: Creating a sample Dashboard using the Google Sheets data source plugin to visualize Google Spreadsheets data in Grafana.
+title: Create a sample dashboard using the Google Sheets data source plugin for Grafana
+menuTitle: Create a sample dashboard
+description: Create a sample Dashboard using the Google Sheets data source plugin to visualize Google Spreadsheets data in Grafana.
 keywords:
   - data source
   - google sheets
@@ -20,7 +20,7 @@ labels:
 weight: 400
 ---
 
-# Creating a sample Dashboard
+# Create a sample dashboard using the Google Sheets data source plugin for Grafana
 
 We are going to create a sample Dashboard by using this publicly available [demo spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing) that is suitable for visualization in graphs and in tables.
 
@@ -39,6 +39,6 @@ We are going to create a sample Dashboard by using this publicly available [demo
 
 ## Play demo
 
-The Play demo dashboards provides a reference the above sample dashboard and also allows you to modify and customized it on the fly.
+The Play demo dashboards provides a reference dashboard and allows you to modify and create your own custom dashboards.
 
 {{< docs/play title="GitHub data source plugin demo" url="https://play.grafana.org/dashboards/f/bb613d16-7ee5-4cf4-89ac-60dd9405fdd7/demo-github" >}}

@@ -24,76 +24,80 @@ weight: 103
 
 You can define and configure the Google Sheets data source in YAML files with Grafana provisioning. For more information about provisioning a data source, and for available configuration options, refer to [Provision Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/#data-sources).
 
-You can use any of the 3 types of provisioning:
+You can provision the data source using any of the following authentication mechanisms:
 
 - API Key
 - Google JWT File
 - GCE Default Service Account
 
-## Using the API key authentication type
+## Using an API key
 
-You can use the basic API key authentication type by simply creating a new API Key for the Google Sheets from the Workspace. For more information about the Google Sheets API Key, refer to [Google Sheets API](https://developers.google.com/sheets/api/reference/rest).
+To create the API key, refer to [Create an API key](<LINK TO NEW SETUP PAGE>).
 
 **Example**
 
-The following YAML snippet can be used to provision the Google Sheets data source for Grafana if you are using the API key authentication type.
+The following YAML snippet provisions the Google Sheets data source using API key authentication.
+Replace _`<API KEY>`_ with your API key, and replace _`<DATA SOURCE NAME>`_ with the name you want to give the data source.
 
 ```yaml
 apiVersion: 1
 datasources:
-  - name: GoogleSheetsDatasourceApiKey
+  - name: <DATA SOURCE NAME>
     type: grafana-googlesheets-datasource
     enabled: true
     jsonData:
       authenticationType: 'key'
     secureJsonData:
-      apiKey: ’<YOUR-API-KEY>’
+      apiKey: <API KEY>
     version: 1
     editable: true
 ```
 
-## Using the Google JWT service accounts authentication type
+## Using a service account JWT
 
-You can use the Google JSON Web Tokens (JWT) service accounts authentication type that will allow you to authenticate for server-side applications or backend services that need to access Google APIs on behalf of a user or service account. For more information about the Google JWT authentication, refer to [Using JWT to authenticate users](https://cloud.google.com/api-gateway/docs/authenticating-users-jwt).
+To create a service account and its JWT, refer to [Create a service account](<LINK TO NEW SETUP PAGE>).
 
 **Example**
 
-The following YAML snippet can be used to provision the Google Sheets data source for Grafana if you are using the JWT (service account) authentication type.
+The following YAML snippet provisions the Google Sheets data source using service account JWT authentication.
+Replace _`<PROJECT ID>`_, _`<CLIENT EMAIL>`_ with your service account details, _`<PRIVATE KEY DATA>`_ with your JWT key data, and replace _`<DATA SOURCE NAME>`_ with the name you want to give the data source.
+
 
 ```yaml
 apiVersion: 1
 datasources:
-  - name: GoogleSheetsDatasourceJWT
+  - name: <DATA SOURCE NAME>
     type: grafana-googlesheets-datasource
     enabled: true
     jsonData:
       authenticationType: 'jwt'
-      defaultProject: ’<YOUR_PROJECT_ID>’
-      clientEmail: ’<YOUR_CLIENT_EMAIL>’
+      defaultProject: <PROJECT ID>
+      clientEmail: <CLIENT EMAIL>
       tokenUri: 'https://oauth2.googleapis.com/token'
     secureJsonData:
-      privateKey: '-----BEGIN PRIVATE KEY-----\nnn-----END PRIVATE KEY-----\n'
+      privateKey: <PRIVATE KEY DATA>
     version: 1
     editable: true
 ```
 
-## Using the GCE authentication type
+## Using the default GCE service account
 
-You can also use the Google Compute Engine (GCE) authentication type if you running applications or services on Google Compute Engine virtual machines as it provides a default service account that is associated with each virtual machin which can also be be used to authenticate and authorize access to Google services and APIs from within the virtual machine. For more information about the GCE authentication, refer to [Authenticate to Compute Engine](https://cloud.google.com/compute/docs/authentication).
+You can use the Google Compute Engine (GCE) default service account to authenticate data source requests if you're running Grafana on GCE.
 
 **Example**
 
-The following YAML snippet can be used to provision the Google Sheets data source for Grafana if you are using the GCE authentication type.
+The following YAML snippet provisions the Google Sheets data source using the default GCE service account for authentication.
+Replace _`<PROJECT ID>` with your GCE project ID and replace _`<DATA SOURCE NAME>`_ with the name you want to give the data source.
 
 ```yaml
 apiVersion: 1
 datasources:
-  - name: GoogleSheetsDatasourceJWT
+  - name: <DATA SOURCE NAME>
     type: grafana-googlesheets-datasource
     enabled: true
     jsonData:
       authenticationType: 'gce'
-      defaultProject: ’<YOUR_PROJECT_ID>’
+      defaultProject: '<PROJECT ID>'
     version: 1
     editable: true
 ```
