@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.13
+
+- Update `github.com/grafana/grafana-plugin-sdk-go` to `v0.248.0`
+- Add logging for response size
+- Fix error source for invalid JWT information
+
 ## 1.2.12
 
 - Update `github.com/grafana/grafana-plugin-sdk-go` to `v0.245.0`
