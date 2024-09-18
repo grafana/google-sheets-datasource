@@ -13,7 +13,6 @@ import (
 	"github.com/araddon/dateparse"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	"github.com/patrickmn/go-cache"
@@ -36,13 +35,13 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 	}
 
 	// This result may be cached
-	sheetData, meta, err := gs.getSheetData(client, qm)
+	sheetData, meta, err := gs.getSheetData(ctx, client, qm)
 	if err != nil {
 		dr = errorsource.Response(err)
 		return
 	}
 
-	frame, err := gs.transformSheetToDataFrame(sheetData, meta, refID, qm)
+	frame, err := gs.transformSheetToDataFrame(ctx, sheetData, meta, refID, qm)
 	if err != nil {
 		dr.Error = err
 		return
@@ -90,7 +89,8 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config models.Datas
 }
 
 // getSheetData gets grid data corresponding to a spreadsheet.
-func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*sheets.GridData, map[string]any, error) {
+func (gs *GoogleSheets) getSheetData(ctx context.Context, client client, qm *models.QueryModel) (*sheets.GridData, map[string]any, error) {
+	logger := backend.Logger.FromContext(ctx)
 	cacheKey := qm.Spreadsheet + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
 		return item.(*sheets.GridData), map[string]any{
@@ -98,7 +98,6 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 			"expires": expires.Unix(),
 		}, nil
 	}
-
 	result, err := client.GetSpreadsheet(qm.Spreadsheet, qm.Range, true)
 	if err != nil {
 		if apiErr, ok := err.(*googleapi.Error); ok {
@@ -109,24 +108,24 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 				return nil, nil, errWithSource
 			}
 			if apiErr.Message != "" {
-				log.DefaultLogger.Warn("Google API Error: " + apiErr.Message)
+				logger.Warn("Google API Error: " + apiErr.Message)
 				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), fmt.Errorf("google API Error %d", apiErr.Code), false)
 				return nil, nil, errWithSource
 			}
 			errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), errors.New("unknown API error"), false)
-			log.DefaultLogger.Warn(apiErr.Error())
+			logger.Warn(apiErr.Error())
 			return nil, nil, errWithSource
 		}
 
 		// Check for all type of timeouts or context canceled that should be treated as downstream errors
 		netErr, neErrOk := err.(net.Error)
 		if neErrOk && netErr.Timeout() || errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-			log.DefaultLogger.Warn("context canceled", "err", err)
+			logger.Warn("context canceled", "err", err)
 			errWithSource := errorsource.DownstreamError(err, false)
 			return nil, nil, errWithSource
 		}
 
-		log.DefaultLogger.Warn("unknown error", "err", err)
+		logger.Warn("unknown error", "err", err)
 		// This is an unknown error from the client - it might have error source middleware.
 		// If not, it will be handled by the default error source - plugin error.
 		return nil, nil, err
@@ -135,7 +134,7 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 	if result.Properties.TimeZone != "" {
 		loc, err := time.LoadLocation(result.Properties.TimeZone)
 		if err != nil {
-			log.DefaultLogger.Warn("could not load timezone from spreadsheet: %w", err)
+			logger.Warn("could not load timezone from spreadsheet: %w", err)
 		} else {
 			time.Local = loc
 		}
@@ -149,7 +148,8 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 	return sheetData, map[string]any{"hit": false}, nil
 }
 
-func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta map[string]any, refID string, qm *models.QueryModel) (*data.Frame, error) {
+func (gs *GoogleSheets) transformSheetToDataFrame(ctx context.Context, sheet *sheets.GridData, meta map[string]any, refID string, qm *models.QueryModel) (*data.Frame, error) {
+	logger := backend.Logger.FromContext(ctx)
 	columns, start := getColumnDefinitions(sheet.RowData)
 	warnings := []string{}
 
@@ -180,13 +180,13 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 		if column.HasMixedTypes() {
 			warning := fmt.Sprintf("Multiple data types found in column %q. Using string data type", column.Header)
 			warnings = append(warnings, warning)
-			log.DefaultLogger.Debug(warning)
+			logger.Debug(warning)
 		}
 
 		if column.HasMixedUnits() {
 			warning := fmt.Sprintf("Multiple units found in column %q. Formatted value will be used", column.Header)
 			warnings = append(warnings, warning)
-			log.DefaultLogger.Debug(warning)
+			logger.Debug(warning)
 		}
 	}
 
@@ -205,7 +205,7 @@ func (gs *GoogleSheets) transformSheetToDataFrame(sheet *sheets.GridData, meta m
 
 			err := inputConverter.Set(columnIndex, rowIndex-start, cellData)
 			if err != nil && !warningsIncludeConverterErrorForColumns[columnIndex] {
-				log.DefaultLogger.Debug("unsuccessful converting of cell data", "err", err)
+				logger.Debug("unsuccessful converting of cell data", "err", err)
 				warnings = append(warnings, err.Error())
 				warningsIncludeConverterErrorForColumns[columnIndex] = true
 			}

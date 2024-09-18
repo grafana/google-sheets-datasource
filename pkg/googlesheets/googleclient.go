@@ -61,6 +61,13 @@ func NewGoogleClient(ctx context.Context, settings models.DatasourceSettings) (*
 		return nil, err
 	}
 
+	// We cannot retrieve response information (such as size) for API key authentication 
+	// because we are not passing the httpClient to the service, and as a result, middleware cannot be provided. 
+	// Therefore, we are logging here to indicate that response information will not be retrieved, allowing us to track this behavior.
+	// This approach is acceptable for now since we are creating a new client for each request. 
+	// If this changes in the future, the logging should be moved to a location where it handles logging for each query.
+	logIfNotAbleToRetrieveResponseInfo(ctx, settings)
+
 	return &GoogleClient{
 		sheetsService: sheetsService,
 		driveService:  driveService,
@@ -225,7 +232,7 @@ func newHTTPClient(settings models.DatasourceSettings, opts httpclient.Options, 
 		return nil, err
 	}
 
-	opts.Middlewares = append(opts.Middlewares, m, errorsource.Middleware("grafana-googlesheets-datasource"))
+	opts.Middlewares = append(opts.Middlewares, m, errorsource.Middleware("grafana-googlesheets-datasource"), ResponseInfoMiddleware())
 	return httpclient.New(opts)
 }
 
