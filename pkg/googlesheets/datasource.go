@@ -43,14 +43,15 @@ func NewDatasource(_ context.Context, _ backend.DataSourceInstanceSettings) (ins
 
 // CheckHealth checks if the datasource is working.
 func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
+	logger := backend.Logger.FromContext(ctx)
 	res := &backend.CheckHealthResult{}
-	log.DefaultLogger.Debug("CheckHealth called")
+	logger.Debug("CheckHealth called")
 	config, err := models.LoadSettings(req.PluginContext)
 
 	if err != nil {
 		res.Status = backend.HealthStatusError
 		res.Message = "Unable to load settings"
-		log.DefaultLogger.Debug(err.Error())
+		logger.Debug(err.Error())
 		return res, nil
 	}
 
@@ -58,7 +59,7 @@ func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRe
 	if err != nil {
 		res.Status = backend.HealthStatusError
 		res.Message = "Unable to create client"
-		log.DefaultLogger.Debug(err.Error())
+		logger.Debug(err.Error())
 		return res, nil
 	}
 
@@ -66,7 +67,7 @@ func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRe
 	if err != nil {
 		res.Status = backend.HealthStatusError
 		res.Message = "Permissions check failed"
-		log.DefaultLogger.Debug(err.Error())
+		logger.Debug(err.Error())
 		return res, nil
 	}
 
@@ -77,10 +78,11 @@ func (d *Datasource) CheckHealth(ctx context.Context, req *backend.CheckHealthRe
 
 // QueryData handles queries to the datasource.
 func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
+	logger := backend.Logger.FromContext(ctx)
 	// create response struct
 	response := backend.NewQueryDataResponse()
 
-	log.DefaultLogger.Debug("QueryData called", "numQueries", len(req.Queries))
+	logger.Debug("QueryData called", "numQueries", len(req.Queries))
 
 	config, err := models.LoadSettings(req.PluginContext)
 	if err != nil {
@@ -100,9 +102,9 @@ func (d *Datasource) QueryData(ctx context.Context, req *backend.QueryDataReques
 		if dr.Error != nil {
 			if dr.ErrorSource == backend.ErrorSourceDownstream {
 				// For downstream errors, we log them as warnings as they are not caused by the plugin itself
-				log.DefaultLogger.Warn("Query failed", "refId", q.RefID, "error", dr.Error, "errorsource", dr.ErrorSource)
+				logger.Debug("Query failed", "refId", q.RefID, "error", dr.Error, "errorsource", dr.ErrorSource)
 			} else {
-				log.DefaultLogger.Error("Query failed", "refId", q.RefID, "error", dr.Error, "errorsource", dr.ErrorSource)
+				logger.Error("Query failed", "refId", q.RefID, "error", dr.Error, "errorsource", dr.ErrorSource)
 			}
 		}
 		response.Responses[q.RefID] = dr

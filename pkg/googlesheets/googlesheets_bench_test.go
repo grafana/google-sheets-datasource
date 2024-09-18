@@ -1,6 +1,7 @@
 package googlesheets
 
 import (
+	"context"
 	"testing"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
@@ -21,7 +22,7 @@ func BenchmarkTransformMixedSheetToDataFrame(b *testing.B) {
 	meta := make(map[string]any)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
+		frame, err := gsd.transformSheetToDataFrame(context.Background(), sheet.Sheets[0].Data[0], meta, "ref1", &qm)
 		require.NoError(b, err)
 		Frame = frame
 	}
@@ -35,7 +36,7 @@ func BenchmarkTransformMixedSheetWithInvalidDateToDataFrame(b *testing.B) {
 	meta := make(map[string]any)
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
+		frame, err := gsd.transformSheetToDataFrame(context.Background(), sheet.Sheets[0].Data[0], meta, "ref1", &qm)
 		require.NoError(b, err)
 		Frame = frame
 	}

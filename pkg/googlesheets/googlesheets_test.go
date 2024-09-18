@@ -27,8 +27,8 @@ type fakeClient struct {
 	mock.Mock
 }
 
-func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
-	args := f.Called(spreadSheetID, sheetRange, includeGridData)
+func (f *fakeClient) GetSpreadsheet(ctx context.Context, spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
+	args := f.Called(ctx, spreadSheetID, sheetRange, includeGridData)
 	if spreadsheet, ok := args.Get(0).(*sheets.Spreadsheet); ok {
 		return spreadsheet, args.Error(1)
 	}
@@ -73,15 +73,15 @@ func TestGooglesheets(t *testing.T) {
 			}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
 
-			_, meta, err := gsd.getSheetData(client, &qm)
+			_, meta, err := gsd.getSheetData(context.Background(), client, &qm)
 			require.NoError(t, err)
 
 			assert.False(t, meta["hit"].(bool))
 			assert.Equal(t, 1, gsd.Cache.ItemCount())
 
-			_, meta, err = gsd.getSheetData(client, &qm)
+			_, meta, err = gsd.getSheetData(context.Background(), client, &qm)
 			require.NoError(t, err)
 			assert.True(t, meta["hit"].(bool))
 			assert.Equal(t, 1, gsd.Cache.ItemCount())
@@ -96,9 +96,9 @@ func TestGooglesheets(t *testing.T) {
 			}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
 
-			_, meta, err := gsd.getSheetData(client, &qm)
+			_, meta, err := gsd.getSheetData(context.Background(), client, &qm)
 			require.NoError(t, err)
 
 			assert.False(t, meta["hit"].(bool))
@@ -116,12 +116,12 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
 				Code:    404,
 				Message: "Not found",
 			})
 
-			_, _, err := gsd.getSheetData(client, qm)
+			_, _, err := gsd.getSheetData(context.Background(), client, qm)
 
 			assert.Error(t, err)
 			assert.Equal(t, "spreadsheet not found", err.Error())
@@ -138,12 +138,12 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
 				Code:    403,
 				Message: "Forbidden",
 			})
 
-			_, _, err := gsd.getSheetData(client, qm)
+			_, _, err := gsd.getSheetData(context.Background(), client, qm)
 
 			assert.Error(t, err)
 			assert.Equal(t, "google API Error 403", err.Error())
@@ -161,9 +161,9 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, context.Canceled)
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, context.Canceled)
 
-			_, _, err := gsd.getSheetData(client, qm)
+			_, _, err := gsd.getSheetData(context.Background(), client, qm)
 
 			assert.Error(t, err)
 			assert.Equal(t, context.Canceled.Error(), err.Error())
@@ -183,9 +183,9 @@ func TestGooglesheets(t *testing.T) {
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
 
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &net.OpError{Err: context.DeadlineExceeded})
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &net.OpError{Err: context.DeadlineExceeded})
 
-			_, _, err := gsd.getSheetData(client, qm)
+			_, _, err := gsd.getSheetData(context.Background(), client, qm)
 
 			assert.Error(t, err)
 			assert.True(t, backend.IsDownstreamError(err))
@@ -220,9 +220,9 @@ func TestGooglesheets(t *testing.T) {
 				Err: retrieveErr,
 			}
 
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, urlErr)
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, urlErr)
 
-			_, _, err := gsd.getSheetData(client, qm)
+			_, _, err := gsd.getSheetData(context.Background(), client, qm)
 
 			assert.Error(t, err)
 			assert.True(t, backend.IsDownstreamError(err))
@@ -241,11 +241,11 @@ func TestGooglesheets(t *testing.T) {
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
 
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
 				Message: "",
 			})
 
-			_, _, err := gsd.getSheetData(client, qm)
+			_, _, err := gsd.getSheetData(context.Background(), client, qm)
 
 			assert.Error(t, err)
 			assert.Equal(t, "unknown API error", err.Error())
@@ -264,7 +264,7 @@ func TestGooglesheets(t *testing.T) {
 		qm := models.QueryModel{Range: "A1:O", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
 		meta := make(map[string]any)
-		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
+		frame, err := gsd.transformSheetToDataFrame(context.Background(), sheet.Sheets[0].Data[0], meta, "ref1", &qm)
 		require.NoError(t, err)
 		require.Equal(t, "ref1", frame.Name)
 
@@ -304,7 +304,7 @@ func TestGooglesheets(t *testing.T) {
 		qm := models.QueryModel{Range: "A2", Spreadsheet: "someId", CacheDurationSeconds: 10}
 
 		meta := make(map[string]any)
-		frame, err := gsd.transformSheetToDataFrame(sheet.Sheets[0].Data[0], meta, "ref1", &qm)
+		frame, err := gsd.transformSheetToDataFrame(context.Background(), sheet.Sheets[0].Data[0], meta, "ref1", &qm)
 		require.NoError(t, err)
 		require.Equal(t, "ref1", frame.Name)
 
