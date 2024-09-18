@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"net"
+	"net/http"
+	"net/url"
 	"os"
 	"testing"
 	"time"
@@ -16,6 +18,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/sheets/v4"
 )
@@ -26,7 +29,10 @@ type fakeClient struct {
 
 func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
 	args := f.Called(spreadSheetID, sheetRange, includeGridData)
-	return args.Get(0).(*sheets.Spreadsheet), args.Error(1)
+	if spreadsheet, ok := args.Get(0).(*sheets.Spreadsheet); ok {
+		return spreadsheet, args.Error(1)
+	}
+	return nil, args.Error(1)
 }
 
 func loadTestSheet(path string) (*sheets.Spreadsheet, error) {
@@ -187,6 +193,43 @@ func TestGooglesheets(t *testing.T) {
 			client.AssertExpectations(t)
 		})
 
+		t.Run("oauth invalid grant", func(t *testing.T) {
+			client := &fakeClient{}
+			qm := &models.QueryModel{
+				Spreadsheet:          "spreadsheet-id",
+				Range:                "Sheet1!A1:B2",
+				CacheDurationSeconds: 60,
+			}
+			gsd := &GoogleSheets{
+				Cache: cache.New(300*time.Second, 50*time.Second),
+			}
+
+			// Simulated oauth2.RetrieveError
+			retrieveErr := &oauth2.RetrieveError{
+				Response: &http.Response{
+					Status:     "400 Bad Request",
+					StatusCode: 400,
+				},
+				Body: []byte(`{"error":"invalid_grant","error_description":"Invalid grant: account not found"}`),
+			}
+
+			// Simulated *url.Error wrapping the retrieveErr
+			urlErr := &url.Error{
+				Op:  "Get",
+				URL: "https://sheets.googleapis.com/v4/spreadsheets/...",
+				Err: retrieveErr,
+			}
+
+			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, urlErr)
+
+			_, _, err := gsd.getSheetData(client, qm)
+
+			assert.Error(t, err)
+			assert.True(t, backend.IsDownstreamError(err))
+
+			client.AssertExpectations(t)
+		})
+
 		t.Run("error that doesn't have message property", func(t *testing.T) {
 			client := &fakeClient{}
 			qm := &models.QueryModel{
@@ -241,7 +284,8 @@ func TestGooglesheets(t *testing.T) {
 		})
 
 		t.Run("meta warnings field is populated correctly", func(t *testing.T) {
-			warnings := meta["warnings"].([]string)
+			warnings, ok := meta["warnings"].([]string)
+			require.True(t, ok)
 			assert.Equal(t, 3, len(warnings))
 			assert.Equal(t, "Multiple data types found in column \"MixedDataTypes\". Using string data type", warnings[0])
 			assert.Equal(t, "Multiple units found in column \"MixedUnits\". Formatted value will be used", warnings[1])

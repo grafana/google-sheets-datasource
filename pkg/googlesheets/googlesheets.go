@@ -17,6 +17,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	"github.com/patrickmn/go-cache"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/sheets/v4"
 )
@@ -93,10 +94,13 @@ func (gs *GoogleSheets) GetSpreadsheets(ctx context.Context, config models.Datas
 func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*sheets.GridData, map[string]any, error) {
 	cacheKey := qm.Spreadsheet + qm.Range
 	if item, expires, found := gs.Cache.GetWithExpiration(cacheKey); found && qm.CacheDurationSeconds > 0 {
-		return item.(*sheets.GridData), map[string]any{
-			"hit":     true,
-			"expires": expires.Unix(),
-		}, nil
+		if gridData, ok := item.(*sheets.GridData); ok {
+			return gridData, map[string]any{
+				"hit":     true,
+				"expires": expires.Unix(),
+			}, nil
+		}
+		return nil, nil, errors.New("invalid cache item not type of *sheets.GridData")
 	}
 
 	result, err := client.GetSpreadsheet(qm.Spreadsheet, qm.Range, true)
@@ -118,12 +122,13 @@ func (gs *GoogleSheets) getSheetData(client client, qm *models.QueryModel) (*she
 			return nil, nil, errWithSource
 		}
 
-		// Check for all type of timeouts or context canceled that should be treated as downstream errors
 		netErr, neErrOk := err.(net.Error)
-		if neErrOk && netErr.Timeout() || errors.Is(err, context.DeadlineExceeded) || errors.Is(err, context.Canceled) {
-			log.DefaultLogger.Warn("context canceled", "err", err)
-			errWithSource := errorsource.DownstreamError(err, false)
-			return nil, nil, errWithSource
+		if neErrOk {
+			var retrieveErr *oauth2.RetrieveError
+			if errors.As(netErr, &retrieveErr) {
+				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(retrieveErr.Response.StatusCode), err, false)
+				return nil, nil, errWithSource
+			}
 		}
 
 		log.DefaultLogger.Warn("unknown error", "err", err)
