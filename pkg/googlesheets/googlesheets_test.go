@@ -24,8 +24,8 @@ type fakeClient struct {
 	mock.Mock
 }
 
-func (f *fakeClient) GetSpreadsheet(spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
-	args := f.Called(spreadSheetID, sheetRange, includeGridData)
+func (f *fakeClient) GetSpreadsheet(ctx context.Context, spreadSheetID string, sheetRange string, includeGridData bool) (*sheets.Spreadsheet, error) {
+	args := f.Called(ctx, spreadSheetID, sheetRange, includeGridData)
 	return args.Get(0).(*sheets.Spreadsheet), args.Error(1)
 }
 

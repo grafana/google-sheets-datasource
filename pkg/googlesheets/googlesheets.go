@@ -98,7 +98,7 @@ func (gs *GoogleSheets) getSheetData(ctx context.Context, client client, qm *mod
 			"expires": expires.Unix(),
 		}, nil
 	}
-	result, err := client.GetSpreadsheet(qm.Spreadsheet, qm.Range, true)
+	result, err := client.GetSpreadsheet(ctx, qm.Spreadsheet, qm.Range, true)
 	if err != nil {
 		if apiErr, ok := err.(*googleapi.Error); ok {
 			// Handle API-specific errors
