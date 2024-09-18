@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/grafana/google-sheets-datasource/pkg/models"
+
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 )
@@ -30,7 +31,7 @@ func RoundTripper(_ httpclient.Options, next http.RoundTripper) http.RoundTrippe
 }
 
 func logIfNotAbleToRetrieveResponseInfo(ctx context.Context, settings models.DatasourceSettings) {
-	if settings.AuthenticationType == authenticationTypeApiKey && len(settings.APIKey) > 0 {
+	if settings.AuthenticationType == authenticationTypeAPIKey && len(settings.APIKey) > 0 {
 		backend.Logger.FromContext(ctx).Debug("Downstream response info", "retrieved", false)
 	}
 }

@@ -20,7 +20,7 @@ import (
 const (
 	sheetsRoute              = "sheets"
 	driveRoute               = "drive"
-	authenticationTypeApiKey = "key"
+	authenticationTypeAPIKey = "key"
 )
 
 type routeInfo struct {
@@ -135,7 +135,7 @@ func createSheetsService(ctx context.Context, settings models.DatasourceSettings
 		return nil, errorsource.DownstreamError(fmt.Errorf("missing AuthenticationType setting"), false)
 	}
 
-	if settings.AuthenticationType == authenticationTypeApiKey {
+	if settings.AuthenticationType == authenticationTypeAPIKey {
 		if len(settings.APIKey) == 0 {
 			// If the API key is not set, return a downstream error as this is a user error.
 			return nil, errorsource.DownstreamError(fmt.Errorf("missing API Key"), false)
@@ -161,7 +161,7 @@ func createDriveService(ctx context.Context, settings models.DatasourceSettings)
 		return nil, fmt.Errorf("missing AuthenticationType setting")
 	}
 
-	if settings.AuthenticationType == authenticationTypeApiKey {
+	if settings.AuthenticationType == authenticationTypeAPIKey {
 		if len(settings.APIKey) == 0 {
 			// If the API key is not set, return a downstream error as this is a user error.
 			return nil, errorsource.DownstreamError(fmt.Errorf("missing API Key"), false)
