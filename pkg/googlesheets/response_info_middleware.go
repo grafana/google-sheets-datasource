@@ -23,14 +23,14 @@ func RoundTripper(_ httpclient.Options, next http.RoundTripper) http.RoundTrippe
 		}
 
 		res.Body = httpclient.CountBytesReader(res.Body, func(size int64) {
-			backend.Logger.FromContext(req.Context()).Debug("downstream response info", "bytes", size, "url", req.URL.String(), "retrieved", true)
+			backend.Logger.FromContext(req.Context()).Debug("Downstream response info", "bytes", size, "url", req.URL.String(), "retrieved", true)
 		})
 		return res, err
 	})
 }
 
 func logIfNotAbleToRetrieveResponseInfo(ctx context.Context, settings models.DatasourceSettings) {
-	if settings.AuthType == "key" && len(settings.APIKey) > 0 {
-		backend.Logger.FromContext(ctx).Debug("downstream response info", "retrieved", false)
+	if settings.AuthenticationType == "key" && len(settings.APIKey) > 0 {
+		backend.Logger.FromContext(ctx).Debug("Downstream response info", "retrieved", false)
 	}
 }
