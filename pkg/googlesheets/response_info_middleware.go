@@ -30,7 +30,7 @@ func RoundTripper(_ httpclient.Options, next http.RoundTripper) http.RoundTrippe
 }
 
 func logIfNotAbleToRetrieveResponseInfo(ctx context.Context, settings models.DatasourceSettings) {
-	if settings.AuthenticationType == "key" && len(settings.APIKey) > 0 {
+	if settings.AuthenticationType == authenticationTypeApiKey && len(settings.APIKey) > 0 {
 		backend.Logger.FromContext(ctx).Debug("Downstream response info", "retrieved", false)
 	}
 }
