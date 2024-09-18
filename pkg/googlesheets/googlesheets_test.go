@@ -73,7 +73,7 @@ func TestGooglesheets(t *testing.T) {
 			}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
 
 			_, meta, err := gsd.getSheetData(context.Background(), client, &qm)
 			require.NoError(t, err)
@@ -96,7 +96,7 @@ func TestGooglesheets(t *testing.T) {
 			}
 			require.Equal(t, 0, gsd.Cache.ItemCount())
 
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(loadTestSheet("./testdata/mixed-data.json"))
 
 			_, meta, err := gsd.getSheetData(context.Background(), client, &qm)
 			require.NoError(t, err)
@@ -116,7 +116,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
 				Code:    404,
 				Message: "Not found",
 			})
@@ -138,7 +138,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
 				Code:    403,
 				Message: "Forbidden",
 			})
@@ -161,7 +161,7 @@ func TestGooglesheets(t *testing.T) {
 			gsd := &GoogleSheets{
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, context.Canceled)
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, context.Canceled)
 
 			_, _, err := gsd.getSheetData(context.Background(), client, qm)
 
@@ -183,7 +183,7 @@ func TestGooglesheets(t *testing.T) {
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
 
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &net.OpError{Err: context.DeadlineExceeded})
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &net.OpError{Err: context.DeadlineExceeded})
 
 			_, _, err := gsd.getSheetData(context.Background(), client, qm)
 
@@ -220,7 +220,7 @@ func TestGooglesheets(t *testing.T) {
 				Err: retrieveErr,
 			}
 
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, urlErr)
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, urlErr)
 
 			_, _, err := gsd.getSheetData(context.Background(), client, qm)
 
@@ -241,7 +241,7 @@ func TestGooglesheets(t *testing.T) {
 				Cache: cache.New(300*time.Second, 50*time.Second),
 			}
 
-			client.On("GetSpreadsheet", qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
+			client.On("GetSpreadsheet", context.Background(), qm.Spreadsheet, qm.Range, true).Return(&sheets.Spreadsheet{}, &googleapi.Error{
 				Message: "",
 			})
 
