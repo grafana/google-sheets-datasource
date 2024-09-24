@@ -26,9 +26,9 @@ You can define and configure the Google Sheets data source in YAML files with Gr
 
 You can provision the data source using any of the following authentication mechanisms:
 
-- API Key
-- Google JWT File
-- GCE Default Service Account
+- Using an API Key
+- Using a service account JWT
+- Using the default GCE service account
 
 ## Using an API key
 
