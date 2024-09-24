@@ -24,7 +24,12 @@ weight: 400
 
 We are going to create a sample Dashboard by using this publicly available [demo spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing) that is suitable for visualization in graphs and in tables.
 
-## Example
+## Before you begin
+
+- Ensure that you have the proper permissions. For more information about permissions, refer to [About users and permissions](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/).
+- Ensure that the Google Sheets data source plugin is correctly setup on the machine, refer to [Setup](./setup/) if you need instructions.
+
+## To create a dashboard
 
 1. Copy the spreadsheet ID from the demo spreadsheet which should look similar to `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8` in your web browser.
 
