@@ -64,7 +64,6 @@ To create a service account, generate a Google JWT file and enable the APIs, ref
 1. Share any private files/folders you want to access with the service account's email address. The email is specified as `client_email` in the Google JWT File.
 1. Save this file on your machine as you will use it later when configuring the plugin.
 
-
 ### Sharing
 
 By default, the service account doesn't have access to any spreadsheets within the account/organization that it is associated with. To grant the service account access to files and/or folders in Google Drive, you need to share the file/folder with the service account's email address. The email is specified in the Google JWT File. If you want to know how to share a file or folder, please refer to the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
