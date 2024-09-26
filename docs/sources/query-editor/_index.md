@@ -33,10 +33,10 @@ You can:
 
 - Enter a spreadsheet ID.
 - Enter a spreadsheet URL.
-  
+
 The query editor automatically extracts the spreadsheet ID from the URL.
 - Enter a spreadsheet URL including a range.
-  
+
   The query editor automatically extracts both spreadsheet ID and range from the URL.
   To copy a range:
   1. Open the spreadsheet.
@@ -49,7 +49,7 @@ The query editor automatically extracts the spreadsheet ID from the URL.
   
   The dropdown is only be populated if you are using Google JWT authentication.
   You can only vide spreadsheets shared with the service account associated with the token.
-  
+
   To configure a service account with JWT authentication, refer to [Create a service account](/docs/google-sheets-datasource/<SHEETS_DATA_SOURCE_VERSION>/setup/configure/#google-jwt-file).
 
 Next to the **Spreadsheet ID** field there's an external link icon.

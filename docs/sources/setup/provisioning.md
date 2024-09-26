@@ -62,7 +62,6 @@ To create a service account and its JWT, refer to [Create a service account](<LI
 The following YAML snippet provisions the Google Sheets data source using service account JWT authentication.
 Replace _`<PROJECT ID>`_, _`<CLIENT EMAIL>`_ with your service account details, _`<PRIVATE KEY DATA>`_ with your JWT key data, and replace _`<DATA SOURCE NAME>`_ with the name you want to give the data source.
 
-
 ```yaml
 apiVersion: 1
 datasources:
