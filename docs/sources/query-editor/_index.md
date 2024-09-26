@@ -23,7 +23,7 @@ weight: 200
 
 The Google Sheets data source query editor configures the Google Sheets API query. Refer to the following sections to understand how to set each configuration option.
 
-{{< figure alt="The Google Sheets data source query editor configured to query a Google Sheet" src="/media/docs/plugins/google-sheets-query-editor-1.png" >}}
+{{< figure alt="The Google Sheets data source query editor configured to query a Google Sheet" src="/media/docs/plugins/google-sheets-query-editor-1.png" caption="The Google Sheets data source query editor configured to query a Google Sheet" >}}
 
 ## Spreadsheet ID
 
@@ -35,6 +35,7 @@ You can:
 - Enter a spreadsheet URL.
 
 The query editor automatically extracts the spreadsheet ID from the URL.
+
 - Enter a spreadsheet URL including a range.
 
   The query editor automatically extracts both spreadsheet ID and range from the URL.
@@ -43,7 +44,7 @@ The query editor automatically extracts the spreadsheet ID from the URL.
   1. Select the cells that you want to include.
   1. Right-click one of the cells and choose **Get link to this range**.
    The link is copied to your clipboard.
-{{< figure alt="Google Sheets spreadsheet with selected cells and the right click menu open" src="/media/docs/plugins/google-sheets-query-editor-3.png" >}}
+{{< figure alt="Google Sheets spreadsheet with selected cells and the right click menu open" src="/media/docs/plugins/google-sheets-query-editor-3.png" caption="Google Sheets spreadsheet with selected cells and the right click menu open" >}}
 
 - Select a spreadsheet from the dropdown.
   
