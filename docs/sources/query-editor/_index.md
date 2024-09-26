@@ -21,20 +21,20 @@ weight: 200
 
 # Query editor
 
-The Google Sheets data source query editor configures the Google Sheets API query.
-Refer to the following sections to understand how to set each configuration option.
+The Google Sheets data source query editor configures the Google Sheets API query. Refer to the following sections to understand how to set each configuration option.
 
-![The Google Sheets data source query editor configured to query a Google Sheet](/media/docs/plugins/google-sheets-query-editor-1.png)
+{{< figure alt="The Google Sheets data source query editor configured to query a Google Sheet" src="/media/docs/plugins/google-sheets-query-editor-1.png" >}}
 
 ## Spreadsheet ID
 
 The **Spreadsheat ID** field controls which spreadsheet to query.
 
 You can:
+
 - Enter a spreadsheet ID.
 - Enter a spreadsheet URL.
   
-  The query editor automatically extracts the spreadsheet ID from the URL.
+The query editor automatically extracts the spreadsheet ID from the URL.
 - Enter a spreadsheet URL including a range.
   
   The query editor automatically extracts both spreadsheet ID and range from the URL.
@@ -42,17 +42,15 @@ You can:
   1. Open the spreadsheet.
   1. Select the cells that you want to include.
   1. Right-click one of the cells and choose **Get link to this range**.
-     The link is copied to your clipboard. 
-  ![Google Sheets spreadsheet with selected cells and the right-click menu open](/media/docs/plugins/google-sheets-query-editor-3.png)
+   The link is copied to your clipboard.
+{{< figure alt="Google Sheets spreadsheet with selected cells and the right click menu open" src="/media/docs/plugins/google-sheets-query-editor-3.png" >}}
 
 - Select a spreadsheet from the dropdown.
   
   The dropdown is only be populated if you are using Google JWT authentication.
-  You can only vide spreadsheets shared with the service account associated with the token. 
+  You can only vide spreadsheets shared with the service account associated with the token.
   
   To configure a service account with JWT authentication, refer to [Create a service account](/docs/google-sheets-datasource/<SHEETS_DATA_SOURCE_VERSION>/setup/configure/#google-jwt-file).
-  
-  ![Available spreadsheets listed in a drop-down menu](/media/docs/plugins/google-sheets-query-editor-2.png)
 
 Next to the **Spreadsheet ID** field there's an external link icon.
 Click that icon to open the spreadsheet in Google Sheets in a new tab.
