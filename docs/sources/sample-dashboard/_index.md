@@ -27,7 +27,7 @@ We are going to create a sample Dashboard by using this publicly available [demo
 ## Before you begin
 
 - Ensure that you have the proper permissions. For more information about permissions, refer to [About users and permissions](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/).
-- Ensure that the Google Sheets data source plugin is correctly setup on the machine, refer to [Setup](./setup/) if you need instructions.
+- Ensure that the Google Sheets data source plugin is correctly setup on the machine, refer to [Setup](../setup/) if you need instructions.
 
 ## To create a dashboard
 

@@ -32,7 +32,7 @@ To configure the Google Sheets plugin, you need to perform the following steps:
    1. API Key
    1. Google JWT File
    1. GCE Default Service Account
-1. You can select any one from above that you have created from the [Authentication](./setup/authentication.md) page.
+1. You can select any one from above that you have created from the [Authentication](../authentication/) page.
 1. Click **Save & Test** button and you should see a confirmation dialog box that says “Data source is working”.
 
 {{< admonition type="tip" >}}
