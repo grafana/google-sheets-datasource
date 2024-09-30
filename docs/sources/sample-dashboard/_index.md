@@ -31,7 +31,7 @@ We are going to create a sample Dashboard by using this publicly available [demo
 
 ## To create a dashboard
 
-1. Copy the spreadsheet ID from the demo spreadsheet which should look similar to 1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8 in your web browser.
+1. Copy the spreadsheet ID from the demo spreadsheet which should look similar to `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8` in your web browser.
 
 1. Paste in the Query editor
    {{< figure alt="Paste the Spreadsheet ID in the query editor" src="/media/docs/plugins/google-sheets-example-1.png"  caption="Paste the Spreadsheet ID in the query editor" >}}
