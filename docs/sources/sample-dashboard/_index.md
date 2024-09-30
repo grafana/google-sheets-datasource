@@ -48,7 +48,6 @@ The Play demo dashboards provides a reference dashboard and allows you to modify
 
 {{< docs/play title="Google Sheets data source plugin demo" url="https://play.grafana.org/d/ddkar8yanj56oa/visualizing-google-sheets-data" >}}
 
-<!---
-    These are at the bottom because the VSCode Marketplace leaves a bit space at the top
-    cSpell:ignore xcsj
+<!--
+cSpell:ignore xcsj
 -->
