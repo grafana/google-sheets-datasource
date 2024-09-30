@@ -22,32 +22,43 @@ weight: 400
 
 # Create a sample dashboard using the Google Sheets data source plugin for Grafana
 
-We are going to create a sample Dashboard by using this publicly available [demo spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing) that is suitable for visualization in graphs and in tables.
+In this task you're going to create a sample dashboard using a publicly available [demonstration spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing).
 
 ## Before you begin
 
-- Ensure that you have the proper permissions. For more information about permissions, refer to [About users and permissions](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/).
-- Ensure that the Google Sheets data source plugin is correctly setup on the machine, refer to [Setup](../setup/) if you need instructions.
+- Ensure that you have the permissions to create a dashboard and add a data source.
+  For more information about permissions, refer to [About users and permissions](https://grafana.com/docs/grafana/latest/administration/roles-and-permissions/).
+- Configure the Google Sheets data source plugin.
 
-## To create a dashboard
+  You can authenticate with an API key to query public Google Sheets.
+  To create an API key, refer to [Authenticate with an API key](../setup/authenticate/#authenticate-with-an-api-key).
 
-1. Copy the spreadsheet ID from the demo spreadsheet which should look similar to `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8` in your web browser.
+  To configure the plugin, refer to [Configure the Google Sheets Plugin](../setup/configure/).
 
-1. Paste in the Query editor
-   {{< figure alt="Paste the Spreadsheet ID in the query editor" src="/media/docs/plugins/google-sheets-example-1.png"  caption="Paste the Spreadsheet ID in the query editor" >}}
+## Create a sample dashboard
 
-1. After that you should be able to see a similar Time series visualization as Grafana automatically detect this data as Time series and uses the Time Series panel visualization to display it.
-   {{< figure alt="View Spreadsheet data in Time Series panel visualization" src="/media/docs/plugins/google-sheets-example-2.png" caption="View Spreadsheet data in Time Series panel visualization" >}}
+To create a sample dashboard:
 
-1. You can also use other visualization panel options for e.g. Bar gauge:
-   {{< figure alt="View Spreadsheet data in Bar Gauge panel visualization" src="/media/docs/plugins/google-sheets-example-3.png" caption="View Spreadsheet data in Bar Gauge panel visualization" >}}
+1. `<STEPS TO CREATE THE DASHBOARD>`
+1. `<STEPS TO CREATE THE PANEL>`
+1. Browse to the [demonstration spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing).
+1. Copy the spreadsheet ID. It should look similar to `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8`.
 
-## Play demo
+1. Paste the spreadsheet ID into the query editor
 
-The Play demo dashboards provides a reference dashboard and allows you to modify and create your own custom dashboards.
+   {{< figure alt="Paste the spreadsheet ID into the query editor" src="/media/docs/plugins/google-sheets-example-1.png" >}}
+
+   Grafana automatically detects this data as time series data and uses the time series panel visualization to display it.
+
+   {{< figure alt="Spreadsheet data visualized in the time series panel visualization" src="/media/docs/plugins/google-sheets-example-2.png" >}}
+
+   You can also use other visualizations like the bar gauge visualization:
+   {{< figure alt="Spreadsheet data visualized in the bar gauge panel visualization" src="/media/docs/plugins/google-sheets-example-3.png" >}}
+
+## Grafana Play demonstration
+
+Grafana Play provides a reference dashboard and lets you to modify and create your own custom dashboards.
 
 {{< docs/play title="Google Sheets data source plugin demo" url="https://play.grafana.org/d/ddkar8yanj56oa/visualizing-google-sheets-data" >}}
 
-<!--
-cSpell:ignore xcsj
--->
+<!-- cSpell:ignore xcsj -->
