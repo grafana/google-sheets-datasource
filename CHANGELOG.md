@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.14
+
+- Bump path-to-regexp from 1.8.0 to 1.9.0 #268
+- Bump github.com/grafana/grafana-plugin-sdk-go from 0.250.0 to 0.251.0. #275
+
 ## 1.2.13
 
 - Update `github.com/grafana/grafana-plugin-sdk-go` to `v0.248.0`
