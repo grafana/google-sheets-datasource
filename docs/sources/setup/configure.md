@@ -1,6 +1,6 @@
 ---
 title: Configure
-menuTitle: Configure 
+menuTitle: Configure
 description: Configure the Google Sheets data source plugin
 keywords:
   - data source
@@ -28,11 +28,12 @@ To configure the Google Sheets plugin, you need to perform the following steps:
 1. Browse to the **Connections** menu and then click on the **Data sources**.
 1. Click on the Google Sheets data source plugin which you have installed.
 1. Go to its settings tab and at the bottom, you will find the **Authentication** section.
-1. You will be provided with three options to authenticated it:
-   1. API Key
-   1. Google JWT File
-   1. GCE Default Service Account
-1. You can select any one from above that you have created from the [Authentication](../authentication/) page.
+1. It supports the following three ways of authentication:
+
+   - [with an API Key](../authenticate/#authenticate-with-an-api-key)
+   - [with a service account JWT](../authenticate/#authenticate-with-a-service-account-jwt)
+   - [with the default GCE service account](../authenticate/#authenticate-with-the-default-gce-service-account)
+
 1. Click **Save & Test** button and you should see a confirmation dialog box that says “Data source is working”.
 
 {{< admonition type="tip" >}}

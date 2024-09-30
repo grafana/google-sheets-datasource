@@ -1,7 +1,7 @@
 ---
-title: Provisioning the Google Sheets data source in Grafana
+title: Google Sheets data source provisioning
 menuTitle: Provisioning
-description: Provisioning the Google Sheets source plugin
+description: About provisioning the Google Sheets data source.
 keywords:
   - data source
   - google sheets
@@ -20,19 +20,20 @@ labels:
 weight: 104
 ---
 
-# Provisioning the Google Sheets data source in Grafana
+# Google Sheets data source provisioning
 
-You can define and configure the Google Sheets data source in YAML files with Grafana provisioning. For more information about provisioning a data source, and for available configuration options, refer to [Provision Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/#data-sources).
+You can define and configure the Google Sheets data source in YAML files with Grafana provisioning.
+For more information about provisioning a data source, and for available configuration options, refer to [Provision Grafana](https://grafana.com/docs/grafana/latest/administration/provisioning/#data-sources).
 
 You can provision the data source using any of the following authentication mechanisms:
 
-- Using an API Key
-- Using a service account JWT
-- Using the default GCE service account
+- [With an API key](#with-an-api-key)
+- [With a service account JWT](#with-a-service-account-jwt)
+- [With the default GCE service account](#with-the-default-gce-service-account)
 
-## Using an API key
+## With an API key
 
-To create the API key, refer to [Create an API key](../authentication/#using-an-api-key).
+To create the API key, refer to [Authenticate with an API key](../authenticate/#authenticate-with-an-api-key).
 
 **Example**
 
@@ -42,20 +43,20 @@ Replace _`<API KEY>`_ with your API key, and replace _`<DATA SOURCE NAME>`_ with
 ```yaml
 apiVersion: 1
 datasources:
-  - name: <DATA SOURCE NAME>
+  - name: '<DATA SOURCE NAME>'
     type: grafana-googlesheets-datasource
     enabled: true
     jsonData:
       authenticationType: 'key'
     secureJsonData:
-      apiKey: <API KEY>
+      apiKey: '<API KEY>'
     version: 1
     editable: true
 ```
 
-## Using a service account JWT
+## With a service account JWT
 
-To create a service account and its JWT, refer to [Create a service account](../authentication/#using-a-service-account-jwt).
+To create a service account and its JWT file, refer to [Authenticate with a service account JWT](../authenticate/#authenticate-with-a-service-account-jwt).
 
 **Example**
 
@@ -65,13 +66,13 @@ Replace _`<PROJECT ID>`_, _`<CLIENT EMAIL>`_ with your service account details, 
 ```yaml
 apiVersion: 1
 datasources:
-  - name: <DATA SOURCE NAME>
+  - name: '<DATA SOURCE NAME>'
     type: grafana-googlesheets-datasource
     enabled: true
     jsonData:
       authenticationType: 'jwt'
-      defaultProject: <PROJECT ID>
-      clientEmail: <CLIENT EMAIL>
+      defaultProject: '<PROJECT ID>'
+      clientEmail: '<CLIENT EMAIL>'
       tokenUri: 'https://oauth2.googleapis.com/token'
     secureJsonData:
       privateKey: <PRIVATE KEY DATA>
@@ -79,19 +80,19 @@ datasources:
     editable: true
 ```
 
-## Using the default GCE service account
+## With the default GCE service account
 
 You can use the Google Compute Engine (GCE) default service account to authenticate data source requests if you're running Grafana on GCE.
 
 **Example**
 
 The following YAML snippet provisions the Google Sheets data source using the default GCE service account for authentication.
-Replace _`<PROJECT ID>` with your GCE project ID and replace _`<DATA SOURCE NAME>`_ with the name you want to give the data source.
+Replace _`<PROJECT ID>`_ with your GCE project ID and replace _`<DATA SOURCE NAME>`_ with the name you want to give the data source.
 
 ```yaml
 apiVersion: 1
 datasources:
-  - name: <DATA SOURCE NAME>
+  - name: '<DATA SOURCE NAME>'
     type: grafana-googlesheets-datasource
     enabled: true
     jsonData:

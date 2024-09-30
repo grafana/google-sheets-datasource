@@ -39,9 +39,9 @@ To use the Google Sheets data source plugin, you need:
 
 ## Get started
 
-- To start using the plugin, you need to generate an access token, then install and configure the plugin. To do this, refer to [Setup](./setup).
+- To start using the plugin, you need to generate an access token, then install and configure the plugin. To do this, refer to [Setup](./setup/).
 - To learn how to use the query editor, refer to [Query Editor](./query-editor/).
-- To quickly visualize spreadsheet data in Grafana, refer to [Sample dashboards](./sample-dashboard/).
+- To quickly visualize spreadsheet data in Grafana, refer to [Create a sample dashboard](./create-a-sample-dashboard/).
 
 ## Get the most out of the plugin
 

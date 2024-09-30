@@ -20,15 +20,16 @@ labels:
 weight: 102
 ---
 
-# Authenticating the Google Sheets Plugin
+# Authenticate the Google Sheets data source plugin
 
-The Google Sheets data source plugin uses the Google Sheet API to access the spreadsheets. It supports the following three ways of authentication:
+The Google Sheets data source plugin uses the Google Sheet API to access the spreadsheets.
+It supports the following three ways of authentication:
 
-- Using an API Key
-- Using a service account JWT
-- Using the default GCE service account
+- [with an API Key](#authenticate-with-an-api-key)
+- [with a service account JWT](#authenticate-with-a-service-account-jwt)
+- [with the default GCE service account](#authenticate-with-the-default-gce-service-account)
 
-## Using an API Key
+## Authenticate with an API Key
 
 If a spreadsheet is shared publicly on the Internet, it can be accessed in the Google Sheets data source using **API Key** auth. When accessing public spreadsheets using the Google Sheets API, the request doesn't need to be authorized, but does need to be accompanied by an identifier, such as an API key.
 
@@ -43,7 +44,7 @@ To generate an API Key, refer to the following steps:
 If you want to know how to share a file or folder, read about that in the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
 {{< /admonition >}}
 
-## Using a service account JWT
+## Authenticate with a service account JWT
 
 Whenever access to private spreadsheets is necessary, service account auth using a Google JWT File should be used. A Google service account is an account that belongs to a project within an account or organization instead of to an individual end user. Your application calls Google APIs on behalf of the service account, so users aren't directly involved.
 
@@ -72,7 +73,7 @@ By default, the service account doesn't have access to any spreadsheets within t
 Beware that once a file/folder is shared with the service account, all users in Grafana will be able to see the spreadsheet/spreadsheets.
 {{< /admonition >}}
 
-## Using the default GCE service account
+## Authenticate with the default GCE service account
 
 When Grafana is running on a Google Compute Engine (GCE) virtual machine, Grafana can automatically retrieve default credentials from the metadata server. As a result, there is no need to generate a private key file for the service account. You also do not need to upload the file to Grafana.
 
