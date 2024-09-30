@@ -21,9 +21,10 @@ weight: 200
 
 # Query editor
 
-The Google Sheets data source query editor configures the Google Sheets API query. Refer to the following sections to understand how to set each configuration option.
+The Google Sheets data source query editor configures the Google Sheets API query.
+Refer to the following sections to understand how to set each configuration option.
 
-{{< figure alt="The Google Sheets data source query editor configured to query a Google Sheet" src="/media/docs/plugins/google-sheets-query-editor-1.png" caption="The Google Sheets data source query editor configured to query a Google Sheet" >}}
+{{< figure alt="The Google Sheets data source query editor configured to query a Google Sheet" src="/media/docs/plugins/google-sheets-query-editor-1.png" >}}
 
 ## Spreadsheet ID
 
@@ -48,12 +49,12 @@ The query editor automatically extracts the spreadsheet ID from the URL.
 
      {{< figure alt="Google Sheets spreadsheet with selected cells and the right click menu open" src="/media/docs/plugins/google-sheets-query-editor-3.png" caption="Google Sheets spreadsheet with selected cells and the right click menu open" >}}
 
-- Select a spreadsheet from the dropdown.
+- Select a spreadsheet from the drop-down menu.
 
-  The dropdown is only be populated if you are using Google JWT authentication.
-  You can only vide spreadsheets shared with the service account associated with the token.
+  The drop-down menu is only populated if you are using Google JWT authentication.
+  You can only view spreadsheets shared with the service account associated with the token.
 
-  To configure a service account with JWT authentication, refer to [Create a service account](../setup/authenticate/#authenticate-with-a-service-account-jwt).
+  To configure a service account with JWT authentication, refer to [Authenticate with a service account JWT](../setup/authenticate/#authenticate-with-a-service-account-jwt).
 
 Next to the **Spreadsheet ID** field there's an external link icon.
 Click that icon to open the spreadsheet in Google Sheets in a new tab.
@@ -78,4 +79,4 @@ To bypass the cache completely, set **Cache Time** to `0s`.
 
 ## Time Filter
 
-The **Time Filter** toggle controls whether to filter rows containing cells with time fields using the dashboard timepicker time.
+The **Time Filter** toggle controls whether to filter rows containing cells with time fields using the dashboard time picker time.
