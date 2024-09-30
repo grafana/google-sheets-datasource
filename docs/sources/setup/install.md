@@ -26,28 +26,31 @@ You can any of the following sets of steps to install the Google Sheets data sou
 
 ## Install from plugin catalog
 
+To install the plugin from the plugin catalog:
+
 1. Sign in to Grafana as a server administrator.
 1. Click **Administration** > **Plugins and data** > **Plugins** in the side navigation menu to view all plugins.
 1. Type **Google Sheets** in the Search box.
 1. Click the **All** in the **State** filter option.
-1. Click the plugin’s logo.
+1. Click the plugin logo.
 1. Click **Install**.
 
-Find more information about the [plugin catalog](https://grafana.com/docs/grafana/latest/administration/plugin-management/#plugin-catalog).
+## Install from the Grafana plugins page
 
-## Install from grafana.com
-
-Install the plugin from the [grafana.com plugins page](https://grafana.com/grafana/plugins/grafana-googlesheets-datasource/?tab=installation) using the instructions provided there. With this installation, you will get the latest published version of the plugin.
+To install the plugin from the Grafana plugins page, browse to the [Google Sheets data source plugin](https://grafana.com/grafana/plugins/grafana-googlesheets-datasource/?tab=installation) and follow the instructions provided there.
 
 ## Install from GitHub
 
-1. Go to [Releases](https://github.com/grafana/google-sheets-datasource/releases) on the GitHub project page.
+To install the plugin from GitHub:
+
+1. Browse to the [plugin GitHub releases page](https://github.com/grafana/google-sheets-datasource/releases).
 
 1. Find the release you want to install.
 
-1. Download the release by clicking the release asset called `grafana-googlesheets-datasource-<VERSION>.zip`. You may need to un-collapse the **Assets** section to see it.
+1. Download the release by clicking the release asset called `grafana-googlesheets-datasource-<VERSION>.zip` where _`VERSION`_ is the version of the plugin you want to install.
+   You may need to un-collapse the **Assets** section to see it.
 
-1. Unarchive the plugin into the Grafana plugins directory:
+1. Extract the plugin into the Grafana plugins directory:
 
    On Linux or macOS, run the following commands to extract the plugin:
 
@@ -64,11 +67,9 @@ Install the plugin from the [grafana.com plugins page](https://grafana.com/grafa
 
 1. Restart Grafana.
 
-## Install using grafana-cli
+## Install using `grafana-cli`
 
-If you are using `grafana-cli`, execute the following command to install the latest published version of the plugin:
-
-1. Login to your machine as `root` user.
+To install the plugin using `grafana-cli`:
 
 1. On Linux or macOS, open your terminal and run the following command:
 
@@ -82,11 +83,11 @@ If you are using `grafana-cli`, execute the following command to install the lat
    grafana-cli.exe plugins install grafana-googlesheets-datasource
    ```
 
-1. Then restart Grafana.
+1. Restart Grafana.
 
 ### Install custom version
 
-If you need custom version of the plugin from GitHub, you can install it by running the following command:
+If you need custom version of the plugin using `grafana-cli`, use the `--pluginUrl` option.
 
 ```bash
 grafana-cli --pluginUrl <ZIP_FILE_URL> plugins install grafana-googlesheets-datasource
