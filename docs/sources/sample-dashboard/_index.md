@@ -36,7 +36,7 @@ We are going to create a sample Dashboard by using this publicly available [demo
 1. Paste in the Query editor
    {{< figure alt="Paste the Spreadsheet ID in the query editor" src="/media/docs/plugins/google-sheets-example-1.png"  caption="Paste the Spreadsheet ID in the query editor" >}}
 
-1. After that you should be able to see a similar Time series visualization as Grafana automatically detect this data as Time series and uses the Time Series panel visualziation to display it.
+1. After that you should be able to see a similar Time series visualization as Grafana automatically detect this data as Time series and uses the Time Series panel visualization to display it.
    {{< figure alt="View Spreadsheet data in Time Series panel visualization" src="/media/docs/plugins/google-sheets-example-2.png" caption="View Spreadsheet data in Time Series panel visualization" >}}
 
 1. You can also use other visualization panel options for e.g. Bar gauge:

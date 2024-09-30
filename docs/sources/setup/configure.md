@@ -22,7 +22,7 @@ weight: 103
 
 # Configure the Google Sheets Plugin
 
-To confgiure the Google Sheets plugin, you need to perform the following steps:
+To configure the Google Sheets plugin, you need to perform the following steps:
 
 1. Navigate into Grafana and click on the menu option on the top left.
 1. Browse to the **Connections** menu and then click on the **Data sources**.

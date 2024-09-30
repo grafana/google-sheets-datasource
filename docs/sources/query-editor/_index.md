@@ -27,7 +27,7 @@ The Google Sheets data source query editor configures the Google Sheets API quer
 
 ## Spreadsheet ID
 
-The **Spreadsheat ID** field controls which spreadsheet to query.
+The **Spreadsheet ID** field controls which spreadsheet to query.
 
 You can:
 
