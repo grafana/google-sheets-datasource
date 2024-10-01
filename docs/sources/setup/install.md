@@ -85,9 +85,9 @@ To install the plugin using `grafana-cli`:
 
 1. Restart Grafana.
 
-### Install custom version
+### Install a custom version
 
-If you need custom version of the plugin using `grafana-cli`, use the `--pluginUrl` option.
+If you need to install a custom version of the plugin using `grafana-cli`, use the `--pluginUrl` option.
 
 ```bash
 grafana-cli --pluginUrl <ZIP_FILE_URL> plugins install grafana-googlesheets-datasource
