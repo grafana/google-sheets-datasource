@@ -26,6 +26,7 @@ To configure the Google Sheets plugin, you need to perform the following steps:
 
 1. Navigate into Grafana and click on the menu option on the top left.
 1. Browse to the **Connections** menu and then click on the **Data sources**.
+1. Click on the **Add new data source** button.
 1. Click on the Google Sheets data source plugin which you have installed.
 1. Go to its settings tab and find the **Authentication** section.
 1. It supports the following three ways of authentication:
