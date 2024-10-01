@@ -37,13 +37,13 @@ To configure the Google Sheets data source plugin, you need to perform the follo
   
 ## Configuring data source with an API Key
 
-1. After you authenticated the API Key, select the **API Key** option in the **Authentication type**.
+1. After you authenticated the [API Key](../authenticate/#authenticate-with-an-api-key), select the **API Key** option in the **Authentication type**.
 1. Paste the API key.
 1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
 
 ## Configuring with a service account JWT
 
-1. After you authenticated the service account JWT, select the **Google JWT File** option in the **Authentication type**.
+1. After you authenticated the [service account JWT](../authenticate/#authenticate-with-a-service-account-jwt), select the **Google JWT File** option in the **Authentication type**.
 1. You can perform one of the following three options:
    1. Drop the Google JWT file by simply clicking the **Click to browse files** and select the .json file you created.
    1. Click the **Paste JWT Token** button and paste the complete JWT token manually
@@ -52,7 +52,7 @@ To configure the Google Sheets data source plugin, you need to perform the follo
 
 ## Configuring with the default GCE service account
 
-1. After you authenticated the default GCE service account, select the **GCE Default Service Account** option in the **Authentication type**.
+1. After you authenticated the [default GCE service account](../authenticate/#authenticate-with-the-default-gce-service-account), select the **GCE Default Service Account** option in the **Authentication type**.
 1. Type the **Default project** name
 1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
 
