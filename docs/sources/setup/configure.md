@@ -1,6 +1,6 @@
 ---
-title: Configure
-menuTitle: Configure
+title: Configure data source
+menuTitle: Configure data source
 description: Configure the Google Sheets data source plugin
 keywords:
   - data source
@@ -20,9 +20,9 @@ labels:
 weight: 103
 ---
 
-# Configure the Google Sheets plugin
+# Configure the Google Sheets data source plugin
 
-To configure the Google Sheets plugin, you need to perform the following steps:
+To configure the Google Sheets data source plugin, you need to perform the following steps:
 
 1. Navigate into Grafana and click on the menu option on the top left.
 1. Browse to the **Connections** menu and then click on the **Data sources**.
@@ -31,10 +31,29 @@ To configure the Google Sheets plugin, you need to perform the following steps:
 1. Go to its settings tab and find the **Authentication** section.
 1. It supports the following three ways of authentication:
 
-   - [with an API Key](../authenticate/#authenticate-with-an-api-key)
-   - [with a service account JWT](../authenticate/#authenticate-with-a-service-account-jwt)
-   - [with the default GCE service account](../authenticate/#authenticate-with-the-default-gce-service-account)
+   - with an API Key
+   - with a service account JWT
+   - with the default GCE service account
+  
+## Configuring data source with an API Key
 
+1. After you authenticated the API Key, select the **API Key** option in the **Authentication type**.
+1. Paste the API key.
+1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
+
+## Configuring with a service account JWT
+
+1. After you authenticated the service account JWT, select the **Google JWT File** option in the **Authentication type**.
+1. You can perform one of the following three options:
+   1. Drop the Google JWT file by simply clicking the **Click to browse files** and select the .json file you created.
+   1. Click the **Paste JWT Token** button and paste the complete JWT token manually
+   1. Click the **Fill In JWT Token manually** button and provide the JWT Key details manually such as (Project ID, Client email, Token URI, Private key).
+1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
+
+## Configuring with the default GCE service account
+
+1. After you authenticated the default GCE service account, select the **GCE Default Service Account** option in the **Authentication type**.
+1. Type the **Default project** name
 1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
 
 {{< admonition type="tip" >}}
