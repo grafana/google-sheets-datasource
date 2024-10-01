@@ -39,9 +39,11 @@ In this task you're going to create a sample dashboard using a publicly availabl
 
 To create a sample dashboard:
 
-1. `<STEPS TO CREATE THE DASHBOARD>`
-1. `<STEPS TO CREATE THE PANEL>`
-1. Browse to the [demonstration spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing).
+1. Navigate to the main menu and click on **Dashboards**.
+1. Click on the **New** button and select **New Dashboard**.
+1. Click on the **Add visualization** button.
+1. Select the Google Sheets data source plugin.
+1. Browse to the [demonstration spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing) on your browser.
 1. Copy the spreadsheet ID. It should look similar to `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8`.
 
 1. Paste the spreadsheet ID into the query editor
