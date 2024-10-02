@@ -1,7 +1,7 @@
 ---
-title: Configure data source
-menuTitle: Configure data source
-description: Configure the Google Sheets data source plugin
+title: Configure the Google Sheets data source plugin
+menuTitle: Configure
+description: How to configure the Google Sheets data source plugin
 keywords:
   - data source
   - google sheets
@@ -31,31 +31,43 @@ To configure the Google Sheets data source plugin, you need to perform the follo
 1. Go to its settings tab and find the **Authentication** section.
 1. It supports the following three ways of authentication:
 
-   - with an API Key
-   - with a service account JWT
-   - with the default GCE service account
-  
-## Configuring data source with an API Key
+   {{< tabs >}}
 
-1. After you authenticated the [API Key](../authenticate/#authenticate-with-an-api-key), select the **API Key** option in the **Authentication type**.
-1. Paste the API key.
-1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
+   {{< tab-content name="with an API key" >}}
+   Before you begin, [create an API key](../authenticate/#authenticate-with-an-api-key).
 
-## Configuring with a service account JWT
+   1. Select the **API Key** option in the **Authentication type**.
+   1. Paste the API key.
+   1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
 
-1. After you authenticated the [service account JWT](../authenticate/#authenticate-with-a-service-account-jwt), select the **Google JWT File** option in the **Authentication type**.
-1. You can perform one of the following three options:
-   1. Drop the Google JWT file by simply clicking the **Click to browse files** and select the .json file you created.
-   1. Click the **Paste JWT Token** button and paste the complete JWT token manually
-   1. Click the **Fill In JWT Token manually** button and provide the JWT Key details manually such as (Project ID, Client email, Token URI, Private key).
-1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
+   {{< /tab-content >}}
 
-## Configuring with the default GCE service account
+   {{< tab-content name="with a service account JWT" >}}
+   Before you begin, [create a service account and download the JWT file](../authenticate/#authenticate-with-a-service-account-jwt).
 
-1. After you authenticated the [default GCE service account](../authenticate/#authenticate-with-the-default-gce-service-account), select the **GCE Default Service Account** option in the **Authentication type**.
-1. Type the **Default project** name
-1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
+   1. Select the **Google JWT File** option in the **Authentication type**.
 
-{{< admonition type="tip" >}}
-If you see errors, check the Grafana logs for troubleshooting.
-{{< /admonition >}}
+   1. You can perform one of the following three options:
+
+      1. Upload the Google JWT file by clicking the **Click to browse files** and select the JSON file you downloaded.
+      1. Click the **Paste JWT Token** button and paste the complete JWT token manually
+      1. Click the **Fill In JWT Token manually** button and provide the JWT details including Project ID, Client email, Token URI, and Private key.
+
+   1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
+
+   {{< /tab-content >}}
+
+   {{< tab-content name="with the default GCE service account" >}}
+
+   Before you begin, set up [authentication with the default GCE service account](../authenticate/#authenticate-with-the-default-gce-service-account)
+
+   1. Select the **GCE Default Service Account** option in the **Authentication type**.
+   1. Type the **Default project** name
+   1. Click **Save & Test** button and you should see a confirmation dialog box that says "Data source is working".
+
+   {{< admonition type="tip" >}}
+   If you see errors, check the Grafana logs for troubleshooting.
+   {{< /admonition >}}
+
+   {{< /tab-content >}}
+   {{< /tabs >}}

@@ -40,7 +40,7 @@ To generate an API key:
    To enable the Google Sheets API, refer to the [Google Sheets API page](https://console.cloud.google.com/apis/library/sheets.googleapis.com).
 1. Open the [Credentials page](https://console.developers.google.com/apis/credentials) in the Google API Console.
 1. Click **Create Credentials** and then **API key**.
-1. Copy the API key to an editor as you will use it later to configure the plugin.
+1. Copy the API key to an editor as you will use it later to [configure the plugin](../configure/).
 
 {{< admonition type="note" >}}
 If you want to know how to share a file or folder, read about that in the [official Google Drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
@@ -74,7 +74,7 @@ To create a service account, generate a Google JWT file and enable the APIs:
    You need access to the Google Drive API to list all spreadsheets that you have access to.
 1. Share any private files and folders you want to access with the service account's email address.
    The service account's email address is the `client_email` field in the JWT file.
-1. Keep the JWT file on your machine as you will use it later to configure the plugin.
+1. Keep the JWT file on your machine as you will use it later to [configure the plugin](../configure/).
 
 ### Sharing
 
@@ -100,4 +100,4 @@ To authenticate with the default GCE service account:
 1. Verify that the GCE virtual machine instance is running as the service account that you created.
    For more information, refer to [setting up an instance to run as a service account](https://cloud.google.com/compute/docs/access/create-enable-service-accounts-for-instances#using).
 1. Allow access to the specified API scope.
-1. Copy the project name as you will use it later to configure the plugin.
+1. Copy the project name as you will use it later to [configure the plugin](../configure/).
