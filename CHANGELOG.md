@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.15
+
+- New documentation on grafana.com #255
+
 ## 1.2.14
 
 - Bump path-to-regexp from 1.8.0 to 1.9.0 #268
