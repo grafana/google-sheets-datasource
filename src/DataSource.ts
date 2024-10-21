@@ -17,6 +17,7 @@ export class GoogleSheetsDataSource extends DataSourceWithBackend<SheetsQuery, D
   constructor(instanceSettings: DataSourceInstanceSettings<DataSourceOptions>) {
     super(instanceSettings);
     this.authType = instanceSettings.jsonData.authenticationType;
+    this.variables = new GoogleSheetsVariableSupport(this);
   }
 
   query(request: DataQueryRequest<SheetsQuery>): Observable<DataQueryResponse> {
