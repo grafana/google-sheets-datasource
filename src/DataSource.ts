@@ -7,11 +7,12 @@ import {
 } from '@grafana/data';
 import { DataSourceOptions } from '@grafana/google-sdk';
 import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
-import { SheetsQuery } from './types';
 import { Observable } from 'rxjs';
 import { trackRequest } from 'tracking';
+import { SheetsQuery } from './types';
+import { GoogleSheetsVariableSupport } from './variables';
 
-export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOptions> {
+export class GoogleSheetsDataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOptions> {
   authType: string;
   constructor(instanceSettings: DataSourceInstanceSettings<DataSourceOptions>) {
     super(instanceSettings);
