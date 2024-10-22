@@ -8,7 +8,7 @@ Visualize your Google Spreadsheets with Grafana
 
 ## Documentation
 
-Check the [docs](https://github.com/grafana/google-sheets-datasource/blob/main/src/README.md) for information on how to use the data source.
+For the plugin documentation, visit [plugin documentation website](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/).
 
 ## Development guide
 
