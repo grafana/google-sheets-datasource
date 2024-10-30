@@ -2,14 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.16
+
+- Bump `uplot` to 1.6.31
+- Bump `github.com/grafana/grafana-plugin-sdk-go` from 0.251.0 to 0.258.0
+
 ## 1.2.15
 
 - New documentation on grafana.com #255
 
 ## 1.2.14
 
-- Bump path-to-regexp from 1.8.0 to 1.9.0 #268
-- Bump github.com/grafana/grafana-plugin-sdk-go from 0.250.0 to 0.251.0. #275
+- Bump `path-to-regexp` from 1.8.0 to 1.9.0 #268
+- Bump `github.com/grafana/grafana-plugin-sdk-go` from 0.250.0 to 0.251.0. #275
 
 ## 1.2.13
 

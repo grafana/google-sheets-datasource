@@ -29,7 +29,8 @@
     "testdata",
     "testid",
     "tokenprovider",
-    "typecheck"
+    "typecheck",
+    "uplot"
   ],
   "language": "en-US"
 }
