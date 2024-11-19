@@ -121,6 +121,11 @@ func (gs *GoogleSheets) getSheetData(ctx context.Context, client client, qm *mod
 			return nil, nil, errWithSource
 		}
 
+		if backend.IsDownstreamHTTPError(err) {
+			errWithSource := errorsource.DownstreamError(err, false)
+			return nil, nil, errWithSource
+		}
+		
 		netErr, neErrOk := err.(net.Error)
 		if neErrOk {
 			var retrieveErr *oauth2.RetrieveError
