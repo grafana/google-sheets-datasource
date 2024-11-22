@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.17
+
+- Improve data source documentation
+- Fix error source for various http errors
+- Bump `cross-spawn` to 7.0.6
+- Bump `github.com/grafana/grafana-plugin-sdk-go` to 0.259.2
+
 ## 1.2.16
 
 - Bump `uplot` to 1.6.31
