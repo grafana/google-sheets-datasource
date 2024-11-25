@@ -16,6 +16,12 @@ Watch this video to learn more about setting up the Grafana Google Sheets data s
 
 [![Google Sheets data source plugin | Visualize Spreadsheets using Grafana | Tutorial](https://img.youtube.com/vi/hqeqeQFrtSA/hq720.jpg)](https://youtu.be/hqeqeQFrtSA "Grafana Google Sheets data source plugin")
 
+> [!TIP]
+> 
+> ## Give it a try using Grafana Play
+> 
+> With Grafana Play, you can explore and see how it works, learning from practical examples to accelerate your development. This feature can be seen on [Google Sheets data source plugin demo](https://play.grafana.org/d/ddkar8yanj56oa/visualizing-google-sheets-data).
+
 ## Development guide
 
 This is a basic guide on how to set up your local environment, make the desired changes and see the result with a fresh Grafana installation.
