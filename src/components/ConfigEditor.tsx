@@ -5,7 +5,7 @@ import React from 'react';
 import { GoogleSheetsAuth, GoogleSheetsSecureJSONData, googleSheetsAuthTypes } from '../types';
 import { getBackwardCompatibleOptions } from '../utils';
 import { ConfigurationHelp } from './ConfigurationHelp';
-import { DataSourceDescription } from '@grafana/experimental';
+import { DataSourceDescription } from '@grafana/plugin-ui';
 import { Divider } from './Divider';
 
 export type Props = DataSourcePluginOptionsEditorProps<DataSourceOptions, GoogleSheetsSecureJSONData>;
