@@ -1,7 +1,8 @@
 module github.com/grafana/google-sheets-datasource
 
-go 1.22
-toolchain go1.22.10
+go 1.22.7
+
+toolchain go1.23.4
 
 require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
