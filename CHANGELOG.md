@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.2.18
+
+- Backend dependencies update
+- Readme changes
+- Replace @grafana/experimental with @grafana/plugin-ui (#294)
+
 ## 1.2.17
 
 - Improve data source documentation
