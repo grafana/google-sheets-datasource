@@ -16,7 +16,17 @@
       "name": "Grafana Labs",
       "url": "https://grafana.com"
     },
-    "keywords": ["google", "sheets", "google sheets", "spreadsheets", "excel", "cloud provider", "google api", "analytics", "developer tools"],
+    "keywords": [
+      "google",
+      "sheets",
+      "google sheets",
+      "spreadsheets",
+      "excel",
+      "cloud provider",
+      "google api",
+      "analytics",
+      "developer tools"
+    ],
     "logos": {
       "small": "img/sheets.svg",
       "large": "img/sheets.svg"
@@ -65,8 +75,8 @@
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaDependency": ">=9.5.18",
-    "grafanaVersion": "9.5.x",
+    "grafanaDependency": ">=10.4.8",
+    "grafanaVersion": "10.4.x",
     "plugins": []
   }
 }

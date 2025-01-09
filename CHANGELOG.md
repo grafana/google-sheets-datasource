@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.0.0
+
+- Plugin now requires Grafana 10.4.8 or newer
+
 ## 1.2.18
 
 - Backend dependencies update
