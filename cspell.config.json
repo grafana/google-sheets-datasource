@@ -1,10 +1,5 @@
 {
-  "ignorePaths": [
-    "node_modules/**",
-    "pkg/googlesheets/testdata",
-    "dist/**",
-    "mage_output_file.go"
-  ],
+  "ignorePaths": ["node_modules/**", "pkg/googlesheets/testdata", "dist/**", "mage_output_file.go"],
   "words": [
     "araddon",
     "dataproxy",
@@ -23,10 +18,13 @@
     "Middlewares",
     "patrickmn",
     "percentunit",
+    "PTRACE",
     "raintank",
     "Sdump",
+    "seccomp",
     "stackdriver",
     "stretchr",
+    "subresource",
     "testdata",
     "testid",
     "tokenprovider",
