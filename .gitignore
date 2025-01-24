@@ -9,3 +9,9 @@ dist/
 provisioning
 .eslintcache
 __debug_bin
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
