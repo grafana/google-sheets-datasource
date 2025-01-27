@@ -6,9 +6,9 @@ provisioning
 .eslintcache
 __debug_bin
 
-# playwright
-test-results/
-playwright-report/
-blob-report/
-playwright/.cache/
-playwright/.auth/
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
