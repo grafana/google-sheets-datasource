@@ -11,20 +11,38 @@
   "annotations": true,
 
   "info": {
-    "description": "Show data from google sheets",
+    "description": "The Google Sheets data source plugin for Grafana lets you to visualize your Google spreadsheets in Grafana",
     "author": {
       "name": "Grafana Labs",
       "url": "https://grafana.com"
     },
-    "keywords": ["google", "sheets", "spreadsheets", "excel", "cloud provider"],
+    "keywords": [
+      "google",
+      "sheets",
+      "google sheets",
+      "spreadsheets",
+      "excel",
+      "cloud provider",
+      "google api",
+      "analytics",
+      "developer tools"
+    ],
     "logos": {
       "small": "img/sheets.svg",
       "large": "img/sheets.svg"
     },
     "links": [
       {
+        "name": "Docs",
+        "url": "https://grafana.com/docs/plugins/grafana-googlesheets-datasource/"
+      },
+      {
         "name": "Website",
         "url": "https://github.com/grafana/google-sheets-datasource"
+      },
+      {
+        "name": "Report bug",
+        "url": "https://github.com/grafana/google-sheets-datasource/issues"
       }
     ],
     "screenshots": [
@@ -57,8 +75,8 @@
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaDependency": ">=9.5.18",
-    "grafanaVersion": "9.5.x",
+    "grafanaDependency": ">=10.4.8",
+    "grafanaVersion": "10.4.x",
     "plugins": []
   }
 }

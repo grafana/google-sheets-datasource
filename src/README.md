@@ -2,18 +2,16 @@
 
 Visualize your Google Spreadsheets in Grafana!
 
-## Configuration
+## Documentation
 
-Please refer to the [configuration](https://github.com/grafana/google-sheets-datasource/blob/main/src/docs/configuration.md) document.
+For the plugin documentation, visit [plugin documentation website](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/).
 
-## Provisioning
+## Video Tutorial
 
-Please refer to the [provisioning](https://github.com/grafana/google-sheets-datasource/blob/main/src/docs/provisioning.md) document.
+Watch this video to learn more about setting up the Grafana Google Sheets data source plugin:
 
-## Using the editor
+[![Google Sheets data source plugin | Visualize Spreadsheets using Grafana | Tutorial](https://img.youtube.com/vi/hqeqeQFrtSA/hq720.jpg)](https://youtu.be/hqeqeQFrtSA "Grafana Google Sheets data source plugin")
 
-Please refer to the [Using the editor](https://github.com/grafana/google-sheets-datasource/blob/main/src/docs/using-the-editor.md) document.
-
-## Quota
-
-Please refer to [the official docs](https://developers.google.com/sheets/api/limits).
+> ## Give it a try using Grafana Play
+> 
+> With Grafana Play, you can explore and see how it works, learning from practical examples to accelerate your development. This feature can be seen on [Google Sheets data source plugin demo](https://play.grafana.org/d/ddkar8yanj56oa/visualizing-google-sheets-data).
