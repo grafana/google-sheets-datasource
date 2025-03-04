@@ -132,13 +132,13 @@ func (gc *GoogleClient) GetSpreadsheetFiles() ([]*drive.File, error) {
 func createSheetsService(ctx context.Context, settings models.DatasourceSettings) (*sheets.Service, error) {
 	if len(settings.AuthenticationType) == 0 {
 		// If the user didn't set up auth, return a downstream error as this is a user error.
-		return nil, errorsource.DownstreamError(fmt.Errorf("missing AuthenticationType setting"), false)
+		return nil, errorsource.DownstreamError(errors.New("missing AuthenticationType setting"), false)
 	}
 
 	if settings.AuthenticationType == authenticationTypeAPIKey {
 		if len(settings.APIKey) == 0 {
 			// If the API key is not set, return a downstream error as this is a user error.
-			return nil, errorsource.DownstreamError(fmt.Errorf("missing API Key"), false)
+			return nil, errorsource.DownstreamError(errors.New("missing API Key"), false)
 		}
 		return sheets.NewService(ctx, option.WithAPIKey(settings.APIKey))
 	}
@@ -158,13 +158,13 @@ func createSheetsService(ctx context.Context, settings models.DatasourceSettings
 
 func createDriveService(ctx context.Context, settings models.DatasourceSettings) (*drive.Service, error) {
 	if len(settings.AuthenticationType) == 0 {
-		return nil, fmt.Errorf("missing AuthenticationType setting")
+		return nil, errorsource.DownstreamError(errors.New("missing AuthenticationType setting"), false)
 	}
 
 	if settings.AuthenticationType == authenticationTypeAPIKey {
 		if len(settings.APIKey) == 0 {
 			// If the API key is not set, return a downstream error as this is a user error.
-			return nil, errorsource.DownstreamError(fmt.Errorf("missing API Key"), false)
+			return nil, errorsource.DownstreamError(errors.New("missing API Key"), false)
 		}
 		return drive.NewService(ctx, option.WithAPIKey(settings.APIKey))
 	}
@@ -239,7 +239,7 @@ func newHTTPClient(settings models.DatasourceSettings, opts httpclient.Options, 
 
 func validateDataSourceSettings(settings models.DatasourceSettings) error {
 	if settings.DefaultProject == "" || settings.ClientEmail == "" || settings.PrivateKey == "" || settings.TokenURI == "" {
-		return fmt.Errorf("datasource is missing authentication details")
+		return errors.New("datasource is missing authentication details")
 	}
 
 	return nil
