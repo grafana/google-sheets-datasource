@@ -1,7 +1,6 @@
 module github.com/grafana/google-sheets-datasource
 
-go 1.22.7
-toolchain go1.23.6
+go 1.24.0
 
 require (
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
@@ -9,7 +8,7 @@ require (
 	github.com/grafana/grafana-plugin-sdk-go v0.268.1
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/stretchr/testify v1.10.0
-	golang.org/x/oauth2 v0.26.0
+	golang.org/x/oauth2 v0.27.0
 	google.golang.org/api v0.169.0
 )
 
