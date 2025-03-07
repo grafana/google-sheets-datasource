@@ -1,9 +1,9 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
 
+	"github.com/grafana/google-sheets-datasource/pkg/bestmemjson"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
 
@@ -23,7 +23,7 @@ type QueryModel struct {
 func GetQueryModel(query backend.DataQuery) (*QueryModel, error) {
 	model := &QueryModel{}
 
-	err := json.Unmarshal(query.JSON, &model)
+	err := bestmemjson.Unmarshal(query.JSON, &model)
 	if err != nil {
 		return nil, fmt.Errorf("error reading query: %s", err.Error())
 	}

@@ -2,11 +2,11 @@ package googlesheets
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/grafana/google-sheets-datasource/pkg/bestmemjson"
 	"github.com/grafana/google-sheets-datasource/pkg/models"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
@@ -123,7 +123,7 @@ func writeResult(rw http.ResponseWriter, path string, val any, err error) {
 		response[path] = val
 	}
 
-	body, err := json.Marshal(response)
+	body, err := bestmemjson.Marshal(response)
 	if err != nil {
 		body = []byte(err.Error())
 		code = http.StatusInternalServerError

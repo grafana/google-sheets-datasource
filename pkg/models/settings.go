@@ -1,9 +1,9 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
 
+	"github.com/grafana/google-sheets-datasource/pkg/bestmemjson"
 	"github.com/grafana/grafana-google-sdk-go/pkg/utils"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 )
@@ -29,7 +29,7 @@ func LoadSettings(ctx backend.PluginContext) (*DatasourceSettings, error) {
 	model := &DatasourceSettings{}
 
 	settings := ctx.DataSourceInstanceSettings
-	err := json.Unmarshal(settings.JSONData, &model)
+	err := bestmemjson.Unmarshal(settings.JSONData, &model)
 	if err != nil {
 		return nil, fmt.Errorf("error reading settings: %s", err.Error())
 	}
