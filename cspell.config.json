@@ -29,7 +29,9 @@
     "testid",
     "tokenprovider",
     "typecheck",
-    "uplot"
+    "uplot",
+    "bestmemjson",
+    "jsoniter"
   ],
   "language": "en-US"
 }

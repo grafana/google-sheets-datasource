@@ -48,7 +48,7 @@ func TestBestMemJSONEfficiency(t *testing.T) {
 			}
 		})
 
-		bestmemResult := testing.Benchmark(func(b *testing.B) {
+		bestMemResult := testing.Benchmark(func(b *testing.B) {
 			b.ResetTimer()
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
@@ -65,18 +65,18 @@ func TestBestMemJSONEfficiency(t *testing.T) {
 			standardResult.AllocsPerOp(),
 			jsoniterResult.AllocedBytesPerOp(),
 			jsoniterResult.AllocsPerOp(),
-			bestmemResult.AllocedBytesPerOp(),
-			bestmemResult.AllocsPerOp())
+			bestMemResult.AllocedBytesPerOp(),
+			bestMemResult.AllocsPerOp())
 
 		// Verify bestmemjson is using the most memory-efficient implementation
-		assert.LessOrEqual(t, bestmemResult.AllocedBytesPerOp(), standardResult.AllocedBytesPerOp(),
+		assert.LessOrEqual(t, bestMemResult.AllocedBytesPerOp(), standardResult.AllocedBytesPerOp(),
 			"bestmemjson.Marshal should not use more memory than encoding/json.Marshal")
-		assert.LessOrEqual(t, bestmemResult.AllocedBytesPerOp(), jsoniterResult.AllocedBytesPerOp(),
+		assert.LessOrEqual(t, bestMemResult.AllocedBytesPerOp(), jsoniterResult.AllocedBytesPerOp(),
 			"bestmemjson.Marshal should not use more memory than jsoniter.Marshal")
 	})
 
 	t.Run("Unmarshal memory efficiency", func(t *testing.T) {
-		var standardModel, jsoniterModel, bestmemModel testStruct
+		var standardModel, jsoniterModel, bestMemModel testStruct
 
 		standardResult := testing.Benchmark(func(b *testing.B) {
 			b.ResetTimer()
@@ -94,11 +94,11 @@ func TestBestMemJSONEfficiency(t *testing.T) {
 			}
 		})
 
-		bestmemResult := testing.Benchmark(func(b *testing.B) {
+		bestMemResult := testing.Benchmark(func(b *testing.B) {
 			b.ResetTimer()
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
-				_ = Unmarshal(testJSON, &bestmemModel)
+				_ = Unmarshal(testJSON, &bestMemModel)
 			}
 		})
 
@@ -111,17 +111,17 @@ func TestBestMemJSONEfficiency(t *testing.T) {
 			standardResult.AllocsPerOp(),
 			jsoniterResult.AllocedBytesPerOp(),
 			jsoniterResult.AllocsPerOp(),
-			bestmemResult.AllocedBytesPerOp(),
-			bestmemResult.AllocsPerOp())
+			bestMemResult.AllocedBytesPerOp(),
+			bestMemResult.AllocsPerOp())
 
 		// Verify bestmemjson is using the most memory-efficient implementation
-		assert.LessOrEqual(t, bestmemResult.AllocedBytesPerOp(), standardResult.AllocedBytesPerOp(),
+		assert.LessOrEqual(t, bestMemResult.AllocedBytesPerOp(), standardResult.AllocedBytesPerOp(),
 			"bestmemjson.Unmarshal should not use more memory than encoding/json.Unmarshal")
-		assert.LessOrEqual(t, bestmemResult.AllocedBytesPerOp(), jsoniterResult.AllocedBytesPerOp(),
+		assert.LessOrEqual(t, bestMemResult.AllocedBytesPerOp(), jsoniterResult.AllocedBytesPerOp(),
 			"bestmemjson.Unmarshal should not use more memory than jsoniter.Unmarshal")
 
 		// Verify all implementations produce the same result
-		assert.Equal(t, standardModel, bestmemModel, "bestmemjson.Unmarshal should produce same result as encoding/json")
-		assert.Equal(t, jsoniterModel, bestmemModel, "bestmemjson.Unmarshal should produce same result as jsoniter")
+		assert.Equal(t, standardModel, bestMemModel, "bestmemjson.Unmarshal should produce same result as encoding/json")
+		assert.Equal(t, jsoniterModel, bestMemModel, "bestmemjson.Unmarshal should produce same result as jsoniter")
 	})
 }
