@@ -1,5 +1,13 @@
 {
-  "ignorePaths": ["node_modules/**", "pkg/googlesheets/testdata", "dist/**", "mage_output_file.go"],
+  "ignorePaths": [
+    "node_modules/**",
+    "pkg/googlesheets/testdata",
+    "dist/**",
+    "mage_output_file.go",
+    "provisioning/**",
+    "package.json",
+    "yarn.lock"
+  ],
   "words": [
     "araddon",
     "dataproxy",
