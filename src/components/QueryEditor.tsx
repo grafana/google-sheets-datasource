@@ -2,12 +2,12 @@ import { QueryEditorProps } from '@grafana/data';
 import { DataSourceOptions } from '@grafana/google-sdk';
 import { InlineFieldRow, InlineFormLabel, InlineSwitch, Input, LinkButton, Segment, SegmentAsync } from '@grafana/ui';
 import React, { ChangeEvent, PureComponent } from 'react';
-import { DataSource } from '../DataSource';
+import { GoogleSheetsDataSource } from '../datasource';
 import { SheetsQuery } from '../types';
 import { reportInteraction } from '@grafana/runtime';
 import { css } from '@emotion/css';
 
-type Props = QueryEditorProps<DataSource, SheetsQuery, DataSourceOptions>;
+type Props = QueryEditorProps<GoogleSheetsDataSource, SheetsQuery, DataSourceOptions>;
 
 export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery> {
   let idx = url?.indexOf('/d/');
