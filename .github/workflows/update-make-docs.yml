@@ -1,4 +1,6 @@
 name: Update `make docs` procedure
+permissions: {}
+
 on:
   schedule:
     - cron: '0 7 * * 1-5'
@@ -11,4 +13,4 @@ jobs:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           persist-credentials: false
-      - uses: grafana/writers-toolkit/update-make-docs@update-make-docs/v1
+      - uses: grafana/writers-toolkit/update-make-docs@update-make-docs/v1 # zizmor: ignore[unpinned-uses]
