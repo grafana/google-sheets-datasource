@@ -31,12 +31,12 @@ export function ConfigEditor(props: Props) {
     <>
       <DataSourceDescription
         dataSourceName="Google Sheets"
-        docsLink="https://grafana.com/grafana/plugins/grafana-googlesheets-datasource/"
+        docsLink="https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/"
         hasRequiredFields={false}
       />
 
       <Divider />
-
+      
       <ConfigurationHelp authenticationType={options.jsonData.authenticationType} />
 
       <Divider />
