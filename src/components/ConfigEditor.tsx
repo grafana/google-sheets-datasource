@@ -36,7 +36,22 @@ export function ConfigEditor(props: Props) {
       />
 
       <Divider />
-      
+      <div className="grafana-info-box">
+        <h5>Choosing an authentication type</h5>
+        <p>
+          We recommend <strong>Google JWT File</strong> as the default, as this allows 
+          you to access private spreadsheets and works in all environments where Grafana is running. 
+          <br/><br/>
+          If the spreadsheets you need to access are shared publicly then <strong>API key</strong> is simpler to configure. 
+          <br/><br/>
+          If you are running Grafana on a Google Compute Engine virtual machine, Grafana can automatically retrieve default 
+          credentials from the metadata server, and you can use the <strong>GCE Default Service Account</strong> option.
+          <br/><br/>
+          <strong>Select an Authentication type below and expand <strong>Configure Google Sheets Authentication</strong> for 
+          detailed guidance on configuration</strong> 
+          
+        </p>
+      </div>
       <ConfigurationHelp authenticationType={options.jsonData.authenticationType} />
 
       <Divider />
