@@ -44,7 +44,7 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 </a>
               </li>
               <li>
-                Copy the key and paste it in the API Key field above. The file contents are encrypted and saved in the
+                Copy the key and paste it in the API Key field below. The file contents are encrypted and saved in the
                 Grafana database.
               </li>
             </ol>
@@ -167,7 +167,7 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 email is specified as <code>client_email</code> in the Google JWT File.
               </li>
               <li>
-                Drag the file to the dotted zone above. Then click <code>Save & Test</code>. The file contents will be
+                Drag the file to the dotted zone below. Then click <code>Save & Test</code>. The file contents will be
                 encrypted and saved in the Grafana database.
               </li>
             </ol>
