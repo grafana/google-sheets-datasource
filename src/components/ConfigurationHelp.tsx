@@ -20,6 +20,18 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
               <li>
                 Open the{' '}
                 <a
+                  href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet"
+                  target="_blank"
+                  style={{ color: theme.colors.text.link }}
+                  rel="noreferrer noopener"
+                >
+                  Google Sheets
+                </a>{' '}
+                in API Library and enable access for your account.
+              </li>
+              <li>
+                Open the{' '}
+                <a
                   href="https://console.developers.google.com/apis/credentials"
                   target="_blank"
                   rel="noreferrer noopener"
@@ -31,18 +43,6 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
               </li>
               <li>
                 Click <strong>Create Credentials</strong> and then click <strong>API key</strong>.
-              </li>
-               <li>
-                Open the{' '}
-                <a
-                  href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet"
-                  target="_blank"
-                  style={{ color: theme.colors.text.link }}
-                  rel="noreferrer noopener"
-                >
-                  Google Sheets
-                </a>{' '}
-                in API Library and enable access for your account.
               </li>
               <li>
                 Copy the key and paste it in the API Key field below. The file contents are encrypted and saved in the
@@ -113,31 +113,6 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
               <li>
                 Open the{' '}
                 <a
-                  href="https://console.developers.google.com/apis/credentials"
-                  target="_blank"
-                  style={{ color: theme.colors.text.link }}
-                  rel="noreferrer noopener"
-                >
-                  Credentials
-                </a>{' '}
-                page in the Google API Console.
-              </li>
-              <li>
-                Click <code>Create Credentials</code> then click <code>Service account</code>.
-              </li>
-              <li>In the <strong>Create service account</strong> section, provide a name, account ID and description,
-                then click <code>Create and continue</code>.
-              </li>
-              <li>
-                Ignore the <strong>Service account permissions</strong> and <strong>Principals with access</strong> sections, just click <code>Continue</code>.
-              </li>
-              <li>
-                Click into the details for the service account, navigate to the <strong>Keys</strong> tab, and click <code>Add Key</code>. Choose key type <strong>JSON</strong> and click{' '}
-                <code>Create</code>. A JSON key file will be created and downloaded to your computer.
-              </li>
-              <li>
-                Open the{' '}
-                <a
                   href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet"
                   target="_blank"
                   style={{ color: theme.colors.text.link }}
@@ -160,6 +135,32 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 in API Library and enable access for your account. Access to the Google Drive API is used to list all
                 spreadsheets to which you have access.
               </li>
+              <li>
+                Open the{' '}
+                <a
+                  href="https://console.developers.google.com/apis/credentials"
+                  target="_blank"
+                  style={{ color: theme.colors.text.link }}
+                  rel="noreferrer noopener"
+                >
+                  Credentials
+                </a>{' '}
+                page in the Google API Console.
+              </li>
+              <li>
+                Click <code>Create Credentials</code> then click <code>Service account</code>.
+              </li>
+              <li>In the <strong>Create service account</strong> section, provide a name, account ID and description,
+                then click <code>Create and continue</code>.
+              </li>
+              <li>
+                Ignore the <strong>Service account permissions</strong> and <strong>Principals with access</strong> sections, just click <code>Continue</code>.
+              </li>
+              <li>
+                Click into the details for the service account, navigate to the <strong>Keys</strong> tab, and click <code>Add Key</code>. Choose key type <strong>JSON</strong> and click{' '}
+                <code>Create</code>. A JSON key file will be created and downloaded to your computer.
+              </li>
+              
               <li>
                 Share any private files/folders you want to access with the service account&apos;s email address. The
                 email is specified as <strong>client_email</strong> in the Google JWT File.
