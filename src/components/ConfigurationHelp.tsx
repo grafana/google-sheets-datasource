@@ -122,20 +122,17 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 page in the Google API Console.
               </li>
               <li>
-                Click <strong>Create Credentials</strong> then click <strong>Service account</strong>.
+                Click <code>Create Credentials</code> then click <code>Service account</code>.
               </li>
-              <li>On the Create service account page, enter the Service account details.</li>
-              <li>
-                On the <code>Create service account</code> page, fill in the <code>Service account details</code> and
-                then click <code>Create</code>
+              <li>In the <strong>Create service account</strong> section, provide a name, account ID and description,
+                then click <code>Create and continue</code>.
               </li>
               <li>
-                On the <code>Service account permissions</code> page, don&rsquo;t add a role to the service account.
-                Just click <code>Continue</code>
+                Ignore the <strong>Service account permissions</strong> and <strong>Principals with access</strong> sections, just click <code>Continue</code>.
               </li>
               <li>
-                In the next step, click <code>Create Key</code>. Choose key type <code>JSON</code> and click{' '}
-                <code>Create</code>. A JSON key file will be created and downloaded to your computer
+                Click into the details for the service account, navigate to the <strong>Keys</strong> tab, and click <code>Add Key</code>. Choose key type <strong>JSON</strong> and click{' '}
+                <code>Create</code>. A JSON key file will be created and downloaded to your computer.
               </li>
               <li>
                 Open the{' '}
@@ -147,7 +144,7 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 >
                   Google Sheets
                 </a>{' '}
-                in API Library and enable access for your account
+                in API Library and enable access for your account.
               </li>
               <li>
                 Open the{' '}
@@ -160,11 +157,11 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                   Google Drive
                 </a>{' '}
                 in API Library and enable access for your account. Access to the Google Drive API is used to list all
-                spreadsheets that you have access to.
+                spreadsheets to which you have access.
               </li>
               <li>
                 Share any private files/folders you want to access with the service account&apos;s email address. The
-                email is specified as <code>client_email</code> in the Google JWT File.
+                email is specified as <strong>client_email</strong> in the Google JWT File.
               </li>
               <li>
                 Drag the file to the dotted zone below. Then click <code>Save & Test</code>. The file contents will be
