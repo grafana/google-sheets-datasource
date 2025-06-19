@@ -33,7 +33,7 @@ You can provision the data source using any of the following authentication mech
 
 ## With an API key
 
-To create the API key, refer to [Authenticate with an API key](../authenticate/#authenticate-with-an-api-key).
+To create the API key, refer to [Authenticate with an API key](../configure/#authenticate-with-an-api-key).
 
 **Example**
 
@@ -56,7 +56,7 @@ datasources:
 
 ## With a service account JWT
 
-To create a service account and its JWT file, refer to [Authenticate with a service account JWT](../authenticate/#authenticate-with-a-service-account-jwt).
+To create a service account and its JWT file, refer to [Authenticate with a service account JWT](../configure/#authenticate-with-a-service-account-jwt).
 
 **Example**
 

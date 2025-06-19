@@ -17,6 +17,8 @@ labels:
     - oss
     - enterprise
     - cloud
+aliases:
+  - ./authenticate/ # /docs/plugins/grafana-googlesheets-datasource/latest/setup/authenticate/
 weight: 103
 ---
 
@@ -37,7 +39,7 @@ The Google Sheets data source supports the following three ways of authenticatio
 ## Authenticate with a service account JWT
 
 If you want to access private spreadsheets, you must use a service account authentication.
-A Google service account is an account that belongs to a project within an account or organization instead of to an individual end user. The application, in this case Grafana, calls Google APIs on behalf of the service account, so users aren't directly involved.
+A Google service account belongs to a project within an account or organization instead of to an individual end user. The application, in this case Grafana, calls Google APIs on behalf of the service account, so users aren't directly involved.
 
 The project that the service account is associated with needs to be granted access to the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) and the [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive).
 
@@ -46,8 +48,8 @@ The Google Sheets data source uses the scope `https://www.googleapis.com/auth/sp
 To create a service account, generate a Google JWT file and enable the APIs:
 
 1. Before you can use the Google APIs, you need to enable them in your Google Cloud project.
-  1. Open the [Google Sheets API page](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) and click enable.
-  1. Open the [Google Drive API page](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive) and click enable.
+   1. Open the [Google Sheets API page](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) and click enable.
+   1. Open the [Google Drive API page](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive) and click enable.
 1. Open the [Credentials](https://console.developers.google.com/apis/credentials) page in the Google API Console.
 1. Click **Create Credentials** then **Service account**.
 1. Fill out the service account details form and then click **Create**.
@@ -73,7 +75,7 @@ If a spreadsheet is shared publicly on the internet the request doesn't need to 
 To generate an API key:
 
 1. Before you can use the Google APIs, you need to enable them in your Google Cloud project.
-  1. Open the [Google Sheets API page](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) and click enable.
+   1. Open the [Google Sheets API page](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) and click enable.
 1. Open the [Credentials page](https://console.developers.google.com/apis/credentials) in the Google API Console.
 1. Click **Create Credentials** and then **API key**.
 1. Paste the value in the **API Key** field of the data source configuration.
