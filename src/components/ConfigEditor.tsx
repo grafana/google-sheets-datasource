@@ -46,8 +46,7 @@ export function ConfigEditor(props: Props) {
           <strong>GCE Default Service Account</strong>: automatically retrieves default credentials. Requires Grafana to be running on a Google Compute Engine virtual machine.
           <br/><br/>
           <strong>Select an Authentication type below and expand <strong>Configure Google Sheets Authentication</strong> for 
-          detailed guidance on configuration</strong> 
-          
+          detailed guidance on configuration</strong>.
         </p>
       </div>
       <ConfigurationHelp authenticationType={options.jsonData.authenticationType} />
