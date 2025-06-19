@@ -1,7 +1,7 @@
 ---
 title: Google Sheets data source provisioning
 menuTitle: Provisioning
-description: Learn how to provision the Google Sheets data source.
+description: Learn how to provision the Google Sheets data source plugin.
 keywords:
   - data source
   - google sheets
