@@ -154,7 +154,7 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 then click <code>Create and continue</code>.
               </li>
               <li>
-                Ignore the <strong>Service account permissions</strong> and <strong>Principals with access</strong> sections, just click <code>Continue</code>.
+                Ignore the <strong>Service account permissions</strong> and <strong>Principals with access</strong> sections, just click <code>Done</code>.
               </li>
               <li>
                 Click into the details for the service account, navigate to the <strong>Keys</strong> tab, and click <code>Add Key</code>. Choose key type <strong>JSON</strong> and click{' '}

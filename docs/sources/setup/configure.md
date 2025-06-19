@@ -52,8 +52,8 @@ To create a service account, generate a Google JWT file and enable the APIs:
    1. Open the [Google Drive API page](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive) and click enable.
 1. Open the [Credentials](https://console.developers.google.com/apis/credentials) page in the Google API Console.
 1. Click **Create Credentials** then **Service account**.
-1. Fill out the service account details form and then click **Create**.
-1. Ignore the **Service account permissions** and **Principals with access** sections, just click **Continue**.
+1. Fill out the service account details form and then click **Create and continue**.
+1. Ignore the **Service account permissions** and **Principals with access** sections, just click **Done**.
 1. Click into the details for the service account, navigate to the **Keys** tab, and click **Add Key**. Choose key type **JSON** and click **Create**. A JSON key file will be created and downloaded to your computer.
 1. Upload or drag this file into the **JWT Key Details** section of the data source configuration.
 
