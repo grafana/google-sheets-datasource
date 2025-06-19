@@ -23,9 +23,9 @@ weight: 10
 # Google Sheets data source plugin for Grafana
 
 The Google Sheets data source plugin for Grafana lets you to visualize your Google spreadsheets in Grafana.
-It uses the Google Sheets API to read the data which you can view in dashboard panels or [Explore](https://grafana.com/docs/grafana/latest/explore/).
+It uses the [Google Sheets API](https://developers.google.com/workspace/sheets/api/guides/concepts) to read the data which you can view in dashboard panels or [Explore](https://grafana.com/docs/grafana/latest/explore/).
 
-Watch this video to learn more about setting up the Grafana Google Sheets data source plugin:  {{< youtube id="hqeqeQFrtSA">}}
+Watch this video to learn more about using the Grafana Google Sheets data source plugin:  {{< youtube id="hqeqeQFrtSA">}}
 
 {{< docs/play title="Google Sheets data source plugin demo" url="https://play.grafana.org/d/ddkar8yanj56oa/visualizing-google-sheets-data" >}}
 
@@ -41,8 +41,8 @@ To use the Google Sheets data source plugin, you need:
 
 ## Get started
 
-- To start using the plugin, you need to generate an access token, then install and configure the plugin. To do this, refer to [Setup](./setup/).
-- To learn how to use the query editor, refer to [Query Editor](./query-editor/).
+- Before using the plugin, you need to install and configure it. To do this, refer to [Setup](./setup/).
+- To learn how to retrieve spreadsheet data, refer to the [Query Editor](./query-editor/) guide.
 - To quickly visualize spreadsheet data in Grafana, refer to [Create a sample dashboard](./create-a-sample-dashboard/).
 
 ## Get the most out of the plugin
