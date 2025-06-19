@@ -19,6 +19,7 @@ labels:
     - cloud
 aliases:
   - ./authenticate/ # /docs/plugins/grafana-googlesheets-datasource/latest/setup/authenticate/
+  - ./install/ # /docs/plugins/grafana-googlesheets-datasource/latest/setup/install/
 weight: 103
 ---
 
