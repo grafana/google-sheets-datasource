@@ -1,7 +1,7 @@
 ---
 title: Configure the Google Sheets data source plugin
 menuTitle: Configure
-description: How to configure the Google Sheets data source plugin
+description: Learn how to configure the Google Sheets data source plugin
 keywords:
   - data source
   - google sheets
