@@ -41,7 +41,7 @@ export function ConfigEditor(props: Props) {
         <p>
           <strong>Google JWT File</strong>: provides access to private spreadsheets and works in all environments where Grafana is running. 
           <br/>
-          <strong>API key</strong>: simpler configuration, but requires spreadsheets to be public.
+          <strong>API Key</strong>: simpler configuration, but requires spreadsheets to be public.
           <br/>
           <strong>GCE Default Service Account</strong>: automatically retrieves default credentials. Requires Grafana to be running on a Google Compute Engine virtual machine.
           <br/><br/>
