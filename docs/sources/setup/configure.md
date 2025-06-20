@@ -37,7 +37,9 @@ The Google Sheets data source supports the following three ways of authenticatio
 - [API key](#authenticate-with-an-api-key): offers simpler configuration, but requires spreadsheets to be public.
 - [GCE Default Service Account](#authenticate-with-the-default-gce-service-account) automatically retrieves default credentials. Requires Grafana to be running on a Google Compute Engine virtual machine.
 
-## Authenticate with a service account JWT
+Depending on your authentication type, you may need to configure appropriate permissions on your spreadsheets, refer to the [sharing](#sharing) section for more guidance.
+
+### Authenticate with a service account JWT
 
 If you want to access private spreadsheets, you must use a service account authentication.
 A Google service account belongs to a project within an account or organization instead of to an individual end user. The application, in this case Grafana, calls Google APIs on behalf of the service account, so users aren't directly involved.
@@ -57,21 +59,12 @@ To create a service account, generate a Google JWT file and enable the APIs:
 1. Ignore the **Service account permissions** and **Principals with access** sections, just click **Done**.
 1. Click into the details for the service account, navigate to the **Keys** tab, and click **Add Key**. Choose key type **JSON** and click **Create**. A JSON key file will be created and downloaded to your computer.
 1. Upload or drag this file into the **JWT Key Details** section of the data source configuration.
+1. Grant the service account [access to resources](#granting-access-to-the-service-account-used-with-jwt-authentication) as appropriate. 
 
-### Sharing
 
-By default, the service account doesn't have access to any spreadsheets within the account or organization that it's associated with.
-To grant the service account access to files and or folders in Google Drive, you need to share the file or folder with the service account's email address.
-The service account's email address is the `client_email` field in the JWT file
-To share a file or folder, refer to the [official Google drive documentation](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en#share_publicly).
+### Authenticate with an API key
 
-{{< admonition type="caution" >}}
-Beware that after you share a file or folder with the service account, all users in Grafana with permissions on the data source are able to see the spreadsheets.
-{{< /admonition >}}
-
-## Authenticate with an API key
-
-If a spreadsheet is shared publicly on the internet the request doesn't need to be authorized, but does need to be accompanied by an identifier - which is the API key.
+If a spreadsheet is [shared publicly](#sharing) on the internet the request doesn't need to be authorized, but does need to be accompanied by an identifier - which is the API key.
 
 To generate an API key:
 
@@ -81,11 +74,11 @@ To generate an API key:
 1. Click **Create Credentials** and then **API key**.
 1. Paste the value in the **API Key** field of the data source configuration.
 
-{{< admonition type="note" >}}
-Learn how to share a file or folder publicly in the [official Google Sheet documentation](https://support.google.com/a/users/answer/13309904#sheets_share_link).
-{{< /admonition >}}
+### Authenticate with the default GCE service account
 
-## Authenticate with the default GCE service account
+{{< admonition type="note" >}}
+This is **only** compatible when running Grafana on a Google Compute Engine (GCE) virtual machine. It is **not supported** in on-premise deployments, Grafana Cloud or other hosted environments.
+{{< /admonition >}}
 
 When Grafana is running on a Google Compute Engine (GCE) virtual machine, Grafana can automatically retrieve default credentials from the metadata server.
 As a result, there is no need to generate a private key file for the service account.
@@ -99,3 +92,21 @@ To authenticate with the default GCE service account:
    For more information, refer to [setting up an instance to run as a service account](https://cloud.google.com/compute/docs/access/create-enable-service-accounts-for-instances#using).
 1. Allow access to the specified API scope.
 1. Enter the project name in the **Default project** field of the data source configuration
+
+
+## Sharing
+
+Refer to the following official guidance from Google to learn how to share resources from:
+- [Google Sheets](https://support.google.com/a/users/answer/13309904#sheets_share_link)
+- [Google Drive](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop#share_publicly)
+
+### Granting access to the service account used with JWT authentication
+
+By default, the service account doesn't have access to any spreadsheets within the account or organization that it's associated with.
+To grant the service account access to files and or folders in Google Drive, you need to share the file or folder with the service account's email address.
+The service account's email address is the `client_email` field in the JWT file.
+
+{{< admonition type="caution" >}}
+Beware that after you share a file or folder with the service account, all users in Grafana with permissions on the data source are able to see the spreadsheets.
+{{< /admonition >}}
+
