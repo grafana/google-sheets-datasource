@@ -38,14 +38,13 @@ export function ConfigEditor(props: Props) {
       <Divider />
       <div className="grafana-info-box">
         <h5>Choosing an authentication type</h5>
-        <p>
-          <strong>Google JWT File</strong>: provides access to private spreadsheets and works in all environments where Grafana is running. 
-          <br/>
-          <strong>API Key</strong>: simpler configuration, but requires spreadsheets to be public.
-          <br/>
-          <strong>GCE Default Service Account</strong>: automatically retrieves default credentials. Requires Grafana to be running on a Google Compute Engine virtual machine.
-          <br/><br/>
-          <strong>Select an Authentication type below and expand <strong>Configure Google Sheets Authentication</strong> for 
+        <ul>
+          <li><strong>Google JWT File</strong>: provides access to private spreadsheets and works in all environments where Grafana is running.</li> 
+          <li><strong>API Key</strong>: simpler configuration, but requires spreadsheets to be public.</li>
+          <li><strong>GCE Default Service Account</strong>: automatically retrieves default credentials. Requires Grafana to be running on a Google Compute Engine virtual machine.</li>
+        </ul>
+        <br/>
+        <p><strong>Select an Authentication type below and expand <strong>Configure Google Sheets Authentication</strong> for 
           detailed guidance on configuration</strong>.
         </p>
       </div>
