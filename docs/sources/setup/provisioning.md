@@ -1,7 +1,7 @@
 ---
 title: Google Sheets data source provisioning
 menuTitle: Provisioning
-description: About provisioning the Google Sheets data source.
+description: Learn how to provision the Google Sheets data source plugin.
 keywords:
   - data source
   - google sheets
@@ -33,7 +33,7 @@ You can provision the data source using any of the following authentication mech
 
 ## With an API key
 
-To create the API key, refer to [Authenticate with an API key](../authenticate/#authenticate-with-an-api-key).
+To create the API key, refer to [Authenticate with an API key](../configure/#authenticate-with-an-api-key).
 
 **Example**
 
@@ -45,18 +45,15 @@ apiVersion: 1
 datasources:
   - name: '<DATA SOURCE NAME>'
     type: grafana-googlesheets-datasource
-    enabled: true
     jsonData:
       authenticationType: 'key'
     secureJsonData:
       apiKey: '<API KEY>'
-    version: 1
-    editable: true
 ```
 
 ## With a service account JWT
 
-To create a service account and its JWT file, refer to [Authenticate with a service account JWT](../authenticate/#authenticate-with-a-service-account-jwt).
+To create a service account and its JWT file, refer to [Authenticate with a service account JWT](../configure/#authenticate-with-a-service-account-jwt).
 
 **Example**
 
@@ -68,7 +65,6 @@ apiVersion: 1
 datasources:
   - name: '<DATA SOURCE NAME>'
     type: grafana-googlesheets-datasource
-    enabled: true
     jsonData:
       authenticationType: 'jwt'
       defaultProject: '<PROJECT ID>'
@@ -76,8 +72,29 @@ datasources:
       tokenUri: 'https://oauth2.googleapis.com/token'
     secureJsonData:
       privateKey: <PRIVATE KEY DATA>
-    version: 1
-    editable: true
+```
+
+### Private key from local file
+
+The Following example shows the provisioning of google sheets datasource plugin instance using a private key file stored locally.
+
+{{< admonition type="note" >}}
+This is not supported in hosted environments such as Grafana Cloud.
+{{< /admonition >}}
+
+**Example**
+
+```yaml
+apiVersion: 1
+datasources:
+  - name: '<DATA SOURCE NAME>'
+    type: grafana-googlesheets-datasource
+    jsonData:
+      authenticationType: 'jwt'
+      defaultProject: '<PROJECT ID>'
+      clientEmail: '<CLIENT EMAIL>'
+      privateKeyPath: '/path/to/privateKey'
+      tokenUri: 'https://oauth2.googleapis.com/token'
 ```
 
 ## With the default GCE service account
@@ -94,10 +111,7 @@ apiVersion: 1
 datasources:
   - name: '<DATA SOURCE NAME>'
     type: grafana-googlesheets-datasource
-    enabled: true
     jsonData:
       authenticationType: 'gce'
       defaultProject: '<PROJECT ID>'
-    version: 1
-    editable: true
 ```

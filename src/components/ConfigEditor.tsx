@@ -1,12 +1,11 @@
 import { DataSourcePluginOptionsEditorProps, onUpdateDatasourceSecureJsonDataOption } from '@grafana/data';
 import { AuthConfig, DataSourceOptions } from '@grafana/google-sdk';
-import { Field, SecretInput } from '@grafana/ui';
+import { Field, SecretInput, Divider } from '@grafana/ui';
 import React from 'react';
 import { GoogleSheetsAuth, GoogleSheetsSecureJSONData, googleSheetsAuthTypes } from '../types';
 import { getBackwardCompatibleOptions } from '../utils';
 import { ConfigurationHelp } from './ConfigurationHelp';
 import { DataSourceDescription } from '@grafana/plugin-ui';
-import { Divider } from './Divider';
 
 export type Props = DataSourcePluginOptionsEditorProps<DataSourceOptions, GoogleSheetsSecureJSONData>;
 
@@ -32,12 +31,23 @@ export function ConfigEditor(props: Props) {
     <>
       <DataSourceDescription
         dataSourceName="Google Sheets"
-        docsLink="https://grafana.com/grafana/plugins/grafana-googlesheets-datasource/"
+        docsLink="https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/"
         hasRequiredFields={false}
       />
 
       <Divider />
-
+      <div className="grafana-info-box">
+        <h5>Choosing an authentication type</h5>
+        <ul>
+          <li><strong>Google JWT File</strong>: provides access to private spreadsheets and works in all environments where Grafana is running.</li> 
+          <li><strong>API Key</strong>: simpler configuration, but requires spreadsheets to be public.</li>
+          <li><strong>GCE Default Service Account</strong>: automatically retrieves default credentials. Requires Grafana to be running on a Google Compute Engine virtual machine.</li>
+        </ul>
+        <br/>
+        <p><strong>Select an Authentication type below and expand <strong>Configure Google Sheets Authentication</strong> for 
+          detailed guidance on configuration</strong>.
+        </p>
+      </div>
       <ConfigurationHelp authenticationType={options.jsonData.authenticationType} />
 
       <Divider />

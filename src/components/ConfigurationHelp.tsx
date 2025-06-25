@@ -20,6 +20,18 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
               <li>
                 Open the{' '}
                 <a
+                  href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet"
+                  target="_blank"
+                  style={{ color: theme.colors.text.link }}
+                  rel="noreferrer noopener"
+                >
+                  Google Sheets
+                </a>{' '}
+                in API Library and enable access for your account.
+              </li>
+              <li>
+                Open the{' '}
+                <a
                   href="https://console.developers.google.com/apis/credentials"
                   target="_blank"
                   rel="noreferrer noopener"
@@ -33,18 +45,7 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 Click <strong>Create Credentials</strong> and then click <strong>API key</strong>.
               </li>
               <li>
-                Before using Google APIs, you need to turn them on in a Google Cloud project.{' '}
-                <a
-                  href="https://console.cloud.google.com/apis/library/sheets.googleapis.com"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  style={{ color: theme.colors.text.link }}
-                >
-                  Enable the API
-                </a>
-              </li>
-              <li>
-                Copy the key and paste it in the API Key field above. The file contents are encrypted and saved in the
+                Copy the key and paste it in the API Key field below. The file contents are encrypted and saved in the
                 Grafana database.
               </li>
             </ol>
@@ -53,6 +54,7 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
       case GoogleSheetsAuth.GCE:
         return (
           <>
+            <h4>Configure GCE Service Account</h4>
             <p>
               When Grafana is running on a Google Compute Engine (GCE) virtual machine, Grafana can automatically
               retrieve default credentials from the metadata server. As a result, there is no need to generate a private
@@ -112,34 +114,6 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
               <li>
                 Open the{' '}
                 <a
-                  href="https://console.developers.google.com/apis/credentials"
-                  target="_blank"
-                  style={{ color: theme.colors.text.link }}
-                  rel="noreferrer noopener"
-                >
-                  Credentials
-                </a>{' '}
-                page in the Google API Console.
-              </li>
-              <li>
-                Click <strong>Create Credentials</strong> then click <strong>Service account</strong>.
-              </li>
-              <li>On the Create service account page, enter the Service account details.</li>
-              <li>
-                On the <code>Create service account</code> page, fill in the <code>Service account details</code> and
-                then click <code>Create</code>
-              </li>
-              <li>
-                On the <code>Service account permissions</code> page, don&rsquo;t add a role to the service account.
-                Just click <code>Continue</code>
-              </li>
-              <li>
-                In the next step, click <code>Create Key</code>. Choose key type <code>JSON</code> and click{' '}
-                <code>Create</code>. A JSON key file will be created and downloaded to your computer
-              </li>
-              <li>
-                Open the{' '}
-                <a
                   href="https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet"
                   target="_blank"
                   style={{ color: theme.colors.text.link }}
@@ -147,7 +121,7 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 >
                   Google Sheets
                 </a>{' '}
-                in API Library and enable access for your account
+                in API Library and enable access for your account.
               </li>
               <li>
                 Open the{' '}
@@ -160,14 +134,43 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                   Google Drive
                 </a>{' '}
                 in API Library and enable access for your account. Access to the Google Drive API is used to list all
-                spreadsheets that you have access to.
+                spreadsheets to which you have access.
               </li>
+              <li>
+                Open the{' '}
+                <a
+                  href="https://console.developers.google.com/apis/credentials"
+                  target="_blank"
+                  style={{ color: theme.colors.text.link }}
+                  rel="noreferrer noopener"
+                >
+                  Credentials
+                </a>{' '}
+                page in the Google API Console.
+              </li>
+              <li>
+                Click <code>Create Credentials</code> then click <code>Service account</code>.
+              </li>
+              <li>
+                In the <strong>Create service account</strong> section, provide a name, account ID and description, then
+                click <code>Create and continue</code>.
+              </li>
+              <li>
+                Ignore the <strong>Service account permissions</strong> and <strong>Principals with access</strong>{' '}
+                sections, just click <code>Done</code>.
+              </li>
+              <li>
+                Click into the details for the service account, navigate to the <strong>Keys</strong> tab, and click{' '}
+                <code>Add Key</code>. Choose key type <strong>JSON</strong> and click <code>Create</code>. A JSON key
+                file will be created and downloaded to your computer.
+              </li>
+
               <li>
                 Share any private files/folders you want to access with the service account&apos;s email address. The
-                email is specified as <code>client_email</code> in the Google JWT File.
+                email is specified as <strong>client_email</strong> in the Google JWT File.
               </li>
               <li>
-                Drag the file to the dotted zone above. Then click <code>Save & Test</code>. The file contents will be
+                Drag the file to the dotted zone below. Then click <code>Save & Test</code>. The file contents will be
                 encrypted and saved in the Grafana database.
               </li>
             </ol>
