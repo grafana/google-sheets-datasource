@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## 2.0.3
 
 - Bump `github.com/grafana/grafana-plugin-sdk-go` to 0.277.1
+- Docs and configuration page updated with inline docs
 
 ## 2.0.2
 
