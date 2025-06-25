@@ -54,6 +54,7 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
       case GoogleSheetsAuth.GCE:
         return (
           <>
+            <h4>Configure GCE Service Account</h4>
             <p>
               When Grafana is running on a Google Compute Engine (GCE) virtual machine, Grafana can automatically
               retrieve default credentials from the metadata server. As a result, there is no need to generate a private
@@ -150,17 +151,20 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
               <li>
                 Click <code>Create Credentials</code> then click <code>Service account</code>.
               </li>
-              <li>In the <strong>Create service account</strong> section, provide a name, account ID and description,
-                then click <code>Create and continue</code>.
+              <li>
+                In the <strong>Create service account</strong> section, provide a name, account ID and description, then
+                click <code>Create and continue</code>.
               </li>
               <li>
-                Ignore the <strong>Service account permissions</strong> and <strong>Principals with access</strong> sections, just click <code>Done</code>.
+                Ignore the <strong>Service account permissions</strong> and <strong>Principals with access</strong>{' '}
+                sections, just click <code>Done</code>.
               </li>
               <li>
-                Click into the details for the service account, navigate to the <strong>Keys</strong> tab, and click <code>Add Key</code>. Choose key type <strong>JSON</strong> and click{' '}
-                <code>Create</code>. A JSON key file will be created and downloaded to your computer.
+                Click into the details for the service account, navigate to the <strong>Keys</strong> tab, and click{' '}
+                <code>Add Key</code>. Choose key type <strong>JSON</strong> and click <code>Create</code>. A JSON key
+                file will be created and downloaded to your computer.
               </li>
-              
+
               <li>
                 Share any private files/folders you want to access with the service account&apos;s email address. The
                 email is specified as <strong>client_email</strong> in the Google JWT File.
