@@ -1,7 +1,7 @@
 ---
 title: Set up the Google Sheets data source plugin for Grafana
 menuTitle: Setup
-description: Learn how to install and configure the Google Sheets data source plugin.
+description: Learn how to configure the Google Sheets data source plugin.
 keywords:
   - data source
   - google sheets
@@ -20,7 +20,7 @@ labels:
 weight: 100
 ---
 
-# Set up the Google Sheets data source plugin for Grafana
+# Configure the Google Sheets data source plugin for Grafana
 
 To set up the Google Sheets data source plugin for Grafana, refer to the following topics:
 
