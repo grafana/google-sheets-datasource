@@ -76,7 +76,11 @@ datasources:
 
 ### Private key from local file
 
-The Following example shows the provisioning of google sheets datasource plugin instance using the private key file stored in local. ( This feature is not available in Grafana Cloud )
+The Following example shows the provisioning of google sheets datasource plugin instance using a private key file stored locally.
+
+{{< admonition type="note" >}}
+This is not supported in hosted environments such as Grafana Cloud.
+{{< /admonition >}}
 
 **Example**
 
