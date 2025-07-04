@@ -53,7 +53,10 @@ export const formatCacheTimeLabel = (s: number = defaultCacheDuration) => {
 export class QueryEditor extends PureComponent<Props> {
   componentDidMount() {
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
-      this.props.query.cacheDurationSeconds = defaultCacheDuration; // um :(
+      this.props.onChange({
+        ...this.props.query,
+        cacheDurationSeconds: defaultCacheDuration, // um :(
+      });
     }
   }
 

@@ -10,12 +10,14 @@ import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
 import { SheetsQuery } from './types';
 import { Observable } from 'rxjs';
 import { trackRequest } from 'tracking';
+import { SheetsVariableSupport } from 'variables';
 
 export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOptions> {
   authType: string;
   constructor(instanceSettings: DataSourceInstanceSettings<DataSourceOptions>) {
     super(instanceSettings);
     this.authType = instanceSettings.jsonData.authenticationType;
+    this.variables = new SheetsVariableSupport(this);
   }
 
   query(request: DataQueryRequest<SheetsQuery>): Observable<DataQueryResponse> {

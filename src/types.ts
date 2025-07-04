@@ -36,3 +36,8 @@ export interface SheetsQuery extends DataQuery {
   cacheDurationSeconds?: number;
   useTimeFilter?: boolean;
 }
+
+export interface SheetsVariableQuery extends SheetsQuery {
+  valueField?: string;
+  labelField?: string;
+}
