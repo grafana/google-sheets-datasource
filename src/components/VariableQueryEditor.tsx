@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { InlineFieldRow, InlineFormLabel, Select, useTheme2 } from '@grafana/ui';
+import { InlineFieldRow, InlineFormLabel, Select, useTheme2, Input, Label } from '@grafana/ui';
 import { QueryEditor } from './QueryEditor';
 import { DataSource } from '../DataSource';
 import { SheetsVariableQuery } from '../types';
@@ -79,6 +79,39 @@ const VariableQueryEditor = (props: Props) => {
           options={choices.map((opt) => ({ label: opt, value: opt }))}
         />
       </InlineFieldRow>
+      <>
+        <Label className={styles.filterSection}>Optional filtering</Label>
+        <InlineFieldRow className={styles.rowSpacing}>
+          <InlineFormLabel width={10} tooltip="Select the column to filter on" className="query-keyword">
+            Filter Field
+          </InlineFormLabel>
+          <Select
+            data-testid="filter-field-select"
+            value={query.filterField}
+            onChange={(opt: SelectableValue<string>) => onChange({ ...query, filterField: opt.value })}
+            width={64}
+            placeholder={loading ? 'Loading...' : 'Select'}
+            options={choices.map((opt) => ({ label: opt, value: opt }))}
+            allowCustomValue
+          />
+        </InlineFieldRow>
+        <InlineFieldRow className={styles.rowSpacing}>
+          <InlineFormLabel
+            width={10}
+            tooltip="Enter the value to filter for in the selected column"
+            className="query-keyword"
+          >
+            Filter Value
+          </InlineFormLabel>
+          <Input
+            data-testid="filter-value-input"
+            value={query.filterValue || ''}
+            onChange={(e) => onChange({ ...query, filterValue: e.currentTarget.value })}
+            width={64}
+            placeholder="Enter filter value"
+          />
+        </InlineFieldRow>
+      </>
     </>
   );
 };
@@ -89,6 +122,10 @@ const getStyles = (theme: GrafanaTheme2) => {
   return {
     rowSpacing: css({
       marginBottom: theme.spacing(0.5),
+    }),
+    filterSection: css({
+      marginTop: theme.spacing(2),
+      marginBottom: theme.spacing(1),
     }),
   };
 };

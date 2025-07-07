@@ -6,15 +6,18 @@ import {
   SelectableValue,
 } from '@grafana/data';
 import { DataSourceOptions } from '@grafana/google-sdk';
-import { DataSourceWithBackend, getTemplateSrv } from '@grafana/runtime';
-import { SheetsQuery } from './types';
+import { DataSourceWithBackend, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
+import { SheetsQuery, SheetsVariableQuery } from './types';
 import { Observable } from 'rxjs';
 import { trackRequest } from 'tracking';
 import { SheetsVariableSupport } from 'variables';
 
 export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOptions> {
   authType: string;
-  constructor(instanceSettings: DataSourceInstanceSettings<DataSourceOptions>) {
+  constructor(
+    instanceSettings: DataSourceInstanceSettings<DataSourceOptions>,
+    private readonly templateSrv: TemplateSrv = getTemplateSrv()
+  ) {
     super(instanceSettings);
     this.authType = instanceSettings.jsonData.authenticationType;
     this.variables = new SheetsVariableSupport(this);
@@ -30,12 +33,31 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOpt
 
   // Support template variables for spreadsheet and range
   applyTemplateVariables(query: SheetsQuery, scopedVars: ScopedVars) {
-    const templateSrv = getTemplateSrv();
     return {
       ...query,
-      spreadsheet: templateSrv.replace(query.spreadsheet, scopedVars),
-      range: query.range ? templateSrv.replace(query.range, scopedVars) : '',
+      spreadsheet: this.interpolateVariable(query.spreadsheet, scopedVars) ?? '',
+      range: this.interpolateVariable(query.range, scopedVars),
     };
+  }
+
+  interpolateVariableQuery(query: SheetsVariableQuery, scopedVars: ScopedVars) {
+    return {
+      // Interpolate query
+      ...this.applyTemplateVariables(query, scopedVars),
+      // Interpolate additional fields in variable query
+      filterValue: this.interpolateVariable(query.filterValue, scopedVars),
+      filterField: this.interpolateVariable(query.filterField, scopedVars),
+      valueField: this.interpolateVariable(query.valueField, scopedVars),
+      labelField: this.interpolateVariable(query.labelField, scopedVars),
+    };
+  }
+
+  interpolateVariable(value: string | undefined, item: ScopedVars) {
+    // If we don't have value or value is empty string, return it
+    if (!value) {
+      return value;
+    }
+    return this.templateSrv.replace(value, item);
   }
 
   async getSpreadSheets(): Promise<Array<SelectableValue<string>>> {
