@@ -44,12 +44,13 @@ To use the Google Sheets data source plugin, you need:
 - Before using the plugin, first you need to [install](https://grafana.com/docs/grafana/latest/administration/plugin-management/#install-a-plugin) the plugin.
 - To learn how to configure the data source, refer to [Setup](./setup/).
 - To learn how to retrieve spreadsheet data, refer to the [Query Editor](./query-editor/) guide.
+- To create dynamic dashboards with variables, refer to [Variables](./variables/).
 - To quickly visualize spreadsheet data in Grafana, refer to [Create a sample dashboard](./create-a-sample-dashboard/).
 
 ## Get the most out of the plugin
 
 - Add [annotations](/docs/grafana/latest/dashboards/build-dashboards/annotate-visualizations/)
-- Configure and use [variables](https://grafana.com/docs/grafana/latest/dashboards/variables/)
+- Configure and use [variables](./variables/)
 - Apply [transformations](/docs/grafana/latest/panels-visualizations/query-transform-data/transform-data/)
 
 ## Quota
