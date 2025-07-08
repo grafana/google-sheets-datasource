@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.2.0
+
+- Add support for filtering in template variables
+
 ## 2.1.0
 
 - Add template variables functionality

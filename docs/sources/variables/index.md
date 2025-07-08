@@ -51,22 +51,34 @@ To create a query variable:
 
 If you don't specify a label field, the value field will be used for both the value and display text.
 
+### Filtering
+
+You can filter your variable data by specifying additional filter criteria:
+
+- **Filter Field**: The column to use for filtering
+- **Filter Value**: The value to match in the filter field
+
+Only rows where the filter field matches the specified filter value will be included in the variable dropdown.
+
 ### Example
 
 Consider a Google Sheet with the following data:
 
-| Country Code | Country Name |
-|-------------|--------------|
-| US          | United States |
-| GB          | United Kingdom |
-| CA          | Canada |
+| Country Code | Country Name | Region |
+|-------------|--------------|--------|
+| US          | United States | North America |
+| GB          | United Kingdom | Europe |
+| CA          | Canada | North America |
+| FR          | France | Europe |
 
-To create a country variable:
+To create a country variable showing only North American countries:
 
 1. Set **Value Field** to `Country Code`
 2. Set **Label Field** to `Country Name`
+3. Set **Filter Field** to `Region`
+4. Set **Filter Value** to `North America`
 
-This creates a dropdown showing "United States", "United Kingdom", "Canada" but using the values "US", "GB", "CA" in your queries.
+This creates a dropdown showing "United States", "Canada" but using the values "US", "CA" in your queries.
 
 ## Related topics
 
