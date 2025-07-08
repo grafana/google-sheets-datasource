@@ -40,4 +40,6 @@ export interface SheetsQuery extends DataQuery {
 export interface SheetsVariableQuery extends SheetsQuery {
   valueField?: string;
   labelField?: string;
+  filterField?: string;
+  filterValue?: string;
 }
