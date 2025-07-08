@@ -18,3 +18,5 @@ jobs:
       golangci-lint-version: '1.64.6'
       plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
       run-playwright: true
+      # skipping for now since dockerhub has some issues, TODO: enable again
+      run-playwright-with-skip-grafana-dev-image: true

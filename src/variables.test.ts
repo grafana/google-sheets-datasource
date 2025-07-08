@@ -58,7 +58,6 @@ describe('queryResponseToVariablesFrame', () => {
     };
 
     const result = queryResponseToVariablesFrame(query, response);
-    console.log(result);
 
     expect(result.data).toEqual([
       { value: '1', text: 'Plugin A' },
