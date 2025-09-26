@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.2.1
+
+🐛 Bump `github.com/grafana/grafana-google-sdk-go` to 0.4.2
+
 ## 2.2.0
 
 - Add support for filtering in template variables
