@@ -2,8 +2,6 @@
 
 ## 2.2.1
 
-### Patch Changes
-
 🐛 Bump `github.com/grafana/grafana-google-sdk-go` to 0.4.2
 
 ## 2.2.0
