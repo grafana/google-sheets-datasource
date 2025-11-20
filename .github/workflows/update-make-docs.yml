@@ -15,4 +15,4 @@ jobs:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           persist-credentials: false
-      - uses: grafana/writers-toolkit/update-make-docs@update-make-docs/v1 # zizmor: ignore[unpinned-uses]
+      - uses: grafana/writers-toolkit/update-make-docs@f65819d6a412b752c0e0263375215f049507b0e6 # update-make-docs/v1 # zizmor: ignore[unpinned-uses]
