@@ -1,15 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
-
   "type": "datasource",
   "name": "Google Sheets",
   "id": "grafana-googlesheets-datasource",
-
   "backend": true,
   "executable": "gpx_sheets",
   "metrics": true,
   "annotations": true,
-
   "info": {
     "description": "The Google Sheets data source plugin for Grafana lets you to visualize your Google spreadsheets in Grafana",
     "author": {
@@ -75,8 +72,9 @@
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaDependency": ">=10.4.8",
+    "grafanaDependency": ">=11.0.0",
     "grafanaVersion": "10.4.x",
     "plugins": []
-  }
+  },
+  "languages": ["en-US", "sv-SE", "es-ES"]
 }

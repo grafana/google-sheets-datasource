@@ -1,0 +1,24 @@
+{
+  "config": {
+    "apiKey": {
+      "label": "Clave de API",
+      "placeholder": "Ingrese la clave de API"
+    },
+    "authType": {
+      "apiKey": {
+        "description": "configuración más simple, pero requiere que las hojas de cálculo sean públicas.",
+        "label": "Clave de API"
+      },
+      "gce": {
+        "description": "recupera automáticamente las credenciales predeterminadas. Requiere que Grafana se ejecute en una máquina virtual de Google Compute Engine.",
+        "label": "Cuenta de servicio predeterminada de GCE"
+      },
+      "instructions": "Seleccione un tipo de autenticación a continuación y expanda Configurar autenticación de Google Sheets para obtener orientación detallada sobre la configuración",
+      "jwt": {
+        "description": "proporciona acceso a hojas de cálculo privadas y funciona en todos los entornos donde se ejecuta Grafana.",
+        "label": "Archivo JWT de Google"
+      },
+      "title": "Elegir un tipo de autenticación"
+    }
+  }
+}

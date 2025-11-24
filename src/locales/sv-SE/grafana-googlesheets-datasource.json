@@ -1,0 +1,24 @@
+{
+  "config": {
+    "apiKey": {
+      "label": "API-nyckel",
+      "placeholder": "Ange API-nyckel"
+    },
+    "authType": {
+      "apiKey": {
+        "description": "enklare konfiguration, men kräver att kalkylblad är publika.",
+        "label": "API-nyckel"
+      },
+      "gce": {
+        "description": "hämtar automatiskt standarduppgifter. Kräver att Grafana körs på en Google Compute Engine virtuell maskin.",
+        "label": "GCE standardtjänstekonto"
+      },
+      "instructions": "Välj en autentiseringstyp nedan och expandera Konfigurera Google Sheets-autentisering för detaljerad vägledning om konfiguration",
+      "jwt": {
+        "description": "ger tillgång till privata kalkylblad och fungerar i alla miljöer där Grafana körs.",
+        "label": "Google JWT-fil"
+      },
+      "title": "Välja en autentiseringstyp"
+    }
+  }
+}
