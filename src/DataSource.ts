@@ -15,13 +15,11 @@ import { SheetsVariableSupport } from 'variables';
 
 export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOptions> {
   authType: string;
-  private _instanceSettings: DataSourceInstanceSettings<DataSourceOptions>;
   constructor(
-    instanceSettings: DataSourceInstanceSettings<DataSourceOptions>,
+    private instanceSettings: DataSourceInstanceSettings<DataSourceOptions>,
     private readonly templateSrv: TemplateSrv = getTemplateSrv()
   ) {
     super(instanceSettings);
-    this._instanceSettings = instanceSettings;
     this.authType = instanceSettings.jsonData.authenticationType || '';
     this.variables = new SheetsVariableSupport(this);
   }
@@ -72,6 +70,6 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOpt
   }
 
   getDefaultQuery(app: CoreApp): Partial<SheetsQuery> {
-    return { spreadsheet: (this._instanceSettings.jsonData as any).defaultSheetID || '' };
+    return { spreadsheet: (this.instanceSettings.jsonData as any).defaultSheetID || '' };
   }
 }

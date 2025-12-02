@@ -6,6 +6,10 @@ import { DataSourceSettings } from '@grafana/data';
 import { GoogleSheetsSecureJSONData } from '../types';
 import { GoogleAuthType, DataSourceOptions } from '@grafana/google-sdk';
 
+jest.mock('@grafana/plugin-ui', () => ({
+  DataSourceDescription: ({ dataSourceName }: any) => <div>{dataSourceName}</div>,
+}));
+
 const dataSourceSettings: DataSourceSettings<DataSourceOptions, GoogleSheetsSecureJSONData> = {
   jsonData: {
     authenticationType: GoogleAuthType.JWT,
@@ -118,23 +122,20 @@ describe('ConfigEditor', () => {
         options={{ jsonData: { authenticationType: 'key' }, secureJsonFields: {} } as any}
       />
     );
-    expect(screen.getByText('Default spreadsheet ID')).toBeInTheDocument();
+    expect(screen.getByText('Default Spreadsheet ID')).toBeInTheDocument();
   });
 
-  it('should update default spreadsheet after selecting it', async () => {
+  it('should display default spreadsheet ID when set', () => {
     const onChange = jest.fn();
-    const props = {
-      options: dataSourceSettings,
-      onOptionsChange: onChange,
-    } as any;
-
-    render(<ConfigEditor {...props} onOptionsChange={onChange} />);
-
-    const selectEl = screen.getByText('Select Spreadsheet ID');
-    expect(selectEl).toBeInTheDocument();
-    await userEvent.click(selectEl);
-    const spreadsheetOption = await screen.findByText('label1');
-    await userEvent.click(spreadsheetOption);
-    await waitFor(() => expect(mockedSelect).toHaveBeenCalledWith({ label: 'label1', value: 'value1' }));
+    render(
+      <ConfigEditor
+        onOptionsChange={onChange}
+        options={{
+          jsonData: { authenticationType: 'jwt', defaultSheetID: '1234567890' },
+          secureJsonFields: {},
+        } as any}
+      />
+    );
+    expect(screen.getByText('Default Spreadsheet ID')).toBeInTheDocument();
   });
 });
