@@ -3,12 +3,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfigEditor } from './ConfigEditor';
 import { DataSourceSettings } from '@grafana/data';
-import { SheetsSourceOptions, GoogleSheetsSecureJsonData } from '../types';
-import { GoogleAuthType } from '@grafana/google-sdk';
+import { GoogleSheetsSecureJSONData } from '../types';
+import { GoogleAuthType, DataSourceOptions } from '@grafana/google-sdk';
 
-const dataSourceSettings: DataSourceSettings<SheetsSourceOptions, GoogleSheetsSecureJsonData> = {
+const dataSourceSettings: DataSourceSettings<DataSourceOptions, GoogleSheetsSecureJSONData> = {
   jsonData: {
-    authType: GoogleAuthType.JWT,
+    authenticationType: GoogleAuthType.JWT,
   },
   secureJsonFields: {
     jwt: true,

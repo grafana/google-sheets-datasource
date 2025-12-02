@@ -1,5 +1,4 @@
 import { DataQuery } from '@grafana/schema';
-import { DataSourceJsonData } from '@grafana/data';
 import { GoogleAuthType, GOOGLE_AUTH_TYPE_OPTIONS, DataSourceSecureJsonData } from '@grafana/google-sdk';
 
 export const GoogleSheetsAuth = {
@@ -43,14 +42,4 @@ export interface SheetsVariableQuery extends SheetsQuery {
   labelField?: string;
   filterField?: string;
   filterValue?: string;
-}
-
-export interface SheetsSourceOptions extends DataSourceJsonData {
-  authenticationType?: string;
-  defaultSheetID?: string;
-}
-
-export interface GoogleSheetsSecureJsonData {
-  apiKey?: string;
-  jwt?: string;
 }

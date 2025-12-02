@@ -19,6 +19,7 @@ type DatasourceSettings struct {
 	TokenURI           string `json:"tokenUri"`
 	AuthenticationType string `json:"authenticationType"`
 	PrivateKeyPath     string `json:"privateKeyPath"`
+	DefaultSheetID     string `json:"defaultSheetID"`
 
 	// Saved in secure JSON
 	PrivateKey string `json:"-"`
