@@ -20,7 +20,7 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOpt
     private readonly templateSrv: TemplateSrv = getTemplateSrv()
   ) {
     super(instanceSettings);
-    this.authType = instanceSettings.jsonData.authenticationType || '';
+    this.authType = instanceSettings.jsonData.authenticationType;
     this.variables = new SheetsVariableSupport(this);
   }
 
