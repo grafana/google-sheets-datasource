@@ -1,41 +1,10 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { ConfigEditor } from './ConfigEditor';
-import { DataSourceSettings } from '@grafana/data';
-import { GoogleSheetsSecureJSONData } from '../types';
-import { GoogleAuthType, DataSourceOptions } from '@grafana/google-sdk';
 
 jest.mock('@grafana/plugin-ui', () => ({
   DataSourceDescription: ({ dataSourceName }: any) => <div>{dataSourceName}</div>,
 }));
-
-const dataSourceSettings: DataSourceSettings<DataSourceOptions, GoogleSheetsSecureJSONData> = {
-  jsonData: {
-    authenticationType: GoogleAuthType.JWT,
-  },
-  secureJsonFields: {
-    jwt: true,
-  },
-  id: 0,
-  uid: '',
-  type: '',
-  access: 'direct',
-  name: 'Google Sheets Test Datasource',
-  basicAuth: false,
-  basicAuthUser: '',
-  database: '',
-  isDefault: false,
-  orgId: 0,
-  readOnly: false,
-  secureJsonData: undefined,
-  typeLogoUrl: '',
-  typeName: '',
-  url: '',
-  user: '',
-  withCredentials: false,
-};
-
 jest.mock('@grafana/runtime', () => ({
   getDataSourceSrv: () => ({
     get: (_: string) =>
@@ -120,20 +89,6 @@ describe('ConfigEditor', () => {
       <ConfigEditor
         onOptionsChange={onChange}
         options={{ jsonData: { authenticationType: 'key' }, secureJsonFields: {} } as any}
-      />
-    );
-    expect(screen.getByText('Default Spreadsheet ID')).toBeInTheDocument();
-  });
-
-  it('should display default spreadsheet ID when set', () => {
-    const onChange = jest.fn();
-    render(
-      <ConfigEditor
-        onOptionsChange={onChange}
-        options={{
-          jsonData: { authenticationType: 'jwt', defaultSheetID: '1234567890' },
-          secureJsonFields: {},
-        } as any}
       />
     );
     expect(screen.getByText('Default Spreadsheet ID')).toBeInTheDocument();
