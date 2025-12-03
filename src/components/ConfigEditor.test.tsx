@@ -2,9 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfigEditor } from './ConfigEditor';
-import { DataSourceSettings } from '@grafana/data';
-import { GoogleSheetsSecureJSONData } from '../types';
-import { GoogleAuthType, DataSourceOptions } from '@grafana/google-sdk';
+import { GoogleAuthType } from '@grafana/google-sdk';
 
 jest.mock('@grafana/plugin-ui', () => ({
   DataSourceDescription: () => <div data-testid="data-source-description" />,
@@ -21,7 +19,7 @@ jest.mock('@grafana/runtime', () => ({
   }),
 }));
 
-const dataSourceSettings: DataSourceSettings<DataSourceOptions, GoogleSheetsSecureJSONData> = {
+const dataSourceSettings = {
   jsonData: {
     authenticationType: GoogleAuthType.JWT,
   },
@@ -29,7 +27,7 @@ const dataSourceSettings: DataSourceSettings<DataSourceOptions, GoogleSheetsSecu
     jwt: true,
   },
   uid: 'test-uid',
-} as DataSourceSettings<DataSourceOptions, GoogleSheetsSecureJSONData>;
+} as any;
 
 
 describe('ConfigEditor', () => {
@@ -110,11 +108,11 @@ describe('ConfigEditor', () => {
 
     const selectEl = screen.getByText('Select Spreadsheet ID');
     expect(selectEl).toBeInTheDocument();
-    
+
     await userEvent.click(selectEl);
     const spreadsheetOption = await screen.findByText('label1', {}, { timeout: 3000 });
     await userEvent.click(spreadsheetOption);
-    
+
     await waitFor(() => {
       expect(onOptionsChange).toHaveBeenCalledWith(
         expect.objectContaining({
