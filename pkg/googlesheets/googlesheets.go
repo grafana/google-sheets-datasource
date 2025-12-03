@@ -14,7 +14,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
-	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	"github.com/patrickmn/go-cache"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/googleapi"
@@ -30,7 +29,7 @@ type GoogleSheets struct {
 func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.QueryModel, config models.DatasourceSettings, timeRange backend.TimeRange) (dr backend.DataResponse) {
 	client, err := NewGoogleClient(ctx, config)
 	if err != nil {
-		dr = errorsource.Response(err)
+		dr = backend.ErrorResponseWithErrorSource(err)
 		dr.Error = fmt.Errorf("unable to create Google API client: %w", err)
 		return
 	}
@@ -38,7 +37,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 	// This result may be cached
 	sheetData, meta, err := gs.getSheetData(ctx, client, qm)
 	if err != nil {
-		dr = errorsource.Response(err)
+		dr = backend.ErrorResponseWithErrorSource(err)
 		return
 	}
 
@@ -108,21 +107,28 @@ func (gs *GoogleSheets) getSheetData(ctx context.Context, client client, qm *mod
 			// Handle API-specific errors
 			// We use ErrorSourceFromHTTPStatus to determine error source based on HTTP status code
 			if apiErr.Code == 404 {
-				errWithSource := errorsource.DownstreamError(errors.New("spreadsheet not found"), false)
+				errWithSource := backend.DownstreamError(errors.New("spreadsheet not found"))
 				return nil, nil, errWithSource
 			}
 			if apiErr.Message != "" {
 				logger.Warn("Google API Error: " + apiErr.Message)
-				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), fmt.Errorf("google API Error %d", apiErr.Code), false)
-				return nil, nil, errWithSource
+				err :=  fmt.Errorf("google API Error %d", apiErr.Code)
+				if backend.ErrorSourceFromHTTPStatus(apiErr.Code) == backend.ErrorSourceDownstream {
+					return nil, nil, backend.DownstreamError(err)
+				}
+				return nil, nil, err
 			}
-			errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(apiErr.Code), errors.New("unknown API error"), false)
+
+			err := errors.New("unknown API error")
+			if backend.ErrorSourceFromHTTPStatus(apiErr.Code) == backend.ErrorSourceDownstream {
+				return nil, nil, backend.DownstreamError(err)
+			}
 			logger.Warn(apiErr.Error())
-			return nil, nil, errWithSource
+			return nil, nil, err
 		}
 
 		if backend.IsDownstreamHTTPError(err) {
-			errWithSource := errorsource.DownstreamError(err, false)
+			errWithSource := backend.DownstreamError(err)
 			return nil, nil, errWithSource
 		}
 
@@ -130,8 +136,10 @@ func (gs *GoogleSheets) getSheetData(ctx context.Context, client client, qm *mod
 		if neErrOk {
 			var retrieveErr *oauth2.RetrieveError
 			if errors.As(netErr, &retrieveErr) {
-				errWithSource := errorsource.SourceError(backend.ErrorSourceFromHTTPStatus(retrieveErr.Response.StatusCode), err, false)
-				return nil, nil, errWithSource
+				if backend.ErrorSourceFromHTTPStatus(retrieveErr.Response.StatusCode) == backend.ErrorSourceDownstream {
+					return nil, nil, backend.DownstreamError(err)
+				}
+				return nil, nil, err
 			}
 		}
 
