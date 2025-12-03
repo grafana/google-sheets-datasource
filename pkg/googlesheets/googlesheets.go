@@ -112,7 +112,7 @@ func (gs *GoogleSheets) getSheetData(ctx context.Context, client client, qm *mod
 			}
 			if apiErr.Message != "" {
 				logger.Warn("Google API Error: " + apiErr.Message)
-				err :=  fmt.Errorf("google API Error %d", apiErr.Code)
+				err := fmt.Errorf("google API Error %d", apiErr.Code)
 				if backend.ErrorSourceFromHTTPStatus(apiErr.Code) == backend.ErrorSourceDownstream {
 					return nil, nil, backend.DownstreamError(err)
 				}
