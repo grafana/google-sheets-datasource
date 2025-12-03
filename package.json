@@ -89,7 +89,7 @@
     "tslib": "2.5.3"
   },
   "resolutions": {
-    "uplot": "1.6.31",
+    "uplot": "1.6.32",
     "prismjs": "1.30.0",
     "@babel/helpers": "7.26.10",
     "js-yaml": "4.1.1",
