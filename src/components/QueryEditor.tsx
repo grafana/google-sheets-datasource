@@ -1,4 +1,4 @@
-import { QueryEditorProps } from '@grafana/data';
+import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { DataSourceOptions } from '@grafana/google-sdk';
 import { InlineFieldRow, InlineFormLabel, InlineSwitch, Input, LinkButton, Segment, SegmentAsync } from '@grafana/ui';
 import React, { ChangeEvent, PureComponent } from 'react';
@@ -51,6 +51,10 @@ export const formatCacheTimeLabel = (s: number = defaultCacheDuration) => {
 };
 
 export class QueryEditor extends PureComponent<Props> {
+  state = {
+    selectedSheetOption: undefined as SelectableValue<string> | string | undefined,
+  };
+
   componentDidMount() {
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
       this.props.onChange({
@@ -58,7 +62,33 @@ export class QueryEditor extends PureComponent<Props> {
         cacheDurationSeconds: defaultCacheDuration, // um :(
       });
     }
+    this.updateSelectedSheetOption();
   }
+
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.query.spreadsheet !== this.props.query.spreadsheet) {
+      this.updateSelectedSheetOption();
+    }
+  }
+
+  updateSelectedSheetOption = async () => {
+    const { query, datasource } = this.props;
+    if (!query.spreadsheet) {
+      this.setState({ selectedSheetOption: undefined });
+      return;
+    }
+    try {
+      const sheetOptions = await datasource.getSpreadSheets();
+      const matchingOption = sheetOptions.find((opt) => opt.value === query.spreadsheet);
+      if (matchingOption) {
+        this.setState({ selectedSheetOption: matchingOption });
+      } else {
+        this.setState({ selectedSheetOption: query.spreadsheet });
+      }
+    } catch {
+      this.setState({ selectedSheetOption: query.spreadsheet });
+    }
+  };
 
   onRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
     this.props.onChange({
@@ -71,10 +101,12 @@ export class QueryEditor extends PureComponent<Props> {
     const { query, onRunQuery, onChange } = this.props;
 
     if (!item.value) {
+      this.setState({ selectedSheetOption: undefined });
       return; // ignore delete?
     }
 
     const v = item.value;
+    this.setState({ selectedSheetOption: item });
     // Check for pasted full URLs
     if (/(.*)\/spreadsheets\/d\/(.*)/.test(v)) {
       onChange({ ...query, ...getGoogleSheetRangeInfoFromURL(v) });
@@ -118,9 +150,19 @@ export class QueryEditor extends PureComponent<Props> {
             Spreadsheet ID
           </InlineFormLabel>
           <SegmentAsync
-            loadOptions={() => datasource.getSpreadSheets()}
+            loadOptions={async () => {
+              const options = await datasource.getSpreadSheets();
+              const { query } = this.props;
+              if (query.spreadsheet) {
+                const matchingOption = options.find((opt) => opt.value === query.spreadsheet);
+                if (matchingOption && this.state.selectedSheetOption !== matchingOption) {
+                  this.setState({ selectedSheetOption: matchingOption });
+                }
+              }
+              return options;
+            }}
             placeholder="Enter SpreadsheetID"
-            value={query.spreadsheet}
+            value={this.state.selectedSheetOption ?? query.spreadsheet}
             allowCustomValue={true}
             onChange={this.onSpreadsheetIDChange}
           />

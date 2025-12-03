@@ -1,21 +1,25 @@
 import {
   DataSourcePluginOptionsEditorProps,
   onUpdateDatasourceSecureJsonDataOption,
+  SelectableValue,
 } from '@grafana/data';
-import { AuthConfig, DataSourceOptions } from '@grafana/google-sdk';
+import { AuthConfig } from '@grafana/google-sdk';
 import { DataSourceDescription } from '@grafana/plugin-ui';
 import { Field, SecretInput, SegmentAsync, Divider } from '@grafana/ui';
-import React from 'react';
-import { GoogleSheetsSecureJSONData, googleSheetsAuthTypes, GoogleSheetsAuth } from '../types';
+import React, { useState, useEffect } from 'react';
+import { GoogleSheetsSecureJSONData, googleSheetsAuthTypes, GoogleSheetsAuth, GoogleSheetsDataSourceOptions } from '../types';
 import { getBackwardCompatibleOptions } from '../utils';
 import { ConfigurationHelp } from './ConfigurationHelp';
 import { getDataSourceSrv } from '@grafana/runtime';
 import { DataSource } from '../DataSource';
 
-export type Props = DataSourcePluginOptionsEditorProps<DataSourceOptions, GoogleSheetsSecureJSONData>;
+export type Props = DataSourcePluginOptionsEditorProps<GoogleSheetsDataSourceOptions, GoogleSheetsSecureJSONData>;
 
 export function ConfigEditor(props: Props) {
   const options = getBackwardCompatibleOptions(props.options);
+  const [selectedSheetOption, setSelectedSheetOption] = useState<SelectableValue<string> | string | undefined>(
+    options.jsonData.defaultSheetID
+  );
 
   const apiKeyProps = {
     isConfigured: Boolean(options.secureJsonFields.apiKey),
@@ -43,6 +47,25 @@ export function ConfigEditor(props: Props) {
       return [];
     }
   };
+
+  useEffect(() => {
+    const currentValue = options.jsonData.defaultSheetID;
+    if (!currentValue || !options.uid) {
+      setSelectedSheetOption(currentValue);
+      return;
+    }
+    const updateSelectedOption = async () => {
+      try {
+        const ds = (await getDataSourceSrv().get(options.uid!)) as DataSource;
+        const sheetOptions = await ds.getSpreadSheets();
+        const matchingOption = sheetOptions.find((opt) => opt.value === currentValue);
+        setSelectedSheetOption(matchingOption || currentValue);
+      } catch {
+        setSelectedSheetOption(currentValue);
+      }
+    };
+    updateSelectedOption();
+  }, [options.jsonData.defaultSheetID, options.uid]);
   return (
     <>
       <DataSourceDescription
@@ -85,15 +108,17 @@ export function ConfigEditor(props: Props) {
         <SegmentAsync
           loadOptions={loadSheetIDs}
           placeholder="Select Spreadsheet ID"
-          value={(options.jsonData as any).defaultSheetID}
+          value={selectedSheetOption}
           allowCustomValue={true}
           onChange={(value) => {
+            const sheetId = typeof value === 'string' ? value : value?.value;
+            setSelectedSheetOption(value);
             props.onOptionsChange({
               ...options,
               jsonData: {
                 ...options.jsonData,
-                defaultSheetID: value?.value || value,
-              } as any,
+                defaultSheetID: sheetId,
+              },
             });
           }}
         />
