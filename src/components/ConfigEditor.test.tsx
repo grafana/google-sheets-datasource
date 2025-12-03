@@ -2,7 +2,9 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfigEditor } from './ConfigEditor';
-import { GoogleAuthType } from '@grafana/google-sdk';
+import { DataSourceSettings } from '@grafana/data';
+import { GoogleSheetsSecureJSONData } from '../types';
+import { GoogleAuthType, DataSourceOptions } from '@grafana/google-sdk';
 
 jest.mock('@grafana/plugin-ui', () => ({
   DataSourceDescription: () => <div data-testid="data-source-description" />,
@@ -19,7 +21,7 @@ jest.mock('@grafana/runtime', () => ({
   }),
 }));
 
-const dataSourceSettings = {
+const dataSourceSettings: Partial<DataSourceSettings<DataSourceOptions, GoogleSheetsSecureJSONData>> = {
   jsonData: {
     authenticationType: GoogleAuthType.JWT,
   },
@@ -27,7 +29,7 @@ const dataSourceSettings = {
     jwt: true,
   },
   uid: 'test-uid',
-} as any;
+};
 
 
 describe('ConfigEditor', () => {
@@ -102,7 +104,7 @@ describe('ConfigEditor', () => {
     render(
       <ConfigEditor
         onOptionsChange={onOptionsChange}
-        options={dataSourceSettings}
+        options={dataSourceSettings as DataSourceSettings<DataSourceOptions, GoogleSheetsSecureJSONData>}
       />
     );
 
