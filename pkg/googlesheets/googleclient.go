@@ -143,7 +143,7 @@ func createSheetsService(ctx context.Context, settings models.DatasourceSettings
 		return sheets.NewService(ctx, option.WithAPIKey(settings.APIKey))
 	}
 
-	client, err := newHTTPClient(httpclient.Options{})
+	client, err := newHTTPClient(settings, httpclient.Options{}, sheetsRoute)
 	if err != nil {
 		return nil, errors.WithMessage(err, "Failed to create http client")
 	}
@@ -233,7 +233,7 @@ func newHTTPClient(settings models.DatasourceSettings, opts httpclient.Options, 
 		return nil, err
 	}
 
-	opts.Middlewares = append(opts.Middlewares, m, errorsource.Middleware("grafana-googlesheets-datasource"), ResponseInfoMiddleware())
+	opts.Middlewares = append(opts.Middlewares, m, ResponseInfoMiddleware())
 	return httpclient.New(opts)
 }
 
