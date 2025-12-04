@@ -246,11 +246,36 @@ var timeConverter = data.FieldConverter{
 		if !ok {
 			return t, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
 		}
-		parsedTime, err := dateparse.ParseLocal(cellData.FormattedValue)
-		if err != nil {
-			return t, fmt.Errorf("error while parsing date '%v'", cellData.FormattedValue)
+
+		switch {
+		// Convert time based on decimal "Number Value" if possible; format agnostic
+		case cellData.EffectiveValue != nil && cellData.EffectiveValue.NumberValue != nil:
+			const (
+				secondsPerDay        = 24 * 60 * 60
+				nanosecondsPerSecond = 1e9
+			)
+
+			// Dates are stored as decimal values where each whole number represents a day counted from December 30, 1899.
+			// See https://developers.google.com/workspace/sheets/api/guides/formats
+			decimalDateTime := *cellData.EffectiveValue.NumberValue
+			baseDate := time.Date(1899, 12, 30, 0, 0, 0, 0, time.UTC)
+			days := int64(decimalDateTime)
+			calculatedDate := baseDate.AddDate(0, 0, int(days))
+
+			timeRemainder := decimalDateTime - float64(days)
+
+			// Put calculated date and time remainder together
+			calculatedDateTime := calculatedDate.Add(time.Duration(timeRemainder * secondsPerDay * nanosecondsPerSecond))
+			return &calculatedDateTime, nil
+
+		// Else, fallback to the old parsing for backwards compatibility
+		default:
+			parsedTime, err := dateparse.ParseLocal(cellData.FormattedValue)
+			if err != nil {
+				return t, fmt.Errorf("error while parsing date '%v'", cellData.FormattedValue)
+			}
+			return &parsedTime, nil
 		}
-		return &parsedTime, nil
 	},
 }
 
