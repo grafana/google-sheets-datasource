@@ -1,11 +1,16 @@
-import { DataSourcePluginOptionsEditorProps, onUpdateDatasourceSecureJsonDataOption } from '@grafana/data';
+import {
+  DataSourcePluginOptionsEditorProps,
+  onUpdateDatasourceSecureJsonDataOption,
+} from '@grafana/data';
 import { AuthConfig, DataSourceOptions } from '@grafana/google-sdk';
-import { Field, SecretInput, Divider } from '@grafana/ui';
+import { DataSourceDescription } from '@grafana/plugin-ui';
+import { Field, SecretInput, SegmentAsync, Divider } from '@grafana/ui';
 import React from 'react';
-import { GoogleSheetsAuth, GoogleSheetsSecureJSONData, googleSheetsAuthTypes } from '../types';
+import { GoogleSheetsSecureJSONData, googleSheetsAuthTypes, GoogleSheetsAuth } from '../types';
 import { getBackwardCompatibleOptions } from '../utils';
 import { ConfigurationHelp } from './ConfigurationHelp';
-import { DataSourceDescription } from '@grafana/plugin-ui';
+import { getDataSourceSrv } from '@grafana/runtime';
+import { DataSource } from '../DataSource';
 
 export type Props = DataSourcePluginOptionsEditorProps<DataSourceOptions, GoogleSheetsSecureJSONData>;
 
@@ -27,6 +32,17 @@ export function ConfigEditor(props: Props) {
     onChange: onUpdateDatasourceSecureJsonDataOption(props, 'apiKey'),
   };
 
+  const loadSheetIDs = async () => {
+    if (!options.uid) {
+      return [];
+    }
+    try {
+      const ds = (await getDataSourceSrv().get(options.uid)) as DataSource;
+      return ds.getSpreadSheets();
+    } catch {
+      return [];
+    }
+  };
   return (
     <>
       <DataSourceDescription
@@ -59,6 +75,29 @@ export function ConfigEditor(props: Props) {
           <SecretInput {...apiKeyProps} label="API key" width={40} />
         </Field>
       )}
+
+      <Divider />
+
+      <Field
+        label="Default Spreadsheet ID"
+        description="Optional spreadsheet ID to use as default when creating new queries"
+      >
+        <SegmentAsync
+          loadOptions={loadSheetIDs}
+          placeholder="Select Spreadsheet ID"
+          value={(options.jsonData as any).defaultSheetID}
+          allowCustomValue={true}
+          onChange={(value) => {
+            props.onOptionsChange({
+              ...options,
+              jsonData: {
+                ...options.jsonData,
+                defaultSheetID: value?.value || value,
+              } as any,
+            });
+          }}
+        />
+      </Field>
     </>
   );
 }
