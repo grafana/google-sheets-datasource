@@ -117,3 +117,26 @@ func TestColumnDefinition(t *testing.T) {
 		})
 	})
 }
+
+func Test_plain_text_cell_number_like_value_is_detected_as_string(t *testing.T) {
+	column := NewColumnDefinition("PlainTextColumn", 0)
+
+	plainTextValue := "1899" // A value that looks like a number but is formatted as plain text
+	cell := &sheets.CellData{
+		FormattedValue: "1899",
+		EffectiveValue: &sheets.ExtendedValue{
+			StringValue: &plainTextValue,
+		},
+		EffectiveFormat: &sheets.CellFormat{
+			NumberFormat: &sheets.NumberFormat{
+				Type: "TEXT", // format as plain text
+			},
+		},
+	}
+
+	column.CheckCell(cell)
+
+	assert.Equal(t, ColumnType("STRING"), column.GetType())
+	assert.True(t, column.types["STRING"])
+	assert.False(t, column.types["NUMBER"])
+}
