@@ -65,8 +65,9 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOpt
     return this.getResource('spreadsheets').then(({ spreadsheets }) =>
       spreadsheets
         ? Object.entries(spreadsheets).map(([value, label]) => ({
-            label: `${label} (${value})`,
+            label,
             value,
+            description: value,
           }) as SelectableValue<string>)
         : []
     );

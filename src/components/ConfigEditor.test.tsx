@@ -15,7 +15,7 @@ jest.mock('@grafana/runtime', () => ({
       Promise.resolve({
         getSpreadSheets: () =>
           Promise.resolve([
-            { label: 'label1 (value1)', value: 'value1' },
+            { label: 'label1', value: 'value1', description: 'value1' },
           ]),
       }),
   }),
@@ -112,7 +112,7 @@ describe('ConfigEditor', () => {
     expect(selectEl).toBeInTheDocument();
 
     await userEvent.click(selectEl);
-    const spreadsheetOption = await screen.findByText('label1 (value1)', {}, { timeout: 3000 });
+    const spreadsheetOption = await screen.findByText('label1', {}, { timeout: 3000 });
     await userEvent.click(spreadsheetOption);
 
     await waitFor(() => {
