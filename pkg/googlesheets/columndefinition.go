@@ -80,6 +80,12 @@ func (cd *ColumnDefinition) checkType(cell *sheets.CellData) {
 		return
 	}
 
+	// If EffectiveValue.StringValue is set, always set to type STRING (plain text or text-formatted cell)
+	if cell.EffectiveValue != nil && cell.EffectiveValue.StringValue != nil && *cell.EffectiveValue.StringValue != "" {
+		cd.types["STRING"] = true
+		return
+	}
+
 	// Has a number value (will not detect 0)
 	hasNumberValue := cell.EffectiveValue != nil && cell.EffectiveValue.NumberValue != nil && *cell.EffectiveValue.NumberValue != 0
 	hasNumberFormat := cell.EffectiveFormat != nil && cell.EffectiveFormat.NumberFormat != nil
