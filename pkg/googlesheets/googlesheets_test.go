@@ -370,3 +370,58 @@ func TestGooglesheets(t *testing.T) {
 		assert.Equal(t, "Plain Text Value", *strVal)
 	})
 }
+
+func Test_timeConverter(t *testing.T) {
+	t.Run("timeConverter with Number Value converts to time.Time", func(t *testing.T) {
+		serialDate := 43845.5 // 15 January 2020 12:00:00 (0.5 days = 12 hours)
+		cell := &sheets.CellData{
+			EffectiveValue: &sheets.ExtendedValue{
+				NumberValue: &serialDate,
+			},
+		}
+
+		result, err := timeConverter.Converter(cell)
+		require.NoError(t, err)
+
+		require.NotNil(t, result)
+		date, ok := result.(*time.Time)
+		require.True(t, ok)
+		assert.Equal(t, 2020, date.Year())
+		assert.Equal(t, time.January, date.Month())
+		assert.Equal(t, 15, date.Day())
+		assert.Equal(t, 12, date.Hour())
+		assert.Equal(t, 0, date.Minute())
+		assert.Equal(t, 0, date.Second())
+	})
+
+	t.Run("timeConverter without Number Value falls back to parsing FormattedValue", func(t *testing.T) {
+		cell := &sheets.CellData{
+			FormattedValue: "2020-01-15 12:00:00",
+		}
+
+		result, err := timeConverter.Converter(cell)
+		require.NoError(t, err)
+
+		require.NotNil(t, result)
+		date, ok := result.(*time.Time)
+		require.True(t, ok)
+		assert.Equal(t, 2020, date.Year())
+		assert.Equal(t, time.January, date.Month())
+		assert.Equal(t, 15, date.Day())
+		assert.Equal(t, 12, date.Hour())
+		assert.Equal(t, 0, date.Minute())
+		assert.Equal(t, 0, date.Second())
+	})
+
+	t.Run("timeConverter returns error when parsing FormattedValue fails", func(t *testing.T) {
+		cell := &sheets.CellData{
+			FormattedValue: "not a valid date",
+		}
+
+		_, err := timeConverter.Converter(cell)
+
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "error while parsing date")
+		assert.Contains(t, err.Error(), "not a valid date")
+	})
+}
