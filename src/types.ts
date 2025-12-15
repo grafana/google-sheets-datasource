@@ -1,5 +1,5 @@
 import { DataQuery } from '@grafana/schema';
-import { GoogleAuthType, GOOGLE_AUTH_TYPE_OPTIONS, DataSourceSecureJsonData } from '@grafana/google-sdk';
+import { GoogleAuthType, GOOGLE_AUTH_TYPE_OPTIONS, DataSourceSecureJsonData, DataSourceOptions } from '@grafana/google-sdk';
 
 export const GoogleSheetsAuth = {
   ...GoogleAuthType,
@@ -10,6 +10,10 @@ export const googleSheetsAuthTypes = [{ label: 'API Key', value: GoogleSheetsAut
 
 export interface GoogleSheetsSecureJSONData extends DataSourceSecureJsonData {
   apiKey?: string;
+}
+
+export interface GoogleSheetsDataSourceOptions extends DataSourceOptions {
+  defaultSheetID?: string;
 }
 
 export interface CacheInfo {

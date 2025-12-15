@@ -15,7 +15,7 @@ jest.mock('@grafana/runtime', () => ({
       Promise.resolve({
         getSpreadSheets: () =>
           Promise.resolve([
-            { label: 'label1', value: 'value1' },
+            { label: 'label1', value: 'value1', description: 'value1' },
           ]),
       }),
   }),
