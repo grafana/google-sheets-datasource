@@ -36,4 +36,3 @@ jobs:
       docs-only: ${{ fromJSON(github.event.inputs.docs-only) }}
       run-playwright: true
       github-draft-release: false
-      run-plugin-validator: true
