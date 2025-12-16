@@ -13,6 +13,7 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/models"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/data"
 
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/assert"
@@ -334,5 +335,93 @@ func TestGooglesheets(t *testing.T) {
 		require.Equal(t, "ZW", getExcelColumnName(699))
 		// cspell:disable-next-line
 		require.Equal(t, "AJIL", getExcelColumnName(24582))
+	})
+
+	t.Run("plain text cells with with StringValue are correctly classified as STRING regardless of presence ofNumberFormat", func(t *testing.T) {
+		plainTextValue := "Plain Text Value"
+		gridData := &sheets.GridData{
+			RowData: []*sheets.RowData{{Values: []*sheets.CellData{{FormattedValue: "Header"}}},
+				{Values: []*sheets.CellData{
+					{
+						FormattedValue: "Plain Text Value",
+						EffectiveValue: &sheets.ExtendedValue{
+							StringValue: &plainTextValue,
+						},
+						EffectiveFormat: &sheets.CellFormat{
+							NumberFormat: &sheets.NumberFormat{
+								Type: "TEXT",
+							},
+						},
+					},
+				}},
+			},
+		}
+
+		gsd := &GoogleSheets{Cache: cache.New(300*time.Second, 50*time.Second)}
+		qm := models.QueryModel{Range: "A1:A2", Spreadsheet: "test", CacheDurationSeconds: 10}
+
+		frame, err := gsd.transformSheetToDataFrame(context.Background(), gridData, make(map[string]any), "ref1", &qm)
+		require.NoError(t, err)
+
+		assert.Equal(t, data.FieldTypeNullableString, frame.Fields[0].Type())
+		strVal, ok := frame.Fields[0].At(0).(*string)
+		require.True(t, ok)
+		require.NotNil(t, strVal)
+		assert.Equal(t, "Plain Text Value", *strVal)
+	})
+}
+
+func Test_timeConverter(t *testing.T) {
+	t.Run("timeConverter with Number Value converts to time.Time", func(t *testing.T) {
+		serialDate := 43845.5 // 15 January 2020 12:00:00 (0.5 days = 12 hours)
+		cell := &sheets.CellData{
+			EffectiveValue: &sheets.ExtendedValue{
+				NumberValue: &serialDate,
+			},
+		}
+
+		result, err := timeConverter.Converter(cell)
+		require.NoError(t, err)
+
+		require.NotNil(t, result)
+		date, ok := result.(*time.Time)
+		require.True(t, ok)
+		assert.Equal(t, 2020, date.Year())
+		assert.Equal(t, time.January, date.Month())
+		assert.Equal(t, 15, date.Day())
+		assert.Equal(t, 12, date.Hour())
+		assert.Equal(t, 0, date.Minute())
+		assert.Equal(t, 0, date.Second())
+	})
+
+	t.Run("timeConverter without Number Value falls back to parsing FormattedValue", func(t *testing.T) {
+		cell := &sheets.CellData{
+			FormattedValue: "2020-01-15 12:00:00",
+		}
+
+		result, err := timeConverter.Converter(cell)
+		require.NoError(t, err)
+
+		require.NotNil(t, result)
+		date, ok := result.(*time.Time)
+		require.True(t, ok)
+		assert.Equal(t, 2020, date.Year())
+		assert.Equal(t, time.January, date.Month())
+		assert.Equal(t, 15, date.Day())
+		assert.Equal(t, 12, date.Hour())
+		assert.Equal(t, 0, date.Minute())
+		assert.Equal(t, 0, date.Second())
+	})
+
+	t.Run("timeConverter returns error when parsing FormattedValue fails", func(t *testing.T) {
+		cell := &sheets.CellData{
+			FormattedValue: "not a valid date",
+		}
+
+		_, err := timeConverter.Converter(cell)
+
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "error while parsing date")
+		assert.Contains(t, err.Error(), "not a valid date")
 	})
 }
