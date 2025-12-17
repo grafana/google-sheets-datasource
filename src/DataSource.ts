@@ -6,17 +6,16 @@ import {
   SelectableValue,
   CoreApp,
 } from '@grafana/data';
-import { DataSourceOptions } from '@grafana/google-sdk';
 import { DataSourceWithBackend, getTemplateSrv, TemplateSrv } from '@grafana/runtime';
-import { SheetsQuery, SheetsVariableQuery } from './types';
+import { GoogleSheetsDataSourceOptions, SheetsQuery, SheetsVariableQuery } from './types';
 import { Observable } from 'rxjs';
 import { trackRequest } from 'tracking';
 import { SheetsVariableSupport } from 'variables';
 
-export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOptions> {
+export class DataSource extends DataSourceWithBackend<SheetsQuery, GoogleSheetsDataSourceOptions> {
   authType: string;
   constructor(
-    private instanceSettings: DataSourceInstanceSettings<DataSourceOptions>,
+    private instanceSettings: DataSourceInstanceSettings<GoogleSheetsDataSourceOptions>,
     private readonly templateSrv: TemplateSrv = getTemplateSrv()
   ) {
     super(instanceSettings);
@@ -74,6 +73,6 @@ export class DataSource extends DataSourceWithBackend<SheetsQuery, DataSourceOpt
   }
 
   getDefaultQuery(app: CoreApp): Partial<SheetsQuery> {
-    return { spreadsheet: (this.instanceSettings.jsonData as any).defaultSheetID || '' };
+    return { spreadsheet: this.instanceSettings.jsonData.defaultSheetID || '' };
   }
 }

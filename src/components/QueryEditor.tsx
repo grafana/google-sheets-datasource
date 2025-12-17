@@ -9,6 +9,25 @@ import { css } from '@emotion/css';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, DataSourceOptions>;
 
+type SelectedSheetOption = SelectableValue<string> | string | undefined;
+
+function resolveSelectedSheetOption(
+  options: Array<SelectableValue<string>>,
+  spreadsheet?: string
+): SelectableValue<string> | string | undefined {
+  if (!spreadsheet) {
+    return undefined;
+  }
+  return options.find((opt) => opt.value === spreadsheet) ?? spreadsheet;
+}
+
+function selectedSheetOptionKey(option: SelectedSheetOption): string | undefined {
+  if (option === undefined) {
+    return undefined;
+  }
+  return typeof option === 'string' ? option : option.value;
+}
+
 export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery> {
   let idx = url?.indexOf('/d/');
   if (!idx) {
@@ -52,7 +71,7 @@ export const formatCacheTimeLabel = (s: number = defaultCacheDuration) => {
 
 export class QueryEditor extends PureComponent<Props> {
   state = {
-    selectedSheetOption: undefined as SelectableValue<string> | string | undefined,
+    selectedSheetOption: undefined as SelectedSheetOption,
   };
 
   componentDidMount() {
@@ -79,12 +98,7 @@ export class QueryEditor extends PureComponent<Props> {
     }
     try {
       const sheetOptions = await datasource.getSpreadSheets();
-      const matchingOption = sheetOptions.find((opt) => opt.value === query.spreadsheet);
-      if (matchingOption) {
-        this.setState({ selectedSheetOption: matchingOption });
-      } else {
-        this.setState({ selectedSheetOption: query.spreadsheet });
-      }
+      this.setState({ selectedSheetOption: resolveSelectedSheetOption(sheetOptions, query.spreadsheet) });
     } catch {
       this.setState({ selectedSheetOption: query.spreadsheet });
     }
@@ -153,11 +167,9 @@ export class QueryEditor extends PureComponent<Props> {
             loadOptions={async () => {
               const options = await datasource.getSpreadSheets();
               const { query } = this.props;
-              if (query.spreadsheet) {
-                const matchingOption = options.find((opt) => opt.value === query.spreadsheet);
-                if (matchingOption && this.state.selectedSheetOption !== matchingOption) {
-                  this.setState({ selectedSheetOption: matchingOption });
-                }
+              const next = resolveSelectedSheetOption(options, query.spreadsheet);
+              if (selectedSheetOptionKey(this.state.selectedSheetOption) !== selectedSheetOptionKey(next)) {
+                this.setState({ selectedSheetOption: next });
               }
               return options;
             }}
