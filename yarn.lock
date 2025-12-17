@@ -3884,12 +3884,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:18.3.0":
-  version: 18.3.0
-  resolution: "@types/react-dom@npm:18.3.0"
-  dependencies:
-    "@types/react": "npm:*"
-  checksum: 10c0/6c90d2ed72c5a0e440d2c75d99287e4b5df3e7b011838cdc03ae5cd518ab52164d86990e73246b9d812eaf02ec351d74e3b4f5bd325bf341e13bf980392fd53b
+"@types/react-dom@npm:18.3.7":
+  version: 18.3.7
+  resolution: "@types/react-dom@npm:18.3.7"
+  peerDependencies:
+    "@types/react": ^18.0.0
+  checksum: 10c0/8bd309e2c3d1604a28a736a24f96cbadf6c05d5288cfef8883b74f4054c961b6b3a5e997fd5686e492be903c8f3380dba5ec017eff3906b1256529cd2d39603e
   languageName: node
   linkType: hard
 
@@ -3920,13 +3920,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:18.3.0":
-  version: 18.3.0
-  resolution: "@types/react@npm:18.3.0"
+"@types/react@npm:18.3.27":
+  version: 18.3.27
+  resolution: "@types/react@npm:18.3.27"
   dependencies:
     "@types/prop-types": "npm:*"
-    csstype: "npm:^3.0.2"
-  checksum: 10c0/6405f805700daf096a507a191bc4f8814ebed49120f156926b0a5b7b6f41424214320cea3dbb6df85f476b220f0554ef7e587baa88f59375e64bdbab525f58aa
+    csstype: "npm:^3.2.2"
+  checksum: 10c0/a761d2f58de03d0714806cc65d32bb3d73fb33a08dd030d255b47a295e5fff2a775cf1c20b786824d8deb6454eaccce9bc6998d9899c14fc04bbd1b0b0b72897
   languageName: node
   linkType: hard
 
@@ -7591,8 +7591,8 @@ __metadata:
     "@types/jest": "npm:30.0.0"
     "@types/lodash": "npm:4.17.21"
     "@types/node": "npm:25.0.1"
-    "@types/react": "npm:18.3.0"
-    "@types/react-dom": "npm:18.3.0"
+    "@types/react": "npm:18.3.27"
+    "@types/react-dom": "npm:18.3.7"
     "@typescript-eslint/eslint-plugin": "npm:8.49.0"
     "@typescript-eslint/parser": "npm:8.49.0"
     copy-webpack-plugin: "npm:13.0.1"
@@ -7612,8 +7612,8 @@ __metadata:
     jest: "npm:30.2.0"
     jest-environment-jsdom: "npm:30.2.0"
     prettier: "npm:3.7.4"
-    react: "npm:18.3.0"
-    react-dom: "npm:18.3.0"
+    react: "npm:18.3.1"
+    react-dom: "npm:18.3.1"
     replace-in-file-webpack-plugin: "npm:1.0.6"
     rxjs: "npm:^7.8.2"
     sass: "npm:1.96.0"
@@ -10905,15 +10905,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:18.3.0":
-  version: 18.3.0
-  resolution: "react-dom@npm:18.3.0"
+"react-dom@npm:18.3.1":
+  version: 18.3.1
+  resolution: "react-dom@npm:18.3.1"
   dependencies:
     loose-envify: "npm:^1.1.0"
-    scheduler: "npm:^0.23.1"
+    scheduler: "npm:^0.23.2"
   peerDependencies:
-    react: ^18.3.0
-  checksum: 10c0/5072767a5d67e242579e5ed46094bf5665385fcfc50584e818273ba668f768348bfd9101841fa3986635635b1238a7a5b2d28b73b134ebbe58a415311afd60d4
+    react: ^18.3.1
+  checksum: 10c0/a752496c1941f958f2e8ac56239172296fcddce1365ce45222d04a1947e0cc5547df3e8447f855a81d6d39f008d7c32eab43db3712077f09e3f67c4874973e85
   languageName: node
   linkType: hard
 
@@ -11290,12 +11290,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:18.3.0":
-  version: 18.3.0
-  resolution: "react@npm:18.3.0"
+"react@npm:18.3.1":
+  version: 18.3.1
+  resolution: "react@npm:18.3.1"
   dependencies:
     loose-envify: "npm:^1.1.0"
-  checksum: 10c0/ad87bbfdb0c5466148c657da18b0d5458e835389fc591d59840f0e6ec797a004073a01c8cdbff1767a8774c7219054a56f74dacd67bdbb849f1314e427999268
+  checksum: 10c0/283e8c5efcf37802c9d1ce767f302dd569dd97a70d9bb8c7be79a789b9902451e0d16334b05d73299b20f048cbc3c7d288bbbde10b701fa194e2089c237dbea3
   languageName: node
   linkType: hard
 
@@ -11685,7 +11685,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scheduler@npm:^0.23.1":
+"scheduler@npm:^0.23.2":
   version: 0.23.2
   resolution: "scheduler@npm:0.23.2"
   dependencies:
