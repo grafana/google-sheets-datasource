@@ -181,6 +181,7 @@ export class QueryEditor extends PureComponent<Props> {
           {query.spreadsheet && (
             <LinkButton
               style={{ marginTop: 1 }}
+              aria-label="Open link"
               fill="text"
               icon="link"
               href={toGoogleURL(query)}
