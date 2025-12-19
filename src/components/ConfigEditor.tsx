@@ -51,8 +51,10 @@ export function ConfigEditor(props: Props) {
   useEffect(() => {
     const currentValue = options.jsonData.defaultSheetID;
     if (!currentValue || !options.uid) {
-      setSelectedSheetOption(currentValue);
-      return;
+      const timeoutId = setTimeout(() => {
+        setSelectedSheetOption(currentValue);
+      }, 0);
+      return () => clearTimeout(timeoutId);
     }
     const updateSelectedOption = async () => {
       try {
