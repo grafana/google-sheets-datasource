@@ -6,8 +6,13 @@ import {
 import { AuthConfig } from '@grafana/google-sdk';
 import { DataSourceDescription } from '@grafana/plugin-ui';
 import { Field, SecretInput, SegmentAsync, Divider } from '@grafana/ui';
-import React, { useState, useEffect } from 'react';
-import { GoogleSheetsSecureJSONData, googleSheetsAuthTypes, GoogleSheetsAuth, GoogleSheetsDataSourceOptions } from '../types';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  GoogleSheetsSecureJSONData,
+  googleSheetsAuthTypes,
+  GoogleSheetsAuth,
+  GoogleSheetsDataSourceOptions,
+} from '../types';
 import { getBackwardCompatibleOptions } from '../utils';
 import { ConfigurationHelp } from './ConfigurationHelp';
 import { getDataSourceSrv } from '@grafana/runtime';
@@ -20,6 +25,7 @@ export function ConfigEditor(props: Props) {
   const [selectedSheetOption, setSelectedSheetOption] = useState<SelectableValue<string> | string | undefined>(
     options.jsonData.defaultSheetID
   );
+  const prevValueRef = useRef<string | undefined>(options.jsonData.defaultSheetID);
 
   const apiKeyProps = {
     isConfigured: Boolean(options.secureJsonFields.apiKey),
@@ -50,6 +56,11 @@ export function ConfigEditor(props: Props) {
 
   useEffect(() => {
     const currentValue = options.jsonData.defaultSheetID;
+    if (prevValueRef.current === currentValue) {
+      return () => {};
+    }
+    prevValueRef.current = currentValue;
+
     if (!currentValue || !options.uid) {
       const timeoutId = setTimeout(() => {
         setSelectedSheetOption(currentValue);
@@ -67,6 +78,7 @@ export function ConfigEditor(props: Props) {
       }
     };
     updateSelectedOption();
+    return () => {};
   }, [options.jsonData.defaultSheetID, options.uid]);
   return (
     <>
@@ -80,13 +92,25 @@ export function ConfigEditor(props: Props) {
       <div className="grafana-info-box">
         <h5>Choosing an authentication type</h5>
         <ul>
-          <li><strong>Google JWT File</strong>: provides access to private spreadsheets and works in all environments where Grafana is running.</li> 
-          <li><strong>API Key</strong>: simpler configuration, but requires spreadsheets to be public.</li>
-          <li><strong>GCE Default Service Account</strong>: automatically retrieves default credentials. Requires Grafana to be running on a Google Compute Engine virtual machine.</li>
+          <li>
+            <strong>Google JWT File</strong>: provides access to private spreadsheets and works in all environments
+            where Grafana is running.
+          </li>
+          <li>
+            <strong>API Key</strong>: simpler configuration, but requires spreadsheets to be public.
+          </li>
+          <li>
+            <strong>GCE Default Service Account</strong>: automatically retrieves default credentials. Requires Grafana
+            to be running on a Google Compute Engine virtual machine.
+          </li>
         </ul>
-        <br/>
-        <p><strong>Select an Authentication type below and expand <strong>Configure Google Sheets Authentication</strong> for 
-          detailed guidance on configuration</strong>.
+        <br />
+        <p>
+          <strong>
+            Select an Authentication type below and expand <strong>Configure Google Sheets Authentication</strong> for
+            detailed guidance on configuration
+          </strong>
+          .
         </p>
       </div>
       <ConfigurationHelp authenticationType={options.jsonData.authenticationType} />
