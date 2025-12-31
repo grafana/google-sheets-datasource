@@ -146,6 +146,7 @@ export class QueryEditor extends PureComponent<Props> {
 
   render() {
     const { query, onRunQuery, onChange, datasource } = this.props;
+    const { selectedSheetOption } = this.state;
     const styles = getStyles();
 
     return (
@@ -168,13 +169,13 @@ export class QueryEditor extends PureComponent<Props> {
               const options = await datasource.getSpreadSheets();
               const { query } = this.props;
               const next = resolveSelectedSheetOption(options, query.spreadsheet);
-              if (selectedSheetOptionKey(this.state.selectedSheetOption) !== selectedSheetOptionKey(next)) {
+              if (selectedSheetOptionKey(selectedSheetOption) !== selectedSheetOptionKey(next)) {
                 this.setState({ selectedSheetOption: next });
               }
               return options;
             }}
             placeholder="Enter SpreadsheetID"
-            value={this.state.selectedSheetOption ?? query.spreadsheet}
+            value={selectedSheetOption ?? query.spreadsheet}
             allowCustomValue={true}
             onChange={this.onSpreadsheetIDChange}
           />
