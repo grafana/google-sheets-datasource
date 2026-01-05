@@ -2,14 +2,12 @@
 
 ## 2.3.0
 
-### Minor Changes
 
 🚀 Add default spreadsheet ID to config editor
 
-### Patch Changes
+🐛 Fix plain text cell classification
 
-🐛 fix plain text cell classification
-🐛 use NumberValue to calculate datetime instead of parsing
+🐛 Use NumberValue to calculate `datetime` instead of parsing
 
 ## 2.2.1
 
