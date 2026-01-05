@@ -1,4 +1,4 @@
-import { QueryEditorProps } from '@grafana/data';
+import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { DataSourceOptions } from '@grafana/google-sdk';
 import { InlineFieldRow, InlineFormLabel, InlineSwitch, Input, LinkButton, Segment, SegmentAsync } from '@grafana/ui';
 import React, { ChangeEvent, PureComponent } from 'react';
@@ -8,6 +8,25 @@ import { reportInteraction } from '@grafana/runtime';
 import { css } from '@emotion/css';
 
 type Props = QueryEditorProps<DataSource, SheetsQuery, DataSourceOptions>;
+
+type SelectedSheetOption = SelectableValue<string> | string | undefined;
+
+function resolveSelectedSheetOption(
+  options: Array<SelectableValue<string>>,
+  spreadsheet?: string
+): SelectableValue<string> | string | undefined {
+  if (!spreadsheet) {
+    return undefined;
+  }
+  return options.find((opt) => opt.value === spreadsheet) ?? spreadsheet;
+}
+
+function selectedSheetOptionKey(option: SelectedSheetOption): string | undefined {
+  if (option === undefined) {
+    return undefined;
+  }
+  return typeof option === 'string' ? option : option.value;
+}
 
 export function getGoogleSheetRangeInfoFromURL(url: string): Partial<SheetsQuery> {
   let idx = url?.indexOf('/d/');
@@ -51,6 +70,10 @@ export const formatCacheTimeLabel = (s: number = defaultCacheDuration) => {
 };
 
 export class QueryEditor extends PureComponent<Props> {
+  state = {
+    selectedSheetOption: undefined as SelectedSheetOption,
+  };
+
   componentDidMount() {
     if (!this.props.query.hasOwnProperty('cacheDurationSeconds')) {
       this.props.onChange({
@@ -58,7 +81,28 @@ export class QueryEditor extends PureComponent<Props> {
         cacheDurationSeconds: defaultCacheDuration, // um :(
       });
     }
+    this.updateSelectedSheetOption();
   }
+
+  componentDidUpdate(prevProps: Props) {
+    if (prevProps.query.spreadsheet !== this.props.query.spreadsheet) {
+      this.updateSelectedSheetOption();
+    }
+  }
+
+  updateSelectedSheetOption = async () => {
+    const { query, datasource } = this.props;
+    if (!query.spreadsheet) {
+      this.setState({ selectedSheetOption: undefined });
+      return;
+    }
+    try {
+      const sheetOptions = await datasource.getSpreadSheets();
+      this.setState({ selectedSheetOption: resolveSelectedSheetOption(sheetOptions, query.spreadsheet) });
+    } catch {
+      this.setState({ selectedSheetOption: query.spreadsheet });
+    }
+  };
 
   onRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
     this.props.onChange({
@@ -71,10 +115,12 @@ export class QueryEditor extends PureComponent<Props> {
     const { query, onRunQuery, onChange } = this.props;
 
     if (!item.value) {
+      this.setState({ selectedSheetOption: undefined });
       return; // ignore delete?
     }
 
     const v = item.value;
+    this.setState({ selectedSheetOption: item });
     // Check for pasted full URLs
     if (/(.*)\/spreadsheets\/d\/(.*)/.test(v)) {
       onChange({ ...query, ...getGoogleSheetRangeInfoFromURL(v) });
@@ -100,6 +146,7 @@ export class QueryEditor extends PureComponent<Props> {
 
   render() {
     const { query, onRunQuery, onChange, datasource } = this.props;
+    const { selectedSheetOption } = this.state;
     const styles = getStyles();
 
     return (
@@ -118,9 +165,17 @@ export class QueryEditor extends PureComponent<Props> {
             Spreadsheet ID
           </InlineFormLabel>
           <SegmentAsync
-            loadOptions={() => datasource.getSpreadSheets()}
+            loadOptions={async () => {
+              const options = await datasource.getSpreadSheets();
+              const { query } = this.props;
+              const next = resolveSelectedSheetOption(options, query.spreadsheet);
+              if (selectedSheetOptionKey(selectedSheetOption) !== selectedSheetOptionKey(next)) {
+                this.setState({ selectedSheetOption: next });
+              }
+              return options;
+            }}
             placeholder="Enter SpreadsheetID"
-            value={query.spreadsheet}
+            value={selectedSheetOption ?? query.spreadsheet}
             allowCustomValue={true}
             onChange={this.onSpreadsheetIDChange}
           />
