@@ -1,5 +1,14 @@
 # Change Log
 
+## 2.3.0
+
+
+🚀 Add default spreadsheet ID to config editor
+
+🐛 Fix plain text cell classification
+
+🐛 Use NumberValue to calculate `datetime` instead of parsing
+
 ## 2.2.1
 
 🐛 Bump `github.com/grafana/grafana-google-sdk-go` to 0.4.2
