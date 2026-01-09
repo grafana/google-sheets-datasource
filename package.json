@@ -91,5 +91,8 @@
     "react-dom": "18.3.1",
     "tslib": "2.8.1"
   },
+  "resolutions": {
+    "@remix-run/router": "^1.23.2"
+  },
   "packageManager": "yarn@4.12.0"
 }
