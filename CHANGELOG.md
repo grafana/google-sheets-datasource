@@ -1,7 +1,11 @@
 # Change Log
 
-## 2.3.0
+## 2.3.1
 
+🐛 Set resolution for @remix-run/router
+🐛 Bump dependency versions
+
+## 2.3.0
 
 🚀 Add default spreadsheet ID to config editor
 
