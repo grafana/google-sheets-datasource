@@ -1,7 +1,11 @@
 # Change Log
 
-## 2.3.0
+## 2.3.1
 
+🐛 Set resolution for @remix-run/router
+🐛 Bump dependency versions
+
+## 2.3.0
 
 🚀 Add default spreadsheet ID to config editor
 
@@ -133,7 +137,7 @@
 
 - Refactored authentication to use grafana google sdks. With this change you can now use GCE authentication with google sheets.
 
-There was a change in the plugin configuration. Please take a look at the provisioning example in the [documentation](src/docs/provisioning.md).
+There was a change in the plugin configuration. Please take a look at the provisioning example in the [documentation](docs/sources/setup/provisioning.md).
 The change is backward compatible so you can still use the old configuration.
 
 ## v1.1.8
