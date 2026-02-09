@@ -94,6 +94,25 @@ To authenticate with the default GCE service account:
 1. Enter the project name in the **Default project** field of the data source configuration
 
 
+## Default Spreadsheet ID
+
+You can optionally configure a **Default Spreadsheet ID** in the data source settings. When set, this spreadsheet ID will be automatically populated in new queries, making it faster to create queries that use the same spreadsheet.
+
+To configure a default spreadsheet ID:
+
+1. Navigate to the data source configuration page.
+1. Scroll to the **Default Spreadsheet ID** field.
+1. Choose one of the following options:
+   - **Select from dropdown** (JWT authentication only): If you're using Google JWT File authentication, you can select a spreadsheet from the dropdown menu. The dropdown shows all spreadsheets that the service account has access to.
+   - **Enter a spreadsheet ID**: Manually enter the spreadsheet ID from the spreadsheet URL.
+   - **Paste a spreadsheet URL**: Paste the full spreadsheet URL, and the ID will be automatically extracted.
+
+When you create a new query, the default spreadsheet ID will be pre-filled in the **Spreadsheet ID** field of the query editor.
+
+{{< admonition type="note" >}}
+The default spreadsheet ID is optional. If not set, you'll need to specify the spreadsheet ID for each query manually.
+{{< /admonition >}}
+
 ## Sharing
 
 Refer to the following official guidance from Google to learn how to share resources from:

@@ -47,6 +47,7 @@ datasources:
     type: grafana-googlesheets-datasource
     jsonData:
       authenticationType: 'key'
+      defaultSheetID: '<SPREADSHEET ID>' # Optional: default spreadsheet ID for new queries
     secureJsonData:
       apiKey: '<API KEY>'
 ```
@@ -70,6 +71,7 @@ datasources:
       defaultProject: '<PROJECT ID>'
       clientEmail: '<CLIENT EMAIL>'
       tokenUri: 'https://oauth2.googleapis.com/token'
+      defaultSheetID: '<SPREADSHEET ID>' # Optional: default spreadsheet ID for new queries
     secureJsonData:
       privateKey: <PRIVATE KEY DATA>
 ```
@@ -95,6 +97,7 @@ datasources:
       clientEmail: '<CLIENT EMAIL>'
       privateKeyPath: '/path/to/privateKey'
       tokenUri: 'https://oauth2.googleapis.com/token'
+      defaultSheetID: '<SPREADSHEET ID>' # Optional: default spreadsheet ID for new queries
 ```
 
 ## With the default GCE service account
@@ -114,4 +117,5 @@ datasources:
     jsonData:
       authenticationType: 'gce'
       defaultProject: '<PROJECT ID>'
+      defaultSheetID: '<SPREADSHEET ID>' # Optional: default spreadsheet ID for new queries
 ```
