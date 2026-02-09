@@ -30,6 +30,10 @@ Refer to the following sections to understand how to set each configuration opti
 
 The **Spreadsheet ID** field controls which spreadsheet to query.
 
+{{< admonition type="tip" >}}
+If you've configured a default spreadsheet ID in the data source settings, it will be automatically pre-filled when you create a new query. Refer to [Configure the data source](../setup/configure/#default-spreadsheet-id) for more information.
+{{< /admonition >}}
+
 You can:
 
 - Enter a spreadsheet ID.
