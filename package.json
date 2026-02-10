@@ -83,7 +83,7 @@
     "@grafana/data": "12.3.2",
     "@grafana/google-sdk": "0.4.1",
     "@grafana/i18n": "12.3.2",
-    "@grafana/plugin-ui": "0.13.0",
+    "@grafana/plugin-ui": "0.13.1",
     "@grafana/runtime": "12.3.2",
     "@grafana/schema": "12.3.2",
     "@grafana/ui": "12.3.2",
