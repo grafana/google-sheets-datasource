@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.4.0
+
+🚀 Update @grafana/plugin-ui for react-19 upgrade preparation
+
 ## 2.3.1
 
 🐛 Set resolution for @remix-run/router
