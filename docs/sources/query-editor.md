@@ -1,5 +1,6 @@
 ---
 title: Query editor
+menuTitle: Query editor
 description: Learn about the query editor for the Google Sheets data source plugin to visualize Google Spreadsheets data in Grafana.
 keywords:
   - data source
@@ -16,22 +17,24 @@ labels:
     - oss
     - enterprise
     - cloud
+aliases:
+  - /docs/plugins/grafana-googlesheets-datasource/latest/query-editor/
 weight: 200
 ---
 
 # Query editor
 
 The Google Sheets data source query editor configures the Google Sheets API query.
-Refer to the following sections to understand how to set each configuration option.
+Refer to the sections below to understand how to set each configuration option.
 
-{{< figure alt="The Google Sheets data source query editor configured to query a Google Sheet" src="/media/docs/plugins/google-sheets-query-editor-1.png" >}}
+{{< figure alt="The Google Sheets data source query editor configured to query a Google Sheet" src="/media/docs/plugins/google-sheets-query-editor-1.png" caption="The Google Sheets data source query editor configured to query a Google Sheet" >}}
 
 ## Spreadsheet ID
 
 The **Spreadsheet ID** field controls which spreadsheet to query.
 
 {{< admonition type="tip" >}}
-If you've configured a default spreadsheet ID in the data source settings, it will be automatically pre-filled when you create a new query. Refer to [Configure the data source](../setup/configure/#default-spreadsheet-id) for more information.
+If you've configured a default spreadsheet ID in the data source settings, it will be automatically pre-filled when you create a new query. Refer to [Configure the data source](configure/#default-spreadsheet-id) for more information.
 {{< /admonition >}}
 
 You can:
@@ -58,7 +61,7 @@ The query editor automatically extracts the spreadsheet ID from the URL.
   The drop-down menu is only populated if you are using Google JWT authentication.
   You can only view spreadsheets shared with the service account associated with the token.
 
-  To configure a service account with JWT authentication, refer to [Authenticate with a service account JWT](../setup/authenticate/#authenticate-with-a-service-account-jwt).
+  To configure a service account with JWT authentication, refer to [Authenticate with a service account JWT](configure/#authenticate-with-a-service-account-jwt).
 
 Next to the **Spreadsheet ID** field there's an external link icon.
 Click that icon to open the spreadsheet in Google Sheets in a new tab.

@@ -1,7 +1,7 @@
 ---
-title: Create a sample dashboard using the Google Sheets data source plugin for Grafana
+title: Create a sample dashboard
 menuTitle: Create a sample dashboard
-description: Create a sample Dashboard using the Google Sheets data source plugin to visualize Google Spreadsheets data in Grafana.
+description: Create a sample dashboard using the Google Sheets data source plugin to visualize Google Spreadsheets data in Grafana.
 keywords:
   - data source
   - google sheets
@@ -17,10 +17,12 @@ labels:
     - oss
     - enterprise
     - cloud
+aliases:
+  - /docs/plugins/grafana-googlesheets-datasource/latest/create-a-sample-dashboard/
 weight: 400
 ---
 
-# Create a sample dashboard using the Google Sheets data source plugin for Grafana
+# Create a sample dashboard
 
 In this task you're going to create a sample dashboard using a publicly available [demonstration spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing).
 
@@ -31,9 +33,9 @@ In this task you're going to create a sample dashboard using a publicly availabl
 - Configure the Google Sheets data source plugin.
 
   You can authenticate with an API key to query public Google Sheets.
-  To create an API key, refer to [Authenticate with an API key](../setup/authenticate/#authenticate-with-an-api-key).
+  To create an API key, refer to [Authenticate with an API key](configure.md#authenticate-with-an-api-key).
 
-  To configure the plugin, refer to [Configure the Google Sheets Plugin](../setup/configure/).
+  To configure the plugin, refer to [Configure the Google Sheets data source](configure.md).
 
 ## Create a sample dashboard
 
@@ -48,18 +50,18 @@ To create a sample dashboard:
 
 1. Paste the spreadsheet ID into the query editor
 
-   {{< figure alt="Paste the spreadsheet ID into the query editor" src="/media/docs/plugins/google-sheets-example-1.png" >}}
+   {{< figure alt="Paste the spreadsheet ID into the query editor" src="/media/docs/plugins/google-sheets-example-1.png" caption="Paste the spreadsheet ID into the query editor" >}}
 
    Grafana automatically detects this data as time series data and uses the time series panel visualization to display it.
 
-   {{< figure alt="Spreadsheet data visualized in the time series panel visualization" src="/media/docs/plugins/google-sheets-example-2.png" >}}
+   {{< figure alt="Spreadsheet data visualized in the time series panel visualization" src="/media/docs/plugins/google-sheets-example-2.png" caption="Spreadsheet data visualized in the time series panel visualization" >}}
 
    You can also use other visualizations like the bar gauge visualization:
-   {{< figure alt="Spreadsheet data visualized in the bar gauge panel visualization" src="/media/docs/plugins/google-sheets-example-3.png" >}}
+   {{< figure alt="Spreadsheet data visualized in the bar gauge panel visualization" src="/media/docs/plugins/google-sheets-example-3.png" caption="Spreadsheet data visualized in the bar gauge panel visualization" >}}
 
 ## Grafana Play demonstration
 
-Grafana Play provides a reference dashboard and lets you to modify and create your own custom dashboards.
+Grafana Play provides a reference dashboard and lets you modify and create your own custom dashboards.
 
 {{< docs/play title="Google Sheets data source plugin demo" url="https://play.grafana.org/d/ddkar8yanj56oa/visualizing-google-sheets-data" >}}
 
