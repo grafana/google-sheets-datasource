@@ -27,7 +27,7 @@ weight: 200
 
 The Google Sheets data source query editor configures the Google Sheets API query. Use it when building panels in a dashboard or in Explore.
 
-This page walks you through key concepts and a summary of the fields, then how to create a query, then each field in detail, and finally [example use cases](#example-use-cases) for common scenarios.
+This document walks you through key concepts and a summary of the fields, then how to create a query, then each field in detail, and finally [example use cases](#example-use-cases) for common scenarios.
 
 ## Before you begin
 
@@ -139,7 +139,7 @@ Use a small range (e.g. one row or a few cells, such as `Summary!B2:B5`) and pai
 
 **Annotations from a sheet**
 
-Use a sheet that has a time column and a text/description column as an [annotation source](https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/annotate-visualizations/). Point the annotation query at the range containing the time and text fields. Enable **Use Time Filter** so annotations stay within the dashboard time range.
+Use a Google Sheet as an annotation source to overlay events on panels. See [Annotations](annotations.md) for sheet layout (time, text, tags), steps to add an annotation query, and **Use Time Filter**.
 
 **Same spreadsheet, different panels**
 

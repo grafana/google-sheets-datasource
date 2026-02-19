@@ -50,7 +50,7 @@ Before you start, ensure you have:
 
 After you configure the data source, you can:
 
-- Add [annotations](https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/annotate-visualizations/) to panels
+- Add [annotations](annotations.md) to panels
 - Use [template variables](template-variables.md) in queries
 - Apply [transformations](https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/transform-data/) to query results
 
