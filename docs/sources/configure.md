@@ -36,7 +36,7 @@ This document explains how to configure and provision the Google Sheets data sou
 Before configuring the data source, ensure you have:
 
 - **Grafana permissions:** Organization administrator role (to add and configure data sources).
-- **Plugin installed:** The Google Sheets data source plugin. For instructions, refer to [Install a plugin](https://grafana.com/docs/grafana/latest/administration/plugin-management/#install-a-plugin).
+- **Plugin installed:** The Google Sheets data source plugin. For instructions, refer to [Install a plugin](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/administration/plugin-management/#install-a-plugin).
 - **Google account:** A Google account; for JWT or API key authentication, a Google Cloud project with the required APIs enabled (see each authentication section below for details).
 
 ## Add the data source
@@ -165,7 +165,7 @@ Click **Save & test** to verify the connection. A successful connection shows th
 
 ## Provision the data source
 
-You can define the Google Sheets data source with [Grafana provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/#data-sources) (YAML) or with the [Grafana Terraform provider](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/data_source).
+You can define the Google Sheets data source with [Grafana provisioning](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/administration/provisioning/#data-sources) (YAML) or with the [Grafana Terraform provider](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/data_source).
 
 You can provision the data source using any of these authentication mechanisms:
 

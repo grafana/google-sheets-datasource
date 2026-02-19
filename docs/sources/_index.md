@@ -24,9 +24,9 @@ weight: 10
 
 # Google Sheets data source
 
-The Google Sheets data source lets you visualize your Google spreadsheets in Grafana. It uses the [Google Sheets API](https://developers.google.com/workspace/sheets/api/guides/concepts) to read data that you can view in dashboard panels or [Explore](https://grafana.com/docs/grafana/latest/explore/).
+The Google Sheets data source lets you visualize your Google spreadsheets in Grafana. It uses the [Google Sheets API](https://developers.google.com/workspace/sheets/api/guides/concepts) to read data that you can view in dashboard panels or [Explore](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/explore/).
 
-This video shows how to use the plugin: {{< youtube id="hqeqeQFrtSA">}}
+Watch the following video to learn more about the plugin:  {{< youtube id="hqeqeQFrtSA">}}
 
 {{< docs/play title="Google Sheets data source demo" url="https://play.grafana.org/d/ddkar8yanj56oa/visualizing-google-sheets-data" >}}
 
@@ -46,7 +46,7 @@ Before you start, ensure you have:
 
 - **Grafana 11.6.0 or newer** (plugin requirement)
 - A [Google account](https://support.google.com/accounts/answer/27441?hl=en) to use Google Sheets
-- One of these Grafana editions: [Grafana OSS](https://grafana.com/oss/grafana/), [Grafana Cloud](https://grafana.com/pricing/), or self-managed [Grafana Enterprise](https://grafana.com/docs/grafana/latest/administration/enterprise-licensing/) with an activated license
+- One of these Grafana editions: [Grafana OSS](https://grafana.com/oss/grafana/), [Grafana Cloud](https://grafana.com/pricing/), or self-managed [Grafana Enterprise](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/administration/enterprise-licensing/) with an activated license
 
 ## Get started
 
@@ -57,7 +57,7 @@ The following documents help you get started:
 - [Template variables](template-variables.md) – Create dynamic dashboards with variables.
 - [Troubleshooting](troubleshooting.md) – Solve common configuration and query errors.
 
-[Install the plugin](https://grafana.com/docs/grafana/latest/administration/plugin-management/#install-a-plugin) if you haven’t already. Try the [Quick start](#quick-start-create-a-sample-dashboard) below to build a sample dashboard in a few steps.
+[Install the plugin](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/administration/plugin-management/#install-a-plugin) if you haven’t already. Try the [Quick start](#quick-start-create-a-sample-dashboard) below to build a sample dashboard in a few steps.
 
 ## Quick start: create a sample dashboard
 
@@ -84,8 +84,8 @@ After you configure the data source, you can:
 
 - Add [annotations](annotations.md) to overlay events on panels
 - Use [template variables](template-variables.md) in queries
-- Use [Explore](https://grafana.com/docs/grafana/latest/explore/) for ad-hoc queries without building a dashboard
-- Apply [transformations](https://grafana.com/docs/grafana/latest/panels-visualizations/query-transform-data/transform-data/) to query results
+- Use [Explore](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/explore/) for ad-hoc queries without building a dashboard
+- Apply [transformations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/panels-visualizations/query-transform-data/transform-data/) to query results
 
 ## Quota
 

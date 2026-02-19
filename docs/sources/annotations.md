@@ -21,7 +21,7 @@ weight: 400
 
 Annotations overlay event information on top of graphs. You can use a Google Sheet as the source for annotations to mark deployments, incidents, releases, or other events on your dashboards.
 
-For general information about annotations, refer to [Annotate visualizations](https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/annotate-visualizations/).
+For general information about annotations, refer to [Annotate visualizations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/build-dashboards/annotate-visualizations/).
 
 ## Before you begin
 
@@ -79,7 +79,7 @@ After creating the annotation query, you can change how it appears:
 - **Show in** – Choose which panels display the annotations (all panels, selected panels, or all except selected).
 - **Filter by** – Add filters to limit when annotations are shown.
 
-For details, see [Annotate visualizations](https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/annotate-visualizations/).
+For details, see [Annotate visualizations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/build-dashboards/annotate-visualizations/).
 
 ## Next steps
 

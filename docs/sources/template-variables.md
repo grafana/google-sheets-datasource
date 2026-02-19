@@ -25,7 +25,7 @@ weight: 300
 
 Instead of hard-coding details such as spreadsheet ID or range in your queries, you can use variables. This helps you create more interactive, dynamic, and reusable dashboards. Grafana refers to such variables as template variables. They typically appear as controls (such as drop-down lists) at the top of the dashboard so you can change what data is shown without editing each panel.
 
-For an introduction to templating and template variables, refer to [Variables](https://grafana.com/docs/grafana/latest/dashboards/variables/) and [Add and manage variables](https://grafana.com/docs/grafana/latest/dashboards/variables/add-variable/).
+For an introduction to templating and template variables, refer to [Variables](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/) and [Add and manage variables](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-variable/).
 
 The Google Sheets data source supports **query variables**: variables whose options are loaded from a Google Sheet. You can then use those variables in panel queries (for example, in **Spreadsheet ID** or **Range**) to make dashboards dynamic.
 
@@ -113,4 +113,4 @@ When the user changes the variable in the dashboard drop-down, queries that refe
 
 - [Query editor](query-editor.md)
 - [Configure the data source](configure.md)
-- [Grafana Variables documentation](https://grafana.com/docs/grafana/latest/dashboards/variables/)
+- [Grafana Variables documentation](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/)

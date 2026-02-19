@@ -59,7 +59,7 @@ The sections below describe each field in detail.
 
 To create a query:
 
-1. Select the **Google Sheets** data source for the panel (or open [Explore](https://grafana.com/docs/grafana/latest/explore/) and select it there).
+1. Select the **Google Sheets** data source for the panel (or open [Explore](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/explore/) and select it there).
 1. In **Spreadsheet ID**, enter the spreadsheet ID or URL, or choose a spreadsheet from the list if you use JWT authentication.
 1. Optionally, enter a **Range** in A1 notation (e.g. `Sheet1!A2:E`). Leave it empty to use the entire first sheet.
 1. Set **Cache Time** if you want something other than the default (5 minutes). Use `0s` to disable caching.

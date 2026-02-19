@@ -83,7 +83,7 @@ These can appear in the panel, in the query editor, or in the response.
 - **Sharing (JWT/service account):** Share the spreadsheet with the service account email with **Viewer** (or **Editor** if you need write; the plugin only reads).
 - **API key:** Ensure the spreadsheet is shared so that “Anyone with the link” can view, or use a key that has access to the sheet. Check [API key restrictions](https://console.cloud.google.com/apis/credentials) so the key is allowed for the Sheets API (and Drive API if listing spreadsheets).
 - **APIs not enabled:** In Google Cloud Console, enable [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) for the project.
-- **Quotas:** If you hit rate limits, you may see errors; see [Quota](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/) and consider increasing **Cache Time** to reduce requests.
+- **Quotas:** If you hit rate limits, you may see errors; see [Quota](_index.md#quota) and consider increasing **Cache Time** to reduce requests.
 
 ### No data or empty panel
 
