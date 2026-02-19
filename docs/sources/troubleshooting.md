@@ -1,5 +1,5 @@
 ---
-title: Troubleshooting
+title: Troubleshoot Google Sheets data Source issues
 menuTitle: Troubleshooting
 description: Fix common issues with the Google Sheets data source.
 keywords:
@@ -17,7 +17,7 @@ last_reviewed: 2025-02-11
 weight: 500
 ---
 
-# Troubleshooting
+# Troubleshoot Google Sheets data source issues
 
 This guide helps you fix common issues when configuring or using the Google Sheets data source.
 
@@ -144,15 +144,19 @@ Google enforces [per-minute quotas](https://developers.google.com/sheets/api/lim
 
 ## Get additional help
 
-If the issue persists:
+If you've tried the solutions above and still encounter issues:
 
-1. Check **Grafana server logs** for the exact error (plugin logs often include the message from the backend).
-2. Run **Save & test** and note the exact message; use the sections above to match it.
-3. For bugs or feature requests, open an issue in the [Google Sheets data source repository](https://github.com/grafana/google-sheets-datasource/issues). Include:
-   - Grafana version and plugin version
-   - Authentication method (JWT, API key, or GCE)
-   - Redacted error message and, if possible, a minimal spreadsheet/range that reproduces the problem
-   - Whether the problem is connection (Save & test), a specific query, variables, or annotations
+- Check the [Grafana community forums](https://community.grafana.com/) for similar issues.
+- Review the [Google Sheets data source GitHub issues](https://github.com/grafana/google-sheets-datasource/issues) for known bugs.
+- Enable debug logging in Grafana to capture detailed error information.
+- Contact [Grafana Support](https://grafana.com/help/) if you're an Enterprise, Cloud Pro or Cloud Contracted user.
+
+When reporting issues, include:
+
+- Grafana version
+- Error messages (redact sensitive information)
+- Steps to reproduce
+- Relevant configuration (redact credentials)
 
 ## Related documentation
 

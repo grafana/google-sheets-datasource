@@ -17,6 +17,8 @@ labels:
     - oss
     - enterprise
     - cloud
+aliases:
+  - /docs/plugins/grafana-googlesheets-datasource/latest/create-a-sample-dashboard/
 weight: 10
 ---
 
@@ -44,7 +46,19 @@ Before you start, ensure you have:
 1. [Configure the data source](configure.md).
 1. Use the [Query editor](query-editor.md) to query spreadsheet data.
 1. Add [template variables](template-variables.md) for dynamic dashboards.
-1. Try [Create a sample dashboard](create-a-sample-dashboard.md) to get started quickly.
+1. Try the [Quick start: create a sample dashboard](#quick-start-create-a-sample-dashboard) below to get started quickly.
+
+## Quick start: create a sample dashboard
+
+You can try the data source using a [public demonstration spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing).
+
+1. [Configure the data source](configure.md) (API key is enough for this public sheet).
+1. Go to **Dashboards** → **New** → **New Dashboard** → **Add visualization**.
+1. Select the **Google Sheets** data source.
+1. In the query editor, paste the spreadsheet ID: `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8`. You can leave **Range** empty to use the first sheet, or set a range (e.g. `Sheet1!A1:E100`).
+1. Run the query. Grafana will detect time series data and suggest a time series panel; you can switch to other visualizations (e.g. bar gauge, table) from the panel.
+
+The embedded Grafana Play dashboard at the top of this page shows a full example you can open and edit.
 
 ## Additional features
 

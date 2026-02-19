@@ -160,5 +160,5 @@ In Google Sheets, select the cells you need, right-click and choose **Get link t
 ## Next steps
 
 - [Use template variables](template-variables.md) to make dashboards dynamic.
-- [Create a sample dashboard](create-a-sample-dashboard.md) to try the data source with sample data.
+- [Quick start: create a sample dashboard](_index.md#quick-start-create-a-sample-dashboard) to try the data source with sample data.
 - [Configure the data source](configure.md) to change authentication or default spreadsheet.

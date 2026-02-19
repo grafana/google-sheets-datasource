@@ -1,7 +1,7 @@
 ---
 title: Template variables
 menuTitle: Template variables
-description: Learn how to create and use variables with the Google Sheets data source plugin for Grafana.
+description: Learn how to create and use variables with the Google Sheets data source for Grafana.
 keywords:
   - data source
   - google sheets
@@ -107,7 +107,7 @@ When the user changes the variable in the dashboard drop-down, queries that refe
 ## Next steps
 
 - Use variables in panel queries: [Query editor](query-editor.md)
-- Build a full example: [Create a sample dashboard](create-a-sample-dashboard.md)
+- Build a full example: [Quick start: create a sample dashboard](_index.md#quick-start-create-a-sample-dashboard)
 
 ## Related topics
 
