@@ -1,5 +1,5 @@
 ---
-title: Query editor
+title: Google Sheets query editor
 menuTitle: Query editor
 description: Learn about the query editor for the Google Sheets data source plugin to visualize Google Spreadsheets data in Grafana.
 keywords:
@@ -23,7 +23,7 @@ last_reviewed: 2025-02-11
 weight: 200
 ---
 
-# Query editor
+# Google Sheets query editor
 
 The Google Sheets data source query editor configures the Google Sheets API query. Use it when building panels in a dashboard or in Explore.
 

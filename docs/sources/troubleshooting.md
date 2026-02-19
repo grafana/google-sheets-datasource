@@ -112,6 +112,8 @@ These can appear in the panel, in the query editor, or in the response.
 
 ## Template variables
 
+Issues specific to query variables that get their options from a Google Sheet.
+
 ### Variable returns no options
 
 **Cause:** The variable query returns no rows or the value/label columns are wrong.
@@ -123,6 +125,8 @@ These can appear in the panel, in the query editor, or in the response.
 - Test the same range in a panel query to confirm the sheet returns data.
 
 ## Annotations
+
+Issues with annotation queries that use a Google Sheet as the source.
 
 ### Annotations do not appear
 
