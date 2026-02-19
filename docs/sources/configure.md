@@ -161,7 +161,7 @@ Beware that after you share a file or folder with the service account, all users
 
 ## Verify the connection
 
-Click **Save & test** to verify the connection. A successful connection shows the message **Success**.
+Click **Save & test** to verify the connection. A successful connection shows the message **Success**. If the test fails, see [Troubleshooting](troubleshooting.md).
 
 ## Provision the data source
 

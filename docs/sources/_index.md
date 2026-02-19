@@ -58,6 +58,10 @@ After you configure the data source, you can:
 
 The Google Sheets API uses per-minute quotas that refill every minute. For limits and usage, refer to the [Google Sheets API usage limits](https://developers.google.com/sheets/api/limits).
 
+## Troubleshooting
+
+If **Save & test** fails, panels show errors, or variables and annotations do not behave as expected, see [Troubleshooting](troubleshooting.md) for common causes and fixes.
+
 ## Report issues
 
 Report bugs and request features in the [Google Sheets data source repository](https://github.com/grafana/google-sheets-datasource/issues).
