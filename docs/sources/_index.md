@@ -59,13 +59,6 @@ The following documents help you get started:
 
 [Install the plugin](https://grafana.com/docs/grafana/latest/administration/plugin-management/#install-a-plugin) if you haven’t already. Try the [Quick start](#quick-start-create-a-sample-dashboard) below to build a sample dashboard in a few steps.
 
-## Key capabilities
-
-- With JWT (service account) authentication: choose spreadsheets from a drop-down list of sheets shared with the service account
-- Paste a Google Sheets URL (including **Get link to this range**) and the editor extracts spreadsheet ID and range automatically
-- Use [template variables](template-variables.md) in **Spreadsheet ID** or **Range** for dynamic dashboards
-- Cache responses by (spreadsheet ID + range) with configurable **Cache Time**; apply the dashboard time range with **Use Time Filter**
-
 ## Quick start: create a sample dashboard
 
 You can try the data source using a [public demonstration spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing).
@@ -77,6 +70,13 @@ You can try the data source using a [public demonstration spreadsheet](https://d
 1. Run the query. Grafana will detect time series data and suggest a time series panel; you can switch to other visualizations (e.g. bar gauge, table) from the panel.
 
 The embedded Grafana Play dashboard at the top of this page shows a full example you can open and edit.
+
+## Key capabilities
+
+- With JWT (service account) authentication: choose spreadsheets from a drop-down list of sheets shared with the service account
+- Paste a Google Sheets URL (including **Get link to this range**) and the editor extracts spreadsheet ID and range automatically
+- Use [template variables](template-variables.md) in **Spreadsheet ID** or **Range** for dynamic dashboards
+- Cache responses by (spreadsheet ID + range) with configurable **Cache Time**; apply the dashboard time range with **Use Time Filter**
 
 ## Additional features
 
