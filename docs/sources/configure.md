@@ -29,14 +29,14 @@ weight: 100
 
 # Configure the Google Sheets data source
 
-This document explains how to configure and provision the Google Sheets data source.
+This document explains how to configure and provision the Google Sheets data source. The plugin uses the Google Sheets API in read-only mode; it does not write or modify spreadsheets.
 
 ## Before you begin
 
 Before configuring the data source, ensure you have:
 
 - **Grafana permissions:** Organization administrator role (to add and configure data sources).
-- **Plugin installed:** The Google Sheets data source plugin. For instructions, see [Install a plugin](https://grafana.com/docs/grafana/latest/administration/plugin-management/#install-a-plugin).
+- **Plugin installed:** The Google Sheets data source plugin. For instructions, refer to [Install a plugin](https://grafana.com/docs/grafana/latest/administration/plugin-management/#install-a-plugin).
 - **Google account:** A Google account; for JWT or API key authentication, a Google Cloud project with the required APIs enabled (see each authentication section below for details).
 
 ## Add the data source

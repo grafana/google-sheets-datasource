@@ -123,6 +123,22 @@ The **Use Time Filter** toggle controls whether to apply the dashboard time rang
 
 The plugin does not use query-language macros (such as `$__timeFilter()`). Use this toggle instead to apply the dashboard time range.
 
+## How data is interpreted
+
+The plugin uses the first row of the range as column headers and infers a type for each column from the cell values:
+
+| Inferred type | Description |
+|---------------|-------------|
+| **Time** | Columns that Google Sheets formats as date, date-time, or time (or that contain numeric date values) are treated as time. **Use Time Filter** and annotation **time** columns rely on this. |
+| **Number** | Numeric cells. |
+| **String** | Text or anything that is not consistently time or number. |
+
+- **Mixed types:** If a column has mixed value types (e.g. numbers and text), the plugin treats the column as string. A warning is added to the response (e.g. “Multiple data types found in column … Using string data type”).
+- **Mixed units:** If a column has mixed units (e.g. different currencies or formats), the plugin uses the formatted value and may add a warning (e.g. “Multiple units found in column … Formatted value will be used”).
+- **Parse errors:** Cells that cannot be parsed (e.g. invalid date text) produce per-cell warnings. The row may still be returned with a fallback or empty value depending on the column type.
+
+These warnings are included in the query response metadata. If a panel shows unexpected types or empty values, check that the sheet has consistent types in each column and that date columns are formatted as date/time in Google Sheets.
+
 ## Example use cases
 
 **Time series or time-based data**
