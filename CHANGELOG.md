@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.4.1
+
+🐛 Updated backend/go version to 1.26.0 from 1.25.6 which resolves CVE-2025-68121
+
+⚙️ Updated frontend & backend dependencies
+
 ## 2.4.0
 
 🚀 Update @grafana/plugin-ui for react-19 upgrade preparation
@@ -7,6 +13,7 @@
 ## 2.3.1
 
 🐛 Set resolution for @remix-run/router
+
 🐛 Bump dependency versions
 
 ## 2.3.0

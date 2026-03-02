@@ -1,6 +1,6 @@
 {
   "name": "grafana-google-sheets-datasource",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Load data from google sheets in grafana",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
@@ -94,7 +94,9 @@
     "tslib": "2.8.1"
   },
   "resolutions": {
-    "@remix-run/router": "^1.23.2"
+    "@remix-run/router": "^1.23.2",
+    "minimatch": "10.2.4",
+    "serialize-javascript": "7.0.3"
   },
   "packageManager": "yarn@4.12.0"
 }
