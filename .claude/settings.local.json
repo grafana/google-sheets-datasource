@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_navigate",
+      "Bash(npx playwright:*)",
+      "mcp__playwright__browser_fill_form",
+      "mcp__playwright-test__planner_setup_page",
+      "mcp__playwright-test__browser_navigate",
+      "mcp__playwright-test__planner_save_plan",
+      "mcp__playwright-test__test_list",
+      "mcp__playwright-test__test_run",
+      "mcp__playwright-test__test_debug",
+      "mcp__playwright-test__browser_snapshot",
+      "mcp__playwright-test__browser_evaluate"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "playwright-test"
+  ]
+}
