@@ -1,7 +1,7 @@
 {
   "name": "grafana-google-sheets-datasource",
   "version": "2.4.1",
-  "description": "Load data from google sheets in grafana",
+  "description": "Grafana data source plugin for Google Sheets",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
     "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
