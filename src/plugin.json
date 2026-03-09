@@ -4,7 +4,7 @@
   "type": "datasource",
   "name": "Google Sheets",
   "id": "grafana-googlesheets-datasource",
-
+  "alerting": true,
   "backend": true,
   "executable": "gpx_sheets",
   "metrics": true,
