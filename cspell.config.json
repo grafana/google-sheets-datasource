@@ -6,6 +6,7 @@
     "mage_output_file.go",
     "provisioning/**",
     "package.json",
+    "renovate.json",
     "yarn.lock"
   ],
   "words": [
