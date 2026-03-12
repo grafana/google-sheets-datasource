@@ -23,6 +23,16 @@ You can create [alert rules](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/
 
 For an overview of alerting in Grafana, see [Alerting](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/).
 
+## Use cases
+
+Alerting on Google Sheets is useful when your metrics or status live in a spreadsheet (for example, updated by scripts, forms, or exports) and you want Grafana to notify you when values cross a threshold or change state. Typical examples:
+
+- **Budgets and quotas** – Track spending, usage, or limits in a sheet; alert when a value exceeds or falls short of a target.
+- **KPIs and SLAs** – Monitor a single row or cell that holds a key metric (e.g. uptime, error rate, NPS); alert when it goes above or below a set level.
+- **Status or health** – Use a sheet as a simple status board (e.g. "ok", "degraded", "down"); alert when the status indicates a problem.
+- **Inventory or capacity** – Alert when stock, seats, or capacity in a sheet drops below (or rises above) a threshold.
+- **Form or survey results** – Alert when the count or average of responses in a sheet crosses a limit (e.g. number of support tickets, satisfaction score).
+
 ## Before you begin
 
 - [Configure the Google Sheets data source](configure.md) and ensure **Save & test** shows **Success**.
@@ -46,6 +56,20 @@ After the rule is created, Grafana will evaluate it on the schedule you configur
 - Use the same [query editor](query-editor.md) options as in panels: **Spreadsheet ID**, **Range**, **Use Time Filter**, and **Cache Time**. The alert evaluation runs your query and then applies the condition to the result.
 - For threshold-style rules, your sheet should return data that Grafana can treat as numeric or time series (e.g. a column with numbers or a time column plus value column). The exact condition you can set depends on your panel type and how the data is shaped.
 - If your sheet data or range changes (e.g. new rows), ensure the alert rule’s query still matches the range you intend (e.g. a fixed range like `Sheet1!A1:E100` or a range that includes new rows).
+
+## Example sheet layout
+
+A simple layout for a threshold alert is a time column plus one or more numeric columns. Format the time column as date or date-time in Google Sheets so the plugin detects it. Example:
+
+| time                | value   |
+|---------------------|---------|
+| 2025-02-11 08:00:00 | 94.2    |
+| 2025-02-11 09:00:00 | 96.1    |
+| 2025-02-11 10:00:00 | 98.5    |
+
+Use a range such as `Sheet1!A1:B100`. In the panel, choose a time series or stat visualization and create an alert rule that fires when `value` is above (or below) a threshold.
+
+For a single KPI (e.g. one cell or row updated by a script or formula), use a small range (e.g. `Sheet1!A1:B1` with headers `metric` and `value`) and a stat or gauge panel; then add an alert rule on that panel.
 
 ## Next steps
 
