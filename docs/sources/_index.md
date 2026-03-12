@@ -38,7 +38,7 @@ Watch the following video to learn more about the plugin:  {{< youtube id="hqeqe
 | Annotations | Yes | Use a sheet as an annotation source (time, text, tags). |
 | Template variables | Yes | Query variables from a sheet; use variables in Spreadsheet ID or Range. |
 | Explore | Yes | Ad-hoc queries without building a dashboard. |
-| Alerting | No | Use a data source that supports alerting for alert rules. |
+| Alerting | Yes | Create alert rules from Google Sheets queries. |
 
 ## Requirements
 
@@ -55,6 +55,7 @@ The following documents help you get started:
 - [Configure the data source](configure.md) – Set up authentication and connect to Google Sheets.
 - [Query editor](query-editor.md) – Query spreadsheet data and build panels.
 - [Template variables](template-variables.md) – Create dynamic dashboards with variables.
+- [Alerting](alerting.md) – Create alert rules from Google Sheets queries.
 - [Troubleshooting](troubleshooting.md) – Solve common configuration and query errors.
 
 [Install the plugin](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/administration/plugin-management/#install-a-plugin) if you haven’t already. Try the [Quick start](#quick-start-create-a-sample-dashboard) below to build a sample dashboard in a few steps.
@@ -83,6 +84,7 @@ The embedded Grafana Play dashboard at the top of this page shows a full example
 After you configure the data source, you can:
 
 - Add [annotations](annotations.md) to overlay events on panels
+- Set up [alerting](alerting.md) to create alert rules from your queries
 - Use [template variables](template-variables.md) in queries
 - Use [Explore](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/explore/) for ad-hoc queries without building a dashboard
 - Apply [transformations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/panels-visualizations/query-transform-data/transform-data/) to query results
@@ -94,7 +96,6 @@ The Google Sheets API uses per-minute quotas that refill every minute. For limit
 ## Known limitations
 
 - **Read-only:** The data source only reads from spreadsheets; it does not write or edit data.
-- **Alerting:** Alert rules cannot use this data source. Use a data source that supports alerting (e.g. Prometheus, MySQL) for alerts.
 - **GCE authentication:** [GCE Default Service Account](configure.md#authenticate-with-the-default-gce-service-account) is only supported when Grafana runs on a Google Compute Engine VM. It is not supported in Grafana Cloud or other hosted environments.
 - **API key:** With API key authentication, spreadsheets must be publicly viewable (e.g. “Anyone with the link”). The **Select Spreadsheet ID** drop-down is only available when using JWT (service account) authentication.
 - **Provisioning:** Provisioning the data source using a local private key file (`privateKeyPath`) is not supported in hosted environments such as Grafana Cloud.
