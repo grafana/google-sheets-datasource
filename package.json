@@ -95,6 +95,8 @@
   },
   "resolutions": {
     "@remix-run/router": "^1.23.2",
+    "dompurify": "3.3.3",
+    "immutable": "5.1.5",
     "minimatch": "10.2.4",
     "serialize-javascript": "7.0.4"
   },
