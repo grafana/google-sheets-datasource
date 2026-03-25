@@ -1,5 +1,5 @@
 ---
-title: Troubleshoot Google Sheets data Source issues
+title: Troubleshoot Google Sheets data source issues
 menuTitle: Troubleshooting
 description: Fix common issues with the Google Sheets data source.
 keywords:
