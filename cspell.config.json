@@ -24,6 +24,7 @@
     "httpadapter",
     "httpclient",
     "instancemgmt",
+    "jsonencode",
     "Middlewares",
     "patrickmn",
     "percentunit",
@@ -36,9 +37,11 @@
     "subresource",
     "testdata",
     "testid",
+    "timeend",
     "tokenprovider",
     "typecheck",
-    "uplot"
+    "uplot",
+    "xcsj"
   ],
   "language": "en-US"
 }
