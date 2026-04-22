@@ -2,7 +2,7 @@
 
 ## 2.5.0
 
-🚀 enable alerting
+🚀 Enable alerting
 
 ## 2.4.1
 
