@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.5.0
+
+🚀 Enable alerting
+
 ## 2.4.1
 
 🐛 Updated backend/go version to 1.26.0 from 1.25.6 which resolves CVE-2025-68121
