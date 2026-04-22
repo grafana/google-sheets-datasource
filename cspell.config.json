@@ -40,7 +40,8 @@
     "timeend",
     "tokenprovider",
     "typecheck",
-    "uplot"
+    "uplot",
+    "xcsj"
   ],
   "language": "en-US"
 }
