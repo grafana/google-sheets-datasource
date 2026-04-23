@@ -1,4 +1,4 @@
-name: Add issues to OSS Big Tent team project
+name: Add issues to Data Source Plugins team project
 on:
   issues:
     types:
