@@ -14,8 +14,6 @@
     "spellcheck": "cspell -c cspell.config.json \"**/*.{ts,tsx,js,go,md,mdx,yml,yaml,json,scss,css}\"",
     "test": "jest --watch --onlyChanged",
     "test:ci": "jest --passWithNoTests --maxWorkers 4",
-    "test:e2e": "grafana-e2e run",
-    "test:e2e:update": "grafana-e2e run --update-screenshots",
     "typecheck": "tsc --noEmit"
   },
   "repository": "github:grafana/google-sheets-datasource",
@@ -27,9 +25,9 @@
     "@changesets/cli": "2.30.0",
     "@grafana/e2e-selectors": "12.4.2",
     "@grafana/eslint-config": "9.0.0",
-    "@grafana/plugin-e2e": "3.4.13",
+    "@grafana/plugin-e2e": "3.5.1",
     "@grafana/tsconfig": "2.0.1",
-    "@openfeature/web-sdk": "1.7.3",
+    "@openfeature/web-sdk": "1.8.0",
     "@playwright/test": "1.59.1",
     "@stylistic/eslint-plugin-ts": "4.4.1",
     "@swc/core": "1.15.24",
@@ -96,7 +94,6 @@
   "resolutions": {
     "@remix-run/router": "^1.23.2",
     "dompurify": "3.4.0",
-    "immutable": "5.1.5",
     "minimatch": "10.2.5",
     "serialize-javascript": "7.0.5"
   },

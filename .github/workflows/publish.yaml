@@ -33,5 +33,5 @@ jobs:
       branch: ${{ github.event.inputs.branch }}
       environment: ${{ github.event.inputs.environment }}
       docs-only: ${{ fromJSON(github.event.inputs.docs-only) }}
-      run-playwright: false
+      run-playwright: true
       github-draft-release: false
