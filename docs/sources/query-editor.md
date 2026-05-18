@@ -105,11 +105,30 @@ Click that icon to open the spreadsheet in Google Sheets in a new tab.
 
 ## Range
 
-The **Range** field controls which cells to query. You can use [A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation) (for example, `Sheet1!A2:E` or `Class Data!A2:E`) or a [named range](https://developers.google.com/sheets/api/guides/concepts#a1_notation). If you leave the range empty, the API returns the whole first sheet in the spreadsheet.
+The **Range** field controls which cells to query. You can use [A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation) or a [named range](https://developers.google.com/sheets/api/guides/concepts#a1_notation). If you leave the range empty, the API returns the whole first sheet in the spreadsheet.
+
+Valid range examples:
+
+| Range | Description |
+|-------|-------------|
+| *(empty)* | Entire first sheet in the spreadsheet. |
+| `Sheet1!A1:E100` | Cells A1 through E100 on the sheet named "Sheet1". |
+| `Sheet1!A2:E` | All rows from row 2 onward in columns A–E (open-ended). |
+| `Sheet1!A:E` | All rows in columns A–E. |
+| `'My Sheet'!A1:D10` | Sheet names that contain spaces must be wrapped in single quotes. |
+| `Class Data!A2:E` | Sheet name without spaces — no quotes needed. |
+| `MyNamedRange` | A named range defined in the spreadsheet. |
 
 {{< admonition type="tip" >}}
 Use a specific range to select relevant data for faster queries and to use less of your Google Sheets API quota.
 {{< /admonition >}}
+
+Common range mistakes that cause errors (such as `[sse.readDataError]`):
+
+- Using a colon in the sheet name instead of `!` (for example, `Sheet1:A1:E10` instead of `Sheet1!A1:E10`).
+- Misspelling or changing the case of the sheet name (names are case-sensitive).
+- Pointing to a range with no data or only a header row.
+- Omitting single quotes around sheet names that contain spaces.
 
 ## Cache Time
 
@@ -172,6 +191,15 @@ For data that changes often (for example, live status), use a short **Cache Time
 **Copying a range from Google Sheets**
 
 In Google Sheets, select the cells you need, right-click and choose **Get link to this range**, then paste the link into **Spreadsheet ID**. The editor extracts both the spreadsheet ID and the range from the URL.
+
+## Use SQL expressions with Google Sheets data
+
+You can use Grafana's [SQL expression](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/panels-visualizations/query-transform-data/expression-queries/) transformation to filter or aggregate Google Sheets data. However, there are limitations to be aware of:
+
+- The Google Sheets plugin returns data in **wide format** (one column per field, with the first row as headers). SQL expressions expect this format by default.
+- If your sheet layout produces data that Grafana interprets as long format (for example, a single value column with a label column), the SQL expression may fail with errors such as `[sse.readDataError] input data must be a wide series but got type not`.
+- To avoid these errors, ensure your sheet has distinct column headers and that each column contains a consistent data type. If a column has mixed types, the plugin treats it as a string, which may cause type mismatches in SQL expressions.
+- For complex transformations, consider using Grafana's built-in [transformations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/panels-visualizations/query-transform-data/transform-data/) (such as **Convert field type**, **Filter by value**, or **Group by**) instead of SQL expressions, as these handle Google Sheets data more reliably.
 
 ## Next steps
 

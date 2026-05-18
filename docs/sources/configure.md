@@ -71,6 +71,21 @@ Enable the [Google Sheets API](https://console.cloud.google.com/apis/library/she
 
 The Google Sheets data source uses the scope `https://www.googleapis.com/auth/spreadsheets.readonly` to get read-only access to spreadsheets. It also uses the scope `https://www.googleapis.com/auth/drive.metadata.readonly` to list all spreadsheets that the service account has access to in Google Drive.
 
+#### Quick checklist
+
+Use this checklist to verify you have completed all the required steps. Each step is explained in detail below.
+
+1. [ ] Google Cloud project exists (or created a new one).
+1. [ ] [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) enabled for the project.
+1. [ ] [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive) enabled for the project.
+1. [ ] Service account created in the project.
+1. [ ] JSON key file downloaded for the service account.
+1. [ ] JSON key file uploaded to the data source configuration in Grafana.
+1. [ ] Spreadsheet(s) shared with the service account email (`client_email` from the JSON key file).
+1. [ ] **Save & test** shows **Success**.
+
+#### Create the service account and key
+
 To create a service account and get a JWT file:
 
 1. Enable the APIs in your Google Cloud project.

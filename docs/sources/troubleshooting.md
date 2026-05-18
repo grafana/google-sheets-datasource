@@ -95,6 +95,20 @@ These can appear in the panel, in the query editor, or in the response.
 - If **Use Time Filter** is enabled, the panel only shows rows where the time column falls within the dashboard time range. Widen the dashboard time range or ensure the sheet has a column the plugin detects as time (date/datetime format) and that its values are inside the selected range.
 - Check that the sheet has data in the specified range and that the first row is the header row.
 
+### "input data must be a wide series" or `[sse.readDataError]`
+
+**Cause:** The query range returns data in a format that Grafana cannot interpret as a wide series. This typically happens when the range is invalid, points to an empty area, or the sheet layout does not match what the panel or expression expects.
+
+**Possible causes and solutions:**
+
+| Cause | Solution |
+|-------|----------|
+| Invalid range syntax | Use valid [A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation). The sheet name and cell references must be correct (for example, `Sheet1!A1:E100`, not `Sheet 1:A1:E100`). Refer to [Range syntax examples](query-editor.md#range) for valid formats. |
+| Range points to empty cells | Verify the range contains data. Open the spreadsheet and confirm the cells are populated. |
+| Sheet name mismatch | Sheet names in the range are case-sensitive and must match exactly, including spaces (for example, `'My Sheet'!A1:D10` — wrap names that contain spaces in single quotes). |
+| Data is not in wide format | The Google Sheets plugin returns data in wide format (one column per field). If you're using a SQL expression or transformation that expects a different layout, refer to [Use SQL expressions with Google Sheets data](query-editor.md#use-sql-expressions-with-google-sheets-data). |
+| Range includes only headers | Ensure your range includes at least one data row below the header row. |
+
 ### Invalid time column / error while parsing date
 
 **Cause:** **Use Time Filter** is enabled but the chosen time column has invalid or non-parsable values.
@@ -145,6 +159,29 @@ Google enforces [per-minute quotas](https://developers.google.com/sheets/api/lim
 - Increase **Cache Time** in the query (or data source default) so the same range is not requested too often.
 - Reduce the number of panels or variables that query the same or many spreadsheets in a short time.
 - For heavy use, consider requesting a quota increase in Google Cloud Console.
+
+## Debug with Query Inspector
+
+When troubleshooting query issues, use the Query Inspector to view the raw data returned by the Google Sheets API. This helps you verify the data format, check for unexpected values, and compare what the API returns with what the panel displays.
+
+To open the Query Inspector:
+
+1. Open the panel you want to debug.
+1. Click the panel title and select **Inspect** > **Query**.
+1. The **Query Inspector** panel opens showing the request and response.
+
+In the Query Inspector you can:
+
+- **View the raw response:** Click **Data** to see the data frames returned by the query. This shows the exact field names, types, and values the plugin returned.
+- **Check the request:** Click **Query** to see the query parameters sent to the plugin (spreadsheet ID, range, cache time, time filter).
+- **View response headers and timing:** Click **Stats** to see response time and metadata.
+- **Export data:** Click **Data** > **Download CSV** to export the raw data for comparison with your spreadsheet.
+
+{{< admonition type="tip" >}}
+If you see traceIDs in Grafana logs but need more detail, the Query Inspector provides a more accessible way to view the actual data and errors without parsing log files.
+{{< /admonition >}}
+
+For more information, refer to [Inspect a panel](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/panels-visualizations/panel-inspector/).
 
 ## Get additional help
 
