@@ -13,7 +13,7 @@ labels:
     - oss
     - enterprise
     - cloud
-last_reviewed: 2025-02-11
+review_date: 2026-05-18
 weight: 400
 ---
 
@@ -35,9 +35,9 @@ To add a Google Sheets annotation to a dashboard:
 1. Open the dashboard and click **Dashboard settings** (gear icon).
 1. Select **Annotations** in the left menu.
 1. Click **Add annotation query** (or **+ New query** if you already have one).
-1. Enter a **Name** for the annotation (e.g. "Deployments", "Incidents").
+1. Enter a **Name** for the annotation (for example, "Deployments", "Incidents").
 1. Select your **Google Sheets** data source.
-1. In the query editor, set **Spreadsheet ID** and **Range** to the sheet and range that contain your annotation data (e.g. `Sheet1!A1:C100`). The first row should be the header row with column names.
+1. In the query editor, set **Spreadsheet ID** and **Range** to the sheet and range that contain your annotation data (for example, `Sheet1!A1:C100`). The first row should be the header row with column names.
 1. Enable **Use Time Filter** so only rows within the dashboard time range are included.
 1. Optionally adjust **Cache Time**.
 1. Click **Apply** to save, then **Save dashboard**.
@@ -79,7 +79,7 @@ After creating the annotation query, you can change how it appears:
 - **Show in** – Choose which panels display the annotations (all panels, selected panels, or all except selected).
 - **Filter by** – Add filters to limit when annotations are shown.
 
-For details, see [Annotate visualizations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/build-dashboards/annotate-visualizations/).
+For details, refer to [Annotate visualizations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/build-dashboards/annotate-visualizations/).
 
 ## Next steps
 

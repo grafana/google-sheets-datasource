@@ -23,7 +23,7 @@ aliases:
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/provisioning/
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/authenticate/
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/install/
-last_reviewed: 2025-02-11
+review_date: 2026-05-18
 weight: 100
 ---
 
@@ -60,7 +60,7 @@ The Google Sheets data source supports three authentication methods. The default
 - [API key](#authenticate-with-an-api-key): offers simpler configuration, but requires spreadsheets to be public.
 - [GCE Default Service Account](#authenticate-with-the-default-gce-service-account): automatically retrieves default credentials. Requires Grafana to be running on a Google Compute Engine virtual machine.
 
-On the configuration page, choose an authentication type. You can expand **Configure Google Sheets Authentication** for step-by-step guidance in the UI. Depending on your authentication type, you may need to share spreadsheets or set permissions; see [Sharing](#sharing).
+On the configuration page, choose an authentication type. You can expand **Configure Google Sheets Authentication** for step-by-step guidance in the UI. Depending on your authentication type, you may need to share spreadsheets or set permissions; refer to [Sharing](#sharing).
 
 ### Authenticate with a service account JWT
 
@@ -122,7 +122,7 @@ Below the authentication type selector, **Default project** and **Default Spread
 | Setting | Description |
 |---------|-------------|
 | **Default project** | (GCE authentication only) The GCE project ID. |
-| **Default Spreadsheet ID** | Optional spreadsheet ID to use as default when creating new queries. See [Default Spreadsheet ID](#default-spreadsheet-id). |
+| **Default Spreadsheet ID** | Optional spreadsheet ID to use as default when creating new queries. Refer to [Default Spreadsheet ID](#default-spreadsheet-id). |
 
 ## Default Spreadsheet ID
 
@@ -161,7 +161,7 @@ Beware that after you share a file or folder with the service account, all users
 
 ## Verify the connection
 
-Click **Save & test** to verify the connection. A successful connection shows the message **Success**. If the test fails, see [Troubleshooting](troubleshooting.md).
+Click **Save & test** to verify the connection. A successful connection shows the message **Success**. If the test fails, refer to [Troubleshooting](troubleshooting.md).
 
 ## Provision the data source
 
@@ -315,4 +315,4 @@ resource "grafana_data_source" "google_sheets" {
 }
 ```
 
-Replace the placeholders with your values. For more examples and options, see the [Grafana Terraform provider documentation](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/data_source).
+Replace the placeholders with your values. For more examples and options, refer to the [Grafana Terraform provider documentation](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/data_source).
