@@ -60,9 +60,15 @@ These messages appear when you click **Save & test** on the data source configur
 - **JWT / service account:** Ensure the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) are enabled for the project. Ensure the service account has access to at least one spreadsheet (for example, share the sheet with the service account email). For “Invalid grant” or “account not found”, verify the service account key is correct and that the account has not been deleted or disabled.
 - **GCE default account:** If using GCE Default Service Account, ensure Grafana runs on a Google Compute Engine VM and that the default service account has the required scopes and access to the sheet.
 
+### Unable to create Google API client (in panel)
+
+**Cause:** Same as [Unable to create client](#unable-to-create-client) but occurring when a panel runs a query (for example, after a config change or on dashboard load) instead of during **Save & test**.
+
+**Solution:** Fix authentication and configuration as described in [Unable to create client](#unable-to-create-client), then re-run the query or reload the dashboard.
+
 ## Query and panel errors
 
-These can appear in the panel, in the query editor, or in the response.
+These errors appear in the panel, in the query editor, or in the query response after the data source connection is working.
 
 ### Spreadsheet not found
 
@@ -118,12 +124,6 @@ These can appear in the panel, in the query editor, or in the response.
 - Use a column that contains real dates or times. In Google Sheets, format the column as a date or date-time so the plugin can detect it. Avoid mixed types or text that does not look like a date in the same column.
 - If the error mentions “error while parsing date”, fix or remove invalid cells in that column so every value is a valid date/time or leave the cell empty (empty may be skipped depending on behavior).
 
-### Unable to create Google API client (in panel)
-
-**Cause:** Same as [Unable to create client](#unable-to-create-client) but occurring when a panel runs a query (for example, after config change or on load).
-
-**Solution:** Fix authentication and configuration as in [Save & test and connection errors](#save--test-and-connection-errors), then re-run the query or reload the dashboard.
-
 ## Template variables
 
 Issues specific to query variables that get their options from a Google Sheet.
@@ -151,6 +151,25 @@ Issues with annotation queries that use a Google Sheet as the source.
 - Use column headers **time** and **text** in your sheet (refer to [Annotations](annotations.md#query-requirements)). Ensure the **time** column is formatted as date/datetime in Google Sheets.
 - Enable **Use Time Filter** on the annotation query and ensure the dashboard time range covers the events in the sheet.
 - Verify **Spreadsheet ID** and **Range** and that the annotation query is enabled (toggle on) in Dashboard settings → Annotations.
+
+## Alerting errors
+
+These errors occur when using Google Sheets queries in alert rules.
+
+### Alert rule fails to evaluate
+
+**Cause:** The alert evaluation query returns data in a format that the alert condition cannot process, or the query itself fails.
+
+**Possible causes and solutions:**
+
+| Cause | Solution |
+|-------|----------|
+| Query returns no numeric data | Alert conditions require at least one numeric field. Ensure your sheet range includes a column with numbers and that the plugin detects it as a number (not string). |
+| Time column not detected | If the alert condition uses a time-series query, ensure the sheet has a date/datetime column that the plugin recognizes. Format the column as date or date-time in Google Sheets. |
+| Range or spreadsheet ID changed | If someone renamed the sheet tab, moved data, or changed sharing, the alert query may fail silently. Verify the range and permissions. |
+| Stale cache during evaluation | Alerts evaluate on a schedule. If **Cache Time** is longer than the evaluation interval, the alert may act on stale data. Set **Cache Time** equal to or shorter than the evaluation interval. |
+
+For general alerting issues not specific to Google Sheets, refer to [Alerting](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/).
 
 ## API quotas and rate limits
 
