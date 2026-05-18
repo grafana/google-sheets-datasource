@@ -111,7 +111,7 @@ These errors appear in the panel, in the query editor, or in the query response 
 |-------|----------|
 | Invalid range syntax | Use valid [A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation). The sheet name and cell references must be correct (for example, `Sheet1!A1:E100`, not `Sheet 1:A1:E100`). Refer to [Range syntax examples](query-editor.md#range) for valid formats. |
 | Range points to empty cells | Verify the range contains data. Open the spreadsheet and confirm the cells are populated. |
-| Sheet name mismatch | Sheet names in the range are case-sensitive and must match exactly, including spaces (for example, `'My Sheet'!A1:D10` — wrap names that contain spaces in single quotes). |
+| Sheet name mismatch | Sheet names in the range are case-sensitive and must match exactly, including spaces (for example, `'My Sheet'!A1:D10`). Wrap names that contain spaces in single quotes. |
 | Data is not in wide format | The Google Sheets plugin returns data in wide format (one column per field). If you're using a SQL expression or transformation that expects a different layout, refer to [Use SQL expressions with Google Sheets data](query-editor.md#use-sql-expressions-with-google-sheets-data). |
 | Range includes only headers | Ensure your range includes at least one data row below the header row. |
 
@@ -197,7 +197,7 @@ In the Query Inspector you can:
 - **Export data:** Click **Data** > **Download CSV** to export the raw data for comparison with your spreadsheet.
 
 {{< admonition type="tip" >}}
-If you see traceIDs in Grafana logs but need more detail, the Query Inspector provides a more accessible way to view the actual data and errors without parsing log files.
+If you see trace IDs in Grafana logs but need more detail, the Query Inspector provides a more accessible way to view the actual data and errors without parsing log files.
 {{< /admonition >}}
 
 For more information, refer to [Inspect a panel](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/panels-visualizations/panel-inspector/).

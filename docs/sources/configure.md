@@ -81,7 +81,7 @@ Use this checklist to verify you have completed all the required steps. Each ste
 1. [ ] Service account created in the project.
 1. [ ] JSON key file downloaded for the service account.
 1. [ ] JSON key file uploaded to the data source configuration in Grafana.
-1. [ ] Spreadsheet(s) shared with the service account email (`client_email` from the JSON key file).
+1. [ ] Spreadsheets shared with the service account email (`client_email` from the JSON key file).
 1. [ ] **Save & test** shows **Success**.
 
 #### Create the service account and key
