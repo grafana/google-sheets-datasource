@@ -80,13 +80,13 @@
   },
   "dependencies": {
     "@emotion/css": "11.13.5",
-    "@grafana/data": "12.4.2",
+    "@grafana/data": "13.0.1",
     "@grafana/google-sdk": "0.5.0",
-    "@grafana/i18n": "12.4.3",
+    "@grafana/i18n": "13.0.1",
     "@grafana/plugin-ui": "0.13.1",
-    "@grafana/runtime": "12.4.2",
-    "@grafana/schema": "12.4.2",
-    "@grafana/ui": "12.4.2",
+    "@grafana/runtime": "13.0.1",
+    "@grafana/schema": "13.0.1",
+    "@grafana/ui": "13.0.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "tslib": "2.8.1"
