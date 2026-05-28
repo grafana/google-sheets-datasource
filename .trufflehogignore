@@ -1,0 +1,4 @@
+# Repo-local .trufflehogignore
+
+# Yarn release bundles: generated package-manager code can trigger false positives.
+^\.yarn/releases/yarn-[0-9]+\.[0-9]+\.[0-9]+\.cjs$
