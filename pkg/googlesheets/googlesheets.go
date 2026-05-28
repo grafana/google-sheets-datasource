@@ -11,7 +11,6 @@ import (
 	"github.com/grafana/google-sheets-datasource/pkg/models"
 
 	"github.com/araddon/dateparse"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/patrickmn/go-cache"
@@ -55,7 +54,7 @@ func (gs *GoogleSheets) Query(ctx context.Context, refID string, qm *models.Quer
 			frame, dr.Error = frame.FilterRowsByField(timeIndex, func(i any) (bool, error) {
 				val, ok := i.(*time.Time)
 				if !ok {
-					return false, fmt.Errorf("invalid time column: %s", spew.Sdump(i))
+					return false, fmt.Errorf("invalid time column: %#v", i)
 				}
 				if val == nil || val.Before(timeRange.From) || val.After(timeRange.To) {
 					return false, nil
