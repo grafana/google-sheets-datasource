@@ -1,7 +1,7 @@
 // Jest setup provided by Grafana scaffolding
 import './.config/jest-setup';
 
-// Mock canvas getContext('2d') for @grafana/ui's measureText which is not supported in JSDOM
+// Mock canvas getContext('2d') for @grafana/ui measureText which is not supported in JSDOM
 HTMLCanvasElement.prototype.getContext = () => ({
   measureText: (text) => ({ width: text.length * 8 }),
   font: '',
