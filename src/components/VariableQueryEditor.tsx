@@ -1,11 +1,11 @@
+import { css } from '@emotion/css';
+import { CoreApp, Field, getDefaultTimeRange, GrafanaTheme2, SelectableValue } from '@grafana/data';
+import { Combobox, InlineFieldRow, InlineFormLabel, Input, Label, useTheme2 } from '@grafana/ui';
 import React, { useEffect, useState } from 'react';
-import { InlineFieldRow, InlineFormLabel, Select, useTheme2, Input, Label } from '@grafana/ui';
-import { QueryEditor } from './QueryEditor';
+import { lastValueFrom } from 'rxjs';
 import { DataSource } from '../DataSource';
 import { SheetsVariableQuery } from '../types';
-import { CoreApp, Field, getDefaultTimeRange, GrafanaTheme2, SelectableValue } from '@grafana/data';
-import { lastValueFrom } from 'rxjs';
-import { css } from '@emotion/css';
+import { QueryEditor } from './QueryEditor';
 
 interface Props {
   query: SheetsVariableQuery;
@@ -51,9 +51,9 @@ const VariableQueryEditor = (props: Props) => {
         >
           Value Field
         </InlineFormLabel>
-        <Select
+        <Combobox
           data-testid="value-field-select"
-          allowCustomValue
+          createCustomValue
           value={query.valueField}
           onChange={(opt: SelectableValue<string>) => onChange({ ...query, valueField: opt.value ?? '' })}
           width={64}
@@ -69,9 +69,9 @@ const VariableQueryEditor = (props: Props) => {
         >
           Label Field
         </InlineFormLabel>
-        <Select
+        <Combobox
           data-testid="label-field-select"
-          allowCustomValue
+          createCustomValue
           value={query.labelField}
           onChange={(opt: SelectableValue<string>) => onChange({ ...query, labelField: opt.value ?? '' })}
           width={64}
@@ -85,14 +85,14 @@ const VariableQueryEditor = (props: Props) => {
           <InlineFormLabel width={10} tooltip="Select the column to filter on" className="query-keyword">
             Filter Field
           </InlineFormLabel>
-          <Select
+          <Combobox
             data-testid="filter-field-select"
             value={query.filterField}
             onChange={(opt: SelectableValue<string>) => onChange({ ...query, filterField: opt.value })}
             width={64}
             placeholder={loading ? 'Loading...' : 'Select'}
             options={choices.map((opt) => ({ label: opt, value: opt }))}
-            allowCustomValue
+            createCustomValue
           />
         </InlineFieldRow>
         <InlineFieldRow className={styles.rowSpacing}>

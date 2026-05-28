@@ -180,7 +180,6 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
   };
   return (
     <Collapse
-      collapsible
       label="Configure Google Sheets Authentication"
       isOpen={isOpen}
       onToggle={() => setIsOpen((x) => !x)}

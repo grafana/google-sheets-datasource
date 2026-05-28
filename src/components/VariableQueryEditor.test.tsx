@@ -7,6 +7,29 @@ import VariableQueryEditor from './VariableQueryEditor';
 import { DataSource } from '../DataSource';
 import { SheetsVariableQuery } from '../types';
 
+// Mock @tanstack/react-virtual since jsdom has no layout engine and the
+// Combobox virtualizer would render no items without this mock.
+jest.mock('@tanstack/react-virtual', () => ({
+  useVirtualizer: (opts: { count: number; estimateSize: (index: number) => number }) => {
+    const ITEM_HEIGHT = 36;
+    const count = opts.count;
+    return {
+      getVirtualItems: () =>
+        Array.from({ length: count }, (_, i) => ({
+          index: i,
+          start: i * ITEM_HEIGHT,
+          size: ITEM_HEIGHT,
+          key: i,
+          lane: 0,
+          end: (i + 1) * ITEM_HEIGHT,
+          measureElement: jest.fn(),
+        })),
+      getTotalSize: () => count * ITEM_HEIGHT,
+      scrollToIndex: jest.fn(),
+    };
+  },
+}));
+
 // Mock the dependencies
 jest.mock('@grafana/data', () => ({
   ...jest.requireActual('@grafana/data'),
@@ -88,18 +111,18 @@ describe('VariableQueryEditor', () => {
         })
       );
     });
-    expect(await screen.findByText('defaultValueField')).toBeInTheDocument();
-    expect(await screen.findByText('defaultLabelField')).toBeInTheDocument();
-    expect(screen.queryByText('baz')).not.toBeInTheDocument();
+    expect(await screen.findByDisplayValue('defaultValueField')).toBeInTheDocument();
+    expect(await screen.findByDisplayValue('defaultLabelField')).toBeInTheDocument();
+    expect(screen.queryByDisplayValue('baz')).not.toBeInTheDocument();
   });
 
   test('shows loading state while fetching choices', async () => {
     render(<VariableQueryEditor {...props} />);
     // Should show loading state
-    expect(await screen.findAllByText('Loading...')).toHaveLength(3); // All three selects show loading
+    expect(await screen.findAllByPlaceholderText('Loading...')).toHaveLength(3); // All three selects show loading
     // Loading should disappear
     await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText('Loading...')).not.toBeInTheDocument();
     });
   });
 
@@ -110,10 +133,10 @@ describe('VariableQueryEditor', () => {
     });
 
     // bar is the default value
-    expect(await screen.findByText('defaultLabelField')).toBeInTheDocument();
-    expect(screen.queryByText('baz')).not.toBeInTheDocument();
+    expect(await screen.findByDisplayValue('defaultLabelField')).toBeInTheDocument();
+    expect(screen.queryByDisplayValue('baz')).not.toBeInTheDocument();
 
-    userEvent.click(await screen.findByText('defaultLabelField'));
+    userEvent.click(await screen.findByDisplayValue('defaultLabelField'));
     expect(await screen.findByText('baz')).toBeInTheDocument();
     expect(await screen.findByText('qux')).toBeInTheDocument();
   });
@@ -125,17 +148,17 @@ describe('VariableQueryEditor', () => {
     });
 
     // bar is the default value
-    expect(await screen.findByText('defaultValueField')).toBeInTheDocument();
-    expect(screen.queryByText('baz')).not.toBeInTheDocument();
+    expect(await screen.findByDisplayValue('defaultValueField')).toBeInTheDocument();
+    expect(screen.queryByDisplayValue('baz')).not.toBeInTheDocument();
 
-    userEvent.click(await screen.findByText('defaultValueField'));
+    userEvent.click(await screen.findByDisplayValue('defaultValueField'));
     expect(await screen.findByText('baz')).toBeInTheDocument();
     expect(await screen.findByText('qux')).toBeInTheDocument();
   });
 
   test('updates the query when the value field is changed', async () => {
     render(<VariableQueryEditor {...props} />);
-    userEvent.click(await screen.findByText('defaultValueField'));
+    userEvent.click(await screen.findByDisplayValue('defaultValueField'));
     userEvent.click(await screen.findByText('qux'));
     await waitFor(() => {
       expect(props.onChange).toHaveBeenCalledWith({
@@ -147,7 +170,7 @@ describe('VariableQueryEditor', () => {
 
   test('updates the query when the label field is changed', async () => {
     render(<VariableQueryEditor {...props} />);
-    userEvent.click(await screen.findByText('defaultLabelField'));
+    userEvent.click(await screen.findByDisplayValue('defaultLabelField'));
     userEvent.click(await screen.findByText('baz'));
     await waitFor(() => {
       expect(props.onChange).toHaveBeenCalledWith({
@@ -204,10 +227,10 @@ describe('VariableQueryEditor', () => {
   test('shows loading state for filter field select', async () => {
     render(<VariableQueryEditor {...props} />);
     // Should show loading state for all selects including filter field
-    expect(await screen.findAllByText('Loading...')).toHaveLength(3); // Value, Label, and Filter field selects
+    expect(await screen.findAllByPlaceholderText('Loading...')).toHaveLength(3); // Value, Label, and Filter field selects
     // Loading should disappear
     await waitFor(() => {
-      expect(screen.queryByText('Loading...')).not.toBeInTheDocument();
+      expect(screen.queryByPlaceholderText('Loading...')).not.toBeInTheDocument();
     });
   });
 });
