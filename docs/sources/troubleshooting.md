@@ -13,7 +13,7 @@ labels:
     - oss
     - enterprise
     - cloud
-last_reviewed: 2025-02-11
+review_date: 2026-05-18
 weight: 500
 ---
 
@@ -33,7 +33,7 @@ These messages appear when you click **Save & test** on the data source configur
 
 - Ensure the data source configuration was saved correctly. Re-enter authentication details if needed.
 - If you use provisioning, check that the YAML or API payload is valid and that secrets are available.
-- Check Grafana server logs for the underlying error (e.g. "error reading settings").
+- Check Grafana server logs for the underlying error (for example, "error reading settings").
 
 ### Unable to create client
 
@@ -45,7 +45,7 @@ These messages appear when you click **Save & test** on the data source configur
 |------------------|----------|
 | **missing AuthenticationType setting** | In the data source config, select an authentication method: **Google JWT File**, **API key**, or **GCE Default Service Account**. Save and test again. |
 | **missing API Key** | For API key authentication, paste your API key in the **API Key** field (or ensure the provisioned secret is set). |
-| **datasource is missing authentication details** | For **Google JWT File**, you must provide either a JWT file (upload/paste) or **Client email**, **Private key**, and **Default project**. See [Configure the data source](configure.md#authenticate-with-a-service-account-jwt). |
+| **datasource is missing authentication details** | For **Google JWT File**, you must provide either a JWT file (upload/paste) or **Client email**, **Private key**, and **Default project**. Refer to [Configure the data source](configure.md#authenticate-with-a-service-account-jwt). |
 | **error parsing JWT file** | The pasted or uploaded JWT is not valid JSON or is malformed. Re-download the service account key from Google Cloud Console and paste or upload it again. Ensure the full JSON is used with no extra characters. |
 | **Failed to create http client** / **unable to retrieve Sheets client** | Check Grafana logs for details. Often related to JWT format, network, or TLS. |
 
@@ -56,13 +56,19 @@ These messages appear when you click **Save & test** on the data source configur
 **Solution:**
 
 - **Network:** Ensure the Grafana server can reach Google APIs (`https://sheets.googleapis.com`, `https://www.googleapis.com`). If you use a proxy or firewall, allow these endpoints.
-- **API key:** If using an API key, ensure the Google Sheets API (and Drive API if you use “Select Spreadsheet ID”) is enabled for the key and that key restrictions (e.g. IP, referrer) allow requests from Grafana.
-- **JWT / service account:** Ensure the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) are enabled for the project. Ensure the service account has access to at least one spreadsheet (e.g. share the sheet with the service account email). For “Invalid grant” or “account not found”, verify the service account key is correct and that the account has not been deleted or disabled.
+- **API key:** If using an API key, ensure the Google Sheets API (and Drive API if you use “Select Spreadsheet ID”) is enabled for the key and that key restrictions (for example, IP, referrer) allow requests from Grafana.
+- **JWT / service account:** Ensure the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) are enabled for the project. Ensure the service account has access to at least one spreadsheet (for example, share the sheet with the service account email). For “Invalid grant” or “account not found”, verify the service account key is correct and that the account has not been deleted or disabled.
 - **GCE default account:** If using GCE Default Service Account, ensure Grafana runs on a Google Compute Engine VM and that the default service account has the required scopes and access to the sheet.
+
+### Unable to create Google API client (in panel)
+
+**Cause:** Same as [Unable to create client](#unable-to-create-client) but occurring when a panel runs a query (for example, after a config change or on dashboard load) instead of during **Save & test**.
+
+**Solution:** Fix authentication and configuration as described in [Unable to create client](#unable-to-create-client), then re-run the query or reload the dashboard.
 
 ## Query and panel errors
 
-These can appear in the panel, in the query editor, or in the response.
+These errors appear in the panel, in the query editor, or in the query response after the data source connection is working.
 
 ### Spreadsheet not found
 
@@ -72,7 +78,7 @@ These can appear in the panel, in the query editor, or in the response.
 
 - Verify the **Spreadsheet ID** in the query. In Google Sheets, the ID is in the URL: `https://docs.google.com/spreadsheets/d/<SPREADSHEET_ID>/edit`.
 - Ensure the spreadsheet has not been deleted.
-- For JWT/service account: share the spreadsheet with the service account email (e.g. `something@project.iam.gserviceaccount.com`) with at least **Viewer** access. For API key: the spreadsheet must be **published to the web** or otherwise publicly readable if your key only allows public data.
+- For JWT/service account: share the spreadsheet with the service account email (for example, `something@project.iam.gserviceaccount.com`) with at least **Viewer** access. For API key: the spreadsheet must be **published to the web** or otherwise publicly readable if your key only allows public data.
 
 ### Google API Error 403
 
@@ -83,7 +89,7 @@ These can appear in the panel, in the query editor, or in the response.
 - **Sharing (JWT/service account):** Share the spreadsheet with the service account email with **Viewer** (or **Editor** if you need write; the plugin only reads).
 - **API key:** Ensure the spreadsheet is shared so that “Anyone with the link” can view, or use a key that has access to the sheet. Check [API key restrictions](https://console.cloud.google.com/apis/credentials) so the key is allowed for the Sheets API (and Drive API if listing spreadsheets).
 - **APIs not enabled:** In Google Cloud Console, enable [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) for the project.
-- **Quotas:** If you hit rate limits, you may see errors; see [Quota](_index.md#quota) and consider increasing **Cache Time** to reduce requests.
+- **Quotas:** If you hit rate limits, you may see errors; refer to [Quota](_index.md#quota) and consider increasing **Cache Time** to reduce requests.
 
 ### No data or empty panel
 
@@ -91,9 +97,23 @@ These can appear in the panel, in the query editor, or in the response.
 
 **Solution:**
 
-- Confirm **Spreadsheet ID** and **Range** (e.g. `Sheet1!A1:D10`). The range must exist and the sheet name must match (case-sensitive).
+- Confirm **Spreadsheet ID** and **Range** (for example, `Sheet1!A1:D10`). The range must exist and the sheet name must match (case-sensitive).
 - If **Use Time Filter** is enabled, the panel only shows rows where the time column falls within the dashboard time range. Widen the dashboard time range or ensure the sheet has a column the plugin detects as time (date/datetime format) and that its values are inside the selected range.
 - Check that the sheet has data in the specified range and that the first row is the header row.
+
+### "input data must be a wide series" or `[sse.readDataError]`
+
+**Cause:** The query range returns data in a format that Grafana cannot interpret as a wide series. This typically happens when the range is invalid, points to an empty area, or the sheet layout does not match what the panel or expression expects.
+
+**Possible causes and solutions:**
+
+| Cause | Solution |
+|-------|----------|
+| Invalid range syntax | Use valid [A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation). The sheet name and cell references must be correct (for example, `Sheet1!A1:E100`, not `Sheet 1:A1:E100`). Refer to [Range syntax examples](query-editor.md#range) for valid formats. |
+| Range points to empty cells | Verify the range contains data. Open the spreadsheet and confirm the cells are populated. |
+| Sheet name mismatch | Sheet names in the range are case-sensitive and must match exactly, including spaces (for example, `'My Sheet'!A1:D10`). Wrap names that contain spaces in single quotes. |
+| Data is not in wide format | The Google Sheets plugin returns data in wide format (one column per field). If you're using a SQL expression or transformation that expects a different layout, refer to [Use SQL expressions with Google Sheets data](query-editor.md#use-sql-expressions-with-google-sheets-data). |
+| Range includes only headers | Ensure your range includes at least one data row below the header row. |
 
 ### Invalid time column / error while parsing date
 
@@ -103,12 +123,6 @@ These can appear in the panel, in the query editor, or in the response.
 
 - Use a column that contains real dates or times. In Google Sheets, format the column as a date or date-time so the plugin can detect it. Avoid mixed types or text that does not look like a date in the same column.
 - If the error mentions “error while parsing date”, fix or remove invalid cells in that column so every value is a valid date/time or leave the cell empty (empty may be skipped depending on behavior).
-
-### Unable to create Google API client (in panel)
-
-**Cause:** Same as [Unable to create client](#unable-to-create-client) but occurring when a panel runs a query (e.g. after config change or on load).
-
-**Solution:** Fix authentication and configuration as in [Save & test and connection errors](#save--test-and-connection-errors), then re-run the query or reload the dashboard.
 
 ## Template variables
 
@@ -134,9 +148,28 @@ Issues with annotation queries that use a Google Sheet as the source.
 
 **Solution:**
 
-- Use column headers **time** and **text** in your sheet (see [Annotations](annotations.md#query-requirements)). Ensure the **time** column is formatted as date/datetime in Google Sheets.
+- Use column headers **time** and **text** in your sheet (refer to [Annotations](annotations.md#query-requirements)). Ensure the **time** column is formatted as date/datetime in Google Sheets.
 - Enable **Use Time Filter** on the annotation query and ensure the dashboard time range covers the events in the sheet.
 - Verify **Spreadsheet ID** and **Range** and that the annotation query is enabled (toggle on) in Dashboard settings → Annotations.
+
+## Alerting errors
+
+These errors occur when using Google Sheets queries in alert rules.
+
+### Alert rule fails to evaluate
+
+**Cause:** The alert evaluation query returns data in a format that the alert condition cannot process, or the query itself fails.
+
+**Possible causes and solutions:**
+
+| Cause | Solution |
+|-------|----------|
+| Query returns no numeric data | Alert conditions require at least one numeric field. Ensure your sheet range includes a column with numbers and that the plugin detects it as a number (not string). |
+| Time column not detected | If the alert condition uses a time-series query, ensure the sheet has a date/datetime column that the plugin recognizes. Format the column as date or date-time in Google Sheets. |
+| Range or spreadsheet ID changed | If someone renamed the sheet tab, moved data, or changed sharing, the alert query may fail silently. Verify the range and permissions. |
+| Stale cache during evaluation | Alerts evaluate on a schedule. If **Cache Time** is longer than the evaluation interval, the alert may act on stale data. Set **Cache Time** equal to or shorter than the evaluation interval. |
+
+For general alerting issues not specific to Google Sheets, refer to [Alerting](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/).
 
 ## API quotas and rate limits
 
@@ -145,6 +178,29 @@ Google enforces [per-minute quotas](https://developers.google.com/sheets/api/lim
 - Increase **Cache Time** in the query (or data source default) so the same range is not requested too often.
 - Reduce the number of panels or variables that query the same or many spreadsheets in a short time.
 - For heavy use, consider requesting a quota increase in Google Cloud Console.
+
+## Debug with Query Inspector
+
+When troubleshooting query issues, use the Query Inspector to view the raw data returned by the Google Sheets API. This helps you verify the data format, check for unexpected values, and compare what the API returns with what the panel displays.
+
+To open the Query Inspector:
+
+1. Open the panel you want to debug.
+1. Click the panel title and select **Inspect** > **Query**.
+1. The **Query Inspector** panel opens showing the request and response.
+
+In the Query Inspector you can:
+
+- **View the raw response:** Click **Data** to see the data frames returned by the query. This shows the exact field names, types, and values the plugin returned.
+- **Check the request:** Click **Query** to see the query parameters sent to the plugin (spreadsheet ID, range, cache time, time filter).
+- **View response headers and timing:** Click **Stats** to see response time and metadata.
+- **Export data:** Click **Data** > **Download CSV** to export the raw data for comparison with your spreadsheet.
+
+{{< admonition type="tip" >}}
+If you see trace IDs in Grafana logs but need more detail, the Query Inspector provides a more accessible way to view the actual data and errors without parsing log files.
+{{< /admonition >}}
+
+For more information, refer to [Inspect a panel](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/panels-visualizations/panel-inspector/).
 
 ## Get additional help
 

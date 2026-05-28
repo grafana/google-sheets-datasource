@@ -23,7 +23,7 @@ aliases:
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/provisioning/
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/authenticate/
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/install/
-last_reviewed: 2025-02-11
+review_date: 2026-05-18
 weight: 100
 ---
 
@@ -60,7 +60,7 @@ The Google Sheets data source supports three authentication methods. The default
 - [API key](#authenticate-with-an-api-key): offers simpler configuration, but requires spreadsheets to be public.
 - [GCE Default Service Account](#authenticate-with-the-default-gce-service-account): automatically retrieves default credentials. Requires Grafana to be running on a Google Compute Engine virtual machine.
 
-On the configuration page, choose an authentication type. You can expand **Configure Google Sheets Authentication** for step-by-step guidance in the UI. Depending on your authentication type, you may need to share spreadsheets or set permissions; see [Sharing](#sharing).
+On the configuration page, choose an authentication type. You can expand **Configure Google Sheets Authentication** for step-by-step guidance in the UI. Depending on your authentication type, you may need to share spreadsheets or set permissions; refer to [Sharing](#sharing).
 
 ### Authenticate with a service account JWT
 
@@ -70,6 +70,21 @@ A Google service account belongs to a project within an account or organization 
 Enable the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) and the [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive) for the project that contains the service account.
 
 The Google Sheets data source uses the scope `https://www.googleapis.com/auth/spreadsheets.readonly` to get read-only access to spreadsheets. It also uses the scope `https://www.googleapis.com/auth/drive.metadata.readonly` to list all spreadsheets that the service account has access to in Google Drive.
+
+#### Quick checklist
+
+Use this checklist to verify you have completed all the required steps. Each step is explained in detail below.
+
+1. [ ] Google Cloud project exists (or created a new one).
+1. [ ] [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) enabled for the project.
+1. [ ] [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive) enabled for the project.
+1. [ ] Service account created in the project.
+1. [ ] JSON key file downloaded for the service account.
+1. [ ] JSON key file uploaded to the data source configuration in Grafana.
+1. [ ] Spreadsheets shared with the service account email (`client_email` from the JSON key file).
+1. [ ] **Save & test** shows **Success**.
+
+#### Create the service account and key
 
 To create a service account and get a JWT file:
 
@@ -122,7 +137,7 @@ Below the authentication type selector, **Default project** and **Default Spread
 | Setting | Description |
 |---------|-------------|
 | **Default project** | (GCE authentication only) The GCE project ID. |
-| **Default Spreadsheet ID** | Optional spreadsheet ID to use as default when creating new queries. See [Default Spreadsheet ID](#default-spreadsheet-id). |
+| **Default Spreadsheet ID** | Optional spreadsheet ID to use as default when creating new queries. Refer to [Default Spreadsheet ID](#default-spreadsheet-id). |
 
 ## Default Spreadsheet ID
 
@@ -161,7 +176,7 @@ Beware that after you share a file or folder with the service account, all users
 
 ## Verify the connection
 
-Click **Save & test** to verify the connection. A successful connection shows the message **Success**. If the test fails, see [Troubleshooting](troubleshooting.md).
+Click **Save & test** to verify the connection. A successful connection shows the message **Success**. If the test fails, refer to [Troubleshooting](troubleshooting.md).
 
 ## Provision the data source
 
@@ -315,4 +330,4 @@ resource "grafana_data_source" "google_sheets" {
 }
 ```
 
-Replace the placeholders with your values. For more examples and options, see the [Grafana Terraform provider documentation](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/data_source).
+Replace the placeholders with your values. For more examples and options, refer to the [Grafana Terraform provider documentation](https://registry.terraform.io/providers/grafana/grafana/latest/docs/resources/data_source).

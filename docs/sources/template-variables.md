@@ -17,7 +17,7 @@ labels:
     - cloud
 aliases:
   - /docs/plugins/grafana-googlesheets-datasource/latest/variables/
-last_reviewed: 2025-02-11
+review_date: 2026-05-18
 weight: 300
 ---
 
@@ -32,7 +32,7 @@ The Google Sheets data source supports **query variables**: variables whose opti
 ## Before you begin
 
 - [Configure the Google Sheets data source](configure.md) and ensure **Save & test** shows **Success**.
-- Have a sheet that contains the data for your variable (e.g. a column of values and optionally a column of labels).
+- Have a sheet that contains the data for your variable (for example, a column of values and optionally a column of labels).
 
 ## Supported variable types
 
@@ -54,7 +54,7 @@ To create a query variable:
 1. Click **Add variable**.
 1. Set **Name** and **Type**. For **Type**, select **Query**.
 1. In **Data source**, select your Google Sheets data source.
-1. In the variable query editor you will see **Spreadsheet ID**, **Range**, **Cache Time**, and **Use Time Filter** (same as in the [query editor](query-editor.md)). Set **Spreadsheet ID** and **Range** to the sheet and range that contain your variable data (e.g. `Sheet1!A1:B10`). Adjust **Cache Time** or **Use Time Filter** if needed.
+1. In the variable query editor you will see **Spreadsheet ID**, **Range**, **Cache Time**, and **Use Time Filter** (same as in the [query editor](query-editor.md)). Set **Spreadsheet ID** and **Range** to the sheet and range that contain your variable data (for example, `Sheet1!A1:B10`). Adjust **Cache Time** or **Use Time Filter** if needed.
 1. Set **Value Field** to the column that holds the values used in queries.
 1. Optionally set **Label Field** to the column that holds the text shown in the drop-down.
 1. Optionally use **Optional filtering** to limit rows: set **Filter Field** and **Filter Value**.
@@ -89,9 +89,9 @@ Consider a Google Sheet with this data:
 To create a country variable showing only North American countries:
 
 1. Set **Value Field** to `Country Code`
-2. Set **Label Field** to `Country Name`
-3. Set **Filter Field** to `Region`
-4. Set **Filter Value** to `North America`
+1. Set **Label Field** to `Country Name`
+1. Set **Filter Field** to `Region`
+1. Set **Filter Value** to `North America`
 
 This creates a drop-down showing "United States", "Canada" but using the values "US", "CA" in your queries.
 
@@ -99,8 +99,8 @@ This creates a drop-down showing "United States", "Canada" but using the values 
 
 After you create a variable, use it in panel queries by referencing its name with a `$` prefix (for example, `$country`). The Google Sheets data source interpolates variables in:
 
-- **Spreadsheet ID** – e.g. use `$spreadsheet` if the variable holds a spreadsheet ID
-- **Range** – e.g. use `$range` or build a range like `Sheet1!A1:$column` to make the range depend on the selected value
+- **Spreadsheet ID** – for example, use `$spreadsheet` if the variable holds a spreadsheet ID
+- **Range** – for example, use `$range` or build a range like `Sheet1!A1:$column` to make the range depend on the selected value
 
 When the user changes the variable in the dashboard drop-down, queries that reference it are re-run with the new value.
 

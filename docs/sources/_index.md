@@ -20,6 +20,7 @@ labels:
 aliases:
   - /docs/plugins/grafana-googlesheets-datasource/latest/create-a-sample-dashboard/
 weight: 10
+review_date: 2026-05-18
 ---
 
 # Google Sheets data source
@@ -67,8 +68,8 @@ You can try the data source using a [public demonstration spreadsheet](https://d
 1. [Configure the data source](configure.md) (API key is enough for this public sheet).
 1. Go to **Dashboards** → **New** → **New Dashboard** → **Add visualization**.
 1. Select the **Google Sheets** data source.
-1. In the query editor, paste the spreadsheet ID: `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8`. You can leave **Range** empty to use the first sheet, or set a range (e.g. `Sheet1!A1:E100`).
-1. Run the query. Grafana will detect time series data and suggest a time series panel; you can switch to other visualizations (e.g. bar gauge, table) from the panel.
+1. In the query editor, paste the spreadsheet ID: `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8`. You can leave **Range** empty to use the first sheet, or set a range (for example, `Sheet1!A1:E100`).
+1. Run the query. Grafana will detect time series data and suggest a time series panel; you can switch to other visualizations (for example, bar gauge, table) from the panel.
 
 The embedded Grafana Play dashboard at the top of this page shows a full example you can open and edit.
 
@@ -97,7 +98,7 @@ The Google Sheets API uses per-minute quotas that refill every minute. For limit
 
 - **Read-only:** The data source only reads from spreadsheets; it does not write or edit data.
 - **GCE authentication:** [GCE Default Service Account](configure.md#authenticate-with-the-default-gce-service-account) is only supported when Grafana runs on a Google Compute Engine VM. It is not supported in Grafana Cloud or other hosted environments.
-- **API key:** With API key authentication, spreadsheets must be publicly viewable (e.g. “Anyone with the link”). The **Select Spreadsheet ID** drop-down is only available when using JWT (service account) authentication.
+- **API key:** With API key authentication, spreadsheets must be publicly viewable (for example, “Anyone with the link”). The **Select Spreadsheet ID** drop-down is only available when using JWT (service account) authentication.
 - **Provisioning:** Provisioning the data source using a local private key file (`privateKeyPath`) is not supported in hosted environments such as Grafana Cloud.
 
 ## Related resources
