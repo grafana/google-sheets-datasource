@@ -13,10 +13,7 @@ jest.mock('@grafana/runtime', () => ({
   getDataSourceSrv: () => ({
     get: (_: string) =>
       Promise.resolve({
-        getSpreadSheets: () =>
-          Promise.resolve([
-            { label: 'label1', value: 'value1', description: 'value1' },
-          ]),
+        getSpreadSheets: () => Promise.resolve([{ label: 'label1', value: 'value1', description: 'value1' }]),
       }),
   }),
 }));
@@ -30,7 +27,6 @@ const dataSourceSettings: Partial<DataSourceSettings<DataSourceOptions, GoogleSh
   },
   uid: 'test-uid',
 };
-
 
 describe('ConfigEditor', () => {
   afterEach(() => {
@@ -55,7 +51,7 @@ describe('ConfigEditor', () => {
 
     // Check onOptionsChange is called with the correct value
     expect(onOptionsChange).toHaveBeenCalledWith({
-      jsonData: { authType: 'key', authenticationType: 'jwt' },
+      jsonData: { authType: 'key', authenticationType: 'jwt', oauthPassThru: false },
       secureJsonFields: {},
     });
   });

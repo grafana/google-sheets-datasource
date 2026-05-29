@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.5.1
+
+⚙️ Updated frontend & backend dependencies
+
 ## 2.5.0
 
 🚀 Enable alerting
