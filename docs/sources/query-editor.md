@@ -31,7 +31,7 @@ This document walks you through key concepts and a summary of the fields, then h
 
 ## Before you begin
 
-- Ensure you have [configured the Google Sheets data source](configure.md) and that **Save & test** shows **Success**.
+- Ensure you have [configured the Google Sheets data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/) and that **Save & test** shows **Success**.
 - Your credentials must have access to the spreadsheets you want to query.
 
 {{< figure alt="The Google Sheets data source query editor configured to query a Google Sheet" src="/media/docs/plugins/google-sheets-query-editor-1.png" caption="The Google Sheets data source query editor configured to query a Google Sheet" >}}
@@ -71,7 +71,7 @@ To create a query:
 The **Spreadsheet ID** field controls which spreadsheet to query.
 
 {{< admonition type="tip" >}}
-If you've configured a default spreadsheet ID in the data source settings, it will be automatically pre-filled when you create a new query. Refer to [Configure the data source](configure/#default-spreadsheet-id) for more information.
+If you've configured a default spreadsheet ID in the data source settings, it will be automatically pre-filled when you create a new query. Refer to [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/#default-spreadsheet-id) for more information.
 {{< /admonition >}}
 
 You can:
@@ -98,7 +98,7 @@ The query editor automatically extracts the spreadsheet ID from the URL.
   The drop-down menu is only populated if you are using Google JWT authentication.
   You can only view spreadsheets shared with the service account associated with the token.
 
-  To configure a service account with JWT authentication, refer to [Authenticate with a service account JWT](configure/#authenticate-with-a-service-account-jwt).
+  To configure a service account with JWT authentication, refer to [Authenticate with a service account JWT](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/#authenticate-with-a-service-account-jwt).
 
 Next to the **Spreadsheet ID** field there's an external link icon.
 Click that icon to open the spreadsheet in Google Sheets in a new tab.
@@ -174,15 +174,15 @@ Use a small range (for example, one row or a few cells, such as `Summary!B2:B5`)
 
 **Annotations from a sheet**
 
-Use a Google Sheet as an annotation source to overlay events on panels. Refer to [Annotations](annotations.md) for sheet layout (time, text, tags), steps to add an annotation query, and **Use Time Filter**.
+Use a Google Sheet as an annotation source to overlay events on panels. Refer to [Annotations](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/annotations/) for sheet layout (time, text, tags), steps to add an annotation query, and **Use Time Filter**.
 
 **Same spreadsheet, different panels**
 
-Use one **Spreadsheet ID** across multiple panels and set a different **Range** in each (for example, `Sales!A1:E100`, `Inventory!A1:C50`). To save time, set a default spreadsheet in the [data source configuration](configure.md#default-spreadsheet-id) so new queries are pre-filled.
+Use one **Spreadsheet ID** across multiple panels and set a different **Range** in each (for example, `Sales!A1:E100`, `Inventory!A1:C50`). To save time, set a default spreadsheet in the [data source configuration](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/#default-spreadsheet-id) so new queries are pre-filled.
 
 **Dynamic spreadsheet or range with template variables**
 
-Use [template variables](template-variables.md) in **Spreadsheet ID** or **Range** (for example, `$spreadsheet` or `Sheet1!A1:$region`) so users can switch sheets or ranges from the dashboard. The query runs with the selected variable values.
+Use [template variables](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/template-variables/) in **Spreadsheet ID** or **Range** (for example, `$spreadsheet` or `Sheet1!A1:$region`) so users can switch sheets or ranges from the dashboard. The query runs with the selected variable values.
 
 **Frequently updated vs. static data**
 
@@ -203,6 +203,6 @@ You can use the [SQL expression](https://grafana.com/docs/grafana/<GRAFANA_VERSI
 
 ## Next steps
 
-- [Use template variables](template-variables.md) to make dashboards dynamic.
-- [Quick start: create a sample dashboard](_index.md#quick-start-create-a-sample-dashboard) to try the data source with sample data.
-- [Configure the data source](configure.md) to change authentication or default spreadsheet.
+- [Use template variables](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/template-variables/) to make dashboards dynamic.
+- [Quick start: create a sample dashboard](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/#quick-start-create-a-sample-dashboard) to try the data source with sample data.
+- [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/) to change authentication or default spreadsheet.

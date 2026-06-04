@@ -45,7 +45,7 @@ These messages appear when you click **Save & test** on the data source configur
 |------------------|----------|
 | **missing AuthenticationType setting** | In the data source config, select an authentication method: **Google JWT File**, **API key**, or **GCE Default Service Account**. Save and test again. |
 | **missing API Key** | For API key authentication, paste your API key in the **API Key** field (or ensure the provisioned secret is set). |
-| **datasource is missing authentication details** | For **Google JWT File**, you must provide either a JWT file (upload/paste) or **Client email**, **Private key**, and **Default project**. Refer to [Configure the data source](configure.md#authenticate-with-a-service-account-jwt). |
+| **datasource is missing authentication details** | For **Google JWT File**, you must provide either a JWT file (upload/paste) or **Client email**, **Private key**, and **Default project**. Refer to [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/#authenticate-with-a-service-account-jwt). |
 | **error parsing JWT file** | The pasted or uploaded JWT is not valid JSON or is malformed. Re-download the service account key from Google Cloud Console and paste or upload it again. Ensure the full JSON is used with no extra characters. |
 | **Failed to create http client** / **unable to retrieve Sheets client** | Check Grafana logs for details. Often related to JWT format, network, or TLS. |
 
@@ -89,7 +89,7 @@ These errors appear in the panel, in the query editor, or in the query response 
 - **Sharing (JWT/service account):** Share the spreadsheet with the service account email with **Viewer** (or **Editor** if you need write; the plugin only reads).
 - **API key:** Ensure the spreadsheet is shared so that “Anyone with the link” can view, or use a key that has access to the sheet. Check [API key restrictions](https://console.cloud.google.com/apis/credentials) so the key is allowed for the Sheets API (and Drive API if listing spreadsheets).
 - **APIs not enabled:** In Google Cloud Console, enable [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) for the project.
-- **Quotas:** If you hit rate limits, you may see errors; refer to [Quota](_index.md#quota) and consider increasing **Cache Time** to reduce requests.
+- **Quotas:** If you hit rate limits, you may see errors; refer to [Quota](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/#quota) and consider increasing **Cache Time** to reduce requests.
 
 ### No data or empty panel
 
@@ -109,10 +109,10 @@ These errors appear in the panel, in the query editor, or in the query response 
 
 | Cause | Solution |
 |-------|----------|
-| Invalid range syntax | Use valid [A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation). The sheet name and cell references must be correct (for example, `Sheet1!A1:E100`, not `Sheet 1:A1:E100`). Refer to [Range syntax examples](query-editor.md#range) for valid formats. |
+| Invalid range syntax | Use valid [A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation). The sheet name and cell references must be correct (for example, `Sheet1!A1:E100`, not `Sheet 1:A1:E100`). Refer to [Range syntax examples](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/#range) for valid formats. |
 | Range points to empty cells | Verify the range contains data. Open the spreadsheet and confirm the cells are populated. |
 | Sheet name mismatch | Sheet names in the range are case-sensitive and must match exactly, including spaces (for example, `'My Sheet'!A1:D10`). Wrap names that contain spaces in single quotes. |
-| Data is not in wide format | The Google Sheets plugin returns data in wide format (one column per field). If you're using a SQL expression or transformation that expects a different layout, refer to [Use SQL expressions with Google Sheets data](query-editor.md#use-sql-expressions-with-google-sheets-data). |
+| Data is not in wide format | The Google Sheets plugin returns data in wide format (one column per field). If you're using a SQL expression or transformation that expects a different layout, refer to [Use SQL expressions with Google Sheets data](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/#use-sql-expressions-with-google-sheets-data). |
 | Range includes only headers | Ensure your range includes at least one data row below the header row. |
 
 ### Invalid time column / error while parsing date
@@ -148,7 +148,7 @@ Issues with annotation queries that use a Google Sheet as the source.
 
 **Solution:**
 
-- Use column headers **time** and **text** in your sheet (refer to [Annotations](annotations.md#query-requirements)). Ensure the **time** column is formatted as date/datetime in Google Sheets.
+- Use column headers **time** and **text** in your sheet (refer to [Annotations](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/annotations/#query-requirements)). Ensure the **time** column is formatted as date/datetime in Google Sheets.
 - Enable **Use Time Filter** on the annotation query and ensure the dashboard time range covers the events in the sheet.
 - Verify **Spreadsheet ID** and **Range** and that the annotation query is enabled (toggle on) in Dashboard settings → Annotations.
 
@@ -220,7 +220,7 @@ When reporting issues, include:
 
 ## Related documentation
 
-- [Configure the data source](configure.md)
-- [Query editor](query-editor.md)
-- [Template variables](template-variables.md)
-- [Annotations](annotations.md)
+- [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/)
+- [Query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/)
+- [Template variables](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/template-variables/)
+- [Annotations](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/annotations/)
