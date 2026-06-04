@@ -176,7 +176,7 @@ Beware that after you share a file or folder with the service account, all users
 
 ## Verify the connection
 
-Click **Save & test** to verify the connection. A successful connection shows the message **Success**. If the test fails, refer to [Troubleshooting](troubleshooting.md).
+Click **Save & test** to verify the connection. A successful connection shows the message **Success**. If the test fails, refer to [Troubleshooting](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/troubleshooting/).
 
 ## Provision the data source
 

@@ -25,13 +25,13 @@ weight: 300
 
 Instead of hard-coding details such as spreadsheet ID or range in your queries, you can use variables. This helps you create more interactive, dynamic, and reusable dashboards. Grafana refers to such variables as template variables. They typically appear as controls (such as drop-down lists) at the top of the dashboard so you can change what data is shown without editing each panel.
 
-For an introduction to templating and template variables, refer to [Variables](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/) and [Add and manage variables](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-variable/).
+For an introduction to templating and template variables, refer to [Variables](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/) and [Add variables](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/add-template-variables/).
 
 The Google Sheets data source supports **query variables**: variables whose options are loaded from a Google Sheet. You can then use those variables in panel queries (for example, in **Spreadsheet ID** or **Range**) to make dashboards dynamic.
 
 ## Before you begin
 
-- [Configure the Google Sheets data source](configure.md) and ensure **Save & test** shows **Success**.
+- [Configure the Google Sheets data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/) and ensure **Save & test** shows **Success**.
 - Have a sheet that contains the data for your variable (for example, a column of values and optionally a column of labels).
 
 ## Supported variable types
@@ -54,7 +54,7 @@ To create a query variable:
 1. Click **Add variable**.
 1. Set **Name** and **Type**. For **Type**, select **Query**.
 1. In **Data source**, select your Google Sheets data source.
-1. In the variable query editor you will see **Spreadsheet ID**, **Range**, **Cache Time**, and **Use Time Filter** (same as in the [query editor](query-editor.md)). Set **Spreadsheet ID** and **Range** to the sheet and range that contain your variable data (for example, `Sheet1!A1:B10`). Adjust **Cache Time** or **Use Time Filter** if needed.
+1. In the variable query editor you will see **Spreadsheet ID**, **Range**, **Cache Time**, and **Use Time Filter** (same as in the [query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/)). Set **Spreadsheet ID** and **Range** to the sheet and range that contain your variable data (for example, `Sheet1!A1:B10`). Adjust **Cache Time** or **Use Time Filter** if needed.
 1. Set **Value Field** to the column that holds the values used in queries.
 1. Optionally set **Label Field** to the column that holds the text shown in the drop-down.
 1. Optionally use **Optional filtering** to limit rows: set **Filter Field** and **Filter Value**.
@@ -106,11 +106,11 @@ When the user changes the variable in the dashboard drop-down, queries that refe
 
 ## Next steps
 
-- Use variables in panel queries: [Query editor](query-editor.md)
-- Build a full example: [Quick start: create a sample dashboard](_index.md#quick-start-create-a-sample-dashboard)
+- Use variables in panel queries: [Query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/)
+- Build a full example: [Quick start: create a sample dashboard](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/#quick-start-create-a-sample-dashboard)
 
 ## Related topics
 
-- [Query editor](query-editor.md)
-- [Configure the data source](configure.md)
+- [Query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/)
+- [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/)
 - [Grafana Variables documentation](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/variables/)

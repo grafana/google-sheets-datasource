@@ -25,7 +25,7 @@ For general information about annotations, refer to [Annotate visualizations](ht
 
 ## Before you begin
 
-- [Configure the Google Sheets data source](configure.md) and ensure **Save & test** shows **Success**.
+- [Configure the Google Sheets data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/) and ensure **Save & test** shows **Success**.
 - Have a Google Sheet that contains your event data, with at least one column that holds a date or time (so the plugin can detect it as a time field). Optionally include columns for the annotation text and tags.
 
 ## Create an annotation query
@@ -83,5 +83,5 @@ For details, refer to [Annotate visualizations](https://grafana.com/docs/grafana
 
 ## Next steps
 
-- [Query editor](query-editor.md) – Spreadsheet ID, Range, and Use Time Filter
-- [Configure the data source](configure.md)
+- [Query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/) – Spreadsheet ID, Range, and Use Time Filter
+- [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/)

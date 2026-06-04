@@ -53,11 +53,11 @@ Before you start, ensure you have:
 
 The following documents help you get started:
 
-- [Configure the data source](configure.md) – Set up authentication and connect to Google Sheets.
-- [Query editor](query-editor.md) – Query spreadsheet data and build panels.
-- [Template variables](template-variables.md) – Create dynamic dashboards with variables.
-- [Alerting](alerting.md) – Create alert rules from Google Sheets queries.
-- [Troubleshooting](troubleshooting.md) – Solve common configuration and query errors.
+- [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/) – Set up authentication and connect to Google Sheets.
+- [Query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/) – Query spreadsheet data and build panels.
+- [Template variables](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/template-variables/) – Create dynamic dashboards with variables.
+- [Alerting](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/alerting/) – Create alert rules from Google Sheets queries.
+- [Troubleshooting](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/troubleshooting/) – Solve common configuration and query errors.
 
 [Install the plugin](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/administration/plugin-management/#install-a-plugin) if you haven’t already. Try the [Quick start](#quick-start-create-a-sample-dashboard) below to build a sample dashboard in a few steps.
 
@@ -65,7 +65,7 @@ The following documents help you get started:
 
 You can try the data source using a [public demonstration spreadsheet](https://docs.google.com/spreadsheets/d/1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8/edit?usp=sharing).
 
-1. [Configure the data source](configure.md) (API key is enough for this public sheet).
+1. [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/) (API key is enough for this public sheet).
 1. Go to **Dashboards** → **New** → **New Dashboard** → **Add visualization**.
 1. Select the **Google Sheets** data source.
 1. In the query editor, paste the spreadsheet ID: `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8`. You can leave **Range** empty to use the first sheet, or set a range (for example, `Sheet1!A1:E100`).
@@ -77,16 +77,16 @@ The embedded Grafana Play dashboard at the top of this page shows a full example
 
 - With JWT (service account) authentication: choose spreadsheets from a drop-down list of sheets shared with the service account
 - Paste a Google Sheets URL (including **Get link to this range**) and the editor extracts spreadsheet ID and range automatically
-- Use [template variables](template-variables.md) in **Spreadsheet ID** or **Range** for dynamic dashboards
+- Use [template variables](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/template-variables/) in **Spreadsheet ID** or **Range** for dynamic dashboards
 - Cache responses by (spreadsheet ID + range) with configurable **Cache Time**; apply the dashboard time range with **Use Time Filter**
 
 ## Additional features
 
 After you configure the data source, you can:
 
-- Add [annotations](annotations.md) to overlay events on panels
-- Set up [alerting](alerting.md) to create alert rules from your queries
-- Use [template variables](template-variables.md) in queries
+- Add [annotations](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/annotations/) to overlay events on panels
+- Set up [alerting](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/alerting/) to create alert rules from your queries
+- Use [template variables](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/template-variables/) in queries
 - Use [Explore](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/explore/) for ad-hoc queries without building a dashboard
 - Apply [transformations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/panels-visualizations/query-transform-data/transform-data/) to query results
 
@@ -97,7 +97,7 @@ The Google Sheets API uses per-minute quotas that refill every minute. For limit
 ## Known limitations
 
 - **Read-only:** The data source only reads from spreadsheets; it does not write or edit data.
-- **GCE authentication:** [GCE Default Service Account](configure.md#authenticate-with-the-default-gce-service-account) is only supported when Grafana runs on a Google Compute Engine VM. It is not supported in Grafana Cloud or other hosted environments.
+- **GCE authentication:** [GCE Default Service Account](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/#authenticate-with-the-default-gce-service-account) is only supported when Grafana runs on a Google Compute Engine VM. It is not supported in Grafana Cloud or other hosted environments.
 - **API key:** With API key authentication, spreadsheets must be publicly viewable (for example, “Anyone with the link”). The **Select Spreadsheet ID** drop-down is only available when using JWT (service account) authentication.
 - **Provisioning:** Provisioning the data source using a local private key file (`privateKeyPath`) is not supported in hosted environments such as Grafana Cloud.
 

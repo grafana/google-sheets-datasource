@@ -35,7 +35,7 @@ Alerting on Google Sheets is useful when your metrics or status live in a spread
 
 ## Before you begin
 
-- [Configure the Google Sheets data source](configure.md) and ensure **Save & test** shows **Success**.
+- [Configure the Google Sheets data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/) and ensure **Save & test** shows **Success**.
 - Have a dashboard panel that uses a Google Sheets query whose data you want to alert on (for example, a metric that should stay above or below a threshold).
 
 ## Create an alert rule from a panel
@@ -46,14 +46,14 @@ Alerting on Google Sheets is useful when your metrics or status live in a spread
 1. Save the panel and the dashboard if you have made changes.
 1. Click the panel title and select **Edit** → open the **Alert** tab (or **Alert** in the panel editor).
 1. Click **Create alert rule from this panel**.
-1. Define the rule: name, folder, condition (for example, when a value is above or below a threshold), evaluation group, and contact points. For details, refer to [Create an alert rule](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/alerting-rules/create-alert-rules/).
+1. Define the rule: name, folder, condition (for example, when a value is above or below a threshold), evaluation group, and contact points. For details, refer to [Configure Grafana-managed alert rules](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/alerting-rules/create-grafana-managed-rule/).
 1. Save the rule.
 
 After the rule is created, Grafana will evaluate it on the schedule you configured and send notifications when the condition is met.
 
 ## Query and data considerations
 
-- Use the same [query editor](query-editor.md) options as in panels: **Spreadsheet ID**, **Range**, **Use Time Filter**, and **Cache Time**. The alert evaluation runs your query and then applies the condition to the result.
+- Use the same [query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/) options as in panels: **Spreadsheet ID**, **Range**, **Use Time Filter**, and **Cache Time**. The alert evaluation runs your query and then applies the condition to the result.
 - For threshold-style rules, your sheet should return data that Grafana can treat as numeric or time series (for example, a column with numbers or a time column plus value column). The exact condition you can set depends on your panel type and how the data is shaped.
 - If your sheet data or range changes (for example, new rows), ensure the alert rule’s query still matches the range you intend (for example, a fixed range like `Sheet1!A1:E100` or a range that includes new rows).
 
@@ -73,6 +73,6 @@ For a single KPI (for example, one cell or row updated by a script or formula), 
 
 ## Next steps
 
-- [Query editor](query-editor.md) – Spreadsheet ID, Range, and Use Time Filter
-- [Configure the data source](configure.md)
+- [Query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/) – Spreadsheet ID, Range, and Use Time Filter
+- [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/)
 - [Alerting](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/) – Grafana alerting documentation
