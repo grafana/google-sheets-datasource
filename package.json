@@ -25,6 +25,7 @@
     "@grafana/e2e-selectors": "13.1.0-25893932881",
     "@grafana/eslint-config": "9.0.0",
     "@grafana/plugin-e2e": "3.8.0",
+    "@grafana/sign-plugin": "^3.2.2",
     "@grafana/tsconfig": "2.1.0",
     "@playwright/test": "1.60.0",
     "@stylistic/eslint-plugin-ts": "4.4.1",
