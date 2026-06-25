@@ -1,0 +1,63 @@
+{
+  "targetApiVersion": "v0alpha1",
+  "settings": {
+    "spec": {
+      "type": "object",
+      "properties": {
+        "jsonData": {
+          "type": "object",
+          "required": [
+            "authenticationType"
+          ],
+          "properties": {
+            "authenticationType": {
+              "description": "Which authentication mechanism the datasource uses to talk to Google APIs.",
+              "type": "string",
+              "default": "jwt",
+              "enum": [
+                "jwt",
+                "key",
+                "gce"
+              ]
+            },
+            "clientEmail": {
+              "description": "Service account email address for JWT authentication.",
+              "type": "string",
+              "x-dsconfig-depends-on": "virtual.jwtUpload == 'manual'"
+            },
+            "defaultProject": {
+              "description": "GCP project ID. In JWT mode, auto-filled from the service account JSON.",
+              "type": "string",
+              "x-dsconfig-depends-on": "virtual.jwtUpload == 'manual'"
+            },
+            "defaultSheetID": {
+              "description": "Optional spreadsheet ID to use as default when creating new queries.",
+              "type": "string"
+            },
+            "privateKeyPath": {
+              "description": "Path to a local private key file on the Grafana server. Not supported in hosted environments.",
+              "type": "string",
+              "x-dsconfig-depends-on": "virtual.privateKeyMode == 'path'"
+            },
+            "tokenUri": {
+              "description": "OAuth2 token endpoint URI.",
+              "type": "string",
+              "default": "https://oauth2.googleapis.com/token",
+              "x-dsconfig-depends-on": "virtual.jwtUpload == 'manual'"
+            }
+          }
+        }
+      }
+    },
+    "secureValues": [
+      {
+        "key": "privateKey",
+        "description": "Service account private key for JWT authentication."
+      },
+      {
+        "key": "apiKey",
+        "description": "Google API key. Spreadsheets must be publicly shared."
+      }
+    ]
+  }
+}
