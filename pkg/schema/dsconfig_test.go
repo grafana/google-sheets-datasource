@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/grafana/dsconfig/schema"
-	"github.com/grafana/google-sheets-datasource/pkg/schema/models"
+	"github.com/grafana/google-sheets-datasource/pkg/models"
 )
 
 //go:embed dsconfig.json
@@ -16,7 +16,7 @@ func TestPlugin(t *testing.T) {
 	schema.RunPluginTests(t, schema.PluginUnderTest{
 		ID:                "grafana-googlesheets-datasource",
 		ConfigSchemaJSON:  configSchemaJSON,
-		SettingsJSONModel: models.SettingsJSON{},
+		SettingsJSONModel: models.DatasourceSettings{},
 		SecureKeys:        []string{"privateKey", "apiKey"},
 	})
 }
