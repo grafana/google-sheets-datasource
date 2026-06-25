@@ -185,6 +185,33 @@
       "description": "Optional spreadsheet ID to use as default when creating new queries.",
       "valueType": "string",
       "target": "jsonData"
+    },
+    {
+      "id": "jsonData.authType",
+      "key": "authType",
+      "label": "Authentication type (legacy)",
+      "description": "Deprecated. Legacy authentication type property, superseded by authenticationType. Read only for backward compatibility with datasources created before the rename; not rendered in the UI.",
+      "valueType": "string",
+      "target": "jsonData",
+      "tags": ["legacy"]
+    },
+    {
+      "id": "jsonData.apiKey",
+      "key": "apiKey",
+      "label": "API Key (legacy)",
+      "description": "Deprecated. Legacy plaintext API key property. The API key is now stored as a secret (secureJsonData.apiKey) and read from secure storage at runtime. Retained only for backward compatibility; not rendered in the UI.",
+      "valueType": "string",
+      "target": "jsonData",
+      "tags": ["legacy"]
+    },
+    {
+      "id": "jsonData.jwt",
+      "key": "jwt",
+      "label": "JWT (legacy)",
+      "description": "Deprecated. Legacy service account JWT property. The JWT is now stored as a secret and read from secure storage at runtime. Retained only for backward compatibility; not rendered in the UI.",
+      "valueType": "string",
+      "target": "jsonData",
+      "tags": ["legacy"]
     }
   ],
   "groups": [
