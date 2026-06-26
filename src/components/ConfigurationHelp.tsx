@@ -133,8 +133,8 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
                 >
                   Google Drive
                 </a>{' '}
-                page in the API Library and enable access for your account. Access to the Google Drive API is used to list all
-                spreadsheets to which you have access.
+                page in the API Library and enable access for your account. Access to the Google Drive API is used to
+                list all spreadsheets to which you have access.
               </li>
               <li>
                 Open the{' '}
@@ -179,11 +179,7 @@ export const ConfigurationHelp = ({ authenticationType }: Props) => {
     }
   };
   return (
-    <Collapse
-      label="Configure Google Sheets Authentication"
-      isOpen={isOpen}
-      onToggle={() => setIsOpen((x) => !x)}
-    >
+    <Collapse label="Configure Google Sheets Authentication" isOpen={isOpen} onToggle={() => setIsOpen((x) => !x)}>
       {renderHelpBody()}
     </Collapse>
   );

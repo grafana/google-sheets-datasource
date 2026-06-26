@@ -26,7 +26,7 @@ export const queryResponseToVariablesFrame = (query: SheetsVariableQuery, respon
   if (response?.data?.length < 1 || !response.data[0]?.fields?.length) {
     return { ...response, data: [] };
   }
-  
+
   // Find the required value field. If not found, return empty data
   const frame = response.data[0];
   const valueField = frame.fields.find((field: Field) => field.name === query.valueField);

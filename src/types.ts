@@ -1,5 +1,10 @@
 import { DataQuery } from '@grafana/schema';
-import { GoogleAuthType, GOOGLE_AUTH_TYPE_OPTIONS, DataSourceSecureJsonData, DataSourceOptions } from '@grafana/google-sdk';
+import {
+  GoogleAuthType,
+  GOOGLE_AUTH_TYPE_OPTIONS,
+  DataSourceSecureJsonData,
+  DataSourceOptions,
+} from '@grafana/google-sdk';
 
 export const GoogleSheetsAuth = {
   ...GoogleAuthType,
