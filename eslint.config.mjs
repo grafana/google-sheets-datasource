@@ -1,5 +1,6 @@
 import { defineConfig } from 'eslint/config';
 import baseConfig from './.config/eslint.config.mjs';
+import prettier from 'eslint-plugin-prettier';
 
 export default defineConfig([
   {
@@ -28,4 +29,13 @@ export default defineConfig([
     ],
   },
   ...baseConfig,
+  {
+    plugins: {
+      prettier: prettier,
+    },
+
+    rules: {
+      'prettier/prettier': 'error',
+    },
+  },
 ]);
