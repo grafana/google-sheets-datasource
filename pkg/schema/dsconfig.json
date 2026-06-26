@@ -4,6 +4,12 @@
   "pluginType": "grafana-googlesheets-datasource",
   "pluginName": "Google Sheets",
   "docURL": "https://grafana.com/docs/plugins/grafana-googlesheets-datasource/",
+  "instructions": [
+    {
+      "msg": "Supports Google JWT file / service account (jwt), API key (key), and GCE default service account (gce) — ask which. But never ask for credentials themselves. Those should be entered in the UI.",
+      "tags": ["llm"]
+    }
+  ],
   "fields": [
     {
       "id": "jsonData.authenticationType",
