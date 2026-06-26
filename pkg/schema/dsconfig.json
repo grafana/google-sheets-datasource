@@ -1,0 +1,246 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/dsconfig/refs/heads/main/dsconfig/schema.json",
+  "schemaVersion": "v1",
+  "pluginType": "grafana-googlesheets-datasource",
+  "pluginName": "Google Sheets",
+  "docURL": "https://grafana.com/docs/plugins/grafana-googlesheets-datasource/",
+  "instructions": [
+    {
+      "msg": "Supports Google JWT file / service account (jwt), API key (key), and GCE default service account (gce) — ask which. But never ask for credentials themselves. Those should be entered in the UI.",
+      "tags": ["llm"]
+    }
+  ],
+  "fields": [
+    {
+      "id": "jsonData.authenticationType",
+      "key": "authenticationType",
+      "label": "Authentication type",
+      "description": "Which authentication mechanism the datasource uses to talk to Google APIs.",
+      "valueType": "string",
+      "target": "jsonData",
+      "required": true,
+      "defaultValue": "jwt",
+      "validations": [
+        {
+          "type": "allowedValues",
+          "values": ["jwt", "key", "gce"]
+        }
+      ],
+      "ui": {
+        "component": "select",
+        "options": [
+          {
+            "label": "Google JWT File",
+            "value": "jwt"
+          },
+          {
+            "label": "API Key",
+            "value": "key"
+          },
+          {
+            "label": "GCE Default Service Account",
+            "value": "gce"
+          }
+        ]
+      },
+      "effects": [
+        {
+          "when": "value == 'jwt'",
+          "set": {
+            "virtual.jwtUpload": "upload"
+          }
+        },
+        {
+          "when": "value == 'gce'",
+          "set": {
+            "virtual.jwtUpload": "manual"
+          }
+        },
+        {
+          "when": "value == 'key'",
+          "set": {
+            "virtual.jwtUpload": ""
+          }
+        }
+      ]
+    },
+    {
+      "id": "virtual.jwtUpload",
+      "key": "jwtUpload",
+      "label": "JWT Token",
+      "description": "Upload or paste a Google service account JSON key file. The file contents are parsed and the relevant fields are populated automatically.",
+      "valueType": "string",
+      "kind": "virtual",
+      "defaultValue": "upload",
+      "dependsOn": "jsonData.authenticationType == 'jwt'",
+      "storage": {
+        "type": "computed",
+        "read": "jsonData.clientEmail ? 'manual' : 'upload'"
+      },
+      "effects": [
+        {
+          "when": "value != 'manual'",
+          "set": {
+            "virtual.privateKeyMode": ""
+          }
+        }
+      ],
+      "ui": {
+        "component": "fileUpload",
+        "accept": [".json"],
+        "placeholder": "Paste Google JWT token here",
+        "fileMapping": {
+          "project_id": "jsonData.defaultProject",
+          "client_email": "jsonData.clientEmail",
+          "token_uri": "jsonData.tokenUri",
+          "private_key": "secureJsonData.privateKey"
+        }
+      }
+    },
+    {
+      "id": "jsonData.defaultProject",
+      "key": "defaultProject",
+      "label": "Project ID",
+      "description": "GCP project ID. In JWT mode, auto-filled from the service account JSON.",
+      "valueType": "string",
+      "target": "jsonData",
+      "dependsOn": "virtual.jwtUpload == 'manual'"
+    },
+    {
+      "id": "jsonData.clientEmail",
+      "key": "clientEmail",
+      "label": "Client Email",
+      "description": "Service account email address for JWT authentication.",
+      "valueType": "string",
+      "target": "jsonData",
+      "dependsOn": "virtual.jwtUpload == 'manual'"
+    },
+    {
+      "id": "jsonData.tokenUri",
+      "key": "tokenUri",
+      "label": "Token URI",
+      "description": "OAuth2 token endpoint URI.",
+      "valueType": "string",
+      "target": "jsonData",
+      "defaultValue": "https://oauth2.googleapis.com/token",
+      "dependsOn": "virtual.jwtUpload == 'manual'"
+    },
+    {
+      "id": "virtual.privateKeyMode",
+      "key": "privateKeyMode",
+      "label": "Private key",
+      "valueType": "string",
+      "kind": "virtual",
+      "defaultValue": "paste",
+      "dependsOn": "virtual.jwtUpload == 'manual'",
+      "storage": {
+        "type": "computed",
+        "read": "jsonData.privateKeyPath ? 'path' : 'paste'"
+      },
+      "ui": {
+        "component": "radio",
+        "options": [
+          {
+            "label": "Paste private key",
+            "value": "paste"
+          },
+          {
+            "label": "Provide path to private key file",
+            "value": "path"
+          }
+        ]
+      }
+    },
+    {
+      "id": "secureJsonData.privateKey",
+      "key": "privateKey",
+      "label": "Private Key",
+      "description": "Service account private key for JWT authentication.",
+      "valueType": "string",
+      "role": "auth.oauth2.jwtPrivateKey",
+      "target": "secureJsonData",
+      "dependsOn": "virtual.privateKeyMode == 'paste'"
+    },
+    {
+      "id": "jsonData.privateKeyPath",
+      "key": "privateKeyPath",
+      "label": "Private Key Path",
+      "description": "Path to a local private key file on the Grafana server. Not supported in hosted environments.",
+      "valueType": "string",
+      "target": "jsonData",
+      "dependsOn": "virtual.privateKeyMode == 'path'",
+      "ui": {
+        "component": "input",
+        "placeholder": "File location of your private key (e.g. /etc/secrets/gce.pem)"
+      }
+    },
+    {
+      "id": "secureJsonData.apiKey",
+      "key": "apiKey",
+      "label": "API Key",
+      "description": "Google API key. Spreadsheets must be publicly shared.",
+      "valueType": "string",
+      "role": "auth.apiKey.key",
+      "target": "secureJsonData",
+      "dependsOn": "jsonData.authenticationType == 'key'"
+    },
+    {
+      "id": "jsonData.defaultSheetID",
+      "key": "defaultSheetID",
+      "label": "Default Spreadsheet ID",
+      "description": "Optional spreadsheet ID to use as default when creating new queries.",
+      "valueType": "string",
+      "target": "jsonData"
+    },
+    {
+      "id": "jsonData.authType",
+      "key": "authType",
+      "label": "Authentication type (legacy)",
+      "description": "Deprecated. Legacy authentication type property, superseded by authenticationType. Read only for backward compatibility with datasources created before the rename; not rendered in the UI.",
+      "valueType": "string",
+      "target": "jsonData",
+      "tags": ["legacy"]
+    },
+    {
+      "id": "jsonData.apiKey",
+      "key": "apiKey",
+      "label": "API Key (legacy)",
+      "description": "Deprecated. Legacy plaintext API key property. The API key is now stored as a secret (secureJsonData.apiKey) and read from secure storage at runtime. Retained only for backward compatibility; not rendered in the UI.",
+      "valueType": "string",
+      "target": "jsonData",
+      "tags": ["legacy"]
+    },
+    {
+      "id": "jsonData.jwt",
+      "key": "jwt",
+      "label": "JWT (legacy)",
+      "description": "Deprecated. Legacy service account JWT property. The JWT is now stored as a secret and read from secure storage at runtime. Retained only for backward compatibility; not rendered in the UI.",
+      "valueType": "string",
+      "target": "jsonData",
+      "tags": ["legacy"]
+    }
+  ],
+  "groups": [
+    {
+      "id": "auth",
+      "title": "Authentication",
+      "fieldRefs": [
+        "jsonData.authenticationType",
+        "virtual.jwtUpload",
+        "jsonData.defaultProject",
+        "jsonData.clientEmail",
+        "jsonData.tokenUri",
+        "virtual.privateKeyMode",
+        "secureJsonData.privateKey",
+        "jsonData.privateKeyPath",
+        "secureJsonData.apiKey"
+      ]
+    },
+    {
+      "id": "sheets-defaults",
+      "title": "Sheets Defaults",
+      "optional": true,
+      "fieldRefs": ["jsonData.defaultSheetID"]
+    }
+  ]
+}
