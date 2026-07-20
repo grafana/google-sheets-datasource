@@ -7,7 +7,7 @@
     "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
     "e2e": "playwright test",
     "lint": "eslint --cache .",
-    "lint:fix": "yarn run lint --fix && prettier --write --list-different .",
+    "lint:fix": "npm run lint -- --fix && prettier --write --list-different .",
     "server": "docker compose up --build",
     "server:debug": "docker compose -f ./docker-compose.debug.yaml up",
     "sign": "npx --yes --ignore-scripts --package @grafana/sign-plugin@3.2.2 sign-plugin",
@@ -88,7 +88,8 @@
     "react-dom": "18.3.1"
   },
   "engines": {
-    "node": ">=24"
+    "node": ">=24",
+    "npm": ">=11.12.1"
   },
-  "packageManager": "yarn@4.17.1"
+  "packageManager": "npm@11.18.0"
 }

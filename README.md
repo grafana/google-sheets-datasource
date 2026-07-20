@@ -31,7 +31,7 @@ This is a basic guide on how to set up your local environment, make the desired 
 You need to install the following first:
 
 - [Mage](https://magefile.org/)
-- [Yarn](https://yarnpkg.com/)
+- [npm](https://www.npmjs.com)
 - [Docker Compose](https://docs.docker.com/compose/)
 
 ## Running the development version
@@ -46,10 +46,10 @@ mage buildAll
 
 ### Compiling the Frontend
 
-After you made the desired changes, you can build and test the new version of the plugin using `yarn`:
+After you made the desired changes, you can build and test the new version of the plugin using `npm`:
 
 ```sh
-yarn run dev # builds and puts the output at ./dist
+npm run dev # builds and puts the output at ./dist
 ```
 
 The built plug-in will be in the `dist/` directory.
