@@ -42,7 +42,8 @@
     "tokenprovider",
     "typecheck",
     "uplot",
-    "xcsj"
+    "xcsj",
+    "dsconfig"
   ],
   "language": "en-US"
 }
