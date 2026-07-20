@@ -12,9 +12,7 @@ import (
 type DatasourceSettings struct {
 	InstanceSettings   backend.DataSourceInstanceSettings
 	AuthType           string `json:"authType"` // jwt | key | gce
-	APIKey             string `json:"apiKey"`
 	DefaultProject     string `json:"defaultProject"`
-	JWT                string `json:"jwt"`
 	ClientEmail        string `json:"clientEmail"`
 	TokenURI           string `json:"tokenUri"`
 	AuthenticationType string `json:"authenticationType"`
@@ -22,6 +20,8 @@ type DatasourceSettings struct {
 	DefaultSheetID     string `json:"defaultSheetID"`
 
 	// Saved in secure JSON
+	APIKey     string `json:"-"`
+	JWT        string `json:"-"`
 	PrivateKey string `json:"-"`
 }
 

@@ -17,6 +17,6 @@ func TestPlugin(t *testing.T) {
 		ID:                "grafana-googlesheets-datasource",
 		ConfigSchemaJSON:  configSchemaJSON,
 		SettingsJSONModel: models.DatasourceSettings{},
-		SecureKeys:        []string{"privateKey", "apiKey"},
+		SecureKeys:        []string{"privateKey", "apiKey", "jwt"},
 	})
 }

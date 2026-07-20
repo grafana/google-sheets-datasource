@@ -4,56 +4,47 @@
     "properties": {
       "jsonData": {
         "type": "object",
-        "required": [
-          "authenticationType"
-        ],
         "properties": {
-          "apiKey": {
-            "description": "Deprecated. Legacy plaintext API key property. The API key is now stored as a secret (secureJsonData.apiKey) and read from secure storage at runtime. Retained only for backward compatibility; not rendered in the UI.",
-            "type": "string"
-          },
           "authType": {
-            "description": "Deprecated. Legacy authentication type property, superseded by authenticationType. Read only for backward compatibility with datasources created before the rename; not rendered in the UI.",
-            "type": "string"
+            "description": "Legacy authentication type field. Older provisioning stored the auth type here; the backend copies its value into `authenticationType` on load. Prefer `authenticationType` for new configurations.",
+            "type": "string",
+            "enum": [
+              "key",
+              "jwt",
+              "gce"
+            ]
           },
           "authenticationType": {
-            "description": "Which authentication mechanism the datasource uses to talk to Google APIs.",
             "type": "string",
             "default": "jwt",
             "enum": [
-              "jwt",
               "key",
+              "jwt",
               "gce"
             ]
           },
           "clientEmail": {
-            "description": "Service account email address for JWT authentication.",
             "type": "string",
-            "x-dsconfig-depends-on": "virtual.jwtUpload == 'manual'"
+            "x-dsconfig-depends-on": "jsonData_authenticationType == 'jwt'",
+            "x-dsconfig-required-when": "jsonData_authenticationType == 'jwt' \u0026\u0026 jsonData_privateKeyPath == ''"
           },
           "defaultProject": {
-            "description": "GCP project ID. In JWT mode, auto-filled from the service account JSON.",
             "type": "string",
-            "x-dsconfig-depends-on": "virtual.jwtUpload == 'manual'"
+            "x-dsconfig-depends-on": "jsonData_authenticationType == 'jwt' || jsonData_authenticationType == 'gce'"
           },
           "defaultSheetID": {
-            "description": "Optional spreadsheet ID to use as default when creating new queries.",
-            "type": "string"
-          },
-          "jwt": {
-            "description": "Deprecated. Legacy service account JWT property. The JWT is now stored as a secret and read from secure storage at runtime. Retained only for backward compatibility; not rendered in the UI.",
+            "description": "Optional spreadsheet ID to use as default when creating new queries",
             "type": "string"
           },
           "privateKeyPath": {
-            "description": "Path to a local private key file on the Grafana server. Not supported in hosted environments.",
+            "description": "Paste private key or provide path to private file",
             "type": "string",
-            "x-dsconfig-depends-on": "virtual.privateKeyMode == 'path'"
+            "x-dsconfig-depends-on": "jsonData_authenticationType == 'jwt'"
           },
           "tokenUri": {
-            "description": "OAuth2 token endpoint URI.",
             "type": "string",
-            "default": "https://oauth2.googleapis.com/token",
-            "x-dsconfig-depends-on": "virtual.jwtUpload == 'manual'"
+            "x-dsconfig-depends-on": "jsonData_authenticationType == 'jwt'",
+            "x-dsconfig-required-when": "jsonData_authenticationType == 'jwt' \u0026\u0026 jsonData_privateKeyPath == ''"
           }
         }
       }
@@ -61,12 +52,15 @@
   },
   "secureValues": [
     {
-      "key": "privateKey",
-      "description": "Service account private key for JWT authentication."
+      "key": "apiKey"
     },
     {
-      "key": "apiKey",
-      "description": "Google API key. Spreadsheets must be publicly shared."
+      "key": "privateKey",
+      "description": "Paste private key or provide path to private file"
+    },
+    {
+      "key": "jwt",
+      "description": "Legacy write-only secret used by older versions of the plugin. The backend still copies its decrypted value into memory but no runtime code path depends on it; new configurations should use `privateKey` instead."
     }
   ]
 }
