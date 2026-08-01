@@ -299,6 +299,13 @@ var numberConverter = data.FieldConverter{
 		if !ok {
 			return nil, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
 		}
+		// EffectiveValue is nil for cells that are number-formatted but whose
+		// formula errored out (#DIV/0!, #N/A, #REF!, ...) or haven't computed a
+		// value yet, even when FormattedValue is non-empty.
+		if cellData.EffectiveValue == nil {
+			var f *float64
+			return f, nil
+		}
 		return cellData.EffectiveValue.NumberValue, nil
 	},
 }

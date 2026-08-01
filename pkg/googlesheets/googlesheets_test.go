@@ -425,3 +425,39 @@ func Test_timeConverter(t *testing.T) {
 		assert.Contains(t, err.Error(), "not a valid date")
 	})
 }
+
+func Test_numberConverter(t *testing.T) {
+	t.Run("numberConverter with EffectiveValue converts to the underlying NumberValue", func(t *testing.T) {
+		val := 42.5
+		cell := &sheets.CellData{
+			EffectiveValue: &sheets.ExtendedValue{
+				NumberValue: &val,
+			},
+		}
+
+		result, err := numberConverter.Converter(cell)
+		require.NoError(t, err)
+
+		floatPtr, ok := result.(*float64)
+		require.True(t, ok)
+		require.NotNil(t, floatPtr)
+		assert.Equal(t, val, *floatPtr)
+	})
+
+	t.Run("numberConverter returns nil instead of panicking when EffectiveValue is nil", func(t *testing.T) {
+		// Regression test: a cell that is number-formatted but whose formula
+		// errored out (#DIV/0!, #N/A, #REF!, ...) or hasn't computed a value yet
+		// has FormattedValue set (the error text) but EffectiveValue == nil.
+		cell := &sheets.CellData{
+			FormattedValue: "#DIV/0!",
+			EffectiveValue: nil,
+		}
+
+		result, err := numberConverter.Converter(cell)
+		require.NoError(t, err)
+
+		floatPtr, ok := result.(*float64)
+		require.True(t, ok)
+		assert.Nil(t, floatPtr)
+	})
+}
