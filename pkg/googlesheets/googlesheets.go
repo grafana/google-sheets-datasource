@@ -240,10 +240,9 @@ func (gs *GoogleSheets) transformSheetToDataFrame(ctx context.Context, sheet *sh
 var timeConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableTime,
 	Converter: func(i any) (any, error) {
-		var t *time.Time
 		cellData, ok := i.(*sheets.CellData)
 		if !ok {
-			return t, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
+			return nil, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
 		}
 
 		switch {
@@ -271,7 +270,7 @@ var timeConverter = data.FieldConverter{
 		default:
 			parsedTime, err := dateparse.ParseLocal(cellData.FormattedValue)
 			if err != nil {
-				return t, fmt.Errorf("error while parsing date '%v'", cellData.FormattedValue)
+				return nil, fmt.Errorf("error while parsing date '%v'", cellData.FormattedValue)
 			}
 			return &parsedTime, nil
 		}
@@ -282,10 +281,9 @@ var timeConverter = data.FieldConverter{
 var stringConverter = data.FieldConverter{
 	OutputFieldType: data.FieldTypeNullableString,
 	Converter: func(i any) (any, error) {
-		var s *string
 		cellData, ok := i.(*sheets.CellData)
 		if !ok {
-			return s, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
+			return nil, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
 		}
 		return &cellData.FormattedValue, nil
 	},
@@ -298,6 +296,12 @@ var numberConverter = data.FieldConverter{
 		cellData, ok := i.(*sheets.CellData)
 		if !ok {
 			return nil, fmt.Errorf("expected type *sheets.CellData, but got %T", i)
+		}
+		// EffectiveValue is nil for cells that are number-formatted but whose
+		// formula errored out (#DIV/0!, #N/A, #REF!, ...) or haven't computed a
+		// value yet, even when FormattedValue is non-empty.
+		if cellData.EffectiveValue == nil {
+			return nil, nil
 		}
 		return cellData.EffectiveValue.NumberValue, nil
 	},

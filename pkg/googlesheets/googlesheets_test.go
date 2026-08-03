@@ -369,6 +369,51 @@ func TestGooglesheets(t *testing.T) {
 		require.NotNil(t, strVal)
 		assert.Equal(t, "Plain Text Value", *strVal)
 	})
+
+	t.Run("number column with a formula error cell produces a nil value instead of panicking", func(t *testing.T) {
+		goodValue := 42.5
+		numberFormat := &sheets.CellFormat{
+			NumberFormat: &sheets.NumberFormat{Type: "NUMBER"},
+		}
+		gridData := &sheets.GridData{
+			RowData: []*sheets.RowData{
+				{Values: []*sheets.CellData{{FormattedValue: "Header"}}},
+				{Values: []*sheets.CellData{{
+					FormattedValue:  "42.5",
+					EffectiveValue:  &sheets.ExtendedValue{NumberValue: &goodValue},
+					EffectiveFormat: numberFormat,
+				}}},
+				// A number-formatted cell whose formula errored out: FormattedValue
+				// holds the error text and EffectiveValue is nil.
+				{Values: []*sheets.CellData{{
+					FormattedValue:  "#DIV/0!",
+					EffectiveValue:  nil,
+					EffectiveFormat: numberFormat,
+				}}},
+			},
+		}
+
+		gsd := &GoogleSheets{Cache: cache.New(300*time.Second, 50*time.Second)}
+		qm := models.QueryModel{Range: "A1:A3", Spreadsheet: "test", CacheDurationSeconds: 10}
+
+		frame, err := gsd.transformSheetToDataFrame(context.Background(), gridData, make(map[string]any), "ref1", &qm)
+		require.NoError(t, err)
+
+		require.Equal(t, data.FieldTypeNullableFloat64, frame.Fields[0].Type())
+		require.Equal(t, 2, frame.Fields[0].Len())
+
+		floatVal, ok := frame.Fields[0].At(0).(*float64)
+		require.True(t, ok)
+		require.NotNil(t, floatVal)
+		assert.Equal(t, goodValue, *floatVal)
+
+		errVal, ok := frame.Fields[0].At(1).(*float64)
+		require.True(t, ok)
+		assert.Nil(t, errVal)
+
+		// The error cell must not be reported as a converter failure.
+		assert.Empty(t, frame.Meta.Custom.(map[string]any)["warnings"])
+	})
 }
 
 func Test_timeConverter(t *testing.T) {
