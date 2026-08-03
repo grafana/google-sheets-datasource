@@ -1,5 +1,15 @@
 # Change Log
 
+## 2.6.0
+
+### Minor Changes
+
+🚀 enable alerting
+
+### Patch Changes
+
+🐛 Fix panic when a number-formatted cell has no computed value (e.g. a formula error like #DIV/0!, #N/A, #REF!)
+
 ## 2.5.1
 
 ⚙️ Updated frontend & backend dependencies
