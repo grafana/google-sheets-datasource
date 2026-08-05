@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.6.1
+
+🐛 Security: bump out-of-SLO react-router to 6.30.4
+
 ## 2.6.0
 
 🐛 Fix panic when a number-formatted cell has no computed value (e.g. a formula error like #DIV/0!, #N/A, #REF!)
