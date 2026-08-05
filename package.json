@@ -90,5 +90,8 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "yarn@4.17.1"
+  "packageManager": "yarn@4.17.1",
+  "resolutions": {
+    "react-router@npm:6.30.3": "6.30.4"
+  }
 }
