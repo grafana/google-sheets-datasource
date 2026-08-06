@@ -15,6 +15,7 @@
             ]
           },
           "authenticationType": {
+            "description": "How Grafana authenticates to the Google Sheets and Google Drive APIs. `jwt` uses a Google JWT service account key file; `key` uses an API key and only works with public spreadsheets; `gce` uses the GCE default service account.",
             "type": "string",
             "default": "jwt",
             "enum": [
@@ -24,27 +25,31 @@
             ]
           },
           "clientEmail": {
+            "description": "Service account email from the JWT key file (the `client_email` field).",
             "type": "string",
-            "x-dsconfig-depends-on": "jsonData_authenticationType == 'jwt'",
-            "x-dsconfig-required-when": "jsonData_authenticationType == 'jwt' \u0026\u0026 jsonData_privateKeyPath == ''"
+            "x-dsconfig-depends-on": "google_sdk_settings.authenticationType == 'jwt'",
+            "x-dsconfig-required-when": "google_sdk_settings.authenticationType == 'jwt'"
           },
           "defaultProject": {
+            "description": "Google Cloud project ID that owns the enabled Sheets and Drive APIs.",
             "type": "string",
-            "x-dsconfig-depends-on": "jsonData_authenticationType == 'jwt' || jsonData_authenticationType == 'gce'"
+            "x-dsconfig-depends-on": "google_sdk_settings.authenticationType == 'jwt' || google_sdk_settings.authenticationType == 'gce'",
+            "x-dsconfig-required-when": "google_sdk_settings.authenticationType == 'jwt'"
           },
           "defaultSheetID": {
             "description": "Optional spreadsheet ID to use as default when creating new queries",
             "type": "string"
           },
           "privateKeyPath": {
-            "description": "Paste private key or provide path to private file",
+            "description": "Path on the Grafana server to a file containing the JWT private key. Use this instead of pasting the private key inline.",
             "type": "string",
-            "x-dsconfig-depends-on": "jsonData_authenticationType == 'jwt'"
+            "x-dsconfig-depends-on": "google_sdk_settings.authenticationType == 'jwt'"
           },
           "tokenUri": {
+            "description": "OAuth 2.0 token endpoint from the JWT key file (the `token_uri` field, typically `https://oauth2.googleapis.com/token`).",
             "type": "string",
-            "x-dsconfig-depends-on": "jsonData_authenticationType == 'jwt'",
-            "x-dsconfig-required-when": "jsonData_authenticationType == 'jwt' \u0026\u0026 jsonData_privateKeyPath == ''"
+            "x-dsconfig-depends-on": "google_sdk_settings.authenticationType == 'jwt'",
+            "x-dsconfig-required-when": "google_sdk_settings.authenticationType == 'jwt'"
           }
         }
       }
@@ -56,7 +61,7 @@
     },
     {
       "key": "privateKey",
-      "description": "Paste private key or provide path to private file"
+      "description": "JWT private key (the `private_key` field of the service account key file). Supply this or `privateKeyPath`, not both."
     },
     {
       "key": "jwt",
