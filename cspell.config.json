@@ -43,7 +43,8 @@
     "typecheck",
     "uplot",
     "xcsj",
-    "dsconfig"
+    "dsconfig",
+    "pluginschema"
   ],
   "language": "en-US"
 }
