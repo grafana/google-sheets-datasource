@@ -44,7 +44,9 @@
     "uplot",
     "xcsj",
     "dsconfig",
-    "pluginschema"
+    "pluginschema",
+    "struct",
+    "Struct"
   ],
   "language": "en-US"
 }
