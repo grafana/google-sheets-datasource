@@ -48,7 +48,7 @@ The plugin uses the first row of the range as column headers. Those headers beco
 
 | Column   | Required | Description |
 |----------|----------|-------------|
-| `time`   | Yes      | The timestamp for the annotation. Use a column with date or datetime values. The plugin detects columns formatted as date/time in Google Sheets and treats them as time. |
+| `time`   | Yes      | The timestamp for the annotation. Use a column with date or date-time values. The plugin detects columns formatted as date/time in Google Sheets and treats them as time. |
 | `text`   | No       | The description shown when you hover over the annotation. |
 | `tags`   | No       | Comma-separated tags to categorize and filter annotations. |
 | `timeend`| No       | End timestamp for range annotations (shaded region instead of a vertical line). |
@@ -75,13 +75,13 @@ Your range could be something like `Annotations!A1:C100` (adjust the sheet name 
 
 After creating the annotation query, you can change how it appears:
 
-- **Color** – Choose a color for the annotation markers.
-- **Show in** – Choose which panels display the annotations (all panels, selected panels, or all except selected).
-- **Filter by** – Add filters to limit when annotations are shown.
+- **Color:** Choose a color for the annotation markers.
+- **Show in:** Choose which panels display the annotations (all panels, selected panels, or all except selected).
+- **Filter by:** Add filters to limit when annotations are shown.
 
 For details, refer to [Annotate visualizations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/dashboards/build-dashboards/annotate-visualizations/).
 
 ## Next steps
 
-- [Query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/) – Spreadsheet ID, Range, and Use Time Filter
+- [Query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/): Spreadsheet ID, Range, and Use Time Filter
 - [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/)

@@ -274,7 +274,7 @@ Replace `<PROJECT_ID>`, `<DATA_SOURCE_NAME>`, and optionally `<SPREADSHEET_ID>` 
 
 ### Provision with Terraform
 
-Use the `grafana_data_source` resource with `type = "grafana-googlesheets-datasource"`. Pass plugin-specific options in `json_data_encoded` and `secure_json_data_encoded` (JSON strings, camelCase keys).
+Use the `grafana_data_source` resource with `type = "grafana-googlesheets-datasource"`. Pass plugin-specific options in `json_data_encoded` and `secure_json_data_encoded` (JSON strings, `camelCase` keys).
 
 **API key:**
 

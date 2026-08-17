@@ -56,8 +56,8 @@ These messages appear when you click **Save & test** on the data source configur
 **Solution:**
 
 - **Network:** Ensure the Grafana server can reach Google APIs (`https://sheets.googleapis.com`, `https://www.googleapis.com`). If you use a proxy or firewall, allow these endpoints.
-- **API key:** If using an API key, ensure the Google Sheets API (and Drive API if you use “Select Spreadsheet ID”) is enabled for the key and that key restrictions (for example, IP, referrer) allow requests from Grafana.
-- **JWT / service account:** Ensure the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) are enabled for the project. Ensure the service account has access to at least one spreadsheet (for example, share the sheet with the service account email). For “Invalid grant” or “account not found”, verify the service account key is correct and that the account has not been deleted or disabled.
+- **API key:** If using an API key, ensure the Google Sheets API (and Drive API if you use "Select Spreadsheet ID") is enabled for the key and that key restrictions (for example, IP, referrer) allow requests from Grafana.
+- **JWT / service account:** Ensure the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) are enabled for the project. Ensure the service account has access to at least one spreadsheet (for example, share the sheet with the service account email). For "Invalid grant" or "account not found", verify the service account key is correct and that the account has not been deleted or disabled.
 - **GCE default account:** If using GCE Default Service Account, ensure Grafana runs on a Google Compute Engine VM and that the default service account has the required scopes and access to the sheet.
 
 ### Unable to create Google API client (in panel)
@@ -87,7 +87,7 @@ These errors appear in the panel, in the query editor, or in the query response 
 **Solution:**
 
 - **Sharing (JWT/service account):** Share the spreadsheet with the service account email with **Viewer** (or **Editor** if you need write; the plugin only reads).
-- **API key:** Ensure the spreadsheet is shared so that “Anyone with the link” can view, or use a key that has access to the sheet. Check [API key restrictions](https://console.cloud.google.com/apis/credentials) so the key is allowed for the Sheets API (and Drive API if listing spreadsheets).
+- **API key:** Ensure the spreadsheet is shared so that "Anyone with the link" can view, or use a key that has access to the sheet. Check [API key restrictions](https://console.cloud.google.com/apis/credentials) so the key is allowed for the Sheets API (and Drive API if listing spreadsheets).
 - **APIs not enabled:** In Google Cloud Console, enable [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) for the project.
 - **Quotas:** If you hit rate limits, you may see errors; refer to [Quota](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/#quota) and consider increasing **Cache Time** to reduce requests.
 
@@ -135,7 +135,7 @@ In plugin versions before 2.6.0, a formula error in a numeric column could cause
 **Solution:**
 
 - Use a column that contains real dates or times. In Google Sheets, format the column as a date or date-time so the plugin can detect it. Avoid mixed types or text that does not look like a date in the same column.
-- If the error mentions “error while parsing date”, fix or remove invalid cells in that column so every value is a valid date/time or leave the cell empty (empty may be skipped depending on behavior).
+- If the error mentions "error while parsing date", fix or remove invalid cells in that column so every value is a valid date/time or leave the cell empty (empty may be skipped depending on behavior).
 
 ## Template variables
 

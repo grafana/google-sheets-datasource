@@ -39,7 +39,7 @@ The Google Sheets data source supports **query variables**: variables whose opti
 | Variable type | Supported |
 |---------------|-----------|
 | Query | Yes. Options are loaded from a Google Sheet. |
-| Custom | Yes. Use Grafana's built-in Custom type; values are not from Google Sheets. |
+| Custom | Yes. Use the built-in Custom type in Grafana; values are not from Google Sheets. |
 | Data source | Yes. |
 
 ## Query variables
@@ -99,8 +99,8 @@ This creates a drop-down showing "United States", "Canada" but using the values 
 
 After you create a variable, use it in panel queries by referencing its name with a `$` prefix (for example, `$country`). The Google Sheets data source interpolates variables in:
 
-- **Spreadsheet ID** – for example, use `$spreadsheet` if the variable holds a spreadsheet ID
-- **Range** – for example, use `$range` or build a range like `Sheet1!A1:$column` to make the range depend on the selected value
+- **Spreadsheet ID:** for example, use `$spreadsheet` if the variable holds a spreadsheet ID
+- **Range:** for example, use `$range` or build a range like `Sheet1!A1:$column` to make the range depend on the selected value
 
 When the user changes the variable in the dashboard drop-down, queries that reference it are re-run with the new value.
 

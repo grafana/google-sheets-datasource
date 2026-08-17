@@ -53,13 +53,13 @@ Before you start, ensure you have:
 
 The following documents help you get started:
 
-- [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/) – Set up authentication and connect to Google Sheets.
-- [Query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/) – Query spreadsheet data and build panels.
-- [Template variables](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/template-variables/) – Create dynamic dashboards with variables.
-- [Alerting](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/alerting/) – Create alert rules from Google Sheets queries.
-- [Troubleshooting](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/troubleshooting/) – Solve common configuration and query errors.
+- [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/): Set up authentication and connect to Google Sheets.
+- [Query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/): Query spreadsheet data and build panels.
+- [Template variables](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/template-variables/): Create dynamic dashboards with variables.
+- [Alerting](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/alerting/): Create alert rules from Google Sheets queries.
+- [Troubleshooting](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/troubleshooting/): Solve common configuration and query errors.
 
-[Install the plugin](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/administration/plugin-management/#install-a-plugin) if you haven’t already. Try the [Quick start](#quick-start-create-a-sample-dashboard) below to build a sample dashboard in a few steps.
+[Install the plugin](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/administration/plugin-management/#install-a-plugin) if you haven't already. Try the [Quick start](#quick-start-create-a-sample-dashboard) below to build a sample dashboard in a few steps.
 
 ## Quick start: create a sample dashboard
 
@@ -98,7 +98,7 @@ The Google Sheets API uses per-minute quotas that refill every minute. For limit
 
 - **Read-only:** The data source only reads from spreadsheets; it does not write or edit data.
 - **GCE authentication:** [GCE Default Service Account](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/#authenticate-with-the-default-gce-service-account) is only supported when Grafana runs on a Google Compute Engine VM. It is not supported in Grafana Cloud or other hosted environments.
-- **API key:** With API key authentication, spreadsheets must be publicly viewable (for example, “Anyone with the link”). The **Select Spreadsheet ID** drop-down is only available when using JWT (service account) authentication.
+- **API key:** With API key authentication, spreadsheets must be publicly viewable (for example, "Anyone with the link"). The **Select Spreadsheet ID** drop-down is only available when using JWT (service account) authentication.
 - **Provisioning:** Provisioning the data source using a local private key file (`privateKeyPath`) is not supported in hosted environments such as Grafana Cloud.
 
 ## Related resources
