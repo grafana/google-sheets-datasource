@@ -13,7 +13,7 @@ labels:
     - oss
     - enterprise
     - cloud
-review_date: 2026-05-18
+review_date: 2026-08-17
 weight: 500
 ---
 
@@ -101,6 +101,19 @@ These errors appear in the panel, in the query editor, or in the query response 
 - If **Use Time Filter** is enabled, the panel only shows rows where the time column falls within the dashboard time range. Widen the dashboard time range or ensure the sheet has a column the plugin detects as time (date/datetime format) and that its values are inside the selected range.
 - Check that the sheet has data in the specified range and that the first row is the header row.
 
+### Null or empty values for cells with formula errors
+
+**Cause:** A cell in a number-formatted column contains a formula that returns an error (for example, `#DIV/0!`, `#N/A`, or `#REF!`) or has not yet computed a value. The plugin returns a null (empty) value for that cell.
+
+**Solution:**
+
+- Open the spreadsheet and fix the formula in the affected cell so it returns a valid number.
+- If the error is expected, either remove the cell's contents or exclude that row from the query **Range** so the null value doesn't affect your panel.
+
+{{< admonition type="note" >}}
+In plugin versions before 2.6.0, a formula error in a numeric column could cause the whole query to fail. From 2.6.0 onward, only the affected cell is null and the rest of the query still returns.
+{{< /admonition >}}
+
 ### "input data must be a wide series" or `[sse.readDataError]`
 
 **Cause:** The query range returns data in a format that Grafana cannot interpret as a wide series. This typically happens when the range is invalid, points to an empty area, or the sheet layout does not match what the panel or expression expects.
@@ -135,7 +148,7 @@ Issues specific to query variables that get their options from a Google Sheet.
 **Solution:**
 
 - Confirm **Spreadsheet ID** and **Range** in the variable query. Ensure **Value Field** is set to a column that exists in the range.
-- If you use **Optional filtering** (**Filter Field** and **Filter Value**), ensure at least some rows match; otherwise the list will be empty.
+- If you use **Optional filtering** (**Filter Field** and **Filter Value**), ensure at least some rows match; otherwise the list is empty.
 - Test the same range in a panel query to confirm the sheet returns data.
 
 ## Annotations

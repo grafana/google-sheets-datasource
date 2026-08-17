@@ -13,7 +13,7 @@ labels:
     - oss
     - enterprise
     - cloud
-review_date: 2026-05-18
+review_date: 2026-08-17
 weight: 500
 ---
 
@@ -49,7 +49,7 @@ Alerting on Google Sheets is useful when your metrics or status live in a spread
 1. Define the rule: name, folder, condition (for example, when a value is above or below a threshold), evaluation group, and contact points. For details, refer to [Configure Grafana-managed alert rules](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/alerting/alerting-rules/create-grafana-managed-rule/).
 1. Save the rule.
 
-After the rule is created, Grafana will evaluate it on the schedule you configured and send notifications when the condition is met.
+After the rule is created, Grafana evaluates it on the schedule you configured and sends notifications when the condition is met.
 
 ## Query and data considerations
 

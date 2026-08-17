@@ -23,7 +23,7 @@ aliases:
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/provisioning/
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/authenticate/
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/install/
-review_date: 2026-05-18
+review_date: 2026-08-17
 weight: 100
 ---
 
@@ -95,7 +95,7 @@ To create a service account and get a JWT file:
 1. Click **Create credentials** then **Service account**.
 1. Fill out the service account details form and then click **Create and continue**.
 1. Ignore the **Service account permissions** and **Principals with access** sections, just click **Done**.
-1. Click into the details for the service account, navigate to the **Keys** tab, and click **Add Key**. Choose key type **JSON** and click **Create**. A JSON key file will be created and downloaded to your computer.
+1. Click into the details for the service account, navigate to the **Keys** tab, and click **Add Key**. Choose key type **JSON** and click **Create**. Grafana creates and downloads a JSON key file to your computer.
 1. Upload or drag this file into the **JWT Key Details** section of the data source configuration.
 1. Grant the service account [access to resources](#granting-access-to-the-service-account-used-with-jwt-authentication) as appropriate.
 
@@ -141,7 +141,7 @@ Below the authentication type selector, **Default project** and **Default Spread
 
 ## Default Spreadsheet ID
 
-You can optionally configure a **Default Spreadsheet ID** in the data source settings. When set, this spreadsheet ID will be automatically populated in new queries, making it faster to create queries that use the same spreadsheet.
+You can optionally configure a **Default Spreadsheet ID** in the data source settings. When set, this spreadsheet ID is automatically populated in new queries, making it faster to create queries that use the same spreadsheet.
 
 To configure a default spreadsheet ID:
 
@@ -149,9 +149,9 @@ To configure a default spreadsheet ID:
 1. Choose one of these options:
    - **Select Spreadsheet ID** (JWT authentication only): If you're using Google JWT File authentication, click the control to select a spreadsheet from the list. The list shows all spreadsheets that the service account has access to.
    - **Enter a spreadsheet ID**: Manually enter the spreadsheet ID from the spreadsheet URL.
-   - **Paste a spreadsheet URL**: Paste the full spreadsheet URL, and the ID will be automatically extracted.
+   - **Paste a spreadsheet URL**: Paste the full spreadsheet URL, and the ID is automatically extracted.
 
-When you create a new query, the default spreadsheet ID will be pre-filled in the **Spreadsheet ID** field of the query editor.
+When you create a new query, the default spreadsheet ID is pre-filled in the **Spreadsheet ID** field of the query editor.
 
 {{< admonition type="note" >}}
 The default spreadsheet ID is optional. If not set, you'll need to specify the spreadsheet ID for each query manually.

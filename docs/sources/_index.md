@@ -20,7 +20,7 @@ labels:
 aliases:
   - /docs/plugins/grafana-googlesheets-datasource/latest/create-a-sample-dashboard/
 weight: 10
-review_date: 2026-05-18
+review_date: 2026-08-17
 ---
 
 # Google Sheets data source
@@ -69,7 +69,7 @@ You can try the data source using a [public demonstration spreadsheet](https://d
 1. Go to **Dashboards** → **New** → **New Dashboard** → **Add visualization**.
 1. Select the **Google Sheets** data source.
 1. In the query editor, paste the spreadsheet ID: `1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8`. You can leave **Range** empty to use the first sheet, or set a range (for example, `Sheet1!A1:E100`).
-1. Run the query. Grafana will detect time series data and suggest a time series panel; you can switch to other visualizations (for example, bar gauge, table) from the panel.
+1. Run the query. Grafana detects time series data and suggests a time series panel; you can switch to other visualizations (for example, bar gauge, table) from the panel.
 
 The embedded Grafana Play dashboard at the top of this page shows a full example you can open and edit.
 
