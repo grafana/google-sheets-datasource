@@ -29,7 +29,7 @@ Alerting on Google Sheets is useful when your metrics or status live in a spread
 
 - **Budgets and quotas:** Track spending, usage, or limits in a sheet; alert when a value exceeds or falls short of a target.
 - **KPIs and SLAs:** Monitor a single row or cell that holds a key metric (for example, uptime, error rate, NPS); alert when it goes above or below a set level.
-- **Status or health:** Use a sheet as a simple status board (for example, "ok", "degraded", "down"); alert when the status indicates a problem.
+- **Status or health:** Use a sheet as a status board (for example, "ok", "degraded", "down"); alert when the status indicates a problem.
 - **Inventory or capacity:** Alert when stock, seats, or capacity in a sheet drops below (or rises above) a threshold.
 - **Form or survey results:** Alert when the count or average of responses in a sheet crosses a limit (for example, number of support tickets, satisfaction score).
 
@@ -59,7 +59,7 @@ After the rule is created, Grafana evaluates it on the schedule you configured a
 
 ## Example sheet layout
 
-A simple layout for a threshold alert is a time column plus one or more numeric columns. Format the time column as date or date-time in Google Sheets so the plugin detects it. Example:
+A basic layout for a threshold alert is a time column plus one or more numeric columns. Format the time column as date or date-time in Google Sheets so the plugin detects it. Example:
 
 | time                | value   |
 |---------------------|---------|

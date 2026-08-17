@@ -87,7 +87,7 @@ After you configure the data source, you can:
 - Add [annotations](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/annotations/) to overlay events on panels
 - Set up [alerting](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/alerting/) to create alert rules from your queries
 - Use [template variables](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/template-variables/) in queries
-- Use [Explore](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/explore/) for ad-hoc queries without building a dashboard
+- Use [Explore](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/explore/) for free-form queries without building a dashboard
 - Apply [transformations](https://grafana.com/docs/grafana/<GRAFANA_VERSION>/panels-visualizations/query-transform-data/transform-data/) to query results
 
 ## Quota

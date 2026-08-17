@@ -97,7 +97,7 @@ To create a service account and get a JWT file:
 1. Ignore the **Service account permissions** and **Principals with access** sections, just click **Done**.
 1. Click into the details for the service account, navigate to the **Keys** tab, and click **Add Key**. Choose key type **JSON** and click **Create**. Grafana creates and downloads a JSON key file to your computer.
 1. Upload or drag this file into the **JWT Key Details** section of the data source configuration.
-1. Grant the service account [access to resources](#granting-access-to-the-service-account-used-with-jwt-authentication) as appropriate.
+1. Grant the service account [access to resources](#grant-access-to-the-service-account-used-with-jwt-authentication) as appropriate.
 
 ### Authenticate with an API key
 
@@ -114,7 +114,7 @@ To generate an API key:
 ### Authenticate with the default GCE service account
 
 {{< admonition type="note" >}}
-This is **only** compatible when running Grafana on a Google Compute Engine (GCE) virtual machine. It is **not supported** in on-premise deployments, Grafana Cloud or other hosted environments.
+This is **only** compatible when running Grafana on a Google Compute Engine (GCE) virtual machine. It is **not supported** in self-managed deployments, Grafana Cloud or other hosted environments.
 {{< /admonition >}}
 
 When Grafana is running on a Google Compute Engine (GCE) virtual machine, Grafana can automatically retrieve default credentials from the metadata server.
@@ -164,7 +164,7 @@ Refer to the official guidance from Google on how to share resources:
 - [Google Sheets](https://support.google.com/a/users/answer/13309904#sheets_share_link)
 - [Google Drive](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop#share_publicly)
 
-### Granting access to the service account used with JWT authentication
+### Grant access to the service account used with JWT authentication
 
 By default, the service account doesn't have access to any spreadsheets within the account or organization that it's associated with.
 To grant the service account access to files or folders in Google Drive, you need to share the file or folder with the service account's email address.

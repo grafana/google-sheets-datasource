@@ -57,7 +57,7 @@ Always enable **Use Time Filter** in the annotation query so only events in the 
 
 ## Example sheet layout
 
-A simple sheet for annotations might look like this:
+A sheet for annotations might look like this:
 
 | time                | text              | tags        |
 |---------------------|-------------------|-------------|
