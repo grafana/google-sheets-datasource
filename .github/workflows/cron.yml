@@ -1,0 +1,17 @@
+name: Scheduled Cloud end-to-end tests
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  playwright-cloud:
+    uses: grafana/data-sources-ci-workflows/.github/workflows/playwright-cloud.yml@main
+    secrets: inherit
+    with:
+      bench-prepare-cmd: corepack yarn install --immutable --mode=skip-build; corepack yarn exec playwright install
+      bench-execute-cmd: corepack yarn run e2e
+      repo-secrets: |
+        DS_INSTANCE_API_KEY=grafana-googlesheets-datasource/<instance>:secure_apiKey
+        DS_INSTANCE_SPREADSHEET_ID=grafana-googlesheets-datasource/<instance>:json_defaultSheetID
