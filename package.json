@@ -93,6 +93,6 @@
   },
   "packageManager": "npm@11.18.0",
   "resolutions": {
-    "react-router@npm:6.30.3": "6.30.4"
+    "react-router@npm:6.30.3": "7.18.0"
   }
 }
