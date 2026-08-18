@@ -3,6 +3,11 @@ import { expect, test, type ExplorePage } from '@grafana/plugin-e2e';
 const PLUGIN_ID = 'grafana-googlesheets-datasource';
 const DEFAULT_SPREADSHEET_ID = process.env.DS_INSTANCE_SPREADSHEET_ID ?? '1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8';
 const API_KEY = process.env.DS_INSTANCE_API_KEY ?? process.env.GOOGLE_SHEETS_API_KEY;
+const CLIENT_EMAIL = process.env.DS_INSTANCE_CLIENT_EMAIL;
+const PRIVATE_KEY = process.env.DS_INSTANCE_PRIVATE_KEY;
+const DEFAULT_PROJECT = process.env.DS_INSTANCE_DEFAULT_PROJECT;
+const TOKEN_URI = process.env.DS_INSTANCE_TOKEN_URI ?? 'https://oauth2.googleapis.com/token';
+const HAS_LIVE_CREDENTIALS = Boolean(API_KEY || (CLIENT_EMAIL && PRIVATE_KEY));
 
 const MOCK_QUERY_RESPONSE = {
   results: {
@@ -80,6 +85,33 @@ function waitForQueryDataResponseWithBody(explorePage: ExplorePage) {
   return { responsePromise, getBody: () => body };
 }
 
+function liveDataSourceConfig() {
+  if (CLIENT_EMAIL && PRIVATE_KEY) {
+    return {
+      jsonData: {
+        authenticationType: 'jwt',
+        clientEmail: CLIENT_EMAIL,
+        defaultProject: DEFAULT_PROJECT,
+        defaultSheetID: DEFAULT_SPREADSHEET_ID,
+        tokenUri: TOKEN_URI,
+      },
+      secureJsonData: {
+        privateKey: PRIVATE_KEY,
+      },
+    };
+  }
+
+  return {
+    jsonData: {
+      authenticationType: 'key',
+      defaultSheetID: DEFAULT_SPREADSHEET_ID,
+    },
+    secureJsonData: {
+      apiKey: API_KEY,
+    },
+  };
+}
+
 test.describe('Query editor', () => {
   let datasourceUid = '';
 
@@ -108,7 +140,7 @@ test.describe('Query editor', () => {
       await explorePage.mockQueryDataResponse(MOCK_QUERY_RESPONSE);
       await page.goto(exploreUrl(datasourceUid));
 
-      const queryRow = page.locator('[data-testid="query-editor-row"]').first();
+      const queryRow = explorePage.getQueryEditorRow('A');
       await expect(queryRow.getByText('Spreadsheet ID', { exact: true })).toBeVisible();
       await expect(queryRow.getByText('Range', { exact: true })).toBeVisible();
       await expect(queryRow.getByText('Cache Time', { exact: true })).toBeVisible();
@@ -119,7 +151,7 @@ test.describe('Query editor', () => {
       await explorePage.mockQueryDataResponse(MOCK_QUERY_RESPONSE);
       await page.goto(exploreUrl(datasourceUid, { range: 'Sheet1!A2:E' }));
 
-      const queryRow = page.locator('[data-testid="query-editor-row"]').first();
+      const queryRow = explorePage.getQueryEditorRow('A');
       await expect(queryRow.getByRole('button', { name: DEFAULT_SPREADSHEET_ID })).toBeVisible();
       await expect(queryRow.getByPlaceholder('Class Data!A2:E')).toHaveValue('Sheet1!A2:E');
     });
@@ -130,7 +162,7 @@ test.describe('Query editor', () => {
       await explorePage.mockQueryDataResponse(MOCK_QUERY_RESPONSE);
       await page.goto(exploreUrl(datasourceUid));
 
-      const rangeInput = page.locator('[data-testid="query-editor-row"]').first().getByPlaceholder('Class Data!A2:E');
+      const rangeInput = explorePage.getQueryEditorRow('A').getByPlaceholder('Class Data!A2:E');
       await rangeInput.fill('Sheet1!A1:B10');
 
       await expect(rangeInput).toHaveValue('Sheet1!A1:B10');
@@ -140,7 +172,7 @@ test.describe('Query editor', () => {
       await explorePage.mockQueryDataResponse(MOCK_QUERY_RESPONSE);
       await page.goto(exploreUrl(datasourceUid));
 
-      const timeFilter = page.locator('[data-testid="query-editor-row"]').first().getByRole('switch');
+      const timeFilter = explorePage.getQueryEditorRow('A').getByRole('switch');
       await timeFilter.check({ force: true });
 
       await expect(timeFilter).toBeChecked();
@@ -163,19 +195,13 @@ test.describe('Query editor with live Google Sheets data', () => {
   let datasourceUid = '';
 
   test.beforeEach(async ({ createDataSource, request }, testInfo) => {
-    test.skip(!API_KEY, 'Google Sheets credentials are not configured');
+    test.skip(!HAS_LIVE_CREDENTIALS, 'Google Sheets credentials are not configured');
 
     const dataSource = await createDataSource({
       type: PLUGIN_ID,
       name: `Google Sheets live E2E ${testInfo.workerIndex}-${Date.now()}`,
       uid: `google-sheets-live-e2e-${testInfo.workerIndex}-${Date.now()}`,
-      jsonData: {
-        authenticationType: 'key',
-        defaultSheetID: DEFAULT_SPREADSHEET_ID,
-      },
-      secureJsonData: {
-        apiKey: API_KEY,
-      },
+      ...liveDataSourceConfig(),
     });
     datasourceUid = dataSource.uid;
 

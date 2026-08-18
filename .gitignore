@@ -28,3 +28,4 @@ mage_output_file.go
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.DS_Store
