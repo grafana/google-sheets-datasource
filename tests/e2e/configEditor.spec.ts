@@ -3,6 +3,10 @@ import { GoogleSheetsDataSourceOptions, GoogleSheetsSecureJSONData } from '../..
 
 const PROVISIONING_FILE = 'datasources.yml';
 
+// GRAFANA_URL is injected only by the Cloud cron workflow (playwright-cloud). Its presence
+// means a failing health check indicates a broken Vault injection, not a local/PR run.
+const isCloudRun = Boolean(process.env.GRAFANA_URL);
+
 test.describe('Config editor', () => {
   test.describe('rendering', () => {
     test('smoke: should render config editor', { tag: '@plugins' }, async ({ createDataSourceConfigPage, page }) => {
@@ -85,7 +89,12 @@ test.describe('Config editor', () => {
         fileName: PROVISIONING_FILE,
       });
       const healthResponse = await request.get(`/api/datasources/uid/${dataSource.uid}/health`);
-      test.skip(!healthResponse.ok(), 'Google Sheets credentials are not configured');
+      if (!healthResponse.ok()) {
+        if (isCloudRun) {
+          throw new Error('Cloud e2e is missing Google Sheets credentials from Vault');
+        }
+        test.skip(true, 'Google Sheets credentials are not configured');
+      }
 
       const configPage = await gotoDataSourceConfigPage(dataSource.uid);
       await page.getByRole('button', { name: /^(Save & test|Test)$/ }).click();

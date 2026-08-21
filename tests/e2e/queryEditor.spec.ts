@@ -9,6 +9,22 @@ const DEFAULT_PROJECT = process.env.DS_INSTANCE_DEFAULT_PROJECT;
 const TOKEN_URI = process.env.DS_INSTANCE_TOKEN_URI ?? 'https://oauth2.googleapis.com/token';
 const HAS_LIVE_CREDENTIALS = Boolean(API_KEY || (CLIENT_EMAIL && PRIVATE_KEY));
 
+// GRAFANA_URL is injected only by the Cloud cron workflow (playwright-cloud). Its presence
+// means missing live credentials indicate a broken Vault injection, not a local/PR run.
+const isCloudRun = Boolean(process.env.GRAFANA_URL);
+
+function skipOrFailIfNoLiveCredentials(hasCredentials: boolean) {
+  if (hasCredentials) {
+    return;
+  }
+
+  if (isCloudRun) {
+    throw new Error('Cloud e2e is missing Google Sheets credentials from Vault');
+  }
+
+  test.skip(true, 'Google Sheets credentials are not configured');
+}
+
 const MOCK_QUERY_RESPONSE = {
   results: {
     A: {
@@ -195,7 +211,7 @@ test.describe('Query editor with live Google Sheets data', () => {
   let datasourceUid = '';
 
   test.beforeEach(async ({ createDataSource, request }, testInfo) => {
-    test.skip(!HAS_LIVE_CREDENTIALS, 'Google Sheets credentials are not configured');
+    skipOrFailIfNoLiveCredentials(HAS_LIVE_CREDENTIALS);
 
     const dataSource = await createDataSource({
       type: PLUGIN_ID,
@@ -206,7 +222,7 @@ test.describe('Query editor with live Google Sheets data', () => {
     datasourceUid = dataSource.uid;
 
     const healthResponse = await request.get(`/api/datasources/uid/${datasourceUid}/health`);
-    test.skip(!healthResponse.ok(), 'Google Sheets credentials are not configured');
+    skipOrFailIfNoLiveCredentials(healthResponse.ok());
   });
 
   test.afterEach(async ({ request }) => {
