@@ -5,10 +5,19 @@ on:
     - cron: '0 6 * * *'
   workflow_dispatch:
 
+# Reusable workflows can only narrow caller permissions, not escalate.
+# `id-token: write` is needed by the Vault OIDC step in playwright-cloud.yml.
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   playwright-cloud:
     uses: grafana/data-sources-ci-workflows/.github/workflows/playwright-cloud.yml@main
     secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
     with:
       bench-prepare-cmd: npm ci --ignore-scripts --no-audit --fund=false; npm exec -- playwright install
       bench-execute-cmd: npm run e2e
