@@ -13,7 +13,7 @@ labels:
     - oss
     - enterprise
     - cloud
-review_date: 2026-05-18
+review_date: 2026-08-17
 weight: 500
 ---
 
@@ -56,8 +56,8 @@ These messages appear when you click **Save & test** on the data source configur
 **Solution:**
 
 - **Network:** Ensure the Grafana server can reach Google APIs (`https://sheets.googleapis.com`, `https://www.googleapis.com`). If you use a proxy or firewall, allow these endpoints.
-- **API key:** If using an API key, ensure the Google Sheets API (and Drive API if you use “Select Spreadsheet ID”) is enabled for the key and that key restrictions (for example, IP, referrer) allow requests from Grafana.
-- **JWT / service account:** Ensure the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) are enabled for the project. Ensure the service account has access to at least one spreadsheet (for example, share the sheet with the service account email). For “Invalid grant” or “account not found”, verify the service account key is correct and that the account has not been deleted or disabled.
+- **API key:** If using an API key, ensure the Google Sheets API (and Drive API if you use "Select Spreadsheet ID") is enabled for the key and that key restrictions (for example, IP, referrer) allow requests from Grafana.
+- **JWT / service account:** Ensure the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) are enabled for the project. Ensure the service account has access to at least one spreadsheet (for example, share the sheet with the service account email). For "Invalid grant" or "account not found", verify the service account key is correct and that the account has not been deleted or disabled.
 - **GCE default account:** If using GCE Default Service Account, ensure Grafana runs on a Google Compute Engine VM and that the default service account has the required scopes and access to the sheet.
 
 ### Unable to create Google API client (in panel)
@@ -87,7 +87,7 @@ These errors appear in the panel, in the query editor, or in the query response 
 **Solution:**
 
 - **Sharing (JWT/service account):** Share the spreadsheet with the service account email with **Viewer** (or **Editor** if you need write; the plugin only reads).
-- **API key:** Ensure the spreadsheet is shared so that “Anyone with the link” can view, or use a key that has access to the sheet. Check [API key restrictions](https://console.cloud.google.com/apis/credentials) so the key is allowed for the Sheets API (and Drive API if listing spreadsheets).
+- **API key:** Ensure the spreadsheet is shared so that "Anyone with the link" can view, or use a key that has access to the sheet. Check [API key restrictions](https://console.cloud.google.com/apis/credentials) so the key is allowed for the Sheets API (and Drive API if listing spreadsheets).
 - **APIs not enabled:** In Google Cloud Console, enable [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com) and [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com) for the project.
 - **Quotas:** If you hit rate limits, you may see errors; refer to [Quota](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/#quota) and consider increasing **Cache Time** to reduce requests.
 
@@ -101,6 +101,19 @@ These errors appear in the panel, in the query editor, or in the query response 
 - If **Use Time Filter** is enabled, the panel only shows rows where the time column falls within the dashboard time range. Widen the dashboard time range or ensure the sheet has a column the plugin detects as time (date/datetime format) and that its values are inside the selected range.
 - Check that the sheet has data in the specified range and that the first row is the header row.
 
+### Null or empty values for cells with formula errors
+
+**Cause:** A cell in a number-formatted column contains a formula that returns an error (for example, `#DIV/0!`, `#N/A`, or `#REF!`) or has not yet computed a value. The plugin returns a null (empty) value for that cell.
+
+**Solution:**
+
+- Open the spreadsheet and fix the formula in the affected cell so it returns a valid number.
+- If the error is expected, either remove the cell's contents or exclude that row from the query **Range** so the null value doesn't affect your panel.
+
+{{< admonition type="note" >}}
+In plugin versions before 2.6.0, a formula error in a numeric column could cause the whole query to fail. From 2.6.0 onward, only the affected cell is null and the rest of the query still returns.
+{{< /admonition >}}
+
 ### "input data must be a wide series" or `[sse.readDataError]`
 
 **Cause:** The query range returns data in a format that Grafana cannot interpret as a wide series. This typically happens when the range is invalid, points to an empty area, or the sheet layout does not match what the panel or expression expects.
@@ -112,7 +125,7 @@ These errors appear in the panel, in the query editor, or in the query response 
 | Invalid range syntax | Use valid [A1 notation](https://developers.google.com/sheets/api/guides/concepts#a1_notation). The sheet name and cell references must be correct (for example, `Sheet1!A1:E100`, not `Sheet 1:A1:E100`). Refer to [Range syntax examples](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/#range) for valid formats. |
 | Range points to empty cells | Verify the range contains data. Open the spreadsheet and confirm the cells are populated. |
 | Sheet name mismatch | Sheet names in the range are case-sensitive and must match exactly, including spaces (for example, `'My Sheet'!A1:D10`). Wrap names that contain spaces in single quotes. |
-| Data is not in wide format | The Google Sheets plugin returns data in wide format (one column per field). If you're using a SQL expression or transformation that expects a different layout, refer to [Use SQL expressions with Google Sheets data](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/#use-sql-expressions-with-google-sheets-data). |
+| Data is not in wide format | The Google Sheets plugin returns data in wide format (one column per field). If you're using an SQL expression or transformation that expects a different layout, refer to [Use SQL expressions with Google Sheets data](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/#use-sql-expressions-with-google-sheets-data). |
 | Range includes only headers | Ensure your range includes at least one data row below the header row. |
 
 ### Invalid time column / error while parsing date
@@ -122,7 +135,7 @@ These errors appear in the panel, in the query editor, or in the query response 
 **Solution:**
 
 - Use a column that contains real dates or times. In Google Sheets, format the column as a date or date-time so the plugin can detect it. Avoid mixed types or text that does not look like a date in the same column.
-- If the error mentions “error while parsing date”, fix or remove invalid cells in that column so every value is a valid date/time or leave the cell empty (empty may be skipped depending on behavior).
+- If the error mentions "error while parsing date", fix or remove invalid cells in that column so every value is a valid date/time or leave the cell empty (empty may be skipped depending on behavior).
 
 ## Template variables
 
@@ -135,7 +148,7 @@ Issues specific to query variables that get their options from a Google Sheet.
 **Solution:**
 
 - Confirm **Spreadsheet ID** and **Range** in the variable query. Ensure **Value Field** is set to a column that exists in the range.
-- If you use **Optional filtering** (**Filter Field** and **Filter Value**), ensure at least some rows match; otherwise the list will be empty.
+- If you use **Optional filtering** (**Filter Field** and **Filter Value**), ensure at least some rows match; otherwise the list is empty.
 - Test the same range in a panel query to confirm the sheet returns data.
 
 ## Annotations
