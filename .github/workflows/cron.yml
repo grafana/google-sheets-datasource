@@ -1,0 +1,28 @@
+name: Scheduled Cloud end-to-end tests
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+# Reusable workflows can only narrow caller permissions, not escalate.
+# `id-token: write` is needed by the Vault OIDC step in playwright-cloud.yml.
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  playwright-cloud:
+    uses: grafana/data-sources-ci-workflows/.github/workflows/playwright-cloud.yml@main
+    secrets: inherit
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      bench-prepare-cmd: npm ci --ignore-scripts --no-audit --fund=false; npm exec -- playwright install
+      bench-execute-cmd: npm run e2e
+      repo-secrets: |
+        DS_INSTANCE_CLIENT_EMAIL=google-sheets-datasource/googleSheets:json_clientEmail
+        DS_INSTANCE_DEFAULT_PROJECT=google-sheets-datasource/googleSheets:json_defaultProject
+        DS_INSTANCE_PRIVATE_KEY=google-sheets-datasource/googleSheets:secure_privateKey
+        DS_INSTANCE_TOKEN_URI=google-sheets-datasource/googleSheets:json_tokenUri
