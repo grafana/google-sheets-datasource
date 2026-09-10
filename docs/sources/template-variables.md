@@ -17,7 +17,7 @@ labels:
     - cloud
 aliases:
   - /docs/plugins/grafana-googlesheets-datasource/latest/variables/
-review_date: 2026-05-18
+review_date: 2026-08-17
 weight: 300
 ---
 
@@ -39,7 +39,7 @@ The Google Sheets data source supports **query variables**: variables whose opti
 | Variable type | Supported |
 |---------------|-----------|
 | Query | Yes. Options are loaded from a Google Sheet. |
-| Custom | Yes. Use Grafana's built-in Custom type; values are not from Google Sheets. |
+| Custom | Yes. Use the built-in Custom type in Grafana; values are not from Google Sheets. |
 | Data source | Yes. |
 
 ## Query variables
@@ -54,7 +54,7 @@ To create a query variable:
 1. Click **Add variable**.
 1. Set **Name** and **Type**. For **Type**, select **Query**.
 1. In **Data source**, select your Google Sheets data source.
-1. In the variable query editor you will see **Spreadsheet ID**, **Range**, **Cache Time**, and **Use Time Filter** (same as in the [query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/)). Set **Spreadsheet ID** and **Range** to the sheet and range that contain your variable data (for example, `Sheet1!A1:B10`). Adjust **Cache Time** or **Use Time Filter** if needed.
+1. In the variable query editor you see **Spreadsheet ID**, **Range**, **Cache Time**, and **Use Time Filter** (same as in the [query editor](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/query-editor/)). Set **Spreadsheet ID** and **Range** to the sheet and range that contain your variable data (for example, `Sheet1!A1:B10`). Adjust **Cache Time** or **Use Time Filter** if needed.
 1. Set **Value Field** to the column that holds the values used in queries.
 1. Optionally set **Label Field** to the column that holds the text shown in the drop-down.
 1. Optionally use **Optional filtering** to limit rows: set **Filter Field** and **Filter Value**.
@@ -64,7 +64,7 @@ To create a query variable:
 - **Value Field**: The column that contains the actual values to be used in queries
 - **Label Field**: The column that contains the display text shown in the drop-down (if different from the value)
 
-If you don't specify a label field, the value field will be used for both the value and display text.
+If you don't specify a label field, the value field is used for both the value and display text.
 
 ### Filtering
 
@@ -73,7 +73,7 @@ You can filter your variable data by specifying additional filter criteria:
 - **Filter Field**: The column to use for filtering
 - **Filter Value**: The value to match in the filter field
 
-Only rows where the filter field matches the specified filter value will be included in the variable drop-down.
+Only rows where the filter field matches the specified filter value are included in the variable drop-down.
 
 ### Example
 
@@ -99,8 +99,8 @@ This creates a drop-down showing "United States", "Canada" but using the values 
 
 After you create a variable, use it in panel queries by referencing its name with a `$` prefix (for example, `$country`). The Google Sheets data source interpolates variables in:
 
-- **Spreadsheet ID** – for example, use `$spreadsheet` if the variable holds a spreadsheet ID
-- **Range** – for example, use `$range` or build a range like `Sheet1!A1:$column` to make the range depend on the selected value
+- **Spreadsheet ID:** for example, use `$spreadsheet` if the variable holds a spreadsheet ID
+- **Range:** for example, use `$range` or build a range like `Sheet1!A1:$column` to make the range depend on the selected value
 
 When the user changes the variable in the dashboard drop-down, queries that reference it are re-run with the new value.
 

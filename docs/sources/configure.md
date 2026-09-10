@@ -23,7 +23,7 @@ aliases:
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/provisioning/
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/authenticate/
   - /docs/plugins/grafana-googlesheets-datasource/latest/setup/install/
-review_date: 2026-05-18
+review_date: 2026-08-17
 weight: 100
 ---
 
@@ -69,7 +69,7 @@ A Google service account belongs to a project within an account or organization 
 
 Enable the [Google Sheets API](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) and the [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive) for the project that contains the service account.
 
-The Google Sheets data source uses the scope `https://www.googleapis.com/auth/spreadsheets.readonly` to get read-only access to spreadsheets. It also uses the scope `https://www.googleapis.com/auth/drive.metadata.readonly` to list all spreadsheets that the service account has access to in Google Drive.
+The Google Sheets data source uses the scope `https://www.googleapis.com/auth/spreadsheets.readonly` to get read-only access to spreadsheets. It also uses the scope `https://www.googleapis.com/auth/drive.readonly` to list all spreadsheets that the service account has access to in Google Drive.
 
 #### Quick checklist
 
@@ -95,9 +95,9 @@ To create a service account and get a JWT file:
 1. Click **Create credentials** then **Service account**.
 1. Fill out the service account details form and then click **Create and continue**.
 1. Ignore the **Service account permissions** and **Principals with access** sections, just click **Done**.
-1. Click into the details for the service account, navigate to the **Keys** tab, and click **Add Key**. Choose key type **JSON** and click **Create**. A JSON key file will be created and downloaded to your computer.
+1. Click into the details for the service account, navigate to the **Keys** tab, and click **Add Key**. Choose key type **JSON** and click **Create**. Grafana creates and downloads a JSON key file to your computer.
 1. Upload or drag this file into the **JWT Key Details** section of the data source configuration.
-1. Grant the service account [access to resources](#granting-access-to-the-service-account-used-with-jwt-authentication) as appropriate.
+1. Grant the service account [access to resources](#grant-access-to-the-service-account-used-with-jwt-authentication) as appropriate.
 
 ### Authenticate with an API key
 
@@ -114,7 +114,7 @@ To generate an API key:
 ### Authenticate with the default GCE service account
 
 {{< admonition type="note" >}}
-This is **only** compatible when running Grafana on a Google Compute Engine (GCE) virtual machine. It is **not supported** in on-premise deployments, Grafana Cloud or other hosted environments.
+This is **only** compatible when running Grafana on a Google Compute Engine (GCE) virtual machine. It is **not supported** in self-managed deployments, Grafana Cloud or other hosted environments.
 {{< /admonition >}}
 
 When Grafana is running on a Google Compute Engine (GCE) virtual machine, Grafana can automatically retrieve default credentials from the metadata server.
@@ -141,7 +141,7 @@ Below the authentication type selector, **Default project** and **Default Spread
 
 ## Default Spreadsheet ID
 
-You can optionally configure a **Default Spreadsheet ID** in the data source settings. When set, this spreadsheet ID will be automatically populated in new queries, making it faster to create queries that use the same spreadsheet.
+You can optionally configure a **Default Spreadsheet ID** in the data source settings. When set, this spreadsheet ID is automatically populated in new queries, making it faster to create queries that use the same spreadsheet.
 
 To configure a default spreadsheet ID:
 
@@ -149,9 +149,9 @@ To configure a default spreadsheet ID:
 1. Choose one of these options:
    - **Select Spreadsheet ID** (JWT authentication only): If you're using Google JWT File authentication, click the control to select a spreadsheet from the list. The list shows all spreadsheets that the service account has access to.
    - **Enter a spreadsheet ID**: Manually enter the spreadsheet ID from the spreadsheet URL.
-   - **Paste a spreadsheet URL**: Paste the full spreadsheet URL, and the ID will be automatically extracted.
+   - **Paste a spreadsheet URL**: Paste the full spreadsheet URL, and the ID is automatically extracted.
 
-When you create a new query, the default spreadsheet ID will be pre-filled in the **Spreadsheet ID** field of the query editor.
+When you create a new query, the default spreadsheet ID is pre-filled in the **Spreadsheet ID** field of the query editor.
 
 {{< admonition type="note" >}}
 The default spreadsheet ID is optional. If not set, you'll need to specify the spreadsheet ID for each query manually.
@@ -164,7 +164,7 @@ Refer to the official guidance from Google on how to share resources:
 - [Google Sheets](https://support.google.com/a/users/answer/13309904#sheets_share_link)
 - [Google Drive](https://support.google.com/drive/answer/2494822?co=GENIE.Platform%3DDesktop#share_publicly)
 
-### Granting access to the service account used with JWT authentication
+### Grant access to the service account used with JWT authentication
 
 By default, the service account doesn't have access to any spreadsheets within the account or organization that it's associated with.
 To grant the service account access to files or folders in Google Drive, you need to share the file or folder with the service account's email address.
@@ -274,7 +274,7 @@ Replace `<PROJECT_ID>`, `<DATA_SOURCE_NAME>`, and optionally `<SPREADSHEET_ID>` 
 
 ### Provision with Terraform
 
-Use the `grafana_data_source` resource with `type = "grafana-googlesheets-datasource"`. Pass plugin-specific options in `json_data_encoded` and `secure_json_data_encoded` (JSON strings, camelCase keys).
+Use the `grafana_data_source` resource with `type = "grafana-googlesheets-datasource"`. Pass plugin-specific options in `json_data_encoded` and `secure_json_data_encoded` (JSON strings, `camelCase` keys).
 
 **API key:**
 
