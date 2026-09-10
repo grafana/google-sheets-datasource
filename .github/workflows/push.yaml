@@ -11,7 +11,7 @@ permissions: {}
 jobs:
   ci:
     name: CI
-    uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@ci-cd-workflows/v10.1.0
+    uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@ci-cd-workflows/v11.2.0
     permissions:
       contents: read
       id-token: write
@@ -27,5 +27,5 @@ jobs:
       id-token: write
       pull-requests: read
     with:
-      go-version: '1.26.3'
-      golangci-lint-version: '2.12.2'
+      go-version: '1.27.1'
+      golangci-lint-version: '2.13.2'
