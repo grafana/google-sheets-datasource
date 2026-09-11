@@ -7,28 +7,65 @@ import VariableQueryEditor from './VariableQueryEditor';
 import { DataSource } from '../DataSource';
 import { SheetsVariableQuery } from '../types';
 
-// Mock @tanstack/react-virtual since jsdom has no layout engine and the
-// Combobox virtualizer would render no items without this mock.
-jest.mock('@tanstack/react-virtual', () => ({
-  useVirtualizer: (opts: { count: number; estimateSize: (index: number) => number }) => {
-    const ITEM_HEIGHT = 36;
-    const count = opts.count;
-    return {
-      getVirtualItems: () =>
-        Array.from({ length: count }, (_, i) => ({
-          index: i,
-          start: i * ITEM_HEIGHT,
-          size: ITEM_HEIGHT,
-          key: i,
-          lane: 0,
-          end: (i + 1) * ITEM_HEIGHT,
-          measureElement: jest.fn(),
-        })),
-      getTotalSize: () => count * ITEM_HEIGHT,
-      scrollToIndex: jest.fn(),
-    };
-  },
-}));
+// Mock @grafana/ui's Combobox with a plain input + option list.
+//
+// The real Combobox (@grafana/ui 13.1.5) uses floating-ui to position its
+// popover. Under jsdom there's no layout engine, so every position
+// measurement comes back as zero, which sends floating-ui's positioning
+// middleware into a render loop. With three Comboboxes in this component
+// all updating their `options` after mount, that loop never settles and
+// pins the process at 100% CPU until Jest is killed. This is a known
+// @grafana/ui bug that only reproduces under jsdom; upgrading past 13.1.5
+// requires React 19, which this plugin doesn't use yet. Remove this mock
+// once @grafana/ui is upgraded past 13.1.5 (or the plugin moves to React 19).
+jest.mock('@grafana/ui', () => {
+  const actualReact = jest.requireActual('react');
+  const actual = jest.requireActual('@grafana/ui');
+
+  const Combobox = ({
+    value,
+    options,
+    onChange,
+    placeholder,
+    'data-testid': testId,
+  }: {
+    value?: string;
+    options: Array<{ label?: string; value?: string }>;
+    onChange: (opt: { label?: string; value?: string }) => void;
+    placeholder?: string;
+    'data-testid'?: string;
+  }) => {
+    const [open, setOpen] = actualReact.useState(false);
+    return (
+      <div>
+        <input
+          data-testid={testId}
+          value={value ?? ''}
+          placeholder={placeholder}
+          readOnly
+          onClick={() => setOpen((o: boolean) => !o)}
+        />
+        {open && (
+          <ul>
+            {options.map((opt) => (
+              <li
+                key={opt.value}
+                onClick={() => {
+                  onChange(opt);
+                  setOpen(false);
+                }}
+              >
+                {opt.label}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
+
+  return { ...actual, Combobox };
+});
 
 // Mock the dependencies
 jest.mock('@grafana/data', () => ({

@@ -19,7 +19,7 @@ labels:
     - cloud
 aliases:
   - /docs/plugins/grafana-googlesheets-datasource/latest/query-editor/
-review_date: 2026-05-18
+review_date: 2026-08-17
 weight: 200
 ---
 
@@ -71,7 +71,7 @@ To create a query:
 The **Spreadsheet ID** field controls which spreadsheet to query.
 
 {{< admonition type="tip" >}}
-If you've configured a default spreadsheet ID in the data source settings, it will be automatically pre-filled when you create a new query. Refer to [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/#default-spreadsheet-id) for more information.
+If you've configured a default spreadsheet ID in the data source settings, it's automatically pre-filled when you create a new query. Refer to [Configure the data source](https://grafana.com/docs/plugins/grafana-googlesheets-datasource/latest/configure/#default-spreadsheet-id) for more information.
 {{< /admonition >}}
 
 You can:
@@ -152,8 +152,9 @@ The plugin uses the first row of the range as column headers and infers a type f
 | **Number** | Numeric cells. |
 | **String** | Text or anything that is not consistently time or number. |
 
-- **Mixed types:** If a column has mixed value types (for example, numbers and text), the plugin treats the column as string. A warning is added to the response (for example, “Multiple data types found in column … Using string data type”).
-- **Mixed units:** If a column has mixed units (for example, different currencies or formats), the plugin uses the formatted value and may add a warning (for example, “Multiple units found in column … Formatted value will be used”).
+- **Mixed types:** If a column has mixed value types (for example, numbers and text), the plugin treats the column as string. A warning is added to the response (for example, "Multiple data types found in column … Using string data type").
+- **Mixed units:** If a column has mixed units (for example, different currencies or formats), the plugin uses the formatted value and may add a warning (for example, "Multiple units found in column … Formatted value will be used").
+- **Formula errors in numeric columns:** A cell in a number column whose formula errors (for example, `#DIV/0!`, `#N/A`, or `#REF!`) or that has not yet computed a value produces a null (empty) value for that cell. The rest of the column is unaffected and the query still returns. Fix the underlying formula in the sheet to restore the value.
 - **Parse errors:** Cells that cannot be parsed (for example, invalid date text) produce per-cell warnings. The row may still be returned with a fallback or empty value depending on the column type.
 
 These warnings are included in the query response metadata. If a panel shows unexpected types or empty values, check that the sheet has consistent types in each column and that date columns are formatted as date/time in Google Sheets.

@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.6.2
+
+🐛 Switch package manager from yarn to npm
+🐛 Update frontend and backend dependencies
+
 ## 2.6.1
 
 🐛 Security: bump out-of-SLO react-router to 6.30.4

@@ -16,7 +16,10 @@ __debug_bin
 mage_output_file.go
 
 # provisioning
-/provisioning/
+/provisioning/*
+!/provisioning/datasources/
+/provisioning/datasources/*
+!/provisioning/datasources/datasources.yml
 
 .pnp.*
 .yarn/*
@@ -25,3 +28,4 @@ mage_output_file.go
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+.DS_Store

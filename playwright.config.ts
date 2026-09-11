@@ -45,7 +45,10 @@ export default defineConfig<PluginOptions>({
     // 2. Run tests in Google Chrome. Every test will start authenticated as admin user.
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'], storageState: 'playwright/.auth/admin.json' },
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: `playwright/.auth/${process.env.GRAFANA_ADMIN_USER || 'admin'}.json`,
+      },
       dependencies: ['auth'],
     },
   ],

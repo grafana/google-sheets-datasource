@@ -7,7 +7,7 @@
     "provisioning/**",
     "package.json",
     "renovate.json",
-    "yarn.lock"
+    "package-lock.json"
   ],
   "words": [
     "araddon",

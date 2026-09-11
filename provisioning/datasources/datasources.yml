@@ -1,0 +1,16 @@
+apiVersion: 1
+
+datasources:
+  - name: 'Google Sheets'
+    type: 'grafana-googlesheets-datasource'
+    uid: 'google-sheets'
+    access: proxy
+    isDefault: false
+    orgId: 1
+    version: 1
+    editable: true
+    jsonData:
+      authenticationType: 'key'
+      defaultSheetID: '1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8'
+    secureJsonData:
+      apiKey: $GOOGLE_SHEETS_API_KEY
