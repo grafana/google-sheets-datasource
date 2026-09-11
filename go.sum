@@ -116,8 +116,8 @@ github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e h1:JKmoR8x90Iww1
 github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
 github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
 github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
-github.com/grafana/dsconfig/dsconfig v0.0.7 h1:rh2PhwKLVrokMa2eTbS3zDfSIS8sOl54X/as082+Qgo=
-github.com/grafana/dsconfig/dsconfig v0.0.7/go.mod h1:orwL9W2Ea8Wjubn0Vw1or/uolFDSKSFfc404G2xrvEc=
+github.com/grafana/dsconfig/dsconfig v0.0.12 h1:v1rjd9EX3VFUHGM9OLRbHqX/fM7mIezrKDbuUS6Gm50=
+github.com/grafana/dsconfig/dsconfig v0.0.12/go.mod h1:MceNATZFsNZyrsomYe7JTgD1NvhLDRBPN+u2s+Tvx5Y=
 github.com/grafana/dsconfig/schema v0.0.12 h1:WQFlKzJtACotG3fcNnU+RcnBMDXxgSAuAphkF2nlyz0=
 github.com/grafana/dsconfig/schema v0.0.12/go.mod h1:kBZ/uoNZw6QjYU/eCS2wdBckerbv7zTWLtgy+9Hm8LQ=
 github.com/grafana/grafana-google-sdk-go v0.4.2 h1:F44hQF1y6UVJhlJPi+Mz+GCJsioVgezEgPMMEQbUZRo=
