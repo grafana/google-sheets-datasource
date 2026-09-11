@@ -1,0 +1,214 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/dsconfig/refs/tags/dsconfig/v0.0.12/dsconfig/schema.json",
+  "schemaVersion": "v1",
+  "pluginType": "grafana-googlesheets-datasource",
+  "pluginName": "Google Sheets",
+  "docURL": "https://grafana.com/docs/plugins/grafana-googlesheets-datasource/",
+  "baseFields": [
+    {
+      "from": "google_sdk_settings",
+      "exclude": [
+        "google_sdk_settings.workloadIdentityPoolProvider",
+        "google_sdk_settings.wifServiceAccountEmail",
+        "google_sdk_settings.usingImpersonation",
+        "google_sdk_settings.serviceAccountToImpersonate",
+        "google_sdk_settings.oauthPassThru"
+      ]
+    }
+  ],
+  "fields": [
+    {
+      "id": "google_sdk_settings.authenticationType",
+      "key": "authenticationType",
+      "label": "Authentication type",
+      "description": "How Grafana authenticates to the Google Sheets and Google Drive APIs. `jwt` uses a Google JWT service account key file; `key` uses an API key and only works with public spreadsheets; `gce` uses the GCE default service account.",
+      "valueType": "string",
+      "target": "jsonData",
+      "role": "auth.discriminator",
+      "defaultValue": "jwt",
+      "validations": [
+        {
+          "type": "allowedValues",
+          "values": ["key", "jwt", "gce"]
+        }
+      ],
+      "ui": {
+        "component": "radio",
+        "options": [
+          {
+            "label": "API Key",
+            "value": "key"
+          },
+          {
+            "label": "Google JWT File",
+            "value": "jwt"
+          },
+          {
+            "label": "GCE Default Service Account",
+            "value": "gce"
+          }
+        ]
+      },
+      "help": {
+        "title": "Configure Google Sheets Authentication",
+        "markdown": "#### Choosing an authentication type\n\n- **Google JWT File**: provides access to private spreadsheets and works in all environments where Grafana is running.\n- **API Key**: simpler configuration, but requires spreadsheets to be public.\n- **GCE Default Service Account**: automatically retrieves default credentials. Requires Grafana to be running on a Google Compute Engine virtual machine.\n\nSelect an Authentication type below and expand **Configure Google Sheets Authentication** for detailed guidance on configuration."
+      }
+    },
+    {
+      "id": "virtual_jwtUpload",
+      "key": "jwtUpload",
+      "label": "JWT token",
+      "description": "Upload or paste a Google service-account JWT key file (.json). Its project_id, client_email, token_uri, and private_key are distributed into the JWT fields below.",
+      "valueType": "string",
+      "kind": "virtual",
+      "dependsOn": "google_sdk_settings.authenticationType == 'jwt'",
+      "ui": {
+        "component": "fileUpload",
+        "accept": [".json"],
+        "fileMapping": {
+          "project_id": "jsonData.defaultProject",
+          "client_email": "jsonData.clientEmail",
+          "token_uri": "jsonData.tokenUri",
+          "private_key": "secureJsonData.privateKey"
+        }
+      },
+      "help": {
+        "title": "Generate a JWT file",
+        "markdown": "1. Open the [Google Sheets](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) page in the API Library and enable access for your account.\n2. Open the [Google Drive](https://console.cloud.google.com/apis/library/drive.googleapis.com?q=drive) page in the API Library and enable access for your account. Access to the Google Drive API is used to list all spreadsheets to which you have access.\n3. Open the [Credentials](https://console.developers.google.com/apis/credentials) page in the Google API Console.\n4. Click **Create Credentials** then click **Service account**.\n5. In the **Create service account** section, provide a name, account ID and description, then click **Create and continue**.\n6. Ignore the **Service account permissions** and **Principals with access** sections, just click **Done**.\n7. Click into the details for the service account, navigate to the **Keys** tab, and click **Add Key**. Choose key type **JSON** and click **Create**. A JSON key file will be created and downloaded to your computer.\n8. Share any private files/folders you want to access with the service account's email address. The email is specified as **client_email** in the Google JWT File.\n9. Drag the file to the dotted zone below. Then click **Save & Test**. The file contents will be encrypted and saved in the Grafana database."
+      }
+    },
+    {
+      "id": "jsonData_authType",
+      "key": "authType",
+      "description": "Legacy authentication type field. Older provisioning stored the auth type here; the backend copies its value into `authenticationType` on load. Prefer `authenticationType` for new configurations.",
+      "valueType": "string",
+      "target": "jsonData",
+      "validations": [
+        {
+          "type": "allowedValues",
+          "values": ["key", "jwt", "gce"]
+        }
+      ],
+      "tags": ["legacy"]
+    },
+    {
+      "id": "secureJsonData_apiKey",
+      "key": "apiKey",
+      "label": "API Key",
+      "valueType": "string",
+      "target": "secureJsonData",
+      "role": "auth.apiKey.value",
+      "dependsOn": "google_sdk_settings.authenticationType == 'key'",
+      "requiredWhen": "google_sdk_settings.authenticationType == 'key'",
+      "ui": {
+        "component": "input",
+        "placeholder": "Enter API key"
+      },
+      "help": {
+        "title": "Generate an API key",
+        "markdown": "1. Open the [Google Sheets](https://console.cloud.google.com/apis/library/sheets.googleapis.com?q=sheet) page in the API Library and enable access for your account.\n2. Open the [Credentials page](https://console.developers.google.com/apis/credentials) in the Google API Console.\n3. Click **Create Credentials** and then click **API key**.\n4. Copy the key and paste it in the API Key field below. The file contents are encrypted and saved in the Grafana database."
+      }
+    },
+    {
+      "id": "google_sdk_settings.defaultProject",
+      "key": "defaultProject",
+      "label": "Default project",
+      "description": "Google Cloud project ID that owns the enabled Sheets and Drive APIs.",
+      "valueType": "string",
+      "target": "jsonData",
+      "dependsOn": "google_sdk_settings.authenticationType == 'jwt' || google_sdk_settings.authenticationType == 'gce'",
+      "requiredWhen": "google_sdk_settings.authenticationType == 'jwt'",
+      "ui": {
+        "component": "input",
+        "placeholder": "my-gcp-project-id"
+      },
+      "help": {
+        "title": "Configure GCE Service Account",
+        "markdown": "When Grafana is running on a Google Compute Engine (GCE) virtual machine, Grafana can automatically retrieve default credentials from the metadata server. As a result, there is no need to generate a private key file for the service account. You also do not need to upload the file to Grafana. The following preconditions must be met before Grafana can retrieve default credentials.\n\n1. You must create a Service Account for use by the GCE virtual machine. For more information, refer to [Create new service account](https://cloud.google.com/compute/docs/access/create-enable-service-accounts-for-instances#createanewserviceaccount).\n2. Verify that the GCE virtual machine instance is running as the service account that you created. For more information, refer to [setting up an instance to run as a service account](https://cloud.google.com/compute/docs/access/create-enable-service-accounts-for-instances#using).\n3. Allow access to the specified API scope.\n\nFor more information about creating and enabling service accounts for GCE instances, refer to [enabling service accounts for instances in Google documentation](https://cloud.google.com/compute/docs/access/create-enable-service-accounts-for-instances)."
+      }
+    },
+    {
+      "id": "google_sdk_settings.privateKey",
+      "key": "privateKey",
+      "label": "Private key",
+      "description": "JWT private key (the `private_key` field of the service account key file). Supply this or `privateKeyPath`, not both.",
+      "valueType": "string",
+      "target": "secureJsonData",
+      "role": "auth.jwt.signingKey",
+      "dependsOn": "google_sdk_settings.authenticationType == 'jwt'",
+      "requiredWhen": "google_sdk_settings.authenticationType == 'jwt' && google_sdk_settings.privateKeyPath == ''",
+      "ui": {
+        "component": "input",
+        "placeholder": "Enter Private key"
+      }
+    },
+    {
+      "id": "secureJsonData_jwt",
+      "key": "jwt",
+      "description": "Legacy write-only secret used by older versions of the plugin. The backend still copies its decrypted value into memory but no runtime code path depends on it; new configurations should use `privateKey` instead.",
+      "valueType": "string",
+      "target": "secureJsonData",
+      "tags": ["legacy"]
+    },
+    {
+      "id": "jsonData_defaultSheetID",
+      "key": "defaultSheetID",
+      "label": "Default Spreadsheet ID",
+      "description": "Optional spreadsheet ID to use as default when creating new queries",
+      "valueType": "string",
+      "target": "jsonData",
+      "ui": {
+        "component": "input",
+        "placeholder": "Select Spreadsheet ID"
+      }
+    }
+  ],
+  "groups": [
+    {
+      "id": "authentication",
+      "title": "Authentication",
+      "order": 1,
+      "fieldRefs": [
+        "google_sdk_settings.authenticationType",
+        "virtual_jwtUpload",
+        "secureJsonData_apiKey",
+        "google_sdk_settings.defaultProject",
+        "google_sdk_settings.clientEmail",
+        "google_sdk_settings.tokenUri",
+        "google_sdk_settings.privateKeyPath",
+        "google_sdk_settings.privateKey"
+      ]
+    },
+    {
+      "id": "settings",
+      "title": "Settings",
+      "order": 2,
+      "optional": true,
+      "fieldRefs": ["jsonData_defaultSheetID"]
+    }
+  ],
+  "relationships": [
+    {
+      "type": "group",
+      "fields": [
+        "google_sdk_settings.defaultProject",
+        "google_sdk_settings.clientEmail",
+        "google_sdk_settings.tokenUri",
+        "google_sdk_settings.privateKeyPath",
+        "google_sdk_settings.privateKey"
+      ],
+      "description": "Google JWT File credentials"
+    },
+    {
+      "type": "group",
+      "fields": ["google_sdk_settings.privateKeyPath", "google_sdk_settings.privateKey"],
+      "description": "Alternative sources for the JWT private key: either supply the key inline as a secret (privateKey) or point at a file path on the Grafana server (privateKeyPath). Exactly one of the two must be configured for jwt auth; privateKeyPath takes precedence when both are set."
+    }
+  ],
+  "instructions": [
+    {
+      "msg": "Three authentication methods are available, selected via jsonData.authenticationType: 'jwt' (Google JWT File, the default and used for private spreadsheets), 'key' (API Key, only works with public spreadsheets), and 'gce' (GCE Default Service Account, only works when Grafana runs on a Google Compute Engine VM). Configure exactly one method; the backend switches on this discriminator and only the credentials of the selected method are used.",
+      "tags": ["llm", "auth"]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "examples": {
+    "gce": {
+      "summary": "GCE Default Service Account",
+      "description": "Credentials are retrieved from the GCE metadata server. Requires Grafana to be running on a Google Compute Engine virtual machine. No secrets are stored.",
+      "value": {
+        "jsonData": {
+          "authenticationType": "gce",
+          "defaultProject": "my-gcp-project-id"
+        }
+      }
+    },
+    "jwt": {
+      "summary": "Google JWT File",
+      "description": "Service account credentials. Reads private and public spreadsheets. Set secureJsonData.privateKey to the `private_key` value from the service account JSON, or set jsonData.privateKeyPath to a file on the Grafana server instead.",
+      "value": {
+        "jsonData": {
+          "authenticationType": "jwt",
+          "clientEmail": "grafana@my-gcp-project-id.iam.gserviceaccount.com",
+          "defaultProject": "my-gcp-project-id",
+          "tokenUri": "https://oauth2.googleapis.com/token"
+        },
+        "secureJsonData": {
+          "privateKey": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+        }
+      }
+    },
+    "key": {
+      "summary": "API Key",
+      "description": "Simplest configuration, but only reads spreadsheets that are shared publicly.",
+      "value": {
+        "jsonData": {
+          "authenticationType": "key"
+        },
+        "secureJsonData": {
+          "apiKey": "AIzaSy..."
+        }
+      }
+    }
+  }
+}
