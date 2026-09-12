@@ -38,13 +38,13 @@
     "@testing-library/user-event": "14.6.7",
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.25",
-    "@types/node": "25.9.5",
+    "@types/node": "25.9.6",
     "@types/react": "18.3.31",
     "@types/react-dom": "18.3.7",
-    "@typescript-eslint/eslint-plugin": "8.69.0",
-    "@typescript-eslint/parser": "8.69.0",
+    "@typescript-eslint/eslint-plugin": "8.70.0",
+    "@typescript-eslint/parser": "8.70.0",
     "copy-webpack-plugin": "14.0.0",
-    "cspell": "10.2.2",
+    "cspell": "10.3.0",
     "css-loader": "7.1.5",
     "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
@@ -77,13 +77,13 @@
   },
   "dependencies": {
     "@emotion/css": "11.13.5",
-    "@grafana/data": "13.1.5",
+    "@grafana/data": "13.2.1",
     "@grafana/google-sdk": "0.6.1",
-    "@grafana/i18n": "13.1.5",
+    "@grafana/i18n": "13.2.1",
     "@grafana/plugin-ui": "0.17.4",
-    "@grafana/runtime": "13.1.5",
-    "@grafana/schema": "13.1.5",
-    "@grafana/ui": "13.1.5",
+    "@grafana/runtime": "13.2.1",
+    "@grafana/schema": "13.2.1",
+    "@grafana/ui": "13.2.1",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
@@ -91,7 +91,7 @@
     "node": ">=24",
     "npm": ">=11.16.0"
   },
-  "packageManager": "npm@11.19.0",
+  "packageManager": "npm@11.19.1",
   "resolutions": {
     "react-router@npm:6.30.3": "6.30.4"
   }
