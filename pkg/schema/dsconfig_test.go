@@ -13,24 +13,32 @@ import (
 //go:embed dsconfig.json
 var configSchemaJSON []byte
 
-// settingsExamples documents one worked configuration per authentication type.
-// Only jsonData is shown; secrets (privateKey, apiKey) are written to
-// secureJsonData and are never readable back.
+// settingsExamples documents one worked configuration per authentication type,
+// shaped as a datasource resource POST body: metadata.name, spec.jsonData, and
+// secure.<field>.create for write-only secrets (privateKey, apiKey). See
+// https://github.com/grafana/grafana/blob/1f6fc213e75436cf04af646735d21a0f33c27f5a/pkg/apis/datasource/v0alpha1/datasource.go#L17-L27.
 var settingsExamples = &sdkSchema.SettingsExamples{
 	Examples: map[string]*spec3.Example{
 		"jwt": {
 			ExampleProps: spec3.ExampleProps{
 				Summary:     "Google JWT File",
-				Description: "Service account credentials. Reads private and public spreadsheets. Set secureJsonData.privateKey to the `private_key` value from the service account JSON, or set jsonData.privateKeyPath to a file on the Grafana server instead.",
+				Description: "Service account credentials. Reads private and public spreadsheets. Set secure.privateKey.create to the `private_key` value from the service account JSON, or set spec.jsonData.privateKeyPath to a file on the Grafana server instead.",
 				Value: map[string]any{
-					"jsonData": map[string]any{
-						"authenticationType": "jwt",
-						"defaultProject":     "my-gcp-project-id",
-						"clientEmail":        "grafana@my-gcp-project-id.iam.gserviceaccount.com",
-						"tokenUri":           "https://oauth2.googleapis.com/token",
+					"metadata": map[string]any{
+						"name": "my-datasource",
 					},
-					"secureJsonData": map[string]any{
-						"privateKey": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+					"spec": map[string]any{
+						"jsonData": map[string]any{
+							"authenticationType": "jwt",
+							"defaultProject":     "my-gcp-project-id",
+							"clientEmail":        "grafana@my-gcp-project-id.iam.gserviceaccount.com",
+							"tokenUri":           "https://oauth2.googleapis.com/token",
+						},
+					},
+					"secure": map[string]any{
+						"privateKey": map[string]any{
+							"create": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+						},
 					},
 				},
 			},
@@ -40,11 +48,18 @@ var settingsExamples = &sdkSchema.SettingsExamples{
 				Summary:     "API Key",
 				Description: "Simplest configuration, but only reads spreadsheets that are shared publicly.",
 				Value: map[string]any{
-					"jsonData": map[string]any{
-						"authenticationType": "key",
+					"metadata": map[string]any{
+						"name": "my-datasource",
 					},
-					"secureJsonData": map[string]any{
-						"apiKey": "AIzaSy...",
+					"spec": map[string]any{
+						"jsonData": map[string]any{
+							"authenticationType": "key",
+						},
+					},
+					"secure": map[string]any{
+						"apiKey": map[string]any{
+							"create": "AIzaSy...",
+						},
 					},
 				},
 			},
@@ -54,9 +69,14 @@ var settingsExamples = &sdkSchema.SettingsExamples{
 				Summary:     "GCE Default Service Account",
 				Description: "Credentials are retrieved from the GCE metadata server. Requires Grafana to be running on a Google Compute Engine virtual machine. No secrets are stored.",
 				Value: map[string]any{
-					"jsonData": map[string]any{
-						"authenticationType": "gce",
-						"defaultProject":     "my-gcp-project-id",
+					"metadata": map[string]any{
+						"name": "my-datasource",
+					},
+					"spec": map[string]any{
+						"jsonData": map[string]any{
+							"authenticationType": "gce",
+							"defaultProject":     "my-gcp-project-id",
+						},
 					},
 				},
 			},
