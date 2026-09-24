@@ -145,7 +145,7 @@
     {
       "id": "secureJsonData_jwt",
       "key": "jwt",
-      "description": "Legacy write-only secret used by older versions of the plugin. The backend still copies its decrypted value into memory but no runtime code path depends on it; new configurations should use `privateKey` instead.",
+      "description": "Legacy write-only secret used by older versions of the plugin. The backend still checks this first and, if set, uses it in place of `privateKey`/`clientEmail`/`tokenUri`; new configurations should use `privateKey` instead. If you are migrating away from this field, you must also clear it, otherwise the old credentials remain active.",
       "valueType": "string",
       "target": "secureJsonData",
       "tags": ["legacy"]
