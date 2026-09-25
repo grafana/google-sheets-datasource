@@ -42,7 +42,11 @@
     "tokenprovider",
     "typecheck",
     "uplot",
-    "xcsj"
+    "xcsj",
+    "dsconfig",
+    "pluginschema",
+    "struct",
+    "Struct"
   ],
   "language": "en-US"
 }
