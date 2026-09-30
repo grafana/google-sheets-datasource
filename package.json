@@ -1,6 +1,6 @@
 {
   "name": "grafana-google-sheets-datasource",
-  "version": "2.6.2",
+  "version": "2.7.0",
   "description": "Grafana data source plugin for Google Sheets",
   "scripts": {
     "build": "webpack -c ./webpack.config.ts --env production",

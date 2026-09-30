@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.7.0
+
+### Minor Changes
+
+🚀 Adds datasource configuration schema
+
 ## 2.6.2
 
 🐛 Switch package manager from yarn to npm
