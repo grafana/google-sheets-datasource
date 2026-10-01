@@ -14,5 +14,9 @@ datasources:
       authenticationType: 'jwt'
       defaultProject: 'jazz-e2320'
       clientEmail: 'sheetstest@jazz-e2320.iam.gserviceaccount.com'
-      privateKeyPath: '/etc/grafana/provisioning/jazz-e2320-9602de2580fd.pem'
+      # only used when GS_JWT is empty: e2e replay points it at a generated throwaway key
+      privateKeyPath: $GS_PRIVATE_KEY_PATH
       tokenUri: 'https://oauth2.googleapis.com/token'
+    secureJsonData:
+      # the whole service account JSON on one line (jq -c); takes priority over the fields above
+      jwt: '$GS_JWT'
