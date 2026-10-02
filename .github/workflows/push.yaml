@@ -11,7 +11,7 @@ permissions: {}
 jobs:
   ci:
     name: CI
-    uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@ci-cd-workflows/v11.2.0
+    uses: grafana/plugin-ci-workflows/.github/workflows/ci.yml@main
     permissions:
       contents: read
       id-token: write
@@ -19,6 +19,7 @@ jobs:
       plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
       playwright-docker-compose-file: docker-compose.vcr.yaml
       upload-playwright-artifacts: true
+      run-playwright-with-limit: "0"
 
   publish-and-deploy:
     if: github.ref == 'refs/heads/main'
