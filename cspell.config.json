@@ -10,6 +10,7 @@
     "package-lock.json"
   ],
   "words": [
+    "e2edata",
     "araddon",
     "dataproxy",
     "datasource",

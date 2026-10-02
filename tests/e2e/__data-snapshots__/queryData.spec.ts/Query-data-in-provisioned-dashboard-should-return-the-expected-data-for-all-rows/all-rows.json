@@ -1,0 +1,106 @@
+{
+  "errors": [],
+  "schemaVersion": 1,
+  "series": [
+    {
+      "fields": [
+        {
+          "config": {
+            "displayName": "Month"
+          },
+          "displayName": "Month",
+          "name": "Month",
+          "type": "time",
+          "values": [
+            1547164800000,
+            1550188800000,
+            1552608000000,
+            1555286400000,
+            1557878400000,
+            1560556800000,
+            1563148800000,
+            1565827200000,
+            1568505600000,
+            1571097600000,
+            1573776000000,
+            1576368000000,
+            null
+          ]
+        },
+        {
+          "config": {
+            "displayName": "Stockholm"
+          },
+          "displayName": "Stockholm",
+          "name": "Stockholm",
+          "type": "number",
+          "values": [
+            -1,
+            -1,
+            3,
+            9,
+            16,
+            21,
+            22,
+            20,
+            15,
+            10,
+            5,
+            1,
+            null
+          ]
+        },
+        {
+          "config": {
+            "displayName": "Berlin"
+          },
+          "displayName": "Berlin",
+          "name": "Berlin",
+          "type": "number",
+          "values": [
+            2.9,
+            4.2,
+            8.5,
+            13.2,
+            18.9,
+            21.6,
+            23.7,
+            23.6,
+            18.8,
+            13,
+            7,
+            4,
+            null
+          ]
+        },
+        {
+          "config": {
+            "displayName": "Los Angeles"
+          },
+          "displayName": "Los Angeles",
+          "name": "Los Angeles",
+          "type": "number",
+          "values": [
+            13,
+            13,
+            14,
+            16,
+            17,
+            19,
+            22,
+            22,
+            21,
+            18,
+            17,
+            14,
+            null
+          ]
+        }
+      ],
+      "length": 13,
+      "name": "A",
+      "refId": "A"
+    }
+  ],
+  "state": "Done"
+}

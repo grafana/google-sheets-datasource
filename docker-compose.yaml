@@ -8,3 +8,6 @@ services:
       service: grafana
     environment:
       GOOGLE_SHEETS_API_KEY: ${GOOGLE_SHEETS_API_KEY:-}
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: grafana-googlesheets-datasource,grafana-e2edata-panel
+    volumes:
+      - ./node_modules/@grafana/plugin-e2e/e2e-data-panel:/var/lib/grafana/plugins/grafana-e2edata-panel

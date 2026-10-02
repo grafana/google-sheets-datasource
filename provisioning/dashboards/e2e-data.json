@@ -1,0 +1,80 @@
+{
+  "uid": "e2e-sheets-data",
+  "title": "E2E data",
+  "editable": true,
+  "schemaVersion": 39,
+  "version": 1,
+  "tags": [],
+  "timezone": "utc",
+  "time": {
+    "from": "2018-12-31T23:00:00.000Z",
+    "to": "2019-12-31T22:59:59.000Z"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "All rows",
+      "type": "grafana-e2edata-panel",
+      "datasource": {
+        "type": "grafana-googlesheets-datasource",
+        "uid": "google-sheets-service-account"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "range": "A1:D",
+          "cacheDurationSeconds": 0,
+          "refId": "A",
+          "spreadsheet": "1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8",
+          "datasource": {
+            "type": "grafana-googlesheets-datasource",
+            "uid": "google-sheets-service-account"
+          }
+        }
+      ],
+      "options": {},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "title": "Time filtered",
+      "type": "grafana-e2edata-panel",
+      "datasource": {
+        "type": "grafana-googlesheets-datasource",
+        "uid": "google-sheets-service-account"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "range": "A1:D13",
+          "cacheDurationSeconds": 30,
+          "useTimeFilter": true,
+          "refId": "A",
+          "spreadsheet": "1TZlZX67Y0s4CvRro_3pCYqRCKuXer81oFp_xcsjPpe8",
+          "datasource": {
+            "type": "grafana-googlesheets-datasource",
+            "uid": "google-sheets-service-account"
+          }
+        }
+      ],
+      "options": {},
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    }
+  ]
+}
