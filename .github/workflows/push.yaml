@@ -17,6 +17,8 @@ jobs:
       id-token: write
     with:
       plugin-version-suffix: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }}
+      playwright-docker-compose-file: docker-compose.vcr.yaml
+      upload-playwright-artifacts: true
 
   publish-and-deploy:
     if: github.ref == 'refs/heads/main'

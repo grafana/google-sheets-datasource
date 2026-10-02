@@ -43,3 +43,4 @@ jobs:
       scopes: grafana_cloud
       github-draft-release: false
       release-reference-regex: (main)|(v\d+\.\d+\.\d+)
+      playwright-docker-compose-file: docker-compose.vcr.yaml
