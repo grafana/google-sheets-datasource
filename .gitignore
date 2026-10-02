@@ -24,6 +24,7 @@ mage_output_file.go
 /provisioning/dashboards/*
 !/provisioning/dashboards/dashboards.yaml
 !/provisioning/dashboards/temp.json
+!/provisioning/dashboards/e2e-data.json
 
 .pnp.*
 .yarn/*
