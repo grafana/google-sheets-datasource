@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.7.1
+
+🐛 Security: update frontend dependencies to resolve brace-expansion (CVE-2026-102276, CVE-2026-102278) and basic-ftp (CVE-2026-102990)
+
 ## 2.7.0
 
 ### Minor Changes
