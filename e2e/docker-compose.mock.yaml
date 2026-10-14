@@ -1,0 +1,68 @@
+services:
+  # spike-only: builds from a sibling checkout of plugin-tools. Once @grafana/plugin-e2e-proxy
+  # ships an image, this becomes `image: ghcr.io/grafana/plugin-e2e-proxy:<tag>` with no build.
+  mock-proxy:
+    image: plugin-e2e-proxy:local
+    build:
+      context: ../../plugin-tools/packages/plugin-e2e-proxy
+    command:
+      - serve
+      - --mode
+      - ${E2E_PROXY_MODE:-replay}
+      - --har
+      - /recordings/googleapis.har
+      - --ca-dir
+      - /recordings/.ca
+      - --config
+      - /recordings/proxy.json
+      - --provisioning
+      - /provisioning
+      - --port
+      - '8091'
+    environment:
+      # read through provisioning's secureJsonData, so the proxy knows which value to scrub
+      GS_JWT: ${GS_JWT:-}
+    volumes:
+      # relative to the project directory (docker-compose.yaml's location), not this file's own
+      # directory - Compose resolves every -f file's relative paths against the first file's dir
+      - ./e2e/recordings:/recordings
+      - ./provisioning:/provisioning:ro
+    healthcheck:
+      test: ['CMD', 'wget', '-qO', '/dev/null', 'http://localhost:8091/ca.pem']
+      interval: 1s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+
+  # JWT auth signs its token request locally, so replay needs a key that can sign but has no access.
+  # Writes replay-key.pem into /recordings/.ca/, which mock-proxy serves at http://mock-proxy:8091/replay-key.pem
+  replay-key:
+    image: plugin-e2e-proxy:local
+    build:
+      context: ../../plugin-tools/packages/plugin-e2e-proxy
+    command: [keygen, --out, /recordings/.ca/replay-key.pem]
+    volumes:
+      - ./e2e/recordings:/recordings
+
+  grafana:
+    depends_on:
+      mock-proxy:
+        condition: service_healthy
+      replay-key:
+        condition: service_completed_successfully
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        mkdir -p /etc/ssl/certs/proxy
+        curl -sf http://mock-proxy:8091/ca.pem -o /etc/ssl/certs/proxy/ca.pem
+        curl -sf http://mock-proxy:8091/replay-key.pem -o /etc/ssl/certs/proxy/replay-key.pem
+        exec /run.sh
+    environment:
+      HTTPS_PROXY: http://mock-proxy:8091
+      HTTP_PROXY: http://mock-proxy:8091
+      NO_PROXY: localhost,127.0.0.1
+      # adds the proxy CA next to the system bundle; SSL_CERT_FILE would replace the bundle
+      SSL_CERT_DIR: /etc/ssl/certs/proxy
+      # replay signs with the generated key; recording leaves this empty and uses the real GS_JWT
+      GS_PRIVATE_KEY_PATH: ${E2E_REPLAY_KEY_PATH-/etc/ssl/certs/proxy/replay-key.pem}
