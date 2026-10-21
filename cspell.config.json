@@ -10,6 +10,8 @@
     "package-lock.json"
   ],
   "words": [
+    "golangci",
+    "GOPATH",
     "araddon",
     "dataproxy",
     "datasource",
