@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.7.3
+
+### Patch Changes
+
+🐛 Bump backend dependency
+
 ## 2.7.2
 
 ⚙️ Pin golangci-lint to 2.15.0 in development dependencies and CI/CD pipelines
