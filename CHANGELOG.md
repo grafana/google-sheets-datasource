@@ -1,5 +1,11 @@
 # Change Log
 
+## 2.7.4
+
+### Patch Changes
+
+🐛 Security: update frontend dependencies to resolve dompurify (GHSA-cg2g-xh64-v4q7, GHSA-mrv2-3pqr-j5jr), source-map-js (CVE-2026-93749) and zod (CVE-2023-54404)
+
 ## 2.7.3
 
 ### Patch Changes
