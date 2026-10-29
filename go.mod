@@ -12,7 +12,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/oauth2 v0.37.0
 	google.golang.org/api v0.306.0
-	google.golang.org/grpc v1.84.0
+	google.golang.org/grpc v1.85.0
 	k8s.io/kube-openapi v0.0.0-20261014044854-ca3452a79603
 )
 
