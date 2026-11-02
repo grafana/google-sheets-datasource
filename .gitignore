@@ -20,6 +20,10 @@ mage_output_file.go
 !/provisioning/datasources/
 /provisioning/datasources/*
 !/provisioning/datasources/datasources.yml
+!/provisioning/dashboards/
+/provisioning/dashboards/*
+!/provisioning/dashboards/dashboards.yaml
+!/provisioning/dashboards/temp.json
 
 .pnp.*
 .yarn/*

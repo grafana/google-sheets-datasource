@@ -1,0 +1,63 @@
+# Runs Grafana behind plugin-vcr, which records or replays the plugin's third-party API calls.
+# Set VCR_MODE=record to record. The default replays with no network and no credentials.
+# Docs: https://github.com/grafana/plugin-tools/tree/main/packages/plugin-vcr
+services:
+  vcr:
+    image: node:24-alpine
+    entrypoint: [/bin/sh, -euc]
+    command:
+      - |
+        # the plugin signs its service account JWT locally, before any HTTP call, so replay needs a
+        # key that can sign but has no access. generated here so no key file is ever committed, and
+        # kept once it exists. served to Grafana over HTTP from the CA dir.
+        npx -y "$$VCR_PKG" keygen --out /recordings/.ca/replay-key.pem
+        exec npx -y "$$VCR_PKG" serve \
+          --mode ${VCR_MODE:-replay} \
+          --har /recordings/api.har \
+          --ca-dir /recordings/.ca \
+          --config /recordings/vcr.json \
+          --provisioning /provisioning \
+          --port 8091
+    environment:
+      VCR_PKG: 'https://pkg.pr.new/grafana/plugin-tools/@grafana/plugin-vcr@f191a32'
+      GS_JWT: '${GS_JWT:-}'
+    volumes:
+      - ./e2e/recordings:/recordings
+      - ./provisioning:/provisioning:ro
+      - vcr-npm-cache:/root/.npm
+    healthcheck:
+      test: ['CMD', 'wget', '-qO', '/dev/null', 'http://localhost:8091/ca.pem']
+      interval: 1s
+      timeout: 3s
+      retries: 30
+      # the first start downloads plugin-vcr
+      start_period: 120s
+
+  grafana:
+    extends:
+      file: docker-compose.yaml
+      service: grafana
+    depends_on:
+      vcr:
+        condition: service_healthy
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        # go reads every file in /etc/ssl/certs; older Grafana doesn't forward SSL_CERT_DIR to plugins
+        curl -sf http://vcr:8091/ca.pem -o /etc/ssl/certs/plugin-vcr-ca.pem
+        curl -sf http://vcr:8091/replay-key.pem -o /tmp/vcr-replay-key.pem
+        if [ -x /entrypoint.sh ]; then exec /entrypoint.sh; fi
+        exec /run.sh
+    environment:
+      HTTPS_PROXY: http://vcr:8091
+      HTTP_PROXY: http://vcr:8091
+      NO_PROXY: localhost,127.0.0.1
+      # empty on replay, so the datasource falls back to the throwaway key below. export the real
+      # service account JSON to record. a non-empty invalid value fails before any HTTP call, because
+      # googleclient.go takes the JWT branch whenever this is set at all.
+      GS_JWT: '${GS_JWT:-}'
+      GS_PRIVATE_KEY_PATH: /tmp/vcr-replay-key.pem
+
+volumes:
+  vcr-npm-cache:

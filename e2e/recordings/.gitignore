@@ -1,0 +1,6 @@
+# the CA's private key never leaves this machine
+.ca/
+# recordings the pre-write scan refused, kept only for inspection
+*.quarantine.json
+# a write interrupted by a kill
+*.tmp
