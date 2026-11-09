@@ -10,6 +10,8 @@
     "package-lock.json"
   ],
   "words": [
+    "golangci",
+    "GOPATH",
     "araddon",
     "dataproxy",
     "datasource",
@@ -17,7 +19,9 @@
     "datasourcetest",
     "dateparse",
     "davecgh",
+    "dompurify",
     "errorsource",
+    "GHSA",
     "googleapi",
     "googlesheets",
     "hqeqe",
@@ -42,7 +46,11 @@
     "tokenprovider",
     "typecheck",
     "uplot",
-    "xcsj"
+    "xcsj",
+    "dsconfig",
+    "pluginschema",
+    "struct",
+    "Struct"
   ],
   "language": "en-US"
 }
