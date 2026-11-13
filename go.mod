@@ -11,7 +11,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.12.1
 	golang.org/x/oauth2 v0.38.0
-	google.golang.org/api v0.311.0
+	google.golang.org/api v0.312.0
 	google.golang.org/grpc v1.85.0
 	k8s.io/kube-openapi v0.0.0-20261104182252-5bee61fc5225
 )
@@ -49,7 +49,7 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/s2a-go v0.1.11 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.24 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.25 // indirect
 	github.com/googleapis/gax-go/v2 v2.27.0 // indirect
 	github.com/grafana/dsconfig/dsconfig v0.0.13 // indirect
 	github.com/grafana/otel-profiling-go v0.7.0 // indirect
